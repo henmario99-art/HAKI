@@ -50,14 +50,14 @@ window.HAKI_PRODUCTOS = [
   },
   {
     "id": 3,
-    "codigo": "HAKI-003",
-    "nombre": "Short Performance",
-    "precio": 22,
-    "categoria": "Shorts",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/shorts.jpg",
-    "imagenRespaldo": "images/shorts.svg",
+    "codigo": "GSCV1-03",
+    "nombre": "ONYX V1 ROJA",
+    "precio": 26,
+    "categoria": "CAMISETAS, COMPRESIÓN",
+    "imagen": "images/images-1-.jpeg",
+    "imagenRespaldo": "images/producto.svg",
     "tallas": {
-      "S": false,
+      "S": true,
       "M": true,
       "L": true,
       "XL": true
