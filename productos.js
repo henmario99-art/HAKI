@@ -28,8 +28,8 @@ window.HAKI_PRODUCTOS = [
     "imagenRespaldo": "images/tee-black.svg",
     "tallas": {
       "S": true,
-      "M": false,
-      "L": false,
+      "M": true,
+      "L": true,
       "XL": true
     }
   },
