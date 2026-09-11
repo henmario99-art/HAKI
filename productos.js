@@ -38,7 +38,7 @@ window.HAKI_PRODUCTOS = [
     "codigo": "GSCV1-06",
     "nombre": "ONYX GRIS V1",
     "precio": 26,
-    "categoria": "COMPRESIÓN",
+    "categoria": "",
     "imagen": "images/ONYXV1GRIS.jpg",
     "imagenRespaldo": "images/tee-gray.svg",
     "tallas": {
@@ -53,7 +53,7 @@ window.HAKI_PRODUCTOS = [
     "codigo": "GSCV1-03",
     "nombre": "ONYX V1 ROJA",
     "precio": 26,
-    "categoria": "COMPRESIÓN",
+    "categoria": "",
     "imagen": "images/ONYXV1ROJA.webp",
     "imagenRespaldo": "images/producto.svg",
     "tallas": {
@@ -68,7 +68,7 @@ window.HAKI_PRODUCTOS = [
     "codigo": "BATC-01",
     "nombre": "BAT NEGRA",
     "precio": 25,
-    "categoria": "COMPRESIÓN",
+    "categoria": "",
     "imagen": "images/BATC-01.webp",
     "imagenRespaldo": "images/leggings.svg",
     "tallas": {
@@ -95,26 +95,26 @@ window.HAKI_PRODUCTOS = [
   },
   {
     "id": 6,
-    "codigo": "HAKI-006",
-    "nombre": "Camiseta Motion",
-    "precio": 24,
-    "categoria": "Camisetas",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-gray.jpg",
+    "codigo": "BATC-06",
+    "nombre": "BAT GRIS OSCURO",
+    "precio": 25,
+    "categoria": "",
+    "imagen": "images/BATC-06.jpg",
     "imagenRespaldo": "images/tee-gray.svg",
     "tallas": {
       "S": true,
       "M": true,
       "L": true,
-      "XL": true
+      "XL": false
     }
   },
   {
     "id": 7,
-    "codigo": "HAKI-007",
-    "nombre": "Short Training",
-    "precio": 23,
-    "categoria": "Shorts",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/shorts.jpg",
+    "codigo": "SUPC-01",
+    "nombre": "SUP NEGRA",
+    "precio": 25,
+    "categoria": "",
+    "imagen": "images/SUPC-01.jpeg",
     "imagenRespaldo": "images/shorts.svg",
     "tallas": {
       "S": true,
@@ -125,11 +125,11 @@ window.HAKI_PRODUCTOS = [
   },
   {
     "id": 8,
-    "codigo": "HAKI-008",
-    "nombre": "Legging Active",
-    "precio": 27,
-    "categoria": "Leggings",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/leggings.jpg",
+    "codigo": "SUPC-03",
+    "nombre": "SUP NEGRA-ROJO",
+    "precio": 26,
+    "categoria": "",
+    "imagen": "images/SUPC-03.jpg",
     "imagenRespaldo": "images/leggings.svg",
     "tallas": {
       "S": false,
