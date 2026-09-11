@@ -25,11 +25,11 @@ window.HAKI_PRODUCTOS = [
     "nombre": "WARRIOR NEGRO",
     "precio": 26.0,
     "categoria": "Compresión",
-    "imagen": "https://www.youngla.com/cdn/shop/files/4041_black_0011_01_15_johnny_ecomm.jpg?v=1737139592&width=1200",
+    "imagen": "images/YLAC-01.jpg",
     "imagenRespaldo": "images/tee-black.svg",
     "tallas": {
       "S": true,
-      "M": true,
+      "M": false,
       "L": true,
       "XL": true
     }
