@@ -95,16 +95,16 @@ window.HAKI_PRODUCTOS = [
     "imagen": "images/ONYXV1ROJA.webp",
     "imagenRespaldo": "images/producto.svg",
     "tallas": {
-      "S": true,
-      "M": true,
-      "L": true,
-      "XL": true
+      "S": false,
+      "M": false,
+      "L": false,
+      "XL": false
     },
     "colecciones": [
       "collection-1"
     ],
     "novedad": true,
-    "imagen2": "images/images-1-.jpeg",
+    "imagen2": "",
     "guiaTallas": "images/465sizechart.webp"
   },
   {
