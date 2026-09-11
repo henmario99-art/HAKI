@@ -64,9 +64,13 @@
       .map(id => collections.find(c => c.id === id)?.nombre || '')
       .join(' ');
     const haystack = normalize(`${p.nombre || ''} ${p.categoria || ''} ${collectionNames}`);
-    if (/accesorio|cinturon|belt|muñequera|strap|gorra|bolso|calcetin/.test(haystack)) return 'accessories';
+
+    // El orden importa: algunas colecciones pueden tener nombres amplios, pero la
+    // categoría/nombre del producto debe permitir reconocer primero shorts y pants.
+    if (/short|shorts|calzoneta|bermuda|pantalon corto/.test(haystack)) return 'shorts';
     if (/pants|pant|jogger|pantalon/.test(haystack)) return 'pants';
-    if (/camiseta|centro|camisa|compresion|oversized|top|tee|shirt/.test(haystack)) return 'tops';
+    if (/camiseta|centro|camisa|compresion|oversized|hoodie|sudadera|top|tee|shirt/.test(haystack)) return 'tops';
+    if (/accesorio|cinturon|belt|muñequera|munequera|strap|gorra|bolso|calcetin/.test(haystack)) return 'accessories';
     return 'other';
   }
 
@@ -75,27 +79,37 @@
     const allOthers = products().filter(p => p.codigo !== source.codigo);
     let pool = [];
 
-    if (type === 'tops') pool = allOthers.filter(p => productType(p) === 'pants');
-    else if (type === 'pants') pool = allOthers.filter(p => productType(p) === 'tops');
-    else if (type === 'accessories') pool = allOthers.filter(p => productType(p) !== 'accessories');
-    else pool = allOthers.filter(p => productType(p) === 'pants');
+    // Lógica HAKI:
+    // camisa/camiseta -> pants o shorts
+    // pants/shorts -> camisas/camisetas
+    if (type === 'tops') {
+      pool = allOthers.filter(p => ['pants','shorts'].includes(productType(p)));
+    } else if (type === 'pants' || type === 'shorts') {
+      pool = allOthers.filter(p => productType(p) === 'tops');
+    } else if (type === 'accessories') {
+      pool = allOthers.filter(p => productType(p) !== 'accessories');
+    } else {
+      pool = allOthers.filter(p => ['tops','pants','shorts'].includes(productType(p)));
+    }
 
     if (!pool.length) pool = allOthers;
 
     const available = pool.filter(p => !soldOut(p));
     const unavailable = pool.filter(p => soldOut(p));
-    return [...available, ...unavailable].slice(0, 4);
+    return [...available, ...unavailable].slice(0, 8);
   }
 
   function addComplements(p, detail) {
-    const options = $('.detail-options', detail);
-    if (!options) return;
-    const old = $('.haki-complements', options);
+    const layout = $('.detail-layout', detail);
+    if (!layout) return;
+
+    const old = $('.haki-complements', detail);
     if (old?.dataset.productCode === p.codigo) return;
     if (old) old.remove();
 
     const picks = complementaryProducts(p);
     if (!picks.length) return;
+
     const section = document.createElement('section');
     section.className = 'haki-complements';
     section.dataset.productCode = p.codigo;
@@ -104,14 +118,16 @@
       <div class="haki-complements-head">
         <div><h2 id="combineTitle">COMBÍNALOS</h2><p>Completa tu outfit con estas prendas.</p></div>
       </div>
-      <div class="haki-complement-grid">
+      <div class="haki-complement-grid" tabindex="0" aria-label="Sugerencias complementarias, desplázate horizontalmente">
         ${picks.map(item => `
           <a class="haki-complement-card" href="#producto/${encodeURIComponent(item.codigo)}">
             <div class="haki-complement-image"><img src="${item.imagen || item.imagenRespaldo || 'images/producto.svg'}" alt="${String(item.nombre || '').replace(/"/g,'&quot;')}" loading="lazy"></div>
             <div class="haki-complement-info"><div><span class="haki-complement-code">${item.codigo}</span><span class="haki-complement-name">${item.nombre}</span></div><span class="haki-complement-price">${money(item.precio)}</span></div>
           </a>`).join('')}
       </div>`;
-    options.appendChild(section);
+
+    // Debe quedar debajo de toda la prenda, no dentro de la columna derecha.
+    layout.insertAdjacentElement('afterend', section);
   }
 
   function enhanceDetail() {
