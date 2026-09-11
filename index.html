@@ -84,28 +84,45 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
-    // El catálogo se carga directamente desde GitHub.
-    // Así los cambios de productos no necesitan un deploy de Netlify.
-    const version = Date.now();
-    const productosScript = document.createElement('script');
-    productosScript.src = `https://raw.githubusercontent.com/henmario99-art/HAKI/main/productos.js?v=${version}`;
-    productosScript.onload = () => {
-      const appScript = document.createElement('script');
-      appScript.src = `app.js?v=3`;
-      document.body.appendChild(appScript);
-    };
-    productosScript.onerror = () => {
-      // Respaldo por si GitHub Raw falla temporalmente.
-      const fallback = document.createElement('script');
-      fallback.src = `productos.js?v=${version}`;
-      fallback.onload = () => {
-        const appScript = document.createElement('script');
-        appScript.src = `app.js?v=3`;
-        document.body.appendChild(appScript);
-      };
-      document.body.appendChild(fallback);
-    };
-    document.body.appendChild(productosScript);
+    (() => {
+      const RAW_CATALOG = 'https://raw.githubusercontent.com/henmario99-art/HAKI/main/productos.js';
+
+      function loadScript(src) {
+        return new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = src;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.body.appendChild(script);
+        });
+      }
+
+      function parseCatalog(source) {
+        const configMatch = source.match(/window\.HAKI_CONFIG\s*=\s*(\{[\s\S]*?\});/);
+        const productsMatch = source.match(/window\.HAKI_PRODUCTOS\s*=\s*(\[[\s\S]*\]);\s*$/);
+        if (!configMatch || !productsMatch) throw new Error('Formato de catálogo no reconocido');
+        window.HAKI_CONFIG = JSON.parse(configMatch[1]);
+        window.HAKI_PRODUCTOS = JSON.parse(productsMatch[1]);
+      }
+
+      async function start() {
+        try {
+          const response = await fetch(`${RAW_CATALOG}?v=${Date.now()}`, {
+            cache: 'no-store',
+            headers: { 'Accept': 'text/plain' }
+          });
+          if (!response.ok) throw new Error(`GitHub respondió ${response.status}`);
+          parseCatalog(await response.text());
+        } catch (error) {
+          console.warn('No se pudo cargar el catálogo en vivo; usando copia local.', error);
+          await loadScript(`productos.js?v=${Date.now()}`);
+        }
+
+        await loadScript('app.js?v=4');
+      }
+
+      start();
+    })();
   </script>
 </body>
 </html>
