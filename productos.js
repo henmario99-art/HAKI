@@ -23,7 +23,7 @@ window.HAKI_PRODUCTOS = [
     "id": 1,
     "codigo": "YLAC-01",
     "nombre": "WARRIOR NEGRO",
-    "precio": 25.0,
+    "precio": 26.0,
     "categoria": "Compresión",
     "imagen": "https://www.youngla.com/cdn/shop/files/4041_black_0011_01_15_johnny_ecomm.jpg?v=1737139592&width=1200",
     "imagenRespaldo": "images/tee-black.svg",
