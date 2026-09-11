@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>HAKI Admin</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <main class="shell">
+    <section id="loginView" class="login-card">
+      <div class="brand">HAKI<span>®</span></div>
+      <h1>Panel de administración</h1>
+      <p>Edita productos y publica los cambios sin tocar código.</p>
+      <form id="loginForm">
+        <label>Contraseña
+          <input id="password" type="password" autocomplete="current-password" required>
+        </label>
+        <button class="primary" type="submit">Entrar</button>
+      </form>
+      <p id="loginStatus" class="status"></p>
+    </section>
+
+    <section id="adminView" hidden>
+      <header class="topbar">
+        <div>
+          <div class="brand">HAKI<span>®</span></div>
+          <p>Administrador del catálogo</p>
+        </div>
+        <div class="top-actions">
+          <a class="ghost" href="/" target="_blank">Ver catálogo</a>
+          <button id="logoutBtn" class="ghost" type="button">Salir</button>
+        </div>
+      </header>
+
+      <section class="toolbar">
+        <input id="search" type="search" placeholder="Buscar por nombre o código">
+        <button id="addBtn" class="ghost" type="button">+ Agregar producto</button>
+        <button id="saveBtn" class="primary" type="button">Guardar y publicar</button>
+      </section>
+
+      <section class="config-card">
+        <h2>Configuración general</h2>
+        <div class="grid config-grid">
+          <label>Marca<input data-config="marca"></label>
+          <label>Instagram<input data-config="instagram"></label>
+          <label>WhatsApp<input data-config="whatsapp"></label>
+          <label>Moneda<input data-config="moneda"></label>
+          <label class="wide">Portada<input data-config="portada"></label>
+          <label class="wide">Anuncio<input data-config="anuncio"></label>
+          <label>País<input data-config="pais"></label>
+          <label>Frase<input data-config="frase"></label>
+          <label class="wide">Subfrase<input data-config="subfrase"></label>
+        </div>
+      </section>
+
+      <section>
+        <div class="section-title">
+          <h2>Productos</h2>
+          <span id="count"></span>
+        </div>
+        <div id="products" class="products"></div>
+      </section>
+
+      <p id="globalStatus" class="status floating"></p>
+    </section>
+  </main>
+  <template id="productTemplate">
+    <article class="product-card">
+      <div class="product-head">
+        <div>
+          <span class="product-index"></span>
+          <strong class="product-title"></strong>
+        </div>
+        <button class="danger remove-btn" type="button">Eliminar</button>
+      </div>
+      <div class="grid">
+        <label>Código<input data-field="codigo"></label>
+        <label>Nombre<input data-field="nombre"></label>
+        <label>Precio<input data-field="precio" type="number" min="0" step="0.01"></label>
+        <label>Categoría<input data-field="categoria"></label>
+        <label class="wide">Imagen<input data-field="imagen"></label>
+        <label class="wide">Imagen de respaldo<input data-field="imagenRespaldo"></label>
+      </div>
+      <div class="media-row">
+        <img class="preview" alt="Vista previa">
+        <label class="upload-label">Subir/reemplazar imagen
+          <input class="image-file" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+        </label>
+      </div>
+      <div class="sizes">
+        <label><input type="checkbox" data-size="S"> S</label>
+        <label><input type="checkbox" data-size="M"> M</label>
+        <label><input type="checkbox" data-size="L"> L</label>
+        <label><input type="checkbox" data-size="XL"> XL</label>
+      </div>
+    </article>
+  </template>
+  <script src="admin.js"></script>
+</body>
+</html>
