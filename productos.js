@@ -42,7 +42,9 @@ window.HAKI_CONFIG = {
     }
   ],
   "tituloColecciones": "¿BUSCAS?",
-  "tipoPortada": "imagen"
+  "tipoPortada": "imagen",
+  "tiktok": "https://www.tiktok.com/@haki_sv?_r=1&_t=ZS-99eKwTohZ3d",
+  "facebook": "https://www.facebook.com/share/1C2Wz9s9Gy/?mibextid=wwXIfr"
 };
 
 window.HAKI_PRODUCTOS = [
@@ -101,7 +103,9 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-1"
     ],
-    "novedad": true
+    "novedad": true,
+    "imagen2": "images/images-1-.jpeg",
+    "guiaTallas": "images/465sizechart.webp"
   },
   {
     "id": 4,
@@ -120,7 +124,9 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-1"
     ],
-    "novedad": true
+    "novedad": true,
+    "imagen2": "images/D_NQ_NP_940975-MLM108975243322_032026-O.webp",
+    "guiaTallas": "images/465sizechart.webp"
   },
   {
     "id": 5,
