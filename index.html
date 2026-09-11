@@ -7,7 +7,7 @@
   <meta name="description" content="Encuentra tu próxima prenda. Explora el catálogo deportivo de HAKI y solicita tu cotización.">
   <title>HAKI — Ropa deportiva</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
- <link rel="stylesheet" href="styles.css?v=2">
+  <link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
   <div class="announcement"><span id="announcementText">HECHO PARA TU SIGUIENTE NIVEL</span><span id="countryText">HAKI · EL SALVADOR</span></div>
@@ -82,19 +82,30 @@
   </aside>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script>
-  const version = Date.now();
 
-  const productosScript = document.createElement("script");
-  productosScript.src = `productos.js?v=${version}`;
-
-  productosScript.onload = function () {
-    const appScript = document.createElement("script");
-    appScript.src = `app.js?v=${version}`;
-    document.body.appendChild(appScript);
-  };
-
-  document.body.appendChild(productosScript);
-</script>
+  <script>
+    // El catálogo se carga directamente desde GitHub.
+    // Así los cambios de productos no necesitan un deploy de Netlify.
+    const version = Date.now();
+    const productosScript = document.createElement('script');
+    productosScript.src = `https://raw.githubusercontent.com/henmario99-art/HAKI/main/productos.js?v=${version}`;
+    productosScript.onload = () => {
+      const appScript = document.createElement('script');
+      appScript.src = `app.js?v=3`;
+      document.body.appendChild(appScript);
+    };
+    productosScript.onerror = () => {
+      // Respaldo por si GitHub Raw falla temporalmente.
+      const fallback = document.createElement('script');
+      fallback.src = `productos.js?v=${version}`;
+      fallback.onload = () => {
+        const appScript = document.createElement('script');
+        appScript.src = `app.js?v=3`;
+        document.body.appendChild(appScript);
+      };
+      document.body.appendChild(fallback);
+    };
+    document.body.appendChild(productosScript);
+  </script>
 </body>
 </html>
