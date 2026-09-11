@@ -47,7 +47,9 @@
           <label>Instagram<input data-config="instagram"></label>
           <label>WhatsApp<input data-config="whatsapp"></label>
           <label>Moneda<input data-config="moneda"></label>
-          <label class="wide">Portada<input data-config="portada"></label>
+          <label>Tipo de portada<select data-config="tipoPortada"><option value="imagen">Foto</option><option value="video">Video</option></select></label>
+          <label class="wide">Foto de portada / respaldo del video<input data-config="portada"></label>
+          <label class="wide">Enlace del video de portada (MP4 o WebM)<input data-config="videoPortada" type="url"></label>
           <label class="wide">Anuncio<input data-config="anuncio"></label>
           <label>País<input data-config="pais"></label>
           <label>Frase<input data-config="frase"></label>
@@ -55,6 +57,12 @@
         </div>
       </section>
 
+      <section class="config-card">
+        <h2>Las cuatro categorías de inicio</h2>
+        <label>Título de la sección<input data-config="tituloColecciones" placeholder="EXPLORA POR CATEGORÍA"></label>
+        <p>Edita cada nombre e imagen. Selecciona las prendas en las casillas de cada producto.</p>
+        <div id="collectionSettings" class="collection-settings"></div>
+      </section>
       <section>
         <div class="section-title">
           <h2>Productos</h2>
@@ -89,6 +97,10 @@
           <input class="image-file" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
         </label>
       </div>
+      <div class="product-placement">
+        <label class="check-label"><input class="new-arrival-check" type="checkbox"> Mostrar en NOVEDADES</label>
+        <fieldset><legend>Mostrar en categorías de inicio</legend><div class="collection-choices"></div></fieldset>
+      </div>
       <div class="sizes">
         <label><input type="checkbox" data-size="S"> S</label>
         <label><input type="checkbox" data-size="M"> M</label>
@@ -97,6 +109,7 @@
       </div>
     </article>
   </template>
-  <script src="admin.js"></script>
+  <script src="../storefront-config.js?v=1"></script>
+  <script src="admin.js?v=2"></script>
 </body>
 </html>

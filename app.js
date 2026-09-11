@@ -1,6 +1,7 @@
 (() => {
   const CONFIG = window.HAKI_CONFIG || {};
   const ALL_PRODUCTS = window.HAKI_PRODUCTOS || [];
+  const COLLECTIONS = window.hakiCollections(CONFIG);
 
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -27,6 +28,7 @@
   const state = {
     query: '',
     category: 'Todos',
+    collection: null,
     selected: {},
     cart: loadCart()
   };
@@ -134,6 +136,27 @@
     $('#instagramFooter').href = ig;
 
     $('#year').textContent = new Date().getFullYear();
+    $('#collectionsTitle').textContent = CONFIG.tituloColecciones || 'EXPLORA POR CATEGORÍA';
+    const video = $('#heroVideo');
+    const isVideo = CONFIG.tipoPortada === 'video' && CONFIG.videoPortada;
+    if (isVideo) {
+      video.src = freshImage(CONFIG.videoPortada);
+      video.muted = true;
+      video.hidden = false;
+      $('#toggleHeroVideo').hidden = false;
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduceMotion) { video.autoplay = false; video.pause(); }
+      else video.play().catch(() => {});
+      const syncVideoButton = () => {
+        $('#toggleHeroVideo').textContent = video.paused ? '▶' : 'Ⅱ';
+        $('#toggleHeroVideo').setAttribute('aria-label', video.paused ? 'Reproducir video de portada' : 'Pausar video de portada');
+      };
+      video.addEventListener('play', syncVideoButton);
+      video.addEventListener('pause', syncVideoButton);
+      video.addEventListener('error', () => { video.hidden = true; $('#toggleHeroVideo').hidden = true; });
+      $('#toggleHeroVideo').addEventListener('click', () => { if (video.paused) video.play().catch(() => {}); else video.pause(); });
+      syncVideoButton();
+    }
   }
 
   function categories() {
@@ -165,6 +188,8 @@
     $$('.filter-btn', els.filters).forEach(btn =>
       btn.addEventListener('click', () => {
         state.category = btn.dataset.category;
+        state.collection = null;
+        $('#catalogTitle').textContent = state.category === 'Todos' ? 'TODAS LAS PRENDAS' : state.category;
 
         renderFilters();
         renderProducts();
@@ -178,7 +203,8 @@
     return ALL_PRODUCTS.filter(
       p =>
         (state.category === 'Todos' ||
-          p.categoria === state.category) &&
+          normalize(p.categoria || '') === normalize(state.category)) &&
+        (!state.collection || inCollection(p, state.collection)) &&
         (!q ||
           normalize(
             `${p.codigo} ${p.nombre} ${p.categoria}`
@@ -186,10 +212,15 @@
     );
   }
 
+  function inCollection(p, collection) {
+    if (Array.isArray(p.colecciones)) return p.colecciones.includes(collection.id);
+    return normalize(p.categoria || '') === normalize(collection.categoria || collection.nombre);
+  }
+
   function renderProducts() {
     const list = visibleProducts();
 
-    els.count.textContent = `${ALL_PRODUCTS.length} productos`;
+    els.count.textContent = `${list.length} productos`;
 
     els.notice.textContent =
       list.length === ALL_PRODUCTS.length
@@ -198,7 +229,12 @@
             list.length === 1 ? '' : 's'
           } encontrado${list.length === 1 ? '' : 's'}.`;
 
-    els.products.innerHTML = list
+    renderProductList(els.products, list);
+    if (!list.length) els.notice.textContent = 'No hay prendas disponibles en esta selección.';
+  }
+
+  function renderProductList(container, list) {
+    container.innerHTML = list
       .map(p => {
         const selected = state.selected[p.codigo] || '';
 
@@ -243,7 +279,7 @@
               >
 
               <span class="product-number">
-                ${String(p.id).padStart(2, '0')}
+                ${p.novedad === true ? 'NUEVO' : esc(String(p.id).padStart(2, '0'))}
               </span>
 
             </div>
@@ -292,7 +328,7 @@
       })
       .join('');
 
-    $$('img[data-fallback]', els.products).forEach(img =>
+    $$('img[data-fallback]', container).forEach(img =>
       img.addEventListener(
         'error',
         () => {
@@ -306,17 +342,25 @@
       )
     );
 
-    $$('.size-option:not(:disabled)', els.products).forEach(
+    $$('.size-option:not(:disabled)', container).forEach(
       btn =>
         btn.addEventListener('click', () => {
           state.selected[btn.dataset.code] =
             btn.dataset.size;
 
-          renderProducts();
+          // Update matching cards without replacing nodes or losing carousel/focus position.
+          $$('article[data-code]').filter(card => card.dataset.code === btn.dataset.code).forEach(card => {
+            $$('.size-option', card).forEach(option => {
+              const active = option.dataset.size === btn.dataset.size;
+              option.classList.toggle('selected', active);
+              option.setAttribute('aria-pressed', String(active));
+            });
+            $('[data-add]', card).disabled = false;
+          });
         })
     );
 
-    $$('[data-add]', els.products).forEach(btn =>
+    $$('[data-add]', container).forEach(btn =>
       btn.addEventListener('click', () =>
         addToCart(btn.dataset.add)
       )
@@ -533,6 +577,10 @@
   }
 
   function openCart() {
+    closeMenu();
+    closeSearch();
+    els.drawer.inert = false;
+    els.closeCart.focus();
     els.overlay.hidden = false;
 
     requestAnimationFrame(() =>
@@ -550,6 +598,9 @@
   }
 
   function closeCart() {
+    if (els.drawer.getAttribute('aria-hidden') === 'true') return;
+    els.drawer.inert = true;
+    els.openCart.focus();
     els.drawer.classList.remove('open');
 
     els.drawer.setAttribute(
@@ -561,9 +612,7 @@
       'cart-open'
     );
 
-    setTimeout(() => {
-      els.overlay.hidden = true;
-    }, 300);
+    els.overlay.hidden = true;
   }
 
   function quoteText() {
@@ -675,8 +724,11 @@ Total estimado: ${money(cartTotal())}`;
     'input',
     e => {
       state.query = e.target.value;
-
-      renderProducts();
+      state.category = 'Todos'; state.collection = null;
+      setHomeVisible(!state.query);
+      if (state.query) window.scrollTo({ top: 0, behavior: 'instant' });
+      $('#catalogTitle').textContent = state.query ? 'RESULTADOS' : 'TODAS LAS PRENDAS';
+      renderFilters(); renderProducts();
     }
   );
 
@@ -700,6 +752,8 @@ Total estimado: ${money(cartTotal())}`;
     e => {
       if (e.key === 'Escape') {
         closeCart();
+        closeMenu();
+        closeSearch();
       }
     }
   );
@@ -714,8 +768,77 @@ Total estimado: ${money(cartTotal())}`;
     submitInstagram
   );
 
+  function setHomeVisible(show) {
+    ['homeHero', 'novedades', 'collectionsSection'].forEach(id => { document.getElementById(id).hidden = !show; });
+    document.body.classList.toggle('collection-view', !show);
+  }
+
+  function renderCollections() {
+    $('#collectionsGrid').innerHTML = COLLECTIONS.map(c => {
+      const first = ALL_PRODUCTS.find(p => inCollection(p, c));
+      const picture = c.imagen || first?.imagen || 'images/producto.svg';
+      return `<a class="collection-tile" href="#coleccion/${encodeURIComponent(c.id)}"><div class="collection-image"><img src="${esc(freshImage(picture))}" alt="${esc(c.nombre)}" loading="lazy"></div><h3>${esc(c.nombre)}</h3></a>`;
+    }).join('');
+    $$('#collectionsGrid img').forEach(img => img.addEventListener('error', () => { img.src = freshImage('images/producto.svg'); }, { once: true }));
+    const fresh = ALL_PRODUCTS.filter(p => p.novedad === true);
+    renderProductList($('#newProducts'), fresh);
+    $('#newEmpty').hidden = fresh.length > 0;
+    $('.rail-actions').hidden = !fresh.length;
+  }
+
+  function route() {
+    let hash;
+    try { hash = decodeURIComponent(location.hash.slice(1)); } catch { hash = ''; }
+    state.query = ''; els.search.value = '';
+    state.category = 'Todos'; state.collection = null;
+    if (hash.startsWith('categoria/')) state.category = hash.slice(10);
+    if (hash.startsWith('coleccion/')) state.collection = COLLECTIONS.find(c => c.id === hash.slice(10)) || null;
+    const filtered = state.category !== 'Todos' || !!state.collection;
+    setHomeVisible(!filtered);
+    $('#catalogTitle').textContent = state.collection?.nombre || (filtered ? state.category : 'TODAS LAS PRENDAS');
+    renderFilters(); renderProducts(); closeMenu(); closeSearch();
+    if (filtered) window.scrollTo({ top: 0, behavior: 'instant' });
+    else if (hash === 'top' || !hash) window.scrollTo({ top: 0, behavior: 'instant' });
+    else if (hash === 'catalogo') els.products.closest('section').scrollIntoView();
+  }
+
+  function closeMenu() {
+    $('#categoryMenu').close();
+    $('#openMenu').setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('menu-open');
+  }
+  function closeSearch() {
+    $('#searchPanel').hidden = true;
+    $('#openSearch').setAttribute('aria-expanded', 'false');
+  }
+  $('#openMenu').addEventListener('click', () => {
+    closeCart(); closeSearch(); $('#categoryMenu').showModal();
+    $('#openMenu').setAttribute('aria-expanded', 'true'); document.body.classList.add('menu-open');
+  });
+  $('#closeMenu').addEventListener('click', closeMenu);
+  $('#categoryMenu').addEventListener('close', () => { $('#openMenu').setAttribute('aria-expanded', 'false'); document.body.classList.remove('menu-open'); });
+  $('#categoryMenu').addEventListener('click', e => { if (e.target === $('#categoryMenu')) closeMenu(); });
+  $$('#categoryMenu a').forEach(a => a.addEventListener('click', () => { if (a.hash === location.hash) route(); else closeMenu(); }));
+  $('#openSearch').addEventListener('click', () => {
+    const opening = $('#searchPanel').hidden;
+    closeMenu(); $('#searchPanel').hidden = !opening;
+    $('#openSearch').setAttribute('aria-expanded', String(opening));
+    if (opening) els.search.focus();
+  });
+  $('#closeSearch').addEventListener('click', () => { closeSearch(); $('#openSearch').focus(); });
+  $('.rail-prev').addEventListener('click', () => $('#newProducts').scrollBy({ left: -$('#newProducts').clientWidth * .8, behavior: 'smooth' }));
+  $('.rail-next').addEventListener('click', () => $('#newProducts').scrollBy({ left: $('#newProducts').clientWidth * .8, behavior: 'smooth' }));
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Tab' || els.drawer.getAttribute('aria-hidden') !== 'false') return;
+    const items = $$('button:not(:disabled), input, a[href]', els.drawer);
+    const first = items[0], last = items[items.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+  window.addEventListener('hashchange', route);
+
   applyConfig();
-  renderFilters();
-  renderProducts();
+  renderCollections();
+  route();
   renderCart();
 })();

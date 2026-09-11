@@ -74,6 +74,7 @@ async function loadCatalog() {
     state.config = data.config || {};
     state.products = data.products || [];
     fillConfig();
+    renderCollectionSettings();
     renderProducts();
     toast('Catálogo cargado', true);
   } catch (err) {
@@ -90,6 +91,44 @@ function fillConfig() {
   });
 }
 
+function normalized(value='') {
+  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+function renderCollectionSettings() {
+  state.config.colecciones = window.hakiCollections(state.config);
+  const wrap = $('#collectionSettings');
+  wrap.replaceChildren();
+  state.config.colecciones.forEach((collection, i) => {
+    const section = document.createElement('fieldset');
+    const legend = document.createElement('legend'); legend.textContent = `Categoría ${i + 1}`;
+    section.append(legend);
+    [['nombre', 'Nombre'], ['imagen', 'Enlace o ruta de imagen']].forEach(([key, text]) => {
+      const label = document.createElement('label'); label.textContent = text;
+      const input = document.createElement('input'); input.value = collection[key] || '';
+      input.addEventListener('input', () => {
+        collection[key] = input.value;
+        if (key === 'nombre') $$(`[data-collection-label="${collection.id}"]`).forEach(el => { el.textContent = input.value; });
+      });
+      label.append(input); section.append(label);
+    });
+    const uploadLabel = document.createElement('label'); uploadLabel.textContent = 'Subir / reemplazar imagen';
+    const upload = document.createElement('input'); upload.type = 'file'; upload.accept = 'image/jpeg,image/png,image/webp,image/gif';
+    upload.addEventListener('change', async () => {
+      const file = upload.files?.[0]; if (!file) return;
+      upload.disabled = true;
+      try {
+        const data = await api('upload', { method: 'POST', body: JSON.stringify({ name: file.name, mime: file.type, base64: await fileToBase64(file) }) });
+        collection.imagen = data.path;
+        section.querySelectorAll('input')[1].value = data.path;
+        toast('Imagen subida. Guarda el catálogo cuando termines.', true);
+      } catch (err) { toast(err.message); }
+      finally { upload.disabled = false; upload.value = ''; }
+    });
+    uploadLabel.append(upload); section.append(uploadLabel); wrap.append(section);
+  });
+}
+
 function nextId() {
   return state.products.reduce((m,p)=>Math.max(m, Number(p.id)||0), 0) + 1;
 }
@@ -102,6 +141,8 @@ function newProduct() {
     nombre: 'Nuevo producto',
     precio: 0,
     categoria: 'Camisetas',
+    novedad: false,
+    colecciones: [],
     imagen: 'images/producto.svg',
     imagenRespaldo: 'images/producto.svg',
     tallas: { S:true, M:true, L:true, XL:true }
@@ -138,6 +179,23 @@ function renderProducts() {
         p.tallas ||= {};
         p.tallas[size] = input.checked;
       });
+    });
+
+    const newCheck = $('.new-arrival-check', tpl);
+    newCheck.checked = p.novedad === true;
+    newCheck.addEventListener('change', () => { p.novedad = newCheck.checked; });
+    const choices = $('.collection-choices', tpl);
+    const collections = window.hakiCollections(state.config);
+    if (!Array.isArray(p.colecciones)) p.colecciones = collections.filter(c => normalized(p.categoria || '') === normalized(c.categoria || c.nombre)).map(c => c.id);
+    collections.forEach(c => {
+      const label = document.createElement('label'); label.className = 'check-label';
+      const checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.checked = p.colecciones.includes(c.id);
+      checkbox.addEventListener('change', () => {
+        p.colecciones = p.colecciones.filter(id => id !== c.id);
+        if (checkbox.checked) p.colecciones.push(c.id);
+      });
+      const text = document.createElement('span'); text.dataset.collectionLabel = c.id; text.textContent = c.nombre;
+      label.append(checkbox, text); choices.append(label);
     });
 
     const preview = $('.preview', tpl);
