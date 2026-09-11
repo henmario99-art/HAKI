@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#111111">
+  <meta name="description" content="Encuentra tu próxima prenda. Explora el catálogo deportivo de HAKI y solicita tu cotización.">
+  <title>HAKI — Ropa deportiva</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="announcement"><span id="announcementText">HECHO PARA TU SIGUIENTE NIVEL</span><span id="countryText">HAKI · EL SALVADOR</span></div>
+
+  <header class="header">
+    <a class="brand" href="#top" aria-label="HAKI inicio">HAKI<span>®</span></a>
+    <nav>
+      <a href="#catalogo">Colección</a>
+      <a id="instagramHeader" href="https://www.instagram.com/haki__sv/" target="_blank" rel="noreferrer">Instagram ↗</a>
+    </nav>
+    <button class="bag" id="openCart" type="button" aria-label="Abrir mi cotización">
+      <span class="bag-icon">⌑</span><span>Mi cotización</span><b id="cartCount">0</b>
+    </button>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">DISCIPLINA EN CADA MOVIMIENTO</p>
+        <h1 id="heroTitle">NO HAY<br>LÍMITES.</h1>
+        <p class="hero-description" id="heroDescription">Tu esfuerzo. Tu ritmo. Tu Haki.<br>Ropa deportiva para darlo todo.</p>
+        <a class="solid hero-button" href="#catalogo">EXPLORAR COLECCIÓN ↗</a>
+        <div class="hero-bottom"><span>FUERZA · MOVIMIENTO · ACTITUD</span><a href="#catalogo" aria-label="Bajar al catálogo">↓</a></div>
+      </div>
+      <div class="hero-photo">
+        <img id="heroImage" src="images/hero-fallback.svg" alt="HAKI ropa deportiva">
+        <span class="image-label">THE HAKI MINDSET.</span>
+        <span class="vertical-label">BEYOND YOUR LIMITS / HAKI</span>
+      </div>
+    </section>
+
+    <section id="catalogo" class="catalog">
+      <div class="catalog-heading">
+        <div><p class="eyebrow">ELIGE TU PRÓXIMO ESENCIAL</p><h2>Diseñados para moverte.</h2></div>
+        <span class="product-count" id="productCount">50 productos</span>
+      </div>
+      <div class="catalog-meta"><span>COLECCIÓN HAKI</span><span>Selecciona tu talla y añádela a tu cotización.</span></div>
+
+      <div class="catalog-tools">
+        <label class="search-wrap"><span>⌕</span><input id="searchInput" type="search" placeholder="Buscar por código o palabra clave…" autocomplete="off"></label>
+        <div class="filters" id="filters" aria-label="Filtros de categoría"></div>
+      </div>
+      <p class="notice" id="resultNotice" role="status"></p>
+      <div class="products" id="products"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <a class="footer-brand" href="#top">HAKI®</a>
+    <p>FUERZA · MOVIMIENTO · ACTITUD</p>
+    <div><a id="instagramFooter" href="https://www.instagram.com/haki__sv/" target="_blank" rel="noreferrer">Instagram ↗</a></div>
+    <small>© <span id="year"></span> HAKI · EL SALVADOR</small>
+  </footer>
+
+  <div class="overlay" id="overlay" hidden></div>
+  <aside class="cart-drawer" id="cartDrawer" aria-hidden="true" aria-label="Mi cotización">
+    <div class="drawer-head"><div><p class="eyebrow">TU SELECCIÓN</p><h2>Mi cotización</h2></div><button id="closeCart" class="icon-btn" type="button" aria-label="Cerrar">×</button></div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-empty" id="cartEmpty"><strong>Tu cotización está vacía.</strong><span>Elige una talla y añade prendas desde el catálogo.</span></div>
+    <div class="cart-summary"><span>Total estimado</span><strong id="cartTotal">$0.00</strong></div>
+    <form class="quote-form" id="quoteForm">
+      <p class="form-title">DATOS PARA COTIZAR</p>
+      <label>Nombre<input id="customerName" required placeholder="Tu nombre"></label>
+      <label>Departamento<input id="customerDepartment" required placeholder="Ej. Santa Ana"></label>
+      <label>Municipio<input id="customerMunicipality" required placeholder="Ej. Santa Ana"></label>
+      <div class="quote-actions">
+        <button class="solid whatsapp" type="submit">SOLICITAR POR WHATSAPP ↗</button>
+        <button class="outline" id="instagramQuote" type="button">SOLICITAR POR INSTAGRAM ↗</button>
+      </div>
+      <p class="form-help" id="formHelp">Instagram copiará tu cotización y abrirá el perfil de HAKI para que la pegues en el mensaje.</p>
+    </form>
+  </aside>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="productos.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
