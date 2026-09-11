@@ -248,29 +248,30 @@ window.HAKI_PRODUCTOS = [
   },
   {
     "id": 10,
-    "codigo": "HAKI-010",
-    "nombre": "Camiseta Everyday",
+    "codigo": "YLAC-06",
+    "nombre": "WARRIOR COMPRESIÓN GRIS",
     "precio": 25,
     "categoria": "Camisetas",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-gray.jpg",
+    "imagen": "images/YLAC-06.jpeg",
     "imagenRespaldo": "images/tee-gray.svg",
     "tallas": {
       "S": true,
-      "M": true,
+      "M": false,
       "L": true,
-      "XL": true
+      "XL": false
     },
     "colecciones": [
       "collection-1"
-    ]
+    ],
+    "imagen2": "images/G.jpeg"
   },
   {
     "id": 11,
-    "codigo": "HAKI-011",
-    "nombre": "Compresión Essential 02",
-    "precio": 26,
+    "codigo": "YLAC1-03",
+    "nombre": "SUPVILLIAN COMPRESIÓN",
+    "precio": 25,
     "categoria": "Compresión",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-black.jpg",
+    "imagen": "images/YLAGlobalSuperShoot-75.jpg",
     "imagenRespaldo": "images/tee-black.svg",
     "tallas": {
       "S": true,
@@ -278,15 +279,18 @@ window.HAKI_PRODUCTOS = [
       "L": true,
       "XL": true
     },
-    "colecciones": []
+    "colecciones": [
+      "collection-1"
+    ],
+    "novedad": true
   },
   {
     "id": 12,
-    "codigo": "HAKI-012",
-    "nombre": "Camiseta Training 02",
+    "codigo": "YLAC1-06",
+    "nombre": "SUPVILLIAN GRIS",
     "precio": 25,
     "categoria": "Camisetas",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-gray.jpg",
+    "imagen": "images/YLAGlobalSuperShoot-56.webp",
     "imagenRespaldo": "images/tee-gray.svg",
     "tallas": {
       "S": true,
@@ -296,7 +300,8 @@ window.HAKI_PRODUCTOS = [
     },
     "colecciones": [
       "collection-1"
-    ]
+    ],
+    "novedad": true
   },
   {
     "id": 13,
