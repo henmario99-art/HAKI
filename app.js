@@ -6,6 +6,7 @@
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 
   const IMAGE_VERSION = Date.now();
+  const RAW_BASE = 'https://raw.githubusercontent.com/henmario99-art/HAKI/main/';
 
   function freshImage(url = '') {
     if (!url) return '';
@@ -19,7 +20,8 @@
       return url;
     }
 
-    return `${url}${url.includes('?') ? '&' : '?'}v=${IMAGE_VERSION}`;
+    const clean = String(url).replace(/^\/?(?:\.\/)?/, '');
+    return `${RAW_BASE}${clean}?v=${IMAGE_VERSION}`;
   }
 
   const state = {
