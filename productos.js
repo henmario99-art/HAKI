@@ -6,15 +6,15 @@
 
 window.HAKI_CONFIG = {
   "marca": "HAKI",
-  "instagram": "haki__sv",
+  "instagram": "hakisv1",
   "whatsapp": "50360228002",
   "moneda": "$",
-  "portada": "https://haki-sport-catalog.henmario99.chatgpt.site/images/hero.jpg",
+  "portada": "https://chatgpt.com/backend-api/estuary/content?id=file_00000000a9bc81f58409308eea4852c8&ts=496974&p=fs&cid=1&sig=039c5790de2fcbde599bad8cbcf1e5a0772fe6790853b7f61ab2049d264bcee5&v=0",
   "portadaRespaldo": "images/hero-fallback.svg",
   "anuncio": "HECHO PARA TU SIGUIENTE NIVEL",
   "pais": "HAKI · EL SALVADOR",
-  "frase": "NO HAY LÍMITES.",
-  "subfrase": "Tu esfuerzo. Tu ritmo. Tu Haki. Ropa deportiva para darlo todo."
+  "frase": "Envíos a todo el país ",
+  "subfrase": "Haki I Anime & Sports I EL Salvador "
 };
 
 window.HAKI_PRODUCTOS = [
@@ -132,7 +132,7 @@ window.HAKI_PRODUCTOS = [
     "imagen": "images/SUPC-03.jpg",
     "imagenRespaldo": "images/leggings.svg",
     "tallas": {
-      "S": false,
+      "S": true,
       "M": true,
       "L": true,
       "XL": true
