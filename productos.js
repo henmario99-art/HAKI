@@ -21,11 +21,11 @@ window.HAKI_CONFIG = {
 window.HAKI_PRODUCTOS = [
   {
     "id": 1,
-    "codigo": "YLAC-01",
-    "nombre": "WARRIOR NEGRA",
+    "codigo": "GSCV1-01",
+    "nombre": "ONYX NEGRA V1",
     "precio": 26.0,
     "categoria": "Compresión",
-    "imagen": "images/YLAC-01.jpg",
+    "imagen": "images/ONYXV1NEGRA.jpg",
     "imagenRespaldo": "images/tee-black.svg",
     "tallas": {
       "S": true,
