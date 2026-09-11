@@ -21,11 +21,11 @@ window.HAKI_CONFIG = {
 window.HAKI_PRODUCTOS = [
   {
     "id": 1,
-    "codigo": "YLAC-01",
-    "nombre": "WARRIOR NEGRO",
+    "codigo": "YLAC-03",
+    "nombre": "WARRIOR AZUL",
     "precio": 26.0,
     "categoria": "Compresión",
-    "imagen": "images/YLAC-01.webp",
+    "imagen": "images/YLAC-03",
     "imagenRespaldo": "images/tee-black.svg",
     "tallas": {
       "S": true,
