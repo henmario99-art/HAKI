@@ -1,14 +1,16 @@
 const $ = (s, el=document) => el.querySelector(s);
 const $$ = (s, el=document) => [...el.querySelectorAll(s)];
 const API = '/.netlify/functions';
+const RAW_BASE = 'https://raw.githubusercontent.com/henmario99-art/HAKI/main/';
 
 let state = { config: {}, products: [], filtered: [] };
 
 function resolveImage(url='') {
   const value = String(url || '').trim();
-  if (!value) return '/images/producto.svg';
-  if (/^(https?:|data:|blob:)/i.test(value) || value.startsWith('/')) return value;
-  return `/${value.replace(/^\.\//, '')}`;
+  if (!value) return `${RAW_BASE}images/producto.svg`;
+  if (/^(https?:|data:|blob:)/i.test(value)) return value;
+  const clean = value.replace(/^\/?(?:\.\/)?/, '');
+  return `${RAW_BASE}${clean}`;
 }
 
 function toast(message, ok=false) {
@@ -93,9 +95,10 @@ function nextId() {
 }
 
 function newProduct() {
+  const id = nextId();
   return {
-    id: nextId(),
-    codigo: `HAKI-${String(nextId()).padStart(3,'0')}`,
+    id,
+    codigo: `HAKI-${String(id).padStart(3,'0')}`,
     nombre: 'Nuevo producto',
     precio: 0,
     categoria: 'Camisetas',
@@ -124,7 +127,7 @@ function renderProducts() {
       input.addEventListener('input', () => {
         p[key] = key === 'precio' ? Number(input.value) : input.value;
         if (key === 'nombre') $('.product-title', card).textContent = input.value || 'Sin nombre';
-        if (key === 'imagen') $('.preview', card).src = resolveImage(input.value || p.imagenRespaldo || 'images/producto.svg');
+        if (key === 'imagen') $('.preview', card).src = `${resolveImage(input.value || p.imagenRespaldo || 'images/producto.svg')}?v=${Date.now()}`;
       });
     });
 
@@ -138,10 +141,10 @@ function renderProducts() {
     });
 
     const preview = $('.preview', tpl);
-    preview.src = resolveImage(p.imagen || p.imagenRespaldo || 'images/producto.svg');
+    preview.src = `${resolveImage(p.imagen || p.imagenRespaldo || 'images/producto.svg')}?v=${Date.now()}`;
     preview.onerror = () => {
       preview.onerror = null;
-      preview.src = resolveImage(p.imagenRespaldo || 'images/producto.svg');
+      preview.src = `${resolveImage(p.imagenRespaldo || 'images/producto.svg')}?v=${Date.now()}`;
     };
 
     $('.remove-btn', tpl).addEventListener('click', () => {
@@ -165,7 +168,7 @@ function renderProducts() {
         const imageInput = $('[data-field="imagen"]', card);
         imageInput.value = data.path;
         preview.src = `${resolveImage(data.path)}?v=${Date.now()}`;
-        toast('Imagen subida. Pulsa Guardar y publicar para guardar el producto.', true);
+        toast('Imagen subida a GitHub. No requiere deploy. Guarda el catálogo cuando termines.', true);
       } catch (err) {
         toast(err.message);
       } finally {
@@ -198,15 +201,15 @@ $('#addBtn').addEventListener('click', () => {
 });
 
 $('#saveBtn').addEventListener('click', async () => {
-  if (!confirm('¿Guardar y publicar estos cambios en el catálogo?')) return;
+  if (!confirm('¿Guardar estos cambios en el catálogo?')) return;
   $('#saveBtn').disabled = true;
-  $('#saveBtn').textContent = 'Publicando…';
+  $('#saveBtn').textContent = 'Guardando…';
   try {
     await api('catalog', {
       method: 'PUT',
       body: JSON.stringify({ config: state.config, products: state.products })
     });
-    toast('Cambios guardados. Netlify publicará la nueva versión automáticamente.', true);
+    toast('Cambios guardados en GitHub. El catálogo los leerá sin un deploy de producción.', true);
     setTimeout(loadCatalog, 1200);
   } catch (err) {
     toast(err.message);
