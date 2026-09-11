@@ -21,15 +21,15 @@ window.HAKI_CONFIG = {
 window.HAKI_PRODUCTOS = [
   {
     "id": 1,
-    "codigo": "YLAC-03",
-    "nombre": "WARRIOR AZUL",
+    "codigo": "YLAC-01",
+    "nombre": "WARRIOR NEGRA",
     "precio": 26.0,
     "categoria": "Compresión",
     "imagen": "images/YLAC-01.jpg",
     "imagenRespaldo": "images/tee-black.svg",
     "tallas": {
-      "S": false,
-      "M": false,
+      "S": true,
+      "M": true,
       "L": true,
       "XL": true
     }
@@ -40,7 +40,7 @@ window.HAKI_PRODUCTOS = [
     "nombre": "ONYX NEGRA V1",
     "precio": 25.0,
     "categoria": "Camisetas",
-    "imagen": "images/ONYXNEGRAV1.jpg",
+    "imagen": "images/ONYXV1NEGRA.jpg",
     "imagenRespaldo": "images/tee-gray.svg",
     "tallas": {
       "S": true,
