@@ -60,24 +60,28 @@
 
   function productType(p) {
     const collections = config().colecciones || [];
-    const names = (p.colecciones || []).map(id => collections.find(c => c.id === id)?.nombre || '').join(' ');
-    const haystack = normalize(`${names} ${p.categoria || ''}`);
-    if (/accesorio/.test(haystack)) return 'accessories';
-    if (/pants|jogger/.test(haystack)) return 'pants';
-    if (/camiseta|centro|camisa|compresion|oversized/.test(haystack)) return 'tops';
+    const collectionNames = (p.colecciones || [])
+      .map(id => collections.find(c => c.id === id)?.nombre || '')
+      .join(' ');
+    const haystack = normalize(`${p.nombre || ''} ${p.categoria || ''} ${collectionNames}`);
+    if (/accesorio|cinturon|belt|muñequera|strap|gorra|bolso|calcetin/.test(haystack)) return 'accessories';
+    if (/pants|pant|jogger|pantalon/.test(haystack)) return 'pants';
+    if (/camiseta|centro|camisa|compresion|oversized|top|tee|shirt/.test(haystack)) return 'tops';
     return 'other';
   }
 
   function complementaryProducts(source) {
     const type = productType(source);
-    let pool = products().filter(p => p.codigo !== source.codigo);
-    if (type === 'tops') pool = pool.filter(p => productType(p) === 'pants');
-    else if (type === 'pants') pool = pool.filter(p => productType(p) === 'tops');
-    else if (type === 'accessories') pool = pool.filter(p => productType(p) !== 'accessories');
-    else {
-      const pants = pool.filter(p => productType(p) === 'pants');
-      pool = pants.length ? pants : pool;
-    }
+    const allOthers = products().filter(p => p.codigo !== source.codigo);
+    let pool = [];
+
+    if (type === 'tops') pool = allOthers.filter(p => productType(p) === 'pants');
+    else if (type === 'pants') pool = allOthers.filter(p => productType(p) === 'tops');
+    else if (type === 'accessories') pool = allOthers.filter(p => productType(p) !== 'accessories');
+    else pool = allOthers.filter(p => productType(p) === 'pants');
+
+    if (!pool.length) pool = allOthers;
+
     const available = pool.filter(p => !soldOut(p));
     const unavailable = pool.filter(p => soldOut(p));
     return [...available, ...unavailable].slice(0, 4);
@@ -85,11 +89,16 @@
 
   function addComplements(p, detail) {
     const options = $('.detail-options', detail);
-    if (!options || $('.haki-complements', options)) return;
+    if (!options) return;
+    const old = $('.haki-complements', options);
+    if (old?.dataset.productCode === p.codigo) return;
+    if (old) old.remove();
+
     const picks = complementaryProducts(p);
     if (!picks.length) return;
     const section = document.createElement('section');
     section.className = 'haki-complements';
+    section.dataset.productCode = p.codigo;
     section.setAttribute('aria-labelledby', 'combineTitle');
     section.innerHTML = `
       <div class="haki-complements-head">
@@ -109,7 +118,7 @@
     const detail = $('#productDetail');
     if (!detail || detail.hidden) return;
     const p = currentDetailProduct();
-    if (!p) return;
+    if (!p || !$('.detail-options', detail)) return;
     addDetailStatus(p, detail);
     addComplements(p, detail);
   }
@@ -149,6 +158,30 @@
     window.open(`https://ig.me/m/${encodeURIComponent(handle)}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
   }
 
+  function autoOpenCartAfterDetailAdd(event) {
+    const button = event.target.closest?.('.detail-add');
+    const detail = $('#productDetail');
+    if (!button || !detail?.contains(button)) return;
+    const selected = $('.detail-size.selected:not(:disabled)', detail);
+    if (!selected) return;
+    setTimeout(() => $('#openCart')?.click(), 0);
+  }
+
+  function polishFooter() {
+    const serviceLabels = new Map([
+      ['encomiendas.html', 'Encomiendas'],
+      ['domicilios.html', 'Domicilios'],
+      ['cambios-devoluciones.html', 'Cambios']
+    ]);
+    $$('.footer-service-links a').forEach(link => {
+      const file = (link.getAttribute('href') || '').split('/').pop();
+      link.textContent = serviceLabels.get(file) || link.textContent.replace(/↗/g, '').trim();
+    });
+    $$('.footer-links a').forEach(link => {
+      link.textContent = link.textContent.replace(/↗/g, '').trim();
+    });
+  }
+
   function smoothCategoryDialog() {
     const dialog = $('#categoryMenu');
     if (!dialog || dialog.dataset.smoothPatched) return;
@@ -176,16 +209,21 @@
       scheduled = false;
       applyCardStatuses();
       enhanceDetail();
+      polishFooter();
       const help = $('#formHelp');
       if (help) help.textContent = 'Instagram abrirá directamente el chat de HAKI y copiará esta misma cotización para que puedas enviarla.';
     });
   }
 
   document.addEventListener('click', instagramQuote, true);
+  document.addEventListener('click', autoOpenCartAfterDetailAdd);
   smoothCategoryDialog();
   const observer = new MutationObserver(enhance);
   observer.observe(document.body, { childList:true, subtree:true });
-  window.addEventListener('hashchange', enhance);
+  window.addEventListener('hashchange', () => {
+    enhance();
+    setTimeout(enhance, 40);
+  });
   window.addEventListener('load', enhance);
   enhance();
 })();
