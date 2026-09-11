@@ -82,7 +82,19 @@
   </aside>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
- <script src="productos.js?v=1"></script>
-<script src="app.js?v=1"></script>
+<script>
+  const version = Date.now();
+
+  const productosScript = document.createElement("script");
+  productosScript.src = `productos.js?v=${version}`;
+
+  productosScript.onload = function () {
+    const appScript = document.createElement("script");
+    appScript.src = `app.js?v=${version}`;
+    document.body.appendChild(appScript);
+  };
+
+  document.body.appendChild(productosScript);
+</script>
 </body>
 </html>
