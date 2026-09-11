@@ -8,6 +8,7 @@
   <title>HAKI — Ropa deportiva</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css?v=4">
+  <link rel="stylesheet" href="enhancements.css?v=1">
 </head>
 <body>
   <div class="announcement"><span id="announcementText">HECHO PARA TU SIGUIENTE NIVEL</span><span id="countryText">HAKI · EL SALVADOR</span></div>
@@ -17,7 +18,7 @@
       <button class="header-icon" id="openMenu" type="button" aria-label="Abrir categorías" aria-expanded="false" aria-controls="categoryMenu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h18M3 16h18"/></svg></button>
       <a class="header-icon" id="instagramHeader" href="https://www.instagram.com/hakisv1/" target="_blank" rel="noopener noreferrer" aria-label="Instagram de HAKI"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none"/></svg></a>
     </div>
-    <a class="brand" href="#top" aria-label="HAKI inicio">HAKI</a>
+    <a class="brand" href="#top" aria-label="HAKI inicio"><img class="brand-logo" src="images/haki-wordmark.svg" alt="HAKI"></a>
     <div class="header-side header-right">
       <button class="header-icon" id="openSearch" type="button" aria-label="Buscar prendas" aria-expanded="false" aria-controls="searchPanel"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
       <button class="header-icon bag" id="openCart" type="button" aria-label="Abrir mi cotización"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16v13H4zM8 8V6a4 4 0 0 1 8 0v2"/></svg><b id="cartCount">0</b></button>
@@ -72,7 +73,14 @@
   </main>
 
   <footer class="footer">
-    <a class="footer-brand" href="#top">HAKI</a>
+    <div class="footer-identity">
+      <a class="footer-brand" href="#top"><img class="brand-logo" src="images/haki-wordmark.svg" alt="HAKI"></a>
+      <nav class="footer-service-links" aria-label="Información de compra">
+        <a href="encomiendas.html" target="_blank" rel="noopener noreferrer">Encomiendas ↗</a>
+        <a href="domicilios.html" target="_blank" rel="noopener noreferrer">Domicilios ↗</a>
+        <a href="cambios-devoluciones.html" target="_blank" rel="noopener noreferrer">Cambios y devoluciones ↗</a>
+      </nav>
+    </div>
     <p>FUERZA · MOVIMIENTO · ACTITUD</p>
     <nav class="footer-links" aria-label="Redes sociales de HAKI">
       <a id="instagramFooter" href="https://www.instagram.com/hakisv1/" target="_blank" rel="noopener noreferrer">Instagram ↗</a>
@@ -98,7 +106,7 @@
         <button class="solid whatsapp" type="submit">SOLICITAR POR WHATSAPP ↗</button>
         <button class="outline" id="instagramQuote" type="button">SOLICITAR POR INSTAGRAM ↗</button>
       </div>
-      <p class="form-help" id="formHelp">Instagram copiará tu cotización y abrirá el perfil de HAKI para que la pegues en el mensaje.</p>
+      <p class="form-help" id="formHelp">Instagram abrirá directamente el chat de HAKI y copiará esta misma cotización para que puedas enviarla.</p>
     </form>
   </aside>
 
@@ -145,6 +153,7 @@
         }
 
         await loadScript('app.js?v=6');
+        await loadScript('enhancements.js?v=1');
       }
 
       start();
