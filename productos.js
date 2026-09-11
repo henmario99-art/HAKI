@@ -82,7 +82,9 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-1"
     ],
-    "novedad": true
+    "novedad": true,
+    "imagen2": "images/images-3-.jpeg",
+    "guiaTallas": "images/TALLAS-COMPRESION.jpg"
   },
   {
     "id": 2,
@@ -101,7 +103,9 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-1"
     ],
-    "novedad": true
+    "novedad": true,
+    "imagen2": "images/749440507_18615500002015250_7046725497273646433_n.jpg",
+    "guiaTallas": "images/574332190_17884017900401333_6760015125964094014_n.jpg"
   },
   {
     "id": 3,
@@ -112,17 +116,17 @@ window.HAKI_PRODUCTOS = [
     "imagen": "images/ONYXV1ROJA.webp",
     "imagenRespaldo": "images/producto.svg",
     "tallas": {
-      "S": false,
-      "M": false,
-      "L": false,
-      "XL": false
+      "S": true,
+      "M": true,
+      "L": true,
+      "XL": true
     },
     "colecciones": [
       "collection-1"
     ],
     "novedad": true,
-    "imagen2": "",
-    "guiaTallas": "images/465sizechart.webp"
+    "imagen2": "images/gymshark-onyx-v1-t-shirt-blackonyx-greycarmine-red-7432978.webp",
+    "guiaTallas": "images/TALLAS-COMPRESION.jpg"
   },
   {
     "id": 4,
@@ -130,7 +134,7 @@ window.HAKI_PRODUCTOS = [
     "nombre": "BAT NEGRA",
     "precio": 25,
     "categoria": "",
-    "imagen": "images/BATC-01.webp",
+    "imagen": "images/YLA9.25.25D-BFBATCAVE_SOCIAL_099_170e850a-e9ca-48fd-b8fb-54e0fd6a90e7.jpg",
     "imagenRespaldo": "images/leggings.svg",
     "tallas": {
       "S": true,
@@ -142,8 +146,8 @@ window.HAKI_PRODUCTOS = [
       "collection-1"
     ],
     "novedad": true,
-    "imagen2": "images/D_NQ_NP_940975-MLM108975243322_032026-O.webp",
-    "guiaTallas": "images/465sizechart.webp"
+    "imagen2": "images/WhatsApp-Image-2026-09-11-at-2.56.24-PM.jpeg",
+    "guiaTallas": ""
   },
   {
     "id": 5,
@@ -151,7 +155,7 @@ window.HAKI_PRODUCTOS = [
     "nombre": "BAT BLANCA",
     "precio": 25,
     "categoria": "COMPRESIÓN",
-    "imagen": "images/BATC-02.jpg",
+    "imagen": "images/WhatsApp-Image-2026-09-11-at-2.58.56-PM.jpeg",
     "imagenRespaldo": "images/tee-black.svg",
     "tallas": {
       "S": true,
@@ -162,7 +166,8 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-1"
     ],
-    "novedad": true
+    "novedad": true,
+    "imagen2": "images/WhatsApp-Image-2026-09-11-at-2.58.56-PMd.jpeg"
   },
   {
     "id": 6,
@@ -200,7 +205,8 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-1"
     ],
-    "novedad": true
+    "novedad": true,
+    "imagen2": "images/WhatsApp-Image-2026-09-11-at-3.01.22-PMy.jpeg"
   },
   {
     "id": 8,
@@ -223,11 +229,11 @@ window.HAKI_PRODUCTOS = [
   },
   {
     "id": 9,
-    "codigo": "HAKI-009",
-    "nombre": "Compresión Core",
-    "precio": 26,
+    "codigo": "YLAC-01",
+    "nombre": "WARRIOR COMPRESIÓN NEGRA",
+    "precio": 25,
     "categoria": "Compresión",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-black.jpg",
+    "imagen": "images/YLAC-01.jpeg",
     "imagenRespaldo": "images/tee-black.svg",
     "tallas": {
       "S": true,
@@ -235,7 +241,10 @@ window.HAKI_PRODUCTOS = [
       "L": true,
       "XL": false
     },
-    "colecciones": []
+    "colecciones": [
+      "collection-1"
+    ],
+    "imagen2": "images/J.jpeg"
   },
   {
     "id": 10,
