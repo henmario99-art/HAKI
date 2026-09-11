@@ -25,7 +25,7 @@ window.HAKI_PRODUCTOS = [
     "nombre": "WARRIOR NEGRO",
     "precio": 26.0,
     "categoria": "Compresión",
-    "imagen": "images/YLAC-01.jpg",
+    "imagen": "images/YLAC-01.webp",
     "imagenRespaldo": "images/tee-black.svg",
     "tallas": {
       "S": true,
