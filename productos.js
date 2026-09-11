@@ -36,11 +36,11 @@ window.HAKI_PRODUCTOS = [
   },
   {
     "id": 2,
-    "codigo": "HAKI-002",
-    "nombre": "Camiseta Training",
+    "codigo": "GSCV1-01",
+    "nombre": "ONYX NEGRA V1",
     "precio": 25.0,
     "categoria": "Camisetas",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-gray.jpg",
+    "imagen": "images/ONYXNEGRAV1.jpg",
     "imagenRespaldo": "images/tee-gray.svg",
     "tallas": {
       "S": true,
