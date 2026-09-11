@@ -25,6 +25,10 @@
     return `${RAW_BASE}${clean}?v=${IMAGE_VERSION}`;
   }
 
+  let detailCode = null;
+  let lastListingHash = '#top';
+  const listingPositions = new Map();
+
   const state = {
     query: '',
     category: 'Todos',
@@ -37,7 +41,6 @@
     products: $('#products'),
     count: $('#productCount'),
     search: $('#searchInput'),
-    filters: $('#filters'),
     notice: $('#resultNotice'),
     openCart: $('#openCart'),
     closeCart: $('#closeCart'),
@@ -134,6 +137,11 @@
 
     $('#instagramHeader').href = ig;
     $('#instagramFooter').href = ig;
+    $('#whatsappFooter').href = `https://wa.me/${String(CONFIG.whatsapp || '').replace(/\D/g, '')}`;
+    [['facebookFooter', CONFIG.facebook], ['tiktokFooter', CONFIG.tiktok]].forEach(([id, url]) => {
+      const link = document.getElementById(id);
+      try { const parsed = new URL(url); if (!['https:', 'http:'].includes(parsed.protocol)) return; link.href = parsed.href; link.hidden = false; } catch {}
+    });
 
     $('#year').textContent = new Date().getFullYear();
     $('#collectionsTitle').textContent = CONFIG.tituloColecciones || 'EXPLORA POR CATEGORÍA';
@@ -157,44 +165,6 @@
       $('#toggleHeroVideo').addEventListener('click', () => { if (video.paused) video.play().catch(() => {}); else video.pause(); });
       syncVideoButton();
     }
-  }
-
-  function categories() {
-    return [
-      'Todos',
-      ...new Set(
-        ALL_PRODUCTS.map(p => p.categoria).filter(Boolean)
-      )
-    ];
-  }
-
-  function renderFilters() {
-    els.filters.innerHTML = categories()
-      .map(
-        c => `
-        <button
-          class="filter-btn ${
-            c === state.category ? 'active' : ''
-          }"
-          type="button"
-          data-category="${esc(c)}"
-        >
-          ${esc(c)}
-        </button>
-      `
-      )
-      .join('');
-
-    $$('.filter-btn', els.filters).forEach(btn =>
-      btn.addEventListener('click', () => {
-        state.category = btn.dataset.category;
-        state.collection = null;
-        $('#catalogTitle').textContent = state.category === 'Todos' ? 'TODAS LAS PRENDAS' : state.category;
-
-        renderFilters();
-        renderProducts();
-      })
-    );
   }
 
   function visibleProducts() {
@@ -267,7 +237,7 @@
             data-code="${esc(p.codigo)}"
           >
 
-            <div class="product-image">
+            <a class="product-image product-detail-link" href="#producto/${encodeURIComponent(p.codigo)}" aria-label="Ver ${esc(p.nombre)}">
 
               <img
                 src="${esc(freshImage(p.imagen))}"
@@ -282,9 +252,9 @@
                 ${p.novedad === true ? 'NUEVO' : esc(String(p.id).padStart(2, '0'))}
               </span>
 
-            </div>
+            </a>
 
-            <div class="product-info">
+            <a class="product-info product-detail-link" href="#producto/${encodeURIComponent(p.codigo)}">
 
               <div>
                 <p class="product-code">
@@ -300,7 +270,7 @@
                 ${money(p.precio)}
               </strong>
 
-            </div>
+            </a>
 
             <div class="product-actions">
 
@@ -327,6 +297,11 @@
         `;
       })
       .join('');
+
+    $$('.product-detail-link', container).forEach(link => link.addEventListener('click', () => {
+      lastListingHash = location.hash || '#top';
+      listingPositions.set(lastListingHash, { y: window.scrollY, query: state.query, category: state.category, collection: state.collection });
+    }));
 
     $$('img[data-fallback]', container).forEach(img =>
       img.addEventListener(
@@ -723,12 +698,19 @@ Total estimado: ${money(cartTotal())}`;
   els.search.addEventListener(
     'input',
     e => {
+      if (detailCode) {
+        detailCode = null;
+        $('#productDetail').hidden = true; $('#catalogo').hidden = false;
+        document.body.classList.remove('detail-view');
+        history.replaceState(null, '', '#catalogo');
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }
       state.query = e.target.value;
       state.category = 'Todos'; state.collection = null;
       setHomeVisible(!state.query);
       if (state.query) window.scrollTo({ top: 0, behavior: 'instant' });
       $('#catalogTitle').textContent = state.query ? 'RESULTADOS' : 'TODAS LAS PRENDAS';
-      renderFilters(); renderProducts();
+      renderProducts();
     }
   );
 
@@ -789,18 +771,114 @@ Total estimado: ${money(cartTotal())}`;
   function route() {
     let hash;
     try { hash = decodeURIComponent(location.hash.slice(1)); } catch { hash = ''; }
+    closeMenu(); closeSearch(); $('#sizeGuideDialog').close();
+    detailCode = hash.startsWith('producto/') ? hash.slice(9) : null;
+    $('#productDetail').hidden = !detailCode;
+    $('#catalogo').hidden = !!detailCode;
+    document.body.classList.toggle('detail-view', !!detailCode);
+    if (detailCode) {
+      setHomeVisible(false);
+      renderProductDetail(productByCode(detailCode));
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      return;
+    }
+    document.title = 'HAKI — Ropa deportiva';
     state.query = ''; els.search.value = '';
     state.category = 'Todos'; state.collection = null;
     if (hash.startsWith('categoria/')) state.category = hash.slice(10);
     if (hash.startsWith('coleccion/')) state.collection = COLLECTIONS.find(c => c.id === hash.slice(10)) || null;
-    const filtered = state.category !== 'Todos' || !!state.collection;
+    const restored = listingPositions.get(location.hash || '#top');
+    if (restored) {
+      state.query = restored.query; els.search.value = restored.query;
+      state.category = restored.category; state.collection = restored.collection;
+      listingPositions.delete(location.hash || '#top');
+    }
+    const filtered = state.category !== 'Todos' || !!state.collection || !!state.query;
     setHomeVisible(!filtered);
-    $('#catalogTitle').textContent = state.collection?.nombre || (filtered ? state.category : 'TODAS LAS PRENDAS');
-    renderFilters(); renderProducts(); closeMenu(); closeSearch();
-    if (filtered) window.scrollTo({ top: 0, behavior: 'instant' });
-    else if (hash === 'top' || !hash) window.scrollTo({ top: 0, behavior: 'instant' });
+    $('#catalogTitle').textContent = state.query ? 'RESULTADOS' : state.collection?.nombre || (filtered ? state.category : 'TODAS LAS PRENDAS');
+    renderProducts();
+    if (restored) requestAnimationFrame(() => window.scrollTo({ top: restored.y, behavior: 'instant' }));
+    else if (filtered || hash === 'top' || !hash) window.scrollTo({ top: 0, behavior: 'instant' });
     else if (hash === 'catalogo') els.products.closest('section').scrollIntoView();
   }
+
+  function renderProductDetail(p) {
+    const detail = $('#productDetail');
+    if (!p) {
+      detail.innerHTML = '<div class="detail-missing"><h1>Prenda no encontrada</h1><a href="#catalogo">Volver al catálogo</a></div>';
+      return;
+    }
+    document.title = `${p.nombre} — HAKI`;
+    const images = [p.imagen || fallbackFor(p), p.imagen2].filter(Boolean);
+    const selected = state.selected[p.codigo] || '';
+    detail.innerHTML = `
+      <a class="detail-back" href="${esc(lastListingHash)}">← Volver a las prendas</a>
+      <div class="detail-layout">
+        <div class="detail-media">
+          <div id="detailGallery" class="detail-gallery" tabindex="0" aria-label="Fotos de ${esc(p.nombre)}">
+            ${images.map((url, i) => `<img src="${esc(freshImage(url))}" data-fallback="${esc(freshImage(fallbackFor(p)))}" alt="${esc(p.nombre)} · Foto ${i + 1}" ${i ? 'loading="lazy"' : 'fetchpriority="high"'}>`).join('')}
+          </div>
+          <div class="gallery-controls" ${images.length < 2 ? 'hidden' : ''}>
+            <button class="header-icon" type="button" id="galleryPrev" aria-label="Foto anterior">←</button>
+            <div class="gallery-dots">${images.map((_, i) => `<button type="button" data-photo="${i}" aria-label="Ver foto ${i + 1}" aria-pressed="${i === 0}"><span></span></button>`).join('')}</div>
+            <button class="header-icon" type="button" id="galleryNext" aria-label="Foto siguiente">→</button>
+          </div>
+        </div>
+        <div class="detail-content">
+          <div class="detail-summary">
+            ${p.novedad ? '<span class="detail-new">NUEVO</span>' : ''}
+            <h1>${esc(p.nombre)}</h1>
+            <p class="detail-code">${esc(p.codigo)}</p>
+            <button class="solid detail-add" type="button">AÑADIR AL CARRITO</button>
+          </div>
+          <div class="detail-options">
+            <strong class="detail-price">${money(p.precio)}</strong>
+            ${p.descripcion ? `<p class="detail-description">${esc(p.descripcion)}</p>` : ''}
+            <div class="detail-size-heading"><h2>Seleccioná tu talla</h2>${p.guiaTallas ? '<button id="openSizeGuide" type="button" class="size-guide-link">Guía de tallas</button>' : ''}</div>
+            <div id="detailSizes" class="detail-sizes" role="group" aria-label="Seleccionar talla">
+              ${['S','M','L','XL'].map(size => `<button type="button" class="detail-size ${selected === size ? 'selected' : ''}" data-detail-size="${size}" aria-pressed="${selected === size}" ${p.tallas?.[size] ? '' : 'disabled'}>${size}</button>`).join('')}
+            </div>
+            <p id="detailSizeStatus" class="detail-size-status" role="status">${selected && p.tallas?.[selected] ? `Talla ${selected} seleccionada` : ''}</p>
+            <button class="solid detail-add" type="button">AÑADIR AL CARRITO</button>
+          </div>
+        </div>
+      </div>`;
+    $$('img[data-fallback]', detail).forEach(img => img.addEventListener('error', () => { img.src = img.dataset.fallback; }, { once: true }));
+    let photo = 0;
+    const gallery = $('#detailGallery');
+    function updateDots() { $$('[data-photo]', detail).forEach(btn => btn.setAttribute('aria-pressed', String(Number(btn.dataset.photo) === photo))); }
+    function goPhoto(index) { photo = Math.max(0, Math.min(images.length - 1, index)); gallery.scrollTo({ left: photo * gallery.clientWidth, behavior: 'smooth' }); updateDots(); }
+    $('#galleryPrev').addEventListener('click', () => goPhoto(photo - 1));
+    $('#galleryNext').addEventListener('click', () => goPhoto(photo + 1));
+    $$('[data-photo]', detail).forEach(btn => btn.addEventListener('click', () => goPhoto(Number(btn.dataset.photo))));
+    gallery.addEventListener('scroll', () => { if (gallery.clientWidth) { photo = Math.round(gallery.scrollLeft / gallery.clientWidth); updateDots(); } }, { passive: true });
+    gallery.addEventListener('keydown', e => { if (['ArrowLeft','ArrowRight'].includes(e.key)) { e.preventDefault(); goPhoto(photo + (e.key === 'ArrowRight' ? 1 : -1)); } });
+    $$('[data-detail-size]', detail).forEach(btn => btn.addEventListener('click', () => {
+      state.selected[p.codigo] = btn.dataset.detailSize;
+      $$('[data-detail-size]', detail).forEach(option => {
+        const active = option === btn; option.classList.toggle('selected', active); option.setAttribute('aria-pressed', String(active));
+      });
+      $('#detailSizeStatus').textContent = `Talla ${btn.dataset.detailSize} seleccionada`;
+    }));
+    $$('.detail-add', detail).forEach(btn => btn.addEventListener('click', () => {
+      const size = state.selected[p.codigo];
+      if (!size || !p.tallas?.[size]) {
+        const available = $('[data-detail-size]:not(:disabled)', detail);
+        $('#detailSizeStatus').textContent = available ? 'Seleccioná una talla para añadir la prenda.' : 'Esta prenda está agotada en todas las tallas.';
+        $('#detailSizes').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (available) available.focus({ preventScroll: true });
+        return;
+      }
+      addToCart(p.codigo);
+    }));
+    if (p.guiaTallas) $('#openSizeGuide').addEventListener('click', () => {
+      $('#sizeGuideImage').src = freshImage(p.guiaTallas);
+      $('#sizeGuideDialog').showModal();
+    });
+  }
+
+  $('#closeSizeGuide').addEventListener('click', () => $('#sizeGuideDialog').close());
+  $('#sizeGuideDialog').addEventListener('click', e => { if (e.target === $('#sizeGuideDialog')) $('#sizeGuideDialog').close(); });
 
   function closeMenu() {
     $('#categoryMenu').close();

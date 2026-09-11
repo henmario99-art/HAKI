@@ -46,6 +46,8 @@
           <label>Marca<input data-config="marca"></label>
           <label>Instagram<input data-config="instagram"></label>
           <label>WhatsApp<input data-config="whatsapp"></label>
+          <label>Enlace de Facebook<input data-config="facebook" type="url" placeholder="https://www.facebook.com/tu-pagina"></label>
+          <label>Enlace de TikTok<input data-config="tiktok" type="url" placeholder="https://www.tiktok.com/@tu-perfil"></label>
           <label>Moneda<input data-config="moneda"></label>
           <label>Tipo de portada<select data-config="tipoPortada"><option value="imagen">Foto</option><option value="video">Video</option></select></label>
           <label class="wide">Foto de portada / respaldo del video<input data-config="portada"></label>
@@ -89,6 +91,9 @@
         <label>Precio<input data-field="precio" type="number" min="0" step="0.01"></label>
         <label>Categoría<input data-field="categoria"></label>
         <label class="wide">Imagen<input data-field="imagen"></label>
+        <label class="wide">Segunda imagen (opcional)<input data-field="imagen2"></label>
+        <label class="wide">Descripción (opcional)<textarea data-field="descripcion" rows="3"></textarea></label>
+        <label class="wide">Imagen de guía de tallas (opcional)<input data-field="guiaTallas"></label>
         <label class="wide">Imagen de respaldo<input data-field="imagenRespaldo"></label>
       </div>
       <div class="media-row">
@@ -96,6 +101,10 @@
         <label class="upload-label">Subir/reemplazar imagen
           <input class="image-file" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
         </label>
+      </div>
+      <div class="extra-media">
+        <div><img class="extra-preview" data-preview="imagen2" alt="Segunda imagen" hidden><label class="upload-label">Subir segunda imagen<input class="extra-image-file" data-image-field="imagen2" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label><button type="button" class="ghost" data-clear-image="imagen2">Quitar segunda imagen</button></div>
+        <div><img class="extra-preview" data-preview="guiaTallas" alt="Guía de tallas" hidden><label class="upload-label">Subir guía de tallas<input class="extra-image-file" data-image-field="guiaTallas" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label><button type="button" class="ghost" data-clear-image="guiaTallas">Quitar guía de tallas</button></div>
       </div>
       <div class="product-placement">
         <label class="check-label"><input class="new-arrival-check" type="checkbox"> Mostrar en NOVEDADES</label>
@@ -110,6 +119,6 @@
     </article>
   </template>
   <script src="../storefront-config.js?v=1"></script>
-  <script src="admin.js?v=2"></script>
+  <script src="admin.js?v=3"></script>
 </body>
 </html>

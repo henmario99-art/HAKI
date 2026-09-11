@@ -198,6 +198,26 @@ function renderProducts() {
       label.append(checkbox, text); choices.append(label);
     });
 
+    ['imagen2', 'guiaTallas'].forEach(field => {
+      const preview = $(`[data-preview="${field}"]`, tpl);
+      const fieldInput = $(`[data-field="${field}"]`, tpl);
+      function refresh() { preview.hidden = !p[field]; if (p[field]) preview.src = resolveImage(p[field]); }
+      refresh(); fieldInput.addEventListener('input', refresh);
+      $(`[data-clear-image="${field}"]`, tpl).addEventListener('click', () => { p[field] = ''; fieldInput.value = ''; refresh(); });
+      const upload = $(`[data-image-field="${field}"]`, tpl);
+      upload.addEventListener('change', async () => {
+        const file = upload.files?.[0]; if (!file) return;
+        upload.disabled = true;
+        try {
+          toast('Subiendo imagen…');
+          const data = await api('upload', { method: 'POST', body: JSON.stringify({ name: file.name, mime: file.type, base64: await fileToBase64(file) }) });
+          p[field] = data.path; fieldInput.value = data.path; refresh();
+          toast('Imagen subida. Guarda los cambios al terminar.', true);
+        } catch (error) { toast(error.message); }
+        finally { upload.disabled = false; upload.value = ''; }
+      });
+    });
+
     const preview = $('.preview', tpl);
     preview.src = `${resolveImage(p.imagen || p.imagenRespaldo || 'images/producto.svg')}?v=${Date.now()}`;
     preview.onerror = () => {

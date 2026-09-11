@@ -7,7 +7,7 @@
   <meta name="description" content="Encuentra tu próxima prenda. Explora el catálogo deportivo de HAKI y solicita tu cotización.">
   <title>HAKI — Ropa deportiva</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="styles.css?v=4">
 </head>
 <body>
   <div class="announcement"><span id="announcementText">HECHO PARA TU SIGUIENTE NIVEL</span><span id="countryText">HAKI · EL SALVADOR</span></div>
@@ -65,20 +65,21 @@
         <div><a class="back-home" href="#top">← Volver al inicio</a><h2 id="catalogTitle">TODAS LAS PRENDAS</h2></div>
         <span class="product-count" id="productCount">50 productos</span>
       </div>
-      <div class="catalog-meta"><span>COLECCIÓN HAKI</span><span>Selecciona tu talla y añádela a tu cotización.</span></div>
-
-      <div class="catalog-tools">
-        <div class="filters" id="filters" aria-label="Filtros de categoría"></div>
-      </div>
       <p class="notice" id="resultNotice" role="status"></p>
       <div class="products" id="products"></div>
     </section>
+    <section id="productDetail" class="product-detail" aria-label="Detalle de la prenda" hidden></section>
   </main>
 
   <footer class="footer">
-    <a class="footer-brand" href="#top">HAKI®</a>
+    <a class="footer-brand" href="#top">HAKI</a>
     <p>FUERZA · MOVIMIENTO · ACTITUD</p>
-    <div><a id="instagramFooter" href="https://www.instagram.com/haki__sv/" target="_blank" rel="noreferrer">Instagram ↗</a></div>
+    <nav class="footer-links" aria-label="Redes sociales de HAKI">
+      <a id="instagramFooter" href="https://www.instagram.com/hakisv1/" target="_blank" rel="noopener noreferrer">Instagram ↗</a>
+      <a id="whatsappFooter" href="https://wa.me/50360228002" target="_blank" rel="noopener noreferrer">WhatsApp ↗</a>
+      <a id="facebookFooter" target="_blank" rel="noopener noreferrer" hidden>Facebook ↗</a>
+      <a id="tiktokFooter" target="_blank" rel="noopener noreferrer" hidden>TikTok ↗</a>
+    </nav>
     <small>© <span id="year"></span> HAKI · EL SALVADOR</small>
   </footer>
 
@@ -101,6 +102,10 @@
     </form>
   </aside>
 
+  <dialog id="sizeGuideDialog" class="size-guide-dialog" aria-labelledby="sizeGuideTitle">
+    <div class="drawer-head"><h2 id="sizeGuideTitle">Guía de tallas</h2><button id="closeSizeGuide" class="header-icon" type="button" aria-label="Cerrar guía de tallas">×</button></div>
+    <img id="sizeGuideImage" alt="Guía de tallas de la prenda">
+  </dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="storefront-config.js?v=1"></script>
@@ -139,7 +144,7 @@
           await loadScript(`productos.js?v=${Date.now()}`);
         }
 
-        await loadScript('app.js?v=5');
+        await loadScript('app.js?v=6');
       }
 
       start();
