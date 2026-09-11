@@ -4,6 +4,13 @@ const API = '/.netlify/functions';
 
 let state = { config: {}, products: [], filtered: [] };
 
+function resolveImage(url='') {
+  const value = String(url || '').trim();
+  if (!value) return '/images/producto.svg';
+  if (/^(https?:|data:|blob:)/i.test(value) || value.startsWith('/')) return value;
+  return `/${value.replace(/^\.\//, '')}`;
+}
+
 function toast(message, ok=false) {
   const el = $('#globalStatus');
   el.textContent = message;
@@ -117,7 +124,7 @@ function renderProducts() {
       input.addEventListener('input', () => {
         p[key] = key === 'precio' ? Number(input.value) : input.value;
         if (key === 'nombre') $('.product-title', card).textContent = input.value || 'Sin nombre';
-        if (key === 'imagen') $('.preview', card).src = input.value || p.imagenRespaldo || 'images/producto.svg';
+        if (key === 'imagen') $('.preview', card).src = resolveImage(input.value || p.imagenRespaldo || 'images/producto.svg');
       });
     });
 
@@ -131,8 +138,11 @@ function renderProducts() {
     });
 
     const preview = $('.preview', tpl);
-    preview.src = p.imagen || p.imagenRespaldo || 'images/producto.svg';
-    preview.onerror = () => { preview.onerror = null; preview.src = p.imagenRespaldo || 'images/producto.svg'; };
+    preview.src = resolveImage(p.imagen || p.imagenRespaldo || 'images/producto.svg');
+    preview.onerror = () => {
+      preview.onerror = null;
+      preview.src = resolveImage(p.imagenRespaldo || 'images/producto.svg');
+    };
 
     $('.remove-btn', tpl).addEventListener('click', () => {
       if (!confirm(`¿Eliminar ${p.nombre}?`)) return;
@@ -154,7 +164,7 @@ function renderProducts() {
         p.imagen = data.path;
         const imageInput = $('[data-field="imagen"]', card);
         imageInput.value = data.path;
-        preview.src = `${data.path}?v=${Date.now()}`;
+        preview.src = `${resolveImage(data.path)}?v=${Date.now()}`;
         toast('Imagen subida. Pulsa Guardar y publicar para guardar el producto.', true);
       } catch (err) {
         toast(err.message);
@@ -192,7 +202,7 @@ $('#saveBtn').addEventListener('click', async () => {
   $('#saveBtn').disabled = true;
   $('#saveBtn').textContent = 'Publicando…';
   try {
-    const data = await api('catalog', {
+    await api('catalog', {
       method: 'PUT',
       body: JSON.stringify({ config: state.config, products: state.products })
     });
