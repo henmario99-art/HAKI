@@ -9,11 +9,11 @@ window.HAKI_CONFIG = {
   "instagram": "hakisv1",
   "whatsapp": "50360228002",
   "moneda": "$",
-  "portada": "https://chatgpt.com/backend-api/estuary/content?id=file_00000000a9bc81f58409308eea4852c8&ts=496974&p=fs&cid=1&sig=039c5790de2fcbde599bad8cbcf1e5a0772fe6790853b7f61ab2049d264bcee5&v=0",
+  "portada": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRQQJDoakPJ29WsQtVjAq7adW4jMZUXiJ20wuaWxufkRpgc8EyTWqSHRTsy&s=10",
   "portadaRespaldo": "images/hero-fallback.svg",
   "anuncio": "HECHO PARA TU SIGUIENTE NIVEL",
   "pais": "HAKI · EL SALVADOR",
-  "frase": "Envíos a todo el país ",
+  "frase": "HAKI",
   "subfrase": "Haki I Anime & Sports I EL Salvador "
 };
 
