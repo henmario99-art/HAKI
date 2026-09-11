@@ -58,10 +58,8 @@ window.HAKI_CONFIG = {
     },
     "cambios": {
       "titulo": "CAMBIOS",
-      "texto": "",
-      "imagenes": [
-        "images/Politica-de-cambios-Haki-malembe.png"
-      ]
+      "texto": "PASOS Y REQUISITOS\n\n1. SE HARÁ CAMBIO SI:\nEl cliente recibe una talla equivocada.\n\n2. EL CLIENTE RECIBE\nuna prenda equivocada.\n\n3. LA PRENDA LLEGA\ndañada.\n\n4. EN CUALQUIERA DE ESTOS CASOS\nHaki se hace cargo de cubrir\nlos costos del cambio.\n\nY SI TODO ESTÁ BIEN,\nPERO QUIERO CAMBIARLA?\n\nSI, PUEDES REALIZAR EL CAMBIO\nde tu prenda o talla.\n\n*Para realizar el cambio la prenda debe estar\nen perfecto estado, sin daños o mal olor *\n\n*EN ESTE CASO EL CLIENTE\nSE HACE CARGO DE LOS COSTOS DEL CAMBIO*",
+      "imagenes": []
     }
   }
 };
