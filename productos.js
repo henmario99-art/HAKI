@@ -23,7 +23,7 @@ window.HAKI_PRODUCTOS = [
     "codigo": "GSCV1-01",
     "nombre": "ONYX NEGRA V1",
     "precio": 26,
-    "categoria": "Compresión",
+    "categoria": "COMPRESIÓN",
     "imagen": "images/ONYXV1NEGRA.jpg",
     "imagenRespaldo": "images/tee-black.svg",
     "tallas": {
@@ -38,7 +38,7 @@ window.HAKI_PRODUCTOS = [
     "codigo": "GSCV1-06",
     "nombre": "ONYX GRIS V1",
     "precio": 26,
-    "categoria": "Camisetas",
+    "categoria": "COMPRESIÓN",
     "imagen": "images/ONYXV1GRIS.jpg",
     "imagenRespaldo": "images/tee-gray.svg",
     "tallas": {
@@ -53,8 +53,8 @@ window.HAKI_PRODUCTOS = [
     "codigo": "GSCV1-03",
     "nombre": "ONYX V1 ROJA",
     "precio": 26,
-    "categoria": "CAMISETAS, COMPRESIÓN",
-    "imagen": "images/images-1-.jpeg",
+    "categoria": "COMPRESIÓN",
+    "imagen": "images/ONYXV1ROJA.webp",
     "imagenRespaldo": "images/producto.svg",
     "tallas": {
       "S": true,
@@ -65,26 +65,26 @@ window.HAKI_PRODUCTOS = [
   },
   {
     "id": 4,
-    "codigo": "HAKI-004",
-    "nombre": "Legging Sculpt",
-    "precio": 28,
-    "categoria": "Leggings",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/leggings.jpg",
+    "codigo": "BATC-01",
+    "nombre": "BAT NEGRA",
+    "precio": 25,
+    "categoria": "COMPRESIÓN",
+    "imagen": "images/BATC-01.webp",
     "imagenRespaldo": "images/leggings.svg",
     "tallas": {
       "S": true,
       "M": true,
       "L": true,
-      "XL": true
+      "XL": false
     }
   },
   {
     "id": 5,
-    "codigo": "HAKI-005",
-    "nombre": "Compresión Long Sleeve",
-    "precio": 28,
-    "categoria": "Compresión",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-black.jpg",
+    "codigo": "BATC-02",
+    "nombre": "BAT BLANCA",
+    "precio": 25,
+    "categoria": "COMPRESIÓN",
+    "imagen": "images/BATC-02.jpg",
     "imagenRespaldo": "images/tee-black.svg",
     "tallas": {
       "S": true,
