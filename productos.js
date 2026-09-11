@@ -47,19 +47,21 @@ window.HAKI_CONFIG = {
   "facebook": "https://www.facebook.com/share/1C2Wz9s9Gy/?mibextid=wwXIfr",
   "informacion": {
     "encomiendas": {
-      "titulo": "¿ENCOMIENDAS?",
-      "texto": "Contamos con encomiendas a todo el país desde $1 por prenda, las encomiendas se realizan por medio de Pedidos Express, puedes encontrar tu destino en el siguiente enlance: https://drive.google.com/drive/folders/11hGdi1gSad8muXkSB_Pn9OmXb_AH5_Oa?fbclid=IwY2xjawURM3xwZG9mBWV4dG4DYWVtAjEwAGJyaWQRMWlnSVVBamtxZUhvaDJlemlzcnRjBmFwcF9pZBAyMjIwMzkxNzg4MjAwODkyAAEe9DcpIeZ_WCCK0f8XQ5bJulC7MKDiNnSHghhdS83sggNEb_PlsyBj2rVHUQU_aem_NzAYz7jhXDEn31CinrXOfw",
+      "titulo": "ENCOMIENDAS",
+      "texto": "Contamos con encomiendas a todo el país desde $1 por prenda, las encomiendas se realizan por medio de Pedidos Express\n\n1.El paquete se envía a una Agencia o Dirección establecida.\n\n2. Se le comparte al cliente una fotografía del paquete que presentará.\n\n3. El cliente llega a la Agencia o Dirección establecida, muestra la foto, Cancela y retira su paquete.\n\n4. Puedes cancelar por transferencia o Efectivo al momento de recibir tu paquete ",
       "imagenes": []
     },
     "domicilios": {
       "titulo": "DOMICILIOS",
-      "texto": "",
+      "texto": "Contamos con envíos a Domicilio por $4 de la mano de C807 \n\n1. El paquete se envía a la dirección exacta que el cliente elija.\n\n2. Se cancela por medio de transferencia antes de realizar el envío.",
       "imagenes": []
     },
     "cambios": {
       "titulo": "CAMBIOS",
       "texto": "",
-      "imagenes": []
+      "imagenes": [
+        "images/Politica-de-cambios-Haki-malembe.png"
+      ]
     }
   }
 };
