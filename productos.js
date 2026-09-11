@@ -36,11 +36,11 @@ window.HAKI_PRODUCTOS = [
   },
   {
     "id": 2,
-    "codigo": "GSCV1-01",
-    "nombre": "ONYX NEGRA V1",
-    "precio": 25.0,
+    "codigo": "GSCV1-06",
+    "nombre": "ONYX GRIS V1",
+    "precio": 26.0,
     "categoria": "Camisetas",
-    "imagen": "images/ONYXV1NEGRA.jpg",
+    "imagen": "images/ONYXV1GRIS.jpg",
     "imagenRespaldo": "images/tee-gray.svg",
     "tallas": {
       "S": true,
