@@ -757,7 +757,7 @@ window.HAKI_PRODUCTOS = [
     "id": 50,
     "codigo": "HAKI-050",
     "nombre": "Camiseta Everyday 05",
-    "precio": 25.01,
+    "precio": 26,
     "categoria": "Camisetas",
     "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-gray.jpg",
     "imagenRespaldo": "images/tee-gray.svg",
