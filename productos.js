@@ -25,12 +25,12 @@ window.HAKI_CONFIG = {
     {
       "id": "collection-2",
       "nombre": "Camisas",
-      "imagen": "images/WhatsApp-Image-2026-09-11-at-12.34.45-AM.jpeg",
+      "imagen": "images/YLA9.25.25D-BFBATCAVE_SOCIAL_023.jpg",
       "categoria": "Shorts"
     },
     {
       "id": "collection-3",
-      "nombre": "Joggers y pants",
+      "nombre": "Joggers, Shorts",
       "imagen": "images/2016_black_002_01_15_rudy_ecomm.webp",
       "categoria": "Pants"
     },
@@ -41,10 +41,27 @@ window.HAKI_CONFIG = {
       "categoria": "Hoodies"
     }
   ],
-  "tituloColecciones": "¿BUSCAS?",
+  "tituloColecciones": "Buscas...",
   "tipoPortada": "imagen",
   "tiktok": "https://www.tiktok.com/@haki_sv?_r=1&_t=ZS-99eKwTohZ3d",
-  "facebook": "https://www.facebook.com/share/1C2Wz9s9Gy/?mibextid=wwXIfr"
+  "facebook": "https://www.facebook.com/share/1C2Wz9s9Gy/?mibextid=wwXIfr",
+  "informacion": {
+    "encomiendas": {
+      "titulo": "¿ENCOMIENDAS?",
+      "texto": "Contamos con encomiendas a todo el país desde $1 por prenda, las encomiendas se realizan por medio de Pedidos Express, puedes encontrar tu destino en el siguiente enlance: https://drive.google.com/drive/folders/11hGdi1gSad8muXkSB_Pn9OmXb_AH5_Oa?fbclid=IwY2xjawURM3xwZG9mBWV4dG4DYWVtAjEwAGJyaWQRMWlnSVVBamtxZUhvaDJlemlzcnRjBmFwcF9pZBAyMjIwMzkxNzg4MjAwODkyAAEe9DcpIeZ_WCCK0f8XQ5bJulC7MKDiNnSHghhdS83sggNEb_PlsyBj2rVHUQU_aem_NzAYz7jhXDEn31CinrXOfw",
+      "imagenes": []
+    },
+    "domicilios": {
+      "titulo": "DOMICILIOS",
+      "texto": "",
+      "imagenes": []
+    },
+    "cambios": {
+      "titulo": "CAMBIOS",
+      "texto": "",
+      "imagenes": []
+    }
+  }
 };
 
 window.HAKI_PRODUCTOS = [
