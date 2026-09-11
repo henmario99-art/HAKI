@@ -1,1 +1,0 @@
-Prueba temporal para verificar que Netlify ignore deploys cuando solo cambia la carpeta images.
