@@ -25,10 +25,10 @@ window.HAKI_PRODUCTOS = [
     "nombre": "WARRIOR AZUL",
     "precio": 26.0,
     "categoria": "Compresión",
-    "imagen": "images/YLAC-03",
+    "imagen": "images/YLAC-01.jpg",
     "imagenRespaldo": "images/tee-black.svg",
     "tallas": {
-      "S": true,
+      "S": false,
       "M": false,
       "L": true,
       "XL": true
