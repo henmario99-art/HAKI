@@ -12,3 +12,6 @@
 @media(max-width:800px){.detail-layout{display:block;padding:0}.detail-back{padding:16px;font-size:14px}.detail-content{padding:0}.detail-gallery{aspect-ratio:4/5}.detail-summary{top:76px;padding:16px 20px;box-shadow:0 4px 8px #00000005}.detail-summary h1{font-size:28px;margin:8px 0}.detail-code{font-size:14px;margin-bottom:14px}.detail-new{padding:4px 8px}.detail-options{padding:24px 20px 44px}.detail-size-heading{margin-top:40px}.detail-size{min-height:60px}.gallery-controls{padding:4px 16px}.footer-links{grid-column:2;font-size:15px}.product-detail{padding-bottom:20px}.detail-sizes{scroll-margin-top:300px}}
 @media(max-height:550px){.detail-summary{position:static}.detail-sizes{scroll-margin-top:100px}}
 @media(prefers-reduced-motion:reduce){.detail-gallery{scroll-behavior:auto}}
+
+/* Hide the public Netlify promotional badge on the storefront. */
+iframe#nl-badge-frame[title="Powered by Netlify"]{display:none!important}
