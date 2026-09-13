@@ -163,3 +163,64 @@
     if (lastConfig !== state.config || !infoQ('#infoSettings')?.children.length) renderInfoSettings();
   }, 250);
 })();
+
+// Keep product names/codes consistent and apply the requested home-category labels.
+(() => {
+  const normalizeText = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
+  const upper = value => String(value || '').toLocaleUpperCase('es-SV');
+
+  function polishAdminState() {
+    let changed = false;
+    if (Array.isArray(state?.config?.colecciones)) {
+      state.config.colecciones.forEach(collection => {
+        const name = normalizeText(collection?.nombre);
+        let next = collection?.nombre || '';
+        if (name === 'accesorios') next = 'Shorts y Pants';
+        if (name === 'camisas, centros' || name === 'camisas centros') next = 'Camisas y Centros';
+        if (collection && collection.nombre !== next) {
+          collection.nombre = next;
+          changed = true;
+        }
+      });
+    }
+    if (Array.isArray(state?.products)) {
+      state.products.forEach(product => {
+        if (!product) return;
+        const code = upper(product.codigo);
+        const name = upper(product.nombre);
+        if (product.codigo !== code) { product.codigo = code; changed = true; }
+        if (product.nombre !== name) { product.nombre = name; changed = true; }
+      });
+    }
+    return changed;
+  }
+
+  const originalNewProduct = newProduct;
+  newProduct = function () {
+    const product = originalNewProduct();
+    product.codigo = upper(product.codigo);
+    product.nombre = upper(product.nombre);
+    return product;
+  };
+
+  document.addEventListener('input', event => {
+    const input = event.target;
+    if (!(input instanceof HTMLInputElement)) return;
+    if (!input.matches('#products [data-field="codigo"], #products [data-field="nombre"]')) return;
+    const next = upper(input.value);
+    if (next !== input.value) input.value = next;
+  }, true);
+
+  let lastConfigRef = null;
+  let lastProductsRef = null;
+  setInterval(() => {
+    if (!state?.config || !Array.isArray(state?.products)) return;
+    if (state.config === lastConfigRef && state.products === lastProductsRef) return;
+    lastConfigRef = state.config;
+    lastProductsRef = state.products;
+    if (polishAdminState()) {
+      renderCollectionSettings();
+      renderProducts();
+    }
+  }, 80);
+})();
