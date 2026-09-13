@@ -3,6 +3,7 @@
     tema:'claro', fuenteTitulos:'Horizon', fuenteTexto:'Poppins', horizonUrl:'',
     anuncio2:'Envío gratis desde $70 en prendas', anuncio3:'Encuentra tu próximo outfit HAKI',
     botonPortada:'EXPLORAR COLECCIÓN', enlacePortada:'#catalogo', botonPortada2:'VER NOVEDADES', enlacePortada2:'#novedades',
+    estiloBotonPortada:'blanco', estiloBotonPortada2:'transparente',
     buscarTexto:'Escribe un código o nombre de prenda…',
     carritoTitulo:'MI CARRITO', carritoAntetitulo:'TU SELECCIÓN', carritoVacio:'Tu carrito está vacío.', carritoAyudaVacio:'Elige una talla y añade tus prendas favoritas.',
     envioMeta:70, envioCosto:1, envioPorPrenda:true,
@@ -189,15 +190,31 @@
     nav.className='catalog-quick-menu';
     nav.setAttribute('aria-label','Filtros del catálogo');
     nav.innerHTML=`
-      <details class="catalog-filter catalog-filter-categories">
-        <summary>CATEGORÍAS <span aria-hidden="true"></span></summary>
+      <details class="catalog-filter catalog-filter-options">
+        <summary><span class="catalog-filter-label">FILTROS</span><span class="catalog-filter-chevron" aria-hidden="true"></span></summary>
         <div class="catalog-dropdown">
-          <a href="#catalogo">Todas las prendas</a>
-          ${categoryItems.map(item=>`<a href="${esc(item.href)}">${esc(item.label)}</a>`).join('')}
+          <section class="catalog-filter-group" aria-labelledby="filterCategoryTitle">
+            <strong id="filterCategoryTitle">CATEGORÍAS</strong>
+            <a href="#catalogo" data-clear-catalog-filters>Todas las prendas</a>
+            ${categoryItems.map(item=>`<a href="${esc(item.href)}">${esc(item.label)}</a>`).join('')}
+          </section>
+          <section class="catalog-filter-group" aria-labelledby="filterColorTitle">
+            <strong id="filterColorTitle">COLORES</strong>
+            <div class="catalog-filter-choices catalog-color-choices">
+              ${['Blanco','Negro','Azul','Rosa','Rojo','Gris'].map(color=>`<button type="button" data-filter-type="color" data-filter-value="${color}" aria-pressed="false"><i class="catalog-color-dot color-${color.toLowerCase()}" aria-hidden="true"></i>${color}</button>`).join('')}
+            </div>
+          </section>
+          <section class="catalog-filter-group" aria-labelledby="filterSizeTitle">
+            <strong id="filterSizeTitle">TALLAS DISPONIBLES</strong>
+            <div class="catalog-filter-choices catalog-size-choices">
+              ${['S','M','L','XL'].map(size=>`<button type="button" data-filter-type="size" data-filter-value="${size}" aria-pressed="false">${size}</button>`).join('')}
+            </div>
+            <button class="catalog-clear-filters" type="button" data-clear-catalog-filters>Limpiar filtros</button>
+          </section>
         </div>
       </details>
       <details class="catalog-filter catalog-filter-shipping">
-        <summary>ENVÍOS <span aria-hidden="true"></span></summary>
+        <summary><span class="catalog-filter-label">ENVÍOS</span><span class="catalog-filter-chevron" aria-hidden="true"></span></summary>
         <div class="catalog-dropdown">
           <a href="encomiendas.html">Encomiendas</a>
           <a href="domicilios.html">Domicilios</a>
@@ -221,7 +238,23 @@
         details.forEach(other=>{if(other!==detail)other.open=false;});
       });
     });
-    nav.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>details.forEach(detail=>detail.open=false)));
+    nav.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{
+      if(link.hasAttribute('data-clear-catalog-filters'))window.dispatchEvent(new CustomEvent('haki:catalog-filter-change',{detail:{clear:true}}));
+      details.forEach(detail=>detail.open=false);
+    }));
+    nav.querySelectorAll('[data-filter-type]').forEach(button=>button.addEventListener('click',()=>{
+      window.dispatchEvent(new CustomEvent('haki:catalog-filter-change',{detail:{type:button.dataset.filterType,value:button.dataset.filterValue}}));
+    }));
+    nav.querySelector('.catalog-clear-filters')?.addEventListener('click',()=>window.dispatchEvent(new CustomEvent('haki:catalog-filter-change',{detail:{clear:true}})));
+    window.addEventListener('haki:catalog-filter-state',event=>{
+      const active=event.detail||{};
+      nav.querySelectorAll('[data-filter-type]').forEach(button=>{
+        const selected=active[button.dataset.filterType]===button.dataset.filterValue;
+        button.classList.toggle('active',selected);
+        button.setAttribute('aria-pressed',String(selected));
+      });
+      nav.classList.toggle('has-active-filters',!!active.color||!!active.size);
+    });
     document.addEventListener('click',event=>{
       if(!nav.contains(event.target)) details.forEach(detail=>detail.open=false);
     });
@@ -241,17 +274,33 @@
         .catalog-filter:first-child{border-right:0!important}
         .catalog-filter summary{list-style:none;min-height:44px;padding:0 8px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;color:var(--ink);font-size:11px;font-weight:650;letter-spacing:.035em;text-transform:uppercase;user-select:none;text-decoration:none!important;border:0!important;background:transparent!important}
         .catalog-filter summary::-webkit-details-marker{display:none}
-        .catalog-filter summary span{position:relative;width:16px;height:12px;flex:0 0 16px;display:inline-block}
-        .catalog-filter summary span::before,.catalog-filter summary span::after{content:'';position:absolute;top:5px;width:8px;height:1.6px;background:currentColor;border-radius:2px;transition:transform .18s ease,top .18s ease}
-        .catalog-filter summary span::before{left:1px;transform:rotate(45deg);transform-origin:right center}
-        .catalog-filter summary span::after{right:1px;transform:rotate(-45deg);transform-origin:left center}
-        .catalog-filter[open] summary span::before{top:4px;transform:rotate(-45deg)}
-        .catalog-filter[open] summary span::after{top:4px;transform:rotate(45deg)}
+        .catalog-filter summary .catalog-filter-label{width:auto;height:auto;flex:0 1 auto;position:static;display:inline;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:5px;transition:text-decoration-color .16s ease}
+        .catalog-filter summary:hover .catalog-filter-label,.catalog-filter summary:focus-visible .catalog-filter-label{color:inherit;text-decoration-color:currentColor}
+        .catalog-filter summary .catalog-filter-chevron{position:relative;width:16px;height:12px;flex:0 0 16px;display:inline-block}
+        .catalog-filter summary .catalog-filter-chevron::before,.catalog-filter summary .catalog-filter-chevron::after{content:'';position:absolute;top:5px;width:8px;height:1.6px;background:currentColor;border-radius:2px;transition:transform .18s ease,top .18s ease}
+        .catalog-filter summary .catalog-filter-chevron::before{left:1px;transform:rotate(45deg);transform-origin:right center}
+        .catalog-filter summary .catalog-filter-chevron::after{right:1px;transform:rotate(-45deg);transform-origin:left center}
+        .catalog-filter[open] summary .catalog-filter-chevron::before{top:4px;transform:rotate(-45deg)}
+        .catalog-filter[open] summary .catalog-filter-chevron::after{top:4px;transform:rotate(45deg)}
         .catalog-dropdown{position:absolute;top:100%;left:0;width:200%;max-height:360px;overflow-y:auto;background:var(--surface);border:0!important;border-top:1px solid var(--line)!important;box-shadow:0 16px 34px rgba(0,0,0,.10);padding:12px 0;z-index:40}
         .catalog-filter:nth-child(2) .catalog-dropdown{left:auto;right:0}
         .catalog-dropdown a{display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:48px;padding:0 18px;color:var(--ink);text-decoration:none!important;font-size:12px;font-weight:550;border:0!important;background:transparent!important;transition:opacity .16s ease}
         .catalog-dropdown a::after{content:'';width:8px;height:8px;flex:0 0 8px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:rotate(-45deg);margin-right:3px}
         .catalog-dropdown a:hover{opacity:.55;text-decoration:none!important}
+        .catalog-filter-options .catalog-dropdown{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:0;padding:18px!important}
+        .catalog-filter-group{min-width:0;padding:0 18px;border-right:1px solid var(--line)}
+        .catalog-filter-group:last-child{border-right:0}
+        .catalog-filter-group>strong{display:block;margin:0 0 12px;font-size:10px;letter-spacing:.08em;color:var(--muted)}
+        .catalog-filter-group>a{min-height:40px!important;padding:0!important;font-size:12px!important}
+        .catalog-filter-choices{display:grid;gap:6px}
+        .catalog-filter-choices button,.catalog-clear-filters{min-height:40px;padding:0 10px;border:1px solid var(--line);background:transparent;color:var(--ink);text-align:left;font-size:12px;cursor:pointer}
+        .catalog-filter-choices button{display:flex;align-items:center;gap:9px}
+        .catalog-filter-choices button:hover,.catalog-filter-choices button.active{border-color:var(--ink);background:var(--soft)}
+        .catalog-color-dot{display:inline-block;width:13px;height:13px;border-radius:50%;border:1px solid #999;flex:0 0 13px}
+        .color-blanco{background:#fff}.color-negro{background:#111}.color-azul{background:#8bbfe7}.color-rosa{background:#efbfd4}.color-rojo{background:#cf1111}.color-gris{background:#999}
+        .catalog-size-choices{grid-template-columns:repeat(2,minmax(0,1fr))}
+        .catalog-size-choices button{justify-content:center;text-align:center}
+        .catalog-clear-filters{width:100%;margin-top:10px;text-align:center;text-decoration:underline;text-underline-offset:3px;border:0}
         :root[data-theme=oscuro] .catalog-dropdown{box-shadow:0 16px 36px rgba(0,0,0,.38)}
         .haki-chevron-back{text-decoration:none!important;display:inline-flex!important;align-items:center;gap:8px}
         .haki-chevron-back::before{content:'';width:8px;height:8px;border-left:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:rotate(45deg);flex:0 0 8px}
@@ -262,21 +311,22 @@
         .haki-empty-cta>span{font-size:0!important;width:8px;height:8px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:rotate(-45deg);display:inline-block}
         @media(hover:hover) and (pointer:fine){
           .catalog-filter summary{padding-left:4px;padding-right:14px}
-          .catalog-filter:hover summary{opacity:.72}
         }
         @media(max-width:800px){
           .catalog-quick-menu{margin:0 0 18px;gap:0}
           .catalog-filter summary{min-height:40px;padding:0 4px;font-size:10px;font-weight:650;letter-spacing:.025em}
-          .catalog-filter summary span{width:15px;height:11px;flex-basis:15px}
-          .catalog-filter summary span::before,.catalog-filter summary span::after{top:5px;width:7.5px;height:1.5px}
-          .catalog-filter summary span::before{left:0}
-          .catalog-filter summary span::after{right:0}
-          .catalog-filter[open] summary span::before,.catalog-filter[open] summary span::after{top:4px}
+          .catalog-filter summary .catalog-filter-chevron{width:15px;height:11px;flex-basis:15px}
+          .catalog-filter summary .catalog-filter-chevron::before,.catalog-filter summary .catalog-filter-chevron::after{top:5px;width:7.5px;height:1.5px}
+          .catalog-filter summary .catalog-filter-chevron::before{left:0}
+          .catalog-filter summary .catalog-filter-chevron::after{right:0}
+          .catalog-filter[open] summary .catalog-filter-chevron::before,.catalog-filter[open] summary .catalog-filter-chevron::after{top:4px}
           .catalog-dropdown{width:200%;padding:8px 0;box-shadow:0 12px 26px rgba(0,0,0,.12)}
           .catalog-dropdown a{min-height:44px;padding:0 14px;font-size:11px}
           .catalog-dropdown a::after{width:7px;height:7px;border-width:1.5px}
+          .catalog-filter-options .catalog-dropdown{grid-template-columns:1fr;gap:22px;padding:18px!important}
+          .catalog-filter-group{padding:0;border-right:0}
         }
-        @media(prefers-reduced-motion:reduce){.catalog-filter summary span::before,.catalog-filter summary span::after,.catalog-dropdown a{transition:none!important}}
+        @media(prefers-reduced-motion:reduce){.catalog-filter summary .catalog-filter-label,.catalog-filter summary .catalog-filter-chevron::before,.catalog-filter summary .catalog-filter-chevron::after,.catalog-dropdown a{transition:none!important}}
       `;
       document.head.appendChild(style);
     }

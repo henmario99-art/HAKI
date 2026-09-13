@@ -28,6 +28,8 @@ function validatePayload(body) {
     p.precio = Number(p.precio || 0);
     p.imagen = String(p.imagen || '').trim();
     p.imagenRespaldo = String(p.imagenRespaldo || 'images/producto.svg').trim();
+    p.masVendido = p.masVendido === true;
+    p.etiquetaMasVendido = String(p.etiquetaMasVendido || 'MÁS VENDIDO').trim().slice(0, 40) || 'MÁS VENDIDO';
     p.tallas = { S: !!p.tallas?.S, M: !!p.tallas?.M, L: !!p.tallas?.L, XL: !!p.tallas?.XL };
 
     if (!p.codigo) throw new Error(`El producto ${index + 1} no tiene código.`);

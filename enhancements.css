@@ -7,6 +7,7 @@
 
 /* Estado de disponibilidad: arriba a la izquierda y sin marco */
 .product-number.availability-badge,.detail-availability{background:#fff;color:#111;border:0!important;font-size:9px;line-height:1;letter-spacing:.09em;text-transform:uppercase;font-weight:800;padding:7px 9px}.product-number.availability-badge{top:14px!important;left:14px!important;right:auto!important;bottom:auto!important}.product-number.availability-badge.sold-out,.detail-availability.sold-out{background:#111;color:#fff}.detail-media{position:relative}.detail-availability{position:absolute;top:14px;left:14px;z-index:6}
+.best-seller-badge{position:absolute;top:44px;left:14px;z-index:6;display:inline-flex;align-items:center;min-height:25px;padding:5px 9px;background:#111;color:#fff;font-size:9px;line-height:1;letter-spacing:.16em;text-transform:uppercase;font-weight:800}.detail-best-seller{top:44px}
 
 /* En detalle dejamos un solo botón de añadir, debajo de las tallas */
 .detail-summary .detail-add{display:none!important}
@@ -56,7 +57,15 @@ html body #collectionsSection #collectionsGrid .collection-tile h3{display:block
 .haki-shipping-fill{display:block;width:0;height:100%;border-radius:inherit;background:#111;transition:width .82s cubic-bezier(.22,.61,.36,1);will-change:width}
 .haki-shipping-progress.is-complete .haki-shipping-fill{width:100%}
 .progress-labels{font-size:10px!important;color:#777!important}
-#cartNotice{margin:16px 0 0!important;padding:0!important;font-size:11px!important;line-height:1.5!important;color:#656565!important;background:transparent!important;border:0!important}
+#cartNotice{position:relative!important;min-height:18px;margin:16px 0 0!important;padding:0 0 0 28px!important;font-size:11px!important;line-height:1.5!important;color:#656565!important;background:transparent!important;border:0!important}
+
+/* Guía fija para todas las prendas catalogadas como camisetas o centros */
+.inline-size-guide{margin-top:38px;padding-top:28px;border-top:1px solid var(--line,#ddd)}
+.inline-size-guide h2{margin:0 0 18px;font-size:18px;font-weight:650;letter-spacing:0}
+.inline-size-guide-scroll{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.inline-size-guide table{width:100%;min-width:500px;border-collapse:collapse;background:var(--surface,#fff);color:var(--ink,#111);font-size:13px;line-height:1.35}
+.inline-size-guide th,.inline-size-guide td{padding:13px 8px;border-bottom:1px solid var(--line,#ddd);text-align:left;white-space:nowrap}
+.inline-size-guide thead th{font-weight:750}.inline-size-guide tbody th{font-weight:500}
 
 .cart-row{grid-template-columns:74px minmax(0,1fr) auto!important;gap:14px!important;padding:18px 0!important}
 .cart-thumb{width:74px!important;height:92px!important;object-fit:cover!important}
@@ -80,7 +89,7 @@ html body #collectionsSection #collectionsGrid .collection-tile h3{display:block
 :root[data-theme=oscuro] .remove:hover{color:#fff!important}
 :root[data-theme=oscuro] .cart-recommendations{background:#181818!important;border-color:#333!important}
 
-@media(max-width:800px){.brand-logo{width:96px}.footer .brand-logo{width:118px}.header .brand{min-width:96px}.footer{grid-template-columns:1fr}.footer-links{justify-content:flex-start}.footer small{grid-column:1}.haki-complements{margin-top:36px;padding-left:16px;padding-right:16px}.haki-complement-card{flex-basis:44vw}html body #collectionsSection #collectionsGrid.collections-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px 8px!important}html body #collectionsSection #collectionsGrid .collection-tile .collection-image{aspect-ratio:4/5!important;margin-bottom:9px!important}html body #collectionsSection #collectionsGrid .collection-tile h3{font-size:14px!important}.cart-drawer.is-empty .cart-empty{min-height:calc(100dvh - 105px);padding:34px 8px 56px}.haki-empty-bag{width:98px;height:98px}.haki-empty-bag svg{width:52px;height:52px}#cartDrawer .drawer-head h2{font-size:25px!important}.shipping-progress{padding-top:18px!important}.shipping-message{font-size:12px!important}.cart-row{grid-template-columns:68px minmax(0,1fr) auto!important;gap:11px!important}.cart-thumb{width:68px!important;height:86px!important}.cart-recommendations{padding:16px!important}}
+@media(max-width:800px){.brand-logo{width:96px}.footer .brand-logo{width:118px}.header .brand{min-width:96px}.footer{grid-template-columns:1fr}.footer-links{justify-content:flex-start}.footer small{grid-column:1}.haki-complements{margin-top:36px;padding-left:16px;padding-right:16px}.haki-complement-card{flex-basis:44vw}html body #collectionsSection #collectionsGrid.collections-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px 8px!important}html body #collectionsSection #collectionsGrid .collection-tile .collection-image{aspect-ratio:4/5!important;margin-bottom:9px!important}html body #collectionsSection #collectionsGrid .collection-tile h3{font-size:14px!important}.cart-drawer.is-empty .cart-empty{min-height:calc(100dvh - 105px);padding:34px 8px 56px}.haki-empty-bag{width:98px;height:98px}.haki-empty-bag svg{width:52px;height:52px}#cartDrawer .drawer-head h2{font-size:25px!important}.shipping-progress{padding-top:18px!important}.shipping-message{font-size:12px!important}.cart-row{grid-template-columns:68px minmax(0,1fr) auto!important;gap:11px!important}.cart-thumb{width:68px!important;height:86px!important}.cart-recommendations{padding:16px!important}.inline-size-guide{margin-top:32px;padding-top:24px}.inline-size-guide table{font-size:12px}}
 @media(max-width:460px){.haki-complements{margin-top:28px}.haki-complement-grid{gap:10px;padding-bottom:4px}.haki-complement-card{flex-basis:68%}.cart-drawer.is-empty .cart-empty strong{font-size:18px}.haki-empty-cta{width:100%;max-width:280px}.cart-row{grid-template-columns:62px minmax(0,1fr) auto!important}.cart-thumb{width:62px!important;height:80px!important}.qty{grid-template-columns:30px 32px 30px!important}.qty button{width:30px!important}}
 
 @media(prefers-reduced-motion:reduce){.category-menu[open],.category-menu.closing,.category-menu::backdrop,.cart-drawer,.overlay,.haki-complement-image img,html body #collectionsSection #collectionsGrid .collection-tile .collection-image img,.haki-empty-cta,.haki-empty-cta span,.haki-shipping-fill{animation:none!important;transition:none!important}}

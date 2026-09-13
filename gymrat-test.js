@@ -127,13 +127,12 @@
   }
 
   function shellMarkup(cfg){
-    return `<div class="gymrat-shell"><div class="gymrat-head"><div><p class="gymrat-kicker">HAKI · GYMRAT TEST</p><h2 class="gymrat-head-title">${esc(cfg.titulo)}</h2></div><button class="gymrat-close" type="button" aria-label="Cerrar">×</button></div><div class="gymrat-progress"><div class="gymrat-progress-meta"><span class="gymrat-step-label">01 / ${String(cfg.preguntas.length).padStart(2,'0')}</span><span>Descubre tu perfil</span></div><div class="gymrat-progress-track"><div class="gymrat-progress-fill"></div></div></div><div class="gymrat-stage"></div><section class="gymrat-result" aria-live="polite"></section></div>`;
+    return `<div class="gymrat-shell"><div class="gymrat-head"><h2 class="gymrat-head-title">${esc(cfg.titulo)}</h2><button class="gymrat-close" type="button" aria-label="Cerrar">×</button></div><div class="gymrat-progress"><div class="gymrat-progress-track"><div class="gymrat-progress-fill"></div></div></div><div class="gymrat-stage"></div><section class="gymrat-result" aria-live="polite"></section></div>`;
   }
 
   function renderQuestion(dialog,state){
     const cfg=state.cfg,question=cfg.preguntas[state.index],stage=dialog.querySelector('.gymrat-stage'),result=dialog.querySelector('.gymrat-result');
     result.classList.remove('active');result.innerHTML='';stage.hidden=false;
-    dialog.querySelector('.gymrat-step-label').textContent=`${String(state.index+1).padStart(2,'0')} / ${String(cfg.preguntas.length).padStart(2,'0')}`;
     dialog.querySelector('.gymrat-progress-fill').style.width=`${(state.index/cfg.preguntas.length)*100}%`;
     stage.innerHTML=`<div class="gymrat-question-view">${state.index===0?`<p class="gymrat-intro">${esc(cfg.introduccion)}</p>`:''}<span class="gymrat-question-number">Pregunta ${state.index+1}</span><h3 class="gymrat-question-title">${esc(question.texto)}</h3><div class="gymrat-options">${(question.opciones||[]).map(option=>`<button class="gymrat-option" type="button" data-value="${esc(option)}">${esc(option)}</button>`).join('')}</div></div>`;
     stage.querySelectorAll('.gymrat-option').forEach(button=>button.addEventListener('click',()=>{
@@ -145,7 +144,7 @@
 
   function reveal(dialog,state){
     const stage=dialog.querySelector('.gymrat-stage');
-    dialog.querySelector('.gymrat-progress-fill').style.width='100%';dialog.querySelector('.gymrat-step-label').textContent='LISTO';
+    dialog.querySelector('.gymrat-progress-fill').style.width='100%';
     stage.innerHTML='<div class="gymrat-reveal"><div class="gymrat-reveal-orbit" aria-hidden="true"></div><h3>LEYENDO TU ENERGÍA...</h3><p>Estamos cruzando tus respuestas con tu forma de entrenar.</p></div>';
     const finish=()=>showResult(dialog,state);if(reduceMotion())finish();else setTimeout(finish,900);
   }

@@ -154,6 +154,8 @@ function newProduct() {
     precio: 0,
     categoria: 'Camisetas',
     novedad: false,
+    masVendido: false,
+    etiquetaMasVendido: 'MÁS VENDIDO',
     colecciones: [],
     colores: [],
     imagen: 'images/producto.svg',
@@ -212,6 +214,9 @@ function renderProducts() {
     const newCheck = $('.new-arrival-check', tpl);
     newCheck.checked = p.novedad === true;
     newCheck.addEventListener('change', () => { p.novedad = newCheck.checked; });
+    const bestSellerCheck = $('.best-seller-check', tpl);
+    bestSellerCheck.checked = p.masVendido === true;
+    bestSellerCheck.addEventListener('change', () => { p.masVendido = bestSellerCheck.checked; });
     const choices = $('.collection-choices', tpl);
     const collections = window.hakiCollections(state.config);
     if (!Array.isArray(p.colecciones)) p.colecciones = collections.filter(c => normalized(p.categoria || '') === normalized(c.categoria || c.nombre)).map(c => c.id);

@@ -15,6 +15,8 @@
     query: '',
     category: 'Todos',
     collection: null,
+    color: '',
+    size: '',
     selected: {},
     cart: loadCart()
   };
@@ -159,6 +161,9 @@
         (state.category === 'Todos' ||
           normalize(p.categoria || '') === normalize(state.category)) &&
         (!state.collection || inCollection(p, state.collection)) &&
+        (!state.color || (Array.isArray(p.colores) ? p.colores : p.color ? [p.color] : [])
+          .some(color => normalize(color) === normalize(state.color))) &&
+        (!state.size || !!p.tallas?.[state.size]) &&
         (!q ||
           normalize(
             `${p.codigo} ${p.nombre} ${p.categoria}`
@@ -169,6 +174,30 @@
   function inCollection(p, collection) {
     if (Array.isArray(p.colecciones)) return p.colecciones.includes(collection.id);
     return normalize(p.categoria || '') === normalize(collection.categoria || collection.nombre);
+  }
+
+  function usesShirtSizeTable(p) {
+    const collectionNames = (p.colecciones || [])
+      .map(id => COLLECTIONS.find(collection => collection.id === id)?.nombre || '')
+      .join(' ');
+    return /camiseta|centro/.test(normalize(`${p.categoria || ''} ${collectionNames}`));
+  }
+
+  function shirtSizeTable() {
+    return `<section class="inline-size-guide" aria-labelledby="inlineSizeGuideTitle">
+      <h2 id="inlineSizeGuideTitle">Guía de tallas</h2>
+      <div class="inline-size-guide-scroll">
+        <table>
+          <thead><tr><th scope="col">Talla USA</th><th scope="col">Pecho (cm)</th><th scope="col">Hombro (cm)</th><th scope="col">Largo (cm)</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">S</th><td>84–88</td><td>39</td><td>60</td></tr>
+            <tr><th scope="row">M</th><td>88–92</td><td>40</td><td>61</td></tr>
+            <tr><th scope="row">L</th><td>89–105</td><td>41</td><td>62</td></tr>
+            <tr><th scope="row">XL</th><td>93–112</td><td>43</td><td>64</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>`;
   }
 
   function renderProducts() {
@@ -236,6 +265,8 @@
                 ${p.novedad === true ? 'NUEVO' : esc(String(p.id).padStart(2, '0'))}
               </span>
 
+              ${p.masVendido === true ? `<span class="best-seller-badge">${esc(String(p.etiquetaMasVendido || '').trim() || 'MÁS VENDIDO')}</span>` : ''}
+
             </a>
 
             <a class="product-info product-detail-link" href="#producto/${encodeURIComponent(p.codigo)}">
@@ -284,7 +315,7 @@
 
     $$('.product-detail-link', container).forEach(link => link.addEventListener('click', () => {
       lastListingHash = location.hash || '#top';
-      listingPositions.set(lastListingHash, { y: window.scrollY, query: state.query, category: state.category, collection: state.collection });
+      listingPositions.set(lastListingHash, { y: window.scrollY, query: state.query, category: state.category, collection: state.collection, color: state.color, size: state.size });
     }));
 
     $$('img[data-fallback]', container).forEach(img =>
@@ -776,11 +807,12 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     if (restored) {
       state.query = restored.query; els.search.value = restored.query;
       state.category = restored.category; state.collection = restored.collection;
+      state.color = restored.color || ''; state.size = restored.size || '';
       listingPositions.delete(location.hash || '#top');
     }
-    const filtered = state.category !== 'Todos' || !!state.collection || !!state.query;
+    const filtered = state.category !== 'Todos' || !!state.collection || !!state.query || !!state.color || !!state.size;
     setHomeVisible(!filtered);
-    $('#catalogTitle').textContent = state.query ? 'RESULTADOS' : state.collection?.nombre || (filtered ? state.category : 'TODAS LAS PRENDAS');
+    $('#catalogTitle').textContent = state.query ? 'RESULTADOS' : state.collection?.nombre || ((state.color || state.size) ? 'PRENDAS FILTRADAS' : (filtered ? state.category : 'TODAS LAS PRENDAS'));
     renderProducts();
     if (restored) requestAnimationFrame(() => window.scrollTo({ top: restored.y, behavior: 'instant' }));
     else if (filtered || hash === 'top' || !hash) window.scrollTo({ top: 0, behavior: 'instant' });
@@ -796,6 +828,7 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     document.title = `${p.nombre} — HAKI`;
     const images = [p.imagen || fallbackFor(p), p.imagen2].filter(Boolean);
     const selected = state.selected[p.codigo] || '';
+    const showShirtSizeTable = usesShirtSizeTable(p);
     detail.innerHTML = `
       <a class="detail-back" href="${esc(lastListingHash)}">← Volver a las prendas</a>
       <div class="detail-layout">
@@ -808,6 +841,7 @@ ${settings().totalTexto}: ${money(totals.total)}`;
             <div class="gallery-dots">${images.map((_, i) => `<button type="button" data-photo="${i}" aria-label="Ver foto ${i + 1}" aria-pressed="${i === 0}"><span></span></button>`).join('')}</div>
             <button class="header-icon" type="button" id="galleryNext" aria-label="Foto siguiente">→</button>
           </div>
+          ${p.masVendido === true ? `<span class="best-seller-badge detail-best-seller">${esc(String(p.etiquetaMasVendido || '').trim() || 'MÁS VENDIDO')}</span>` : ''}
         </div>
         <div class="detail-content">
           <div class="detail-summary">
@@ -819,12 +853,13 @@ ${settings().totalTexto}: ${money(totals.total)}`;
           <div class="detail-options">
             <strong class="detail-price">${money(p.precio)}</strong>
             ${p.descripcion ? `<p class="detail-description">${esc(p.descripcion)}</p>` : ''}
-            <div class="detail-size-heading"><h2>Seleccioná tu talla</h2>${p.guiaTallas ? '<button id="openSizeGuide" type="button" class="size-guide-link">Guía de tallas</button>' : ''}</div>
+            <div class="detail-size-heading"><h2>Seleccioná tu talla</h2>${p.guiaTallas && !showShirtSizeTable ? '<button id="openSizeGuide" type="button" class="size-guide-link">Guía de tallas</button>' : ''}</div>
             <div id="detailSizes" class="detail-sizes" role="group" aria-label="Seleccionar talla">
               ${['S','M','L','XL'].map(size => `<button type="button" class="detail-size ${selected === size ? 'selected' : ''}" data-detail-size="${size}" aria-pressed="${selected === size}" ${p.tallas?.[size] ? '' : 'disabled'}>${size}</button>`).join('')}
             </div>
             <p id="detailSizeStatus" class="detail-size-status" role="status">${selected && p.tallas?.[selected] ? `Talla ${selected} seleccionada` : ''}</p>
             <button class="solid detail-add" type="button">AÑADIR AL CARRITO</button>
+            ${showShirtSizeTable ? shirtSizeTable() : ''}
           </div>
         </div>
       </div>`;
@@ -857,7 +892,7 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       }
       addToCart(p.codigo);
     }));
-    if (p.guiaTallas) $('#openSizeGuide').addEventListener('click', () => {
+    if (p.guiaTallas && !showShirtSizeTable) $('#openSizeGuide').addEventListener('click', () => {
       $('#sizeGuideImage').src = freshImage(p.guiaTallas);
       $('#sizeGuideDialog').showModal();
     });
@@ -901,6 +936,24 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   });
   window.addEventListener('hashchange', route);
+  window.addEventListener('haki:catalog-filter-change', event => {
+    const detail = event.detail || {};
+    if (detail.clear) {
+      state.color = '';
+      state.size = '';
+    } else if (detail.type === 'color') {
+      state.color = state.color === detail.value ? '' : detail.value;
+    } else if (detail.type === 'size') {
+      state.size = state.size === detail.value ? '' : detail.value;
+    }
+    window.dispatchEvent(new CustomEvent('haki:catalog-filter-state', { detail: { color: state.color, size: state.size } }));
+    if (location.hash !== '#catalogo') location.hash = '#catalogo';
+    else {
+      setHomeVisible(false);
+      $('#catalogTitle').textContent = state.color || state.size ? 'PRENDAS FILTRADAS' : 'TODAS LAS PRENDAS';
+      renderProducts();
+    }
+  });
 
   const settings=()=>window.hakiSettings(CONFIG);
   let announcementTimer;
@@ -920,7 +973,7 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     Object.entries(texts).forEach(([selector,value])=>{$(selector).textContent=value;});
     $('#cartDrawer').setAttribute('aria-label',c.carritoTitulo);
     [['#customerName',c.nombrePlaceholder],['#customerDepartment',c.departamentoPlaceholder],['#customerMunicipality',c.municipioPlaceholder],['#desktopSearch',c.buscarTexto],['#searchInput',c.buscarTexto]].forEach(([selector,value])=>$(selector).placeholder=value);
-    [1,2].forEach(i=>{const b=$('#heroButton'+i);b.textContent=c[i===1?'botonPortada':'botonPortada2'];b.href=window.hakiSafeLink(c[i===1?'enlacePortada':'enlacePortada2']);b.hidden=!b.textContent.trim();});
+    [1,2].forEach(i=>{const b=$('#heroButton'+i),style=String(c[i===1?'estiloBotonPortada':'estiloBotonPortada2']||'').toLowerCase()==='transparente'?'transparente':'blanco';b.textContent=c[i===1?'botonPortada':'botonPortada2'];b.href=window.hakiSafeLink(c[i===1?'enlacePortada':'enlacePortada2']);b.hidden=!b.textContent.trim();b.classList.toggle('solid',style==='blanco');b.classList.toggle('outline',style==='transparente');b.dataset.heroStyle=style;});
     clearInterval(announcementTimer);
     const announcements=[c.anuncio||'Envíos desde $1',c.anuncio2,c.anuncio3].filter(v=>String(v||'').trim());
     announcementIndex=0;$('#announcementText').textContent=announcements[0];

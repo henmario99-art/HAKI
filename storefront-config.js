@@ -17,8 +17,7 @@ window.hakiCollections = config => window.HAKI_COLLECTION_DEFAULTS.map((item, in
     const style = document.createElement('style');
     style.id = 'haki-catalog-menu-polish';
     style.textContent = `
-      /* Ocultar filtros rápidos dentro de categorías, resultados y detalle */
-      body.collection-view .catalog-quick-menu,
+      /* Mantener los filtros disponibles en listas filtradas; ocultarlos solo en detalle */
       body.detail-view .catalog-quick-menu{display:none!important}
 
       /* Barra superior del desplegable: dos opciones limpias */
@@ -48,9 +47,9 @@ window.hakiCollections = config => window.HAKI_COLLECTION_DEFAULTS.map((item, in
         background:var(--surface)!important;
         border-bottom-color:var(--ink)!important;
       }
-      .catalog-filter summary span{width:18px!important;height:18px!important;flex-basis:18px!important}
-      .catalog-filter summary span::before,
-      .catalog-filter summary span::after{
+      .catalog-filter summary .catalog-filter-chevron{width:18px!important;height:18px!important;flex-basis:18px!important}
+      .catalog-filter summary .catalog-filter-chevron::before,
+      .catalog-filter summary .catalog-filter-chevron::after{
         left:3px!important;
         top:8px!important;
         width:12px!important;
