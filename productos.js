@@ -112,27 +112,27 @@ window.HAKI_CONFIG = {
     },
     "tituloPortada": {
       "fuente": "Horizon",
-      "negrita": false
+      "negrita": true
     },
     "textoPortada": {
       "fuente": "Poppins",
-      "negrita": false
+      "negrita": true
     },
     "botonesPortada": {
       "fuente": "Poppins",
       "negrita": false
     },
     "titulosSeccion": {
-      "fuente": "Poppins",
+      "fuente": "Horizon",
       "negrita": false
     },
     "categorias": {
-      "fuente": "Poppins",
+      "fuente": "Horizon",
       "negrita": false
     },
     "nombreProducto": {
       "fuente": "Poppins",
-      "negrita": false
+      "negrita": true
     },
     "codigoProducto": {
       "fuente": "Poppins",
@@ -156,7 +156,7 @@ window.HAKI_CONFIG = {
     },
     "botonesCarrito": {
       "fuente": "Poppins",
-      "negrita": true
+      "negrita": false
     },
     "footer": {
       "fuente": "Poppins",
@@ -168,7 +168,7 @@ window.HAKI_CONFIG = {
     },
     "gymratTexto": {
       "fuente": "Poppins",
-      "negrita": false
+      "negrita": true
     }
   },
   "gymrat": {
