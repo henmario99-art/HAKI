@@ -47,4 +47,29 @@
   };
   window.hakiSrcset=url=>imageItems(url).map(v=>`${v.src} ${v.width}w`).join(', ');
   window.hakiSafeLink=(value,fallback='#catalogo')=>{try{const u=new URL(value,location.href);return ['https:','http:'].includes(u.protocol)?value:fallback;}catch{return fallback;}};
+
+  // Reproduce la animación de progreso también cuando el usuario abre
+  // manualmente el carrito desde el icono de la bolsa. Al añadir una prenda,
+  // enhancements.js ya dispara la misma animación desde 0 hasta el nuevo total.
+  const animateShippingProgressOnManualOpen=()=>{
+    const native=document.getElementById('shippingProgress');
+    const visual=document.getElementById('hakiShippingProgress');
+    const fill=visual?.querySelector('.haki-shipping-fill');
+    const drawer=document.getElementById('cartDrawer');
+    if(!native||!visual||!fill||drawer?.classList.contains('is-empty'))return;
+    const target=Math.max(0,Math.min(100,Number(native.value)||0));
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      fill.style.width=`${target}%`;
+      return;
+    }
+    fill.style.transition='none';
+    fill.style.width='0%';
+    void fill.offsetWidth;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      fill.style.transition='';
+      fill.style.width=`${target}%`;
+      fill.dataset.progress=String(target);
+    }));
+  };
+  document.getElementById('openCart')?.addEventListener('click',animateShippingProgressOnManualOpen);
 })();
