@@ -65,8 +65,6 @@
       .join(' ');
     const haystack = normalize(`${p.nombre || ''} ${p.categoria || ''} ${collectionNames}`);
 
-    // El orden importa: algunas colecciones pueden tener nombres amplios, pero la
-    // categoría/nombre del producto debe permitir reconocer primero shorts y pants.
     if (/short|shorts|calzoneta|bermuda|pantalon corto/.test(haystack)) return 'shorts';
     if (/pants|pant|jogger|pantalon/.test(haystack)) return 'pants';
     if (/camiseta|centro|camisa|compresion|oversized|hoodie|sudadera|top|tee|shirt/.test(haystack)) return 'tops';
@@ -79,9 +77,6 @@
     const allOthers = products().filter(p => p.codigo !== source.codigo);
     let pool = [];
 
-    // Lógica HAKI:
-    // camisa/camiseta -> pants o shorts
-    // pants/shorts -> camisas/camisetas
     if (type === 'tops') {
       pool = allOthers.filter(p => ['pants','shorts'].includes(productType(p)));
     } else if (type === 'pants' || type === 'shorts') {
@@ -126,7 +121,6 @@
           </a>`).join('')}
       </div>`;
 
-    // Debe quedar debajo de toda la prenda, no dentro de la columna derecha.
     layout.insertAdjacentElement('afterend', section);
   }
 
@@ -216,6 +210,74 @@
     drawer.classList.toggle('is-empty', !items.querySelector('.cart-row'));
   }
 
+  function setupShippingProgress() {
+    const native = $('#shippingProgress');
+    if (!native) return;
+
+    let visual = $('#hakiShippingProgress');
+    if (!visual) {
+      visual = document.createElement('div');
+      visual.id = 'hakiShippingProgress';
+      visual.className = 'haki-shipping-progress';
+      visual.setAttribute('aria-hidden', 'true');
+      visual.innerHTML = '<span class="haki-shipping-fill"></span>';
+      native.classList.add('haki-native-progress');
+      native.insertAdjacentElement('afterend', visual);
+    }
+
+    if (!native.dataset.hakiProgressObserved) {
+      native.dataset.hakiProgressObserved = '1';
+      new MutationObserver(() => syncShippingProgress(false)).observe(native, {
+        attributes: true,
+        attributeFilter: ['value']
+      });
+    }
+
+    syncShippingProgress(false, true);
+  }
+
+  function syncShippingProgress(fromZero = false, immediate = false) {
+    const native = $('#shippingProgress');
+    const visual = $('#hakiShippingProgress');
+    const fill = $('.haki-shipping-fill', visual || document);
+    if (!native || !visual || !fill) return;
+
+    const target = Math.max(0, Math.min(100, Number(native.value) || 0));
+    visual.classList.toggle('is-complete', target >= 100);
+
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches || immediate) {
+      fill.style.transition = 'none';
+      fill.style.width = `${target}%`;
+      fill.dataset.progress = String(target);
+      requestAnimationFrame(() => { fill.style.transition = ''; });
+      return;
+    }
+
+    if (fromZero) {
+      fill.style.transition = 'none';
+      fill.style.width = '0%';
+      fill.dataset.progress = '0';
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          fill.style.transition = '';
+          fill.style.width = `${target}%`;
+          fill.dataset.progress = String(target);
+        });
+      });
+      return;
+    }
+
+    fill.style.width = `${target}%`;
+    fill.dataset.progress = String(target);
+  }
+
+  function animateShippingOnCartOpen() {
+    const drawer = $('#cartDrawer');
+    if (!drawer || drawer.classList.contains('is-empty')) return;
+    setupShippingProgress();
+    setTimeout(() => syncShippingProgress(true), 90);
+  }
+
   function polishFooter() {
     const serviceLabels = new Map([
       ['encomiendas.html', 'Encomiendas'],
@@ -261,19 +323,25 @@
       enhanceDetail();
       setupEmptyCart();
       syncEmptyCart();
+      setupShippingProgress();
 
       ['products','newProducts','productDetail'].forEach(id=>observer.observe(document.getElementById(id),{childList:true,subtree:true}));
 
     });
   }
 
-
   document.addEventListener('click', autoOpenCartAfterDetailAdd);
+  $('#openCart')?.addEventListener('click', animateShippingOnCartOpen);
   smoothCategoryDialog();
   const observer = new MutationObserver(enhance);
   ['products','newProducts','productDetail'].forEach(id=>observer.observe(document.getElementById(id),{childList:true,subtree:true}));
   const cartItems = $('#cartItems');
-  if (cartItems) new MutationObserver(() => { setupEmptyCart(); syncEmptyCart(); }).observe(cartItems,{childList:true,subtree:true});
+  if (cartItems) new MutationObserver(() => {
+    setupEmptyCart();
+    syncEmptyCart();
+    setupShippingProgress();
+    requestAnimationFrame(() => syncShippingProgress(false));
+  }).observe(cartItems,{childList:true,subtree:true});
   window.addEventListener('hashchange', () => {
     enhance();
     setTimeout(enhance, 40);
@@ -281,5 +349,6 @@
   window.addEventListener('load', enhance);
   setupEmptyCart();
   syncEmptyCart();
+  setupShippingProgress();
   enhance();
 })();
