@@ -183,6 +183,39 @@
     setTimeout(() => $('#openCart')?.click(), 0);
   }
 
+  function setupEmptyCart() {
+    const empty = $('#cartEmpty');
+    if (!empty || empty.dataset.hakiEmptyReady) return;
+    empty.dataset.hakiEmptyReady = '1';
+    empty.innerHTML = `
+      <div class="haki-empty-bag" aria-hidden="true">
+        <svg viewBox="0 0 64 64" role="img">
+          <path d="M15 23h34l-3 30H18L15 23Z"></path>
+          <path d="M24 23v-4a8 8 0 0 1 16 0v4"></path>
+          <path d="M24 37h16"></path>
+        </svg>
+      </div>
+      <strong>TU CARRITO ESTÁ VACÍO</strong>
+      <span>Encuentra tu próxima prenda HAKI y arma tu outfit.</span>
+      <button class="haki-empty-cta" id="emptyCartShopButton" type="button">VER PRENDAS <span aria-hidden="true">→</span></button>
+    `;
+    $('#emptyCartShopButton')?.addEventListener('click', () => {
+      $('#closeCart')?.click();
+      if (location.hash === '#catalogo') {
+        $('#catalogo')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        location.hash = '#catalogo';
+      }
+    });
+  }
+
+  function syncEmptyCart() {
+    const drawer = $('#cartDrawer');
+    const items = $('#cartItems');
+    if (!drawer || !items) return;
+    drawer.classList.toggle('is-empty', !items.querySelector('.cart-row'));
+  }
+
   function polishFooter() {
     const serviceLabels = new Map([
       ['encomiendas.html', 'Encomiendas'],
@@ -226,6 +259,8 @@
       observer.disconnect();
       applyCardStatuses();
       enhanceDetail();
+      setupEmptyCart();
+      syncEmptyCart();
 
       ['products','newProducts','productDetail'].forEach(id=>observer.observe(document.getElementById(id),{childList:true,subtree:true}));
 
@@ -237,10 +272,14 @@
   smoothCategoryDialog();
   const observer = new MutationObserver(enhance);
   ['products','newProducts','productDetail'].forEach(id=>observer.observe(document.getElementById(id),{childList:true,subtree:true}));
+  const cartItems = $('#cartItems');
+  if (cartItems) new MutationObserver(() => { setupEmptyCart(); syncEmptyCart(); }).observe(cartItems,{childList:true,subtree:true});
   window.addEventListener('hashchange', () => {
     enhance();
     setTimeout(enhance, 40);
   });
   window.addEventListener('load', enhance);
+  setupEmptyCart();
+  syncEmptyCart();
   enhance();
 })();
