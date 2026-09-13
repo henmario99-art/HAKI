@@ -9,9 +9,10 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css?v=4">
   <link rel="stylesheet" href="enhancements.css?v=2">
+  <link rel="stylesheet" href="experience.css?v=1">
 </head>
 <body>
-  <div class="announcement"><span id="announcementText">HECHO PARA TU SIGUIENTE NIVEL</span><span id="countryText">HAKI · EL SALVADOR</span></div>
+  <div class="announcement"><span id="announcementText">HECHO PARA TU SIGUIENTE NIVEL</span><span id="countryText" hidden>HAKI · EL SALVADOR</span><button id="pauseAnnouncement" type="button" aria-label="Pausar anuncios">Ⅱ</button></div>
 
   <header class="header">
     <div class="header-side">
@@ -20,7 +21,7 @@
     </div>
     <a class="brand" href="#top" aria-label="HAKI inicio"><img class="brand-logo" src="images/haki-wordmark.svg" alt="HAKI"></a>
     <div class="header-side header-right">
-      <button class="header-icon" id="openSearch" type="button" aria-label="Buscar prendas" aria-expanded="false" aria-controls="searchPanel"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
+      <label class="desktop-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg><input id="desktopSearch" type="search" aria-label="Buscar prendas por código o nombre" placeholder="Escribe un código o nombre de prenda…"></label><button class="header-icon" id="openSearch" type="button" aria-label="Buscar prendas" aria-expanded="false" aria-controls="searchPanel"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
       <button class="header-icon bag" id="openCart" type="button" aria-label="Abrir mi cotización"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16v13H4zM8 8V6a4 4 0 0 1 8 0v2"/></svg><b id="cartCount">0</b></button>
     </div>
     <div id="searchPanel" class="search-panel" hidden>
@@ -42,13 +43,13 @@
   <main id="top">
     <section class="hero" id="homeHero">
       <div class="hero-photo">
-        <img id="heroImage" src="images/hero-fallback.svg" alt="HAKI ropa deportiva" fetchpriority="high">
+        <img id="heroImage" src="images/optimized/927243238ebd-1919.webp" srcset="images/optimized/927243238ebd-640.webp 640w, images/optimized/927243238ebd-1279.webp 1279w, images/optimized/927243238ebd-1919.webp 1919w" sizes="100vw" alt="HAKI ropa deportiva" fetchpriority="high">
         <video id="heroVideo" muted playsinline loop autoplay hidden aria-label="Portada HAKI"></video>
       </div>
       <div class="hero-copy">
         <h1 id="heroTitle">NO HAY LÍMITES.</h1>
         <p class="hero-description" id="heroDescription">Tu esfuerzo. Tu ritmo. Tu Haki.</p>
-        <a class="solid hero-button" href="#catalogo">EXPLORAR COLECCIÓN</a>
+        <div class="hero-buttons"><a id="heroButton1" class="solid hero-button" href="#catalogo">EXPLORAR COLECCIÓN</a><a id="heroButton2" class="outline hero-button" href="#novedades">VER NOVEDADES</a></div>
       </div>
       <button id="toggleHeroVideo" class="video-toggle" type="button" hidden aria-label="Pausar video de portada">Ⅱ</button>
     </section>
@@ -97,14 +98,17 @@
   <div class="overlay" id="overlay" hidden></div>
   <aside class="cart-drawer" id="cartDrawer" inert role="dialog" aria-modal="true" aria-hidden="true" aria-label="Mi cotización">
     <div class="drawer-head"><div><p class="eyebrow">TU SELECCIÓN</p><h2>Mi cotización</h2></div><button id="closeCart" class="icon-btn" type="button" aria-label="Cerrar">×</button></div>
+    <section class="shipping-progress" aria-label="Progreso para envío gratis"><div class="shipping-message"><span id="shippingMessage" role="status"></span><details class="shipping-info"><summary aria-label="Información de envío"><span aria-hidden="true">i</span></summary><p id="shippingInfo"></p></details></div><progress id="shippingProgress" max="100" value="0" aria-label="Progreso para envío gratis"></progress><div class="progress-labels"><span>$0</span><span id="shippingThreshold">$70</span></div></section>
+    <p id="cartNotice" class="cart-notice"></p>
     <div class="cart-items" id="cartItems"></div>
     <div class="cart-empty" id="cartEmpty"><strong>Tu cotización está vacía.</strong><span>Elige una talla y añade prendas desde el catálogo.</span></div>
-    <div class="cart-summary"><span>Total estimado</span><strong id="cartTotal">$0.00</strong></div>
+    <section id="cartRecommendations" class="cart-recommendations" hidden><h3 id="recommendationsTitle"></h3><p id="recommendationsText"></p><div id="recommendationItems" class="recommendation-rail"></div></section>
+    <section class="order-summary"><h3 id="orderSummaryTitle"></h3><div><span id="subtotalLabel"></span><span id="cartSubtotal"></span></div><div><span id="shippingLabel"></span><span id="shippingAmount"></span></div><div class="cart-summary"><span id="totalLabel">Total estimado</span><strong id="cartTotal">$0.00</strong></div></section>
     <form class="quote-form" id="quoteForm">
       <p class="form-title">DATOS PARA COTIZAR</p>
-      <label>Nombre<input id="customerName" required placeholder="Tu nombre"></label>
-      <label>Departamento<input id="customerDepartment" required placeholder="Ej. Santa Ana"></label>
-      <label>Municipio<input id="customerMunicipality" required placeholder="Ej. Santa Ana"></label>
+      <label><span id="nameLabel">Nombre</span><input id="customerName" required placeholder="Tu nombre"></label>
+      <label><span id="departmentLabel">Departamento</span><input id="customerDepartment" required placeholder="Ej. Santa Ana"></label>
+      <label><span id="municipalityLabel">Municipio</span><input id="customerMunicipality" required placeholder="Ej. Santa Ana"></label>
       <div class="quote-actions">
         <button class="solid whatsapp" type="submit">SOLICITAR POR WHATSAPP ↗</button>
         <button class="outline" id="instagramQuote" type="button">SOLICITAR POR INSTAGRAM ↗</button>
@@ -119,48 +123,12 @@
   </dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="storefront-config.js?v=1"></script>
-  <script>
-    (() => {
-      const RAW_CATALOG = 'https://raw.githubusercontent.com/henmario99-art/HAKI/main/productos.js';
-
-      function loadScript(src) {
-        return new Promise((resolve, reject) => {
-          const script = document.createElement('script');
-          script.src = src;
-          script.onload = resolve;
-          script.onerror = reject;
-          document.body.appendChild(script);
-        });
-      }
-
-      function parseCatalog(source) {
-        const configMatch = source.match(/window\.HAKI_CONFIG\s*=\s*(\{[\s\S]*?\});/);
-        const productsMatch = source.match(/window\.HAKI_PRODUCTOS\s*=\s*(\[[\s\S]*\]);\s*$/);
-        if (!configMatch || !productsMatch) throw new Error('Formato de catálogo no reconocido');
-        window.HAKI_CONFIG = JSON.parse(configMatch[1]);
-        window.HAKI_PRODUCTOS = JSON.parse(productsMatch[1]);
-      }
-
-      async function start() {
-        try {
-          const response = await fetch(`${RAW_CATALOG}?v=${Date.now()}`, {
-            cache: 'no-store',
-            headers: { 'Accept': 'text/plain' }
-          });
-          if (!response.ok) throw new Error(`GitHub respondió ${response.status}`);
-          parseCatalog(await response.text());
-        } catch (error) {
-          console.warn('No se pudo cargar el catálogo en vivo; usando copia local.', error);
-          await loadScript(`productos.js?v=${Date.now()}`);
-        }
-
-        await loadScript('app.js?v=6');
-        await loadScript('enhancements.js?v=2');
-      }
-
-      start();
-    })();
-  </script>
+  <script defer src="image-manifest.js?v=1"></script>
+  <script defer src="storefront-config.js?v=1"></script>
+  <script defer src="experience-config.js?v=1"></script>
+  <script defer src="productos.js"></script>
+  <script defer src="catalog-loader.js?v=1"></script>
+  <script defer src="app.js?v=7"></script>
+  <script defer src="enhancements.js?v=3"></script>
 </body>
 </html>

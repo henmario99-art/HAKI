@@ -23,6 +23,17 @@ function toast(message, ok=false) {
 }
 
 async function api(path, options={}) {
+  if(path==='upload'&&options.body){
+    const body=JSON.parse(options.body);
+    if(['image/jpeg','image/png','image/webp'].includes(body.mime)){
+      const image=new Image();image.src=`data:${body.mime};base64,${body.base64}`;await image.decode();
+      const ratio=Math.min(1,1600/Math.max(image.width,image.height));
+      const canvas=document.createElement('canvas');canvas.width=Math.round(image.width*ratio);canvas.height=Math.round(image.height*ratio);canvas.getContext('2d').drawImage(image,0,0,canvas.width,canvas.height);
+      const data=canvas.toDataURL('image/webp',.84);
+      if(data.startsWith('data:image/webp')&&data.length<body.base64.length*1.05){body.base64=data.split(',')[1];body.mime='image/webp';body.name=body.name.replace(/\.[^.]+$/,'')+'.webp';}
+      options={...options,body:JSON.stringify(body)};
+    }
+  }
   const res = await fetch(`${API}/${path}`, {
     credentials: 'same-origin',
     headers: { 'content-type': 'application/json', ...(options.headers||{}) },
@@ -71,7 +82,7 @@ async function loadCatalog() {
   $('#saveBtn').disabled = true;
   try {
     const data = await api('catalog', { method: 'GET' });
-    state.config = data.config || {};
+    state.config = window.hakiSettings(data.config || {});
     state.products = data.products || [];
     fillConfig();
     renderCollectionSettings();
@@ -87,7 +98,8 @@ async function loadCatalog() {
 function fillConfig() {
   $$('[data-config]').forEach(input => {
     input.value = state.config[input.dataset.config] ?? '';
-    input.oninput = () => state.config[input.dataset.config] = input.value;
+    input.oninput = () => { state.config[input.dataset.config] = input.type==='number'?Number(input.value):input.value; if(input.dataset.config==='tema')document.documentElement.dataset.theme=input.value; };
+    if(input.dataset.config==='tema')document.documentElement.dataset.theme=input.value;
   });
 }
 
@@ -219,6 +231,7 @@ function renderProducts() {
     });
 
     const preview = $('.preview', tpl);
+    preview.loading = 'lazy';
     preview.src = `${resolveImage(p.imagen || p.imagenRespaldo || 'images/producto.svg')}?v=${Date.now()}`;
     preview.onerror = () => {
       preview.onerror = null;
@@ -279,6 +292,7 @@ $('#addBtn').addEventListener('click', () => {
 });
 
 $('#saveBtn').addEventListener('click', async () => {
+  for (const input of document.querySelectorAll('#experienceSettings input')) { if (!input.reportValidity()) return; }
   if (!confirm('¿Guardar estos cambios en el catálogo?')) return;
   $('#saveBtn').disabled = true;
   $('#saveBtn').textContent = 'Guardando…';

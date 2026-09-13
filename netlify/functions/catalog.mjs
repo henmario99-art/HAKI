@@ -1,17 +1,11 @@
 import { json, bodyJson, verifyAdmin, github, repoParts, BRANCH } from './_shared.mjs';
 
 function parseCatalog(source) {
-  const configStart = source.indexOf('window.HAKI_CONFIG =');
-  const productsStart = source.indexOf('window.HAKI_PRODUCTOS =');
-  if (configStart < 0 || productsStart < 0) throw new Error('No se reconoce el formato de productos.js');
-
-  const configEq = source.indexOf('=', configStart) + 1;
-  const configEnd = source.indexOf(';', configEq);
-  const productsEq = source.indexOf('=', productsStart) + 1;
-  const productsEnd = source.indexOf(';', productsEq);
-
-  const config = JSON.parse(source.slice(configEq, configEnd).trim());
-  const products = JSON.parse(source.slice(productsEq, productsEnd).trim());
+  const a = source.match(/window\.HAKI_CONFIG\s*=\s*(\{[\s\S]*?\});\s*window\.HAKI_PRODUCTOS/);
+  const b = source.match(/window\.HAKI_PRODUCTOS\s*=\s*(\[[\s\S]*\]);\s*$/);
+  if (!a || !b) throw new Error('No se reconoce el formato de productos.js');
+  const config = JSON.parse(a[1]);
+  const products = JSON.parse(b[1]);
   return { config, products };
 }
 

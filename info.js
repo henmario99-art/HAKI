@@ -10,18 +10,6 @@
     return JSON.parse(match[1]);
   }
 
-  async function loadConfig() {
-    try {
-      const response = await fetch(`${RAW_CATALOG}?v=${Date.now()}`, { cache: 'no-store', headers: { Accept: 'text/plain' } });
-      if (!response.ok) throw new Error(`GitHub respondió ${response.status}`);
-      return parseConfig(await response.text());
-    } catch (error) {
-      const response = await fetch(`productos.js?v=${Date.now()}`, { cache: 'no-store' });
-      if (!response.ok) throw error;
-      return parseConfig(await response.text());
-    }
-  }
-
   function resolveImage(url = '') {
     const value = String(url || '').trim();
     if (!value) return '';
@@ -65,7 +53,7 @@
       gallery.className = 'info-gallery';
       images.forEach((url, index) => {
         const img = document.createElement('img');
-        img.src = resolveImage(url);
+        img.src = window.hakiImage(url,1400);
         img.alt = `${title} · imagen ${index + 1}`;
         img.loading = index ? 'lazy' : 'eager';
         gallery.append(img);
@@ -74,5 +62,13 @@
     }
   }
 
-  loadConfig().then(config => render(config?.informacion?.[key])).catch(error => console.warn('No se pudo cargar la información editable.', error));
+  function update(){
+    const config=window.hakiSettings(window.HAKI_CONFIG||{});
+    document.documentElement.dataset.theme=config.tema==='oscuro'?'oscuro':'claro';
+    document.documentElement.style.setProperty('--font-title',config.fuenteTitulos==='Horizon'?'Horizon,Poppins,sans-serif':'Poppins,sans-serif');
+    document.documentElement.style.setProperty('--font-body',config.fuenteTexto==='Horizon'?'Horizon,Poppins,sans-serif':'Poppins,sans-serif');
+    if(config.horizonUrl){const font=new FontFace('Horizon',`url(${JSON.stringify(window.hakiSafeLink(config.horizonUrl,''))})`,{display:'swap'});font.load().then(f=>document.fonts.add(f)).catch(()=>{});}
+    render(config.informacion?.[key]);
+  }
+  window.addEventListener('haki:catalog-updated',update);update();
 })();
