@@ -41,7 +41,7 @@ window.HAKI_CONFIG = {
       "categoria": "Hoodies"
     }
   ],
-  "tituloColecciones": "Buscas...",
+  "tituloColecciones": "BUSCAS...",
   "tipoPortada": "imagen",
   "tiktok": "https://www.tiktok.com/@haki_sv?_r=1&_t=ZS-99eKwTohZ3d",
   "facebook": "https://www.facebook.com/share/1C2Wz9s9Gy/?mibextid=wwXIfr",
