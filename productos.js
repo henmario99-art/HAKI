@@ -81,7 +81,7 @@ window.HAKI_CONFIG = {
     },
     {
       "id": "collection-4",
-      "nombre": "Accesorios",
+      "nombre": "Shorts y Pants",
       "imagen": "images/TaperedDoubleProngLiftingBeltGSBlackAmethistI1B7O_BD0D_0115.webp",
       "categoria": "Hoodies"
     }
@@ -1413,7 +1413,7 @@ window.HAKI_PRODUCTOS = [
   {
     "id": 46,
     "codigo": "YLAP-01",
-    "nombre": "Yla-Pants",
+    "nombre": "YLA-PANTS",
     "precio": 35,
     "categoria": "Camisetas",
     "imagen": "images/1789335902578-1ac4eac4-IMG_5041.webp",
