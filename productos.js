@@ -1511,7 +1511,7 @@ window.HAKI_PRODUCTOS = [
     "imagen": "images/1789336258515-ed6db935-IMG_5046.webp",
     "imagenRespaldo": "images/tee-gray.svg",
     "tallas": {
-      "S": true,
+      "S": false,
       "M": true,
       "L": true,
       "XL": true
@@ -1519,8 +1519,11 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-3"
     ],
-    "colores": [],
+    "colores": [
+      "Negro"
+    ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "novedad": true
   }
 ];
