@@ -654,7 +654,7 @@ window.HAKI_PRODUCTOS = [
     "nombre": "YLA-GÓTICA",
     "precio": 25,
     "categoria": "Leggings",
-    "imagen": "images/1789323656075-d5468ae4-images.webp",
+    "imagen": "images/1789324357367-2a255661-Jerdani_Lookbook_20250806.webp",
     "imagenRespaldo": "images/leggings.svg",
     "tallas": {
       "S": true,
@@ -671,7 +671,8 @@ window.HAKI_PRODUCTOS = [
     ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "novedad": true
+    "novedad": true,
+    "imagen2": ""
   },
   {
     "id": 15,
@@ -679,7 +680,7 @@ window.HAKI_PRODUCTOS = [
     "nombre": "GYMS GRIS",
     "precio": 25,
     "categoria": "Compresión",
-    "imagen": "images/1789323860373-c6b54775-images-1-.webp",
+    "imagen": "images/1789324298834-0f608730-images-StormMuscleFitSeamlessT_ShirtGSBlackGSPitchGreyA3B5N_BB3J_0716_V2_1920x.webp",
     "imagenRespaldo": "images/tee-black.svg",
     "tallas": {
       "S": true,
@@ -694,13 +695,14 @@ window.HAKI_PRODUCTOS = [
       "Negro"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "imagen2": "images/1789324304093-e7f0337d-images-StormMuscleFitSeamlessT_ShirtGSBlackGSPitchGreyA3B5N_BB3J_0731_V1_1920x.webp"
   },
   {
     "id": 16,
     "codigo": "GSC-04",
     "nombre": "ONX NEGRA-AZUL",
-    "precio": 25.01,
+    "precio": 25,
     "categoria": "Camisetas",
     "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-gray.jpg",
     "imagenRespaldo": "images/tee-gray.svg",
@@ -719,13 +721,13 @@ window.HAKI_PRODUCTOS = [
     ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "imagen2": "images/1789323989419-4ef599ed-images-2-.webp"
+    "imagen2": "images/1789324317198-136bb651-images-2-.webp"
   },
   {
     "id": 17,
-    "codigo": "HAKI-017",
-    "nombre": "Short Training 02",
-    "precio": 23,
+    "codigo": "SUPH-06",
+    "nombre": "SUP-CENTRO GRIS",
+    "precio": 20,
     "categoria": "Shorts",
     "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/shorts.jpg",
     "imagenRespaldo": "images/shorts.svg",
@@ -736,28 +738,35 @@ window.HAKI_PRODUCTOS = [
       "XL": false
     },
     "colecciones": [
-      "collection-2"
+      "collection-1"
     ],
-    "colores": [],
+    "colores": [
+      "Gris"
+    ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "imagen2": "images/1789324742829-a731f1ce-ChatGPT-Image-13-sept-2026-12_38_49-p.m..webp"
   },
   {
     "id": 18,
-    "codigo": "HAKI-018",
-    "nombre": "Legging Active 02",
-    "precio": 27,
+    "codigo": "SUPH-01",
+    "nombre": "SUP-CENTRO NEGRO",
+    "precio": 20,
     "categoria": "Leggings",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/leggings.jpg",
+    "imagen": "images/1789324800031-e568c2eb-1eced321-8d27-4b67-92f7-f9f0ff8eff3c.webp",
     "imagenRespaldo": "images/leggings.svg",
     "tallas": {
       "S": false,
       "M": true,
       "L": true,
-      "XL": true
+      "XL": false
     },
-    "colecciones": [],
-    "colores": [],
+    "colecciones": [
+      "collection-1"
+    ],
+    "colores": [
+      "Negro"
+    ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
