@@ -116,7 +116,7 @@ window.HAKI_CONFIG = {
     },
     "textoPortada": {
       "fuente": "Poppins",
-      "negrita": true
+      "negrita": false
     },
     "botonesPortada": {
       "fuente": "Poppins",
@@ -164,10 +164,10 @@ window.HAKI_CONFIG = {
     },
     "gymratTitulo": {
       "fuente": "Horizon",
-      "negrita": false
+      "negrita": true
     },
     "gymratTexto": {
-      "fuente": "Poppins",
+      "fuente": "Horizon",
       "negrita": true
     }
   },
