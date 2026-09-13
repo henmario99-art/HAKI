@@ -1298,72 +1298,81 @@ window.HAKI_PRODUCTOS = [
   },
   {
     "id": 41,
-    "codigo": "HAKI-041",
-    "nombre": "Compresión Essential 05",
+    "codigo": "AOTF-02",
+    "nombre": "YLA-SNK",
     "precio": 26,
     "categoria": "Compresión",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-black.jpg",
+    "imagen": "images/1789335366719-d0e45c8c-IMG_5036.jpeg",
     "imagenRespaldo": "images/tee-black.svg",
     "tallas": {
       "S": true,
-      "M": true,
-      "L": true,
-      "XL": false
+      "M": false,
+      "L": false,
+      "XL": true
     },
-    "colecciones": [],
-    "colores": [],
+    "colecciones": [
+      "collection-4"
+    ],
+    "colores": [
+      "Blanco"
+    ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 42,
-    "codigo": "HAKI-042",
-    "nombre": "Camiseta Training 05",
-    "precio": 25,
+    "codigo": "AOTF-01",
+    "nombre": "YLA-SNK NEGRA",
+    "precio": 26,
     "categoria": "Camisetas",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-gray.jpg",
+    "imagen": "images/1789335406465-fb4fc6f9-IMG_5037.jpeg",
     "imagenRespaldo": "images/tee-gray.svg",
     "tallas": {
       "S": true,
-      "M": true,
-      "L": true,
-      "XL": true
+      "M": false,
+      "L": false,
+      "XL": false
     },
     "colecciones": [
-      "collection-1"
+      "collection-4"
     ],
-    "colores": [],
+    "colores": [
+      "Negro"
+    ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 43,
-    "codigo": "HAKI-043",
-    "nombre": "Short Performance 05",
-    "precio": 22,
+    "codigo": "AOTF-03",
+    "nombre": "YLA-SNK ROJA",
+    "precio": 26,
     "categoria": "Shorts",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/shorts.jpg",
+    "imagen": "images/1789335439174-862e2bb2-IMG_5035.jpeg",
     "imagenRespaldo": "images/shorts.svg",
     "tallas": {
-      "S": false,
-      "M": true,
-      "L": true,
-      "XL": true
+      "S": true,
+      "M": false,
+      "L": false,
+      "XL": false
     },
     "colecciones": [
-      "collection-2"
+      "collection-4"
     ],
-    "colores": [],
+    "colores": [
+      "Negro",
+      "Rojo"
+    ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 44,
-    "codigo": "HAKI-044",
-    "nombre": "Legging Sculpt 05",
-    "precio": 28,
+    "codigo": "YLAO-01",
+    "nombre": "YLA-OVERSIZED",
+    "precio": 26,
     "categoria": "Leggings",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/leggings.jpg",
+    "imagen": "images/1789335516494-993de3a1-IMG_5038.jpeg",
     "imagenRespaldo": "images/leggings.svg",
     "tallas": {
       "S": true,
@@ -1371,27 +1380,33 @@ window.HAKI_PRODUCTOS = [
       "L": true,
       "XL": true
     },
-    "colecciones": [],
+    "colecciones": [
+      "collection-4"
+    ],
     "colores": [],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 45,
-    "codigo": "HAKI-045",
-    "nombre": "Compresión Long Sleeve 05",
-    "precio": 28,
+    "codigo": "GLD-01",
+    "nombre": "YLA-GOLDS",
+    "precio": 26,
     "categoria": "Compresión",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-black.jpg",
+    "imagen": "images/1789335636758-918f8338-IMG_5039.jpeg",
     "imagenRespaldo": "images/tee-black.svg",
     "tallas": {
       "S": true,
       "M": true,
       "L": true,
-      "XL": false
+      "XL": true
     },
-    "colecciones": [],
-    "colores": [],
+    "colecciones": [
+      "collection-4"
+    ],
+    "colores": [
+      "Negro"
+    ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
