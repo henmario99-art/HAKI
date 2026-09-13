@@ -26,8 +26,6 @@
     const shipping=!count||free?0:rate*(c.envioPorPrenda===true||c.envioPorPrenda==='true'?count:1);
     return {subtotal:cents/100,shipping:shipping/100,total:(cents+shipping)/100,free,remaining:Math.max(0,meta-cents)/100,progress:Math.min(100,cents/meta*100),threshold:meta/100};
   };
-  // Ignore responsive variants that were published empty, so the storefront
-  // always falls back to a valid optimized size instead of a broken image.
   const brokenImageVariants=new Set([
     'images/optimized/06de4e28143e-800.webp',
     'images/optimized/2e82ffe16ce2-800.webp',
@@ -48,9 +46,6 @@
   window.hakiSrcset=url=>imageItems(url).map(v=>`${v.src} ${v.width}w`).join(', ');
   window.hakiSafeLink=(value,fallback='#catalogo')=>{try{const u=new URL(value,location.href);return ['https:','http:'].includes(u.protocol)?value:fallback;}catch{return fallback;}};
 
-  // Reproduce la animación de progreso también cuando el usuario abre
-  // manualmente el carrito desde el icono de la bolsa. Al añadir una prenda,
-  // enhancements.js ya dispara la misma animación desde 0 hasta el nuevo total.
   const animateShippingProgressOnManualOpen=()=>{
     const native=document.getElementById('shippingProgress');
     const visual=document.getElementById('hakiShippingProgress');
@@ -73,8 +68,6 @@
   };
   document.getElementById('openCart')?.addEventListener('click',animateShippingProgressOnManualOpen);
 
-  // Selector claro/oscuro del catálogo. La preferencia del visitante se guarda
-  // en este navegador y tiene prioridad sobre el tema configurado en el panel.
   const THEME_KEY='haki_theme_v1';
   const root=document.documentElement;
   const savedTheme=(()=>{try{return localStorage.getItem(THEME_KEY)||'';}catch{return '';}})();
@@ -178,9 +171,17 @@
     const heading=catalog?.querySelector('.catalog-heading');
     if(!catalog||!heading||catalog.querySelector('.catalog-quick-menu'))return;
 
-    const categories=[...new Set((window.HAKI_PRODUCTOS||[])
-      .map(p=>String(p?.categoria||'').trim())
-      .filter(Boolean))];
+    const esc=value=>String(value||'').replace(/[&<>"']/g,char=>({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    })[char]);
+    const collections=Array.isArray(window.HAKI_CONFIG?.colecciones)?window.HAKI_CONFIG.colecciones:[];
+    const categoryItems=collections.length
+      ? collections.filter(item=>item&&item.id&&item.nombre).map(item=>({label:item.nombre,href:`#coleccion/${encodeURIComponent(item.id)}`}))
+      : [
+          {label:'Compresión',href:'#categoria/Compresi%C3%B3n'},
+          {label:'Oversized',href:'#categoria/Oversized'},
+          {label:'Pants',href:'#categoria/Pants'}
+        ];
 
     const nav=document.createElement('nav');
     nav.className='catalog-quick-menu';
@@ -190,7 +191,7 @@
         <summary>CATEGORÍAS <span aria-hidden="true"></span></summary>
         <div class="catalog-dropdown">
           <a href="#catalogo">Todas las prendas</a>
-          ${categories.map(category=>`<a href="#categoria/${encodeURIComponent(category)}">${category.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</a>`).join('')}
+          ${categoryItems.map(item=>`<a href="${esc(item.href)}">${esc(item.label)}</a>`).join('')}
         </div>
       </details>
       <details class="catalog-filter catalog-filter-shipping">
