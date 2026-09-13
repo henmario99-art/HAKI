@@ -13,9 +13,9 @@ window.HAKI_CONFIG = {
   "anuncio3": "Bienvenido a la familia Haki",
   "botonPortada": "EXPLORAR COLECCIÓN",
   "enlacePortada": "#catalogo",
-  "estiloBotonPortada": "blanco",
   "botonPortada2": "VER NOVEDADES",
   "enlacePortada2": "#novedades",
+  "estiloBotonPortada": "blanco",
   "estiloBotonPortada2": "transparente",
   "buscarTexto": "Escribe un código o nombre de prenda…",
   "carritoTitulo": "MI CARRITO",
@@ -344,10 +344,12 @@ window.HAKI_PRODUCTOS = [
     ],
     "novedad": true,
     "imagen2": "",
-    "guiaTallas": "images/TALLAS-COMPRESION.jpg",
+    "guiaTallas": "",
     "colores": [
       "Negro"
-    ]
+    ],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 2,
@@ -368,10 +370,12 @@ window.HAKI_PRODUCTOS = [
     ],
     "novedad": true,
     "imagen2": "images/749440507_18615500002015250_7046725497273646433_n.jpg",
-    "guiaTallas": "images/574332190_17884017900401333_6760015125964094014_n.jpg",
+    "guiaTallas": "",
     "colores": [
       "Gris"
-    ]
+    ],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 3,
@@ -392,11 +396,13 @@ window.HAKI_PRODUCTOS = [
     ],
     "novedad": true,
     "imagen2": "images/gymshark-onyx-v1-t-shirt-blackonyx-greycarmine-red-7432978.webp",
-    "guiaTallas": "images/TALLAS-COMPRESION.jpg",
+    "guiaTallas": "",
     "colores": [
       "Negro",
       "Rojo"
-    ]
+    ],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 4,
@@ -421,7 +427,9 @@ window.HAKI_PRODUCTOS = [
     "colores": [
       "Negro",
       "Gris"
-    ]
+    ],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 5,
@@ -442,7 +450,9 @@ window.HAKI_PRODUCTOS = [
     ],
     "novedad": true,
     "imagen2": "images/WhatsApp-Image-2026-09-11-at-2.58.56-PMd.jpeg",
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 6,
@@ -462,7 +472,9 @@ window.HAKI_PRODUCTOS = [
       "collection-1"
     ],
     "novedad": true,
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 7,
@@ -483,7 +495,9 @@ window.HAKI_PRODUCTOS = [
     ],
     "novedad": true,
     "imagen2": "images/WhatsApp-Image-2026-09-11-at-3.01.22-PMy.jpeg",
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 8,
@@ -503,7 +517,9 @@ window.HAKI_PRODUCTOS = [
       "collection-1"
     ],
     "novedad": true,
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 9,
@@ -523,7 +539,9 @@ window.HAKI_PRODUCTOS = [
       "collection-1"
     ],
     "imagen2": "images/J.jpeg",
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 10,
@@ -543,7 +561,9 @@ window.HAKI_PRODUCTOS = [
       "collection-1"
     ],
     "imagen2": "images/G.jpeg",
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 11,
@@ -563,7 +583,9 @@ window.HAKI_PRODUCTOS = [
       "collection-1"
     ],
     "novedad": true,
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 12,
@@ -583,7 +605,9 @@ window.HAKI_PRODUCTOS = [
       "collection-1"
     ],
     "novedad": true,
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 13,
@@ -602,7 +626,9 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-2"
     ],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 14,
@@ -619,7 +645,9 @@ window.HAKI_PRODUCTOS = [
       "XL": true
     },
     "colecciones": [],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 15,
@@ -636,7 +664,9 @@ window.HAKI_PRODUCTOS = [
       "XL": true
     },
     "colecciones": [],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 16,
@@ -655,7 +685,9 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-1"
     ],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 17,
@@ -674,7 +706,9 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-2"
     ],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 18,
@@ -691,7 +725,9 @@ window.HAKI_PRODUCTOS = [
       "XL": true
     },
     "colecciones": [],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 19,
@@ -708,7 +744,9 @@ window.HAKI_PRODUCTOS = [
       "XL": true
     },
     "colecciones": [],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 20,
@@ -727,7 +765,9 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-1"
     ],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 21,
@@ -744,7 +784,9 @@ window.HAKI_PRODUCTOS = [
       "XL": false
     },
     "colecciones": [],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 22,
@@ -763,7 +805,9 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-1"
     ],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 23,
@@ -782,7 +826,9 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-2"
     ],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 24,
@@ -799,7 +845,9 @@ window.HAKI_PRODUCTOS = [
       "XL": true
     },
     "colecciones": [],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 25,
@@ -816,7 +864,9 @@ window.HAKI_PRODUCTOS = [
       "XL": false
     },
     "colecciones": [],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 26,
@@ -835,7 +885,9 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-1"
     ],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 27,
@@ -854,7 +906,9 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-2"
     ],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 28,
@@ -871,7 +925,9 @@ window.HAKI_PRODUCTOS = [
       "XL": true
     },
     "colecciones": [],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 29,
@@ -888,7 +944,9 @@ window.HAKI_PRODUCTOS = [
       "XL": false
     },
     "colecciones": [],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 30,
@@ -907,7 +965,9 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-1"
     ],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 31,
@@ -924,7 +984,9 @@ window.HAKI_PRODUCTOS = [
       "XL": true
     },
     "colecciones": [],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 32,
@@ -943,7 +1005,9 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-1"
     ],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 33,
@@ -962,7 +1026,9 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-2"
     ],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 34,
@@ -979,7 +1045,9 @@ window.HAKI_PRODUCTOS = [
       "XL": true
     },
     "colecciones": [],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 35,
@@ -996,7 +1064,9 @@ window.HAKI_PRODUCTOS = [
       "XL": true
     },
     "colecciones": [],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 36,
@@ -1015,7 +1085,9 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-1"
     ],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 37,
@@ -1034,7 +1106,9 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-2"
     ],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 38,
@@ -1051,7 +1125,9 @@ window.HAKI_PRODUCTOS = [
       "XL": true
     },
     "colecciones": [],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 39,
@@ -1068,7 +1144,9 @@ window.HAKI_PRODUCTOS = [
       "XL": true
     },
     "colecciones": [],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 40,
@@ -1087,7 +1165,9 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-1"
     ],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 41,
@@ -1104,7 +1184,9 @@ window.HAKI_PRODUCTOS = [
       "XL": false
     },
     "colecciones": [],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 42,
@@ -1123,7 +1205,9 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-1"
     ],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 43,
@@ -1142,7 +1226,9 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-2"
     ],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 44,
@@ -1159,7 +1245,9 @@ window.HAKI_PRODUCTOS = [
       "XL": true
     },
     "colecciones": [],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 45,
@@ -1176,7 +1264,9 @@ window.HAKI_PRODUCTOS = [
       "XL": false
     },
     "colecciones": [],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 46,
@@ -1195,7 +1285,9 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-1"
     ],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 47,
@@ -1214,7 +1306,9 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-2"
     ],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 48,
@@ -1231,7 +1325,9 @@ window.HAKI_PRODUCTOS = [
       "XL": true
     },
     "colecciones": [],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 49,
@@ -1248,7 +1344,9 @@ window.HAKI_PRODUCTOS = [
       "XL": false
     },
     "colecciones": [],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 50,
@@ -1267,6 +1365,8 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-1"
     ],
-    "colores": []
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
   }
 ];
