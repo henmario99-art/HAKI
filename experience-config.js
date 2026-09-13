@@ -109,8 +109,8 @@
   }
 
   function setupThemeToggle(){
-    const headerRight=document.querySelector('.header .header-right');
-    if(!headerRight)return;
+    const headerLeft=document.querySelector('.header > .header-side:not(.header-right)');
+    if(!headerLeft)return;
 
     let button=document.getElementById('themeToggle');
     if(!button){
@@ -118,14 +118,19 @@
       button.id='themeToggle';
       button.className='header-icon theme-toggle';
       button.type='button';
-      const cart=document.getElementById('openCart');
-      headerRight.insertBefore(button,cart||null);
+      const instagram=document.getElementById('instagramHeader');
+      if(instagram?.nextSibling) headerLeft.insertBefore(button,instagram.nextSibling);
+      else headerLeft.appendChild(button);
+    } else if(button.parentElement!==headerLeft){
+      headerLeft.appendChild(button);
     }
 
     if(!document.getElementById('haki-theme-toggle-style')){
       const style=document.createElement('style');
       style.id='haki-theme-toggle-style';
       style.textContent=`
+        #openMenu{display:none!important}
+        .header > .header-side:not(.header-right){gap:14px!important}
         .theme-toggle{color:var(--ink)!important;transition:color .2s ease,transform .2s ease}
         .theme-toggle svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
         .theme-toggle:hover{transform:rotate(8deg)}
@@ -138,7 +143,7 @@
         :root[data-theme=oscuro] .header .desktop-search input::placeholder{color:#a9a9a9!important}
         :root[data-theme=oscuro] .header{border-bottom-color:#303030!important}
         :root[data-theme=oscuro] .search-panel .header-icon{color:#fff!important}
-        @media(max-width:800px){.header-right{gap:8px!important}.theme-toggle{width:40px;min-width:40px;height:40px;padding:7px}.theme-toggle svg{width:22px;height:22px}}
+        @media(max-width:800px){.header-right{gap:8px!important}.header > .header-side:not(.header-right){gap:8px!important}.theme-toggle{width:40px;min-width:40px;height:40px;padding:7px}.theme-toggle svg{width:22px;height:22px}}
         @media(prefers-reduced-motion:reduce){.theme-toggle{transition:none!important}.theme-toggle:hover{transform:none}}
       `;
       document.head.appendChild(style);
@@ -168,6 +173,79 @@
     }
   }
 
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setupThemeToggle,{once:true});
-  else setupThemeToggle();
+  function setupCatalogMenus(){
+    const catalog=document.getElementById('catalogo');
+    const heading=catalog?.querySelector('.catalog-heading');
+    if(!catalog||!heading||catalog.querySelector('.catalog-quick-menu'))return;
+
+    const categories=[...new Set((window.HAKI_PRODUCTOS||[])
+      .map(p=>String(p?.categoria||'').trim())
+      .filter(Boolean))];
+
+    const nav=document.createElement('nav');
+    nav.className='catalog-quick-menu';
+    nav.setAttribute('aria-label','Filtros del catálogo');
+    nav.innerHTML=`
+      <details class="catalog-filter catalog-filter-categories">
+        <summary>CATEGORÍAS <span aria-hidden="true"></span></summary>
+        <div class="catalog-dropdown">
+          <a href="#catalogo">Todas las prendas</a>
+          ${categories.map(category=>`<a href="#categoria/${encodeURIComponent(category)}">${category.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</a>`).join('')}
+        </div>
+      </details>
+      <details class="catalog-filter catalog-filter-shipping">
+        <summary>ENVÍOS <span aria-hidden="true"></span></summary>
+        <div class="catalog-dropdown">
+          <a href="encomiendas.html">Encomiendas</a>
+          <a href="domicilios.html">Domicilios</a>
+        </div>
+      </details>`;
+    heading.insertAdjacentElement('afterend',nav);
+
+    const details=[...nav.querySelectorAll('details')];
+    details.forEach(detail=>{
+      detail.addEventListener('toggle',()=>{
+        if(!detail.open)return;
+        details.forEach(other=>{if(other!==detail)other.open=false;});
+      });
+    });
+    nav.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>details.forEach(detail=>detail.open=false)));
+    document.addEventListener('click',event=>{
+      if(!nav.contains(event.target)) details.forEach(detail=>detail.open=false);
+    });
+
+    if(!document.getElementById('haki-catalog-menu-style')){
+      const style=document.createElement('style');
+      style.id='haki-catalog-menu-style';
+      style.textContent=`
+        .catalog-quick-menu{display:grid;grid-template-columns:1fr 1fr;position:relative;z-index:24;margin:0 0 26px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--surface)}
+        .catalog-filter{position:relative;min-width:0}
+        .catalog-filter:first-child{border-right:1px solid var(--line)}
+        .catalog-filter summary{list-style:none;min-height:52px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;gap:14px;cursor:pointer;color:var(--ink);font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;user-select:none}
+        .catalog-filter summary::-webkit-details-marker{display:none}
+        .catalog-filter summary span{position:relative;width:14px;height:14px;flex:0 0 14px}
+        .catalog-filter summary span::before,.catalog-filter summary span::after{content:'';position:absolute;left:2px;top:6px;width:10px;height:1.5px;background:currentColor;transition:transform .2s ease}
+        .catalog-filter summary span::after{transform:rotate(90deg)}
+        .catalog-filter[open] summary span::after{transform:rotate(0)}
+        .catalog-filter[open] summary{background:var(--soft)}
+        .catalog-dropdown{position:absolute;top:100%;left:0;width:200%;max-height:330px;overflow-y:auto;background:var(--surface);border:1px solid var(--line);box-shadow:0 14px 30px rgba(0,0,0,.12);padding:6px 0;z-index:40}
+        .catalog-filter:nth-child(2) .catalog-dropdown{left:auto;right:0}
+        .catalog-dropdown a{display:flex;align-items:center;min-height:46px;padding:0 16px;color:var(--ink);text-decoration:none;font-size:12px;font-weight:500;border-bottom:1px solid var(--line)}
+        .catalog-dropdown a:last-child{border-bottom:0}
+        .catalog-dropdown a:hover{background:var(--soft)}
+        :root[data-theme=oscuro] .catalog-dropdown{box-shadow:0 14px 32px rgba(0,0,0,.4)}
+        @media(max-width:800px){.catalog-quick-menu{margin-bottom:20px}.catalog-filter summary{min-height:48px;padding:0 12px;font-size:11px}.catalog-dropdown a{min-height:44px;padding:0 14px}}
+        @media(prefers-reduced-motion:reduce){.catalog-filter summary span::before,.catalog-filter summary span::after{transition:none!important}}
+      `;
+      document.head.appendChild(style);
+    }
+  }
+
+  const setupHeaderAndCatalog=()=>{
+    setupThemeToggle();
+    setupCatalogMenus();
+  };
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setupHeaderAndCatalog,{once:true});
+  else setupHeaderAndCatalog();
 })();
