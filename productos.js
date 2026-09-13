@@ -1059,7 +1059,7 @@ window.HAKI_PRODUCTOS = [
     "nombre": "SUP NEGRA MANGA LARGA",
     "precio": 26,
     "categoria": "Compresión",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-black.jpg",
+    "imagen": "images/1789335755577-d9ec79ca-IMG_2444.jpeg",
     "imagenRespaldo": "images/tee-black.svg",
     "tallas": {
       "S": false,
@@ -1075,7 +1075,7 @@ window.HAKI_PRODUCTOS = [
     ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "imagen2": "images/1789333945224-651d7c80-IMG_2443.jpeg"
+    "imagen2": "images/1789335742577-c0929b25-IMG_2443.jpeg"
   },
   {
     "id": 32,
@@ -1127,6 +1127,30 @@ window.HAKI_PRODUCTOS = [
     "novedad": true
   },
   {
+    "id": 35,
+    "codigo": "YLAF-03",
+    "nombre": "BOXY SKULL ROJA",
+    "precio": 26,
+    "categoria": "Compresión",
+    "imagen": "images/1789334536065-131410ad-IMG_5028.webp",
+    "imagenRespaldo": "images/tee-black.svg",
+    "tallas": {
+      "S": true,
+      "M": true,
+      "L": true,
+      "XL": false
+    },
+    "colecciones": [
+      "collection-4"
+    ],
+    "colores": [
+      "Rojo"
+    ],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "novedad": true
+  },
+  {
     "id": 34,
     "codigo": "YLAF1-01",
     "nombre": "BOXY SERPIENTE",
@@ -1149,30 +1173,6 @@ window.HAKI_PRODUCTOS = [
     "masVendido": true,
     "etiquetaMasVendido": "MÁS VENDIDO",
     "imagen2": "images/1789334437869-4e51e8e7-64c7ae95-a57e-4798-99bb-b578c8d51c80.jpeg",
-    "novedad": true
-  },
-  {
-    "id": 35,
-    "codigo": "YLAF-03",
-    "nombre": "BOXY SKULL ROJA",
-    "precio": 26,
-    "categoria": "Compresión",
-    "imagen": "images/1789334536065-131410ad-IMG_5028.webp",
-    "imagenRespaldo": "images/tee-black.svg",
-    "tallas": {
-      "S": true,
-      "M": true,
-      "L": true,
-      "XL": false
-    },
-    "colecciones": [
-      "collection-4"
-    ],
-    "colores": [
-      "Rojo"
-    ],
-    "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO",
     "novedad": true
   },
   {
@@ -1412,11 +1412,11 @@ window.HAKI_PRODUCTOS = [
   },
   {
     "id": 46,
-    "codigo": "HAKI-046",
-    "nombre": "Camiseta Motion 05",
-    "precio": 24,
+    "codigo": "YLAP-01",
+    "nombre": "Yla-Pants",
+    "precio": 35,
     "categoria": "Camisetas",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-gray.jpg",
+    "imagen": "images/1789335902578-1ac4eac4-IMG_5041.webp",
     "imagenRespaldo": "images/tee-gray.svg",
     "tallas": {
       "S": true,
@@ -1425,40 +1425,45 @@ window.HAKI_PRODUCTOS = [
       "XL": true
     },
     "colecciones": [
-      "collection-1"
+      "collection-3"
     ],
-    "colores": [],
-    "masVendido": false,
+    "colores": [
+      "Negro"
+    ],
+    "masVendido": true,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 47,
-    "codigo": "HAKI-047",
-    "nombre": "Short Training 05",
-    "precio": 23,
+    "codigo": "AOTP-06",
+    "nombre": "YLA-SNK PANTS",
+    "precio": 35,
     "categoria": "Shorts",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/shorts.jpg",
+    "imagen": "images/1789336024042-f3312759-IMG_5042.webp",
     "imagenRespaldo": "images/shorts.svg",
     "tallas": {
       "S": true,
-      "M": true,
-      "L": true,
-      "XL": true
+      "M": false,
+      "L": false,
+      "XL": false
     },
     "colecciones": [
-      "collection-2"
+      "collection-3"
     ],
-    "colores": [],
+    "colores": [
+      "Negro"
+    ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "imagen2": "images/1789336027972-549aaf15-IMG_5043.webp"
   },
   {
     "id": 48,
-    "codigo": "HAKI-048",
-    "nombre": "Legging Active 05",
-    "precio": 27,
+    "codigo": "YLAP1-01",
+    "nombre": "YLA-PANTS NEGRO",
+    "precio": 35,
     "categoria": "Leggings",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/leggings.jpg",
+    "imagen": "images/1789336133515-6c58b61a-IMG_5044.jpeg",
     "imagenRespaldo": "images/leggings.svg",
     "tallas": {
       "S": false,
@@ -1466,37 +1471,44 @@ window.HAKI_PRODUCTOS = [
       "L": true,
       "XL": true
     },
-    "colecciones": [],
+    "colecciones": [
+      "collection-3"
+    ],
     "colores": [],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "novedad": true
   },
   {
     "id": 49,
-    "codigo": "HAKI-049",
-    "nombre": "Compresión Core 05",
-    "precio": 26,
+    "codigo": "YLAP3-01",
+    "nombre": "YLA-BASIC PANTS",
+    "precio": 35,
     "categoria": "Compresión",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-black.jpg",
+    "imagen": "images/1789336194725-87af1880-IMG_5045.webp",
     "imagenRespaldo": "images/tee-black.svg",
     "tallas": {
-      "S": true,
+      "S": false,
       "M": true,
       "L": true,
-      "XL": false
+      "XL": true
     },
-    "colecciones": [],
-    "colores": [],
+    "colecciones": [
+      "collection-3"
+    ],
+    "colores": [
+      "Negro"
+    ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 50,
-    "codigo": "HAKI-050",
-    "nombre": "Camiseta Everyday 05",
-    "precio": 26,
+    "codigo": "YLAP4-01",
+    "nombre": "YLA-SKULL PANTS",
+    "precio": 35,
     "categoria": "Camisetas",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-gray.jpg",
+    "imagen": "images/1789336258515-ed6db935-IMG_5046.webp",
     "imagenRespaldo": "images/tee-gray.svg",
     "tallas": {
       "S": true,
@@ -1505,7 +1517,7 @@ window.HAKI_PRODUCTOS = [
       "XL": true
     },
     "colecciones": [
-      "collection-1"
+      "collection-3"
     ],
     "colores": [],
     "masVendido": false,
