@@ -174,7 +174,9 @@
     const esc=value=>String(value||'').replace(/[&<>"']/g,char=>({
       '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
     })[char]);
-    const collections=Array.isArray(window.HAKI_CONFIG?.colecciones)?window.HAKI_CONFIG.colecciones:[];
+    const collections=typeof window.hakiCollections==='function'
+      ? window.hakiCollections(window.HAKI_CONFIG||{})
+      : (window.HAKI_COLLECTION_DEFAULTS||[]);
     const categoryItems=collections.length
       ? collections.filter(item=>item&&item.id&&item.nombre).map(item=>({label:item.nombre,href:`#coleccion/${encodeURIComponent(item.id)}`}))
       : [
@@ -242,11 +244,12 @@
     }
   }
 
-  const setupHeaderAndCatalog=()=>{
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',setupThemeToggle,{once:true});
+    document.addEventListener('DOMContentLoaded',setupCatalogMenus,{once:true});
+  } else {
     setupThemeToggle();
-    setupCatalogMenus();
-  };
-
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setupHeaderAndCatalog,{once:true});
-  else setupHeaderAndCatalog();
+    if(document.readyState==='complete') setupCatalogMenus();
+    else document.addEventListener('DOMContentLoaded',setupCatalogMenus,{once:true});
+  }
 })();
