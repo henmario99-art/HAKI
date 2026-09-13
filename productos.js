@@ -104,6 +104,221 @@ window.HAKI_CONFIG = {
       "texto": "PASOS Y REQUISITOS\n\n1. SE HARÁ CAMBIO SI:\nEl cliente recibe una talla equivocada.\n\n2. EL CLIENTE RECIBE\nuna prenda equivocada.\n\n3. LA PRENDA LLEGA\ndañada.\n\n4. EN CUALQUIERA DE ESTOS CASOS\nHaki se hace cargo de cubrir\nlos costos del cambio.\n\nY SI TODO ESTÁ BIEN,\nPERO QUIERO CAMBIARLA?\n\nSI, PUEDES REALIZAR EL CAMBIO\nde tu prenda o talla.\n\n*Para realizar el cambio la prenda debe estar\nen perfecto estado, sin daños o mal olor *\n\n*EN ESTE CASO EL CLIENTE\nSE HACE CARGO DE LOS COSTOS DEL CAMBIO*",
       "imagenes": []
     }
+  },
+  "tipografia": {
+    "anuncio": {
+      "fuente": "Poppins",
+      "negrita": false
+    },
+    "tituloPortada": {
+      "fuente": "Horizon",
+      "negrita": false
+    },
+    "textoPortada": {
+      "fuente": "Poppins",
+      "negrita": false
+    },
+    "botonesPortada": {
+      "fuente": "Poppins",
+      "negrita": false
+    },
+    "titulosSeccion": {
+      "fuente": "Poppins",
+      "negrita": false
+    },
+    "categorias": {
+      "fuente": "Poppins",
+      "negrita": false
+    },
+    "nombreProducto": {
+      "fuente": "Poppins",
+      "negrita": false
+    },
+    "codigoProducto": {
+      "fuente": "Poppins",
+      "negrita": false
+    },
+    "precioProducto": {
+      "fuente": "Poppins",
+      "negrita": true
+    },
+    "botonesCatalogo": {
+      "fuente": "Poppins",
+      "negrita": false
+    },
+    "tituloCarrito": {
+      "fuente": "Horizon",
+      "negrita": false
+    },
+    "textoCarrito": {
+      "fuente": "Poppins",
+      "negrita": false
+    },
+    "botonesCarrito": {
+      "fuente": "Poppins",
+      "negrita": true
+    },
+    "footer": {
+      "fuente": "Poppins",
+      "negrita": false
+    },
+    "gymratTitulo": {
+      "fuente": "Horizon",
+      "negrita": false
+    },
+    "gymratTexto": {
+      "fuente": "Poppins",
+      "negrita": false
+    }
+  },
+  "gymrat": {
+    "habilitado": true,
+    "botonTexto": "GYMRAT TEST",
+    "titulo": "GYMRAT TEST",
+    "introduccion": "Descubre que tipo de GYMRAT eres:",
+    "preguntas": [
+      {
+        "id": "color",
+        "texto": "¿Color favorito?",
+        "opciones": [
+          "Blanco",
+          "Negro",
+          "Rojo",
+          "Azul",
+          "Gris"
+        ]
+      },
+      {
+        "id": "ejercicio",
+        "texto": "¿Ejercicio favorito?",
+        "opciones": [
+          "Sentadilla",
+          "Peso Muerto",
+          "Press banca",
+          "Curl bíceps"
+        ]
+      },
+      {
+        "id": "frecuencia",
+        "texto": "Entreno...",
+        "opciones": [
+          "2-3 días a la semana",
+          "7 días a la semana",
+          "Cuando puedo"
+        ]
+      },
+      {
+        "id": "fit",
+        "texto": "Prefieres...",
+        "opciones": [
+          "Compresión",
+          "Holgado"
+        ]
+      }
+    ],
+    "perfiles": {
+      "dark": {
+        "nombre": "GYMRAT DARK MODE",
+        "texto": "Eres un GYMRAT DARK MODE, seguro de ti mismo. No necesitas ser extrovertido para hacerte notar; seguramente entrenas con Rosa Pastel de fondo.\n\n Te preparamos una selección de prendas que sabemos que te van a gustar.",
+        "reglas": {
+          "color": [
+            "Negro",
+            "Rojo",
+            "Gris"
+          ],
+          "ejercicio": [
+            "Peso Muerto",
+            "Sentadilla"
+          ],
+          "frecuencia": [
+            "7 días a la semana"
+          ],
+          "fit": [
+            "Compresión"
+          ]
+        },
+        "coloresProducto": [
+          "negro",
+          "negra",
+          "black",
+          "gris",
+          "gray"
+        ],
+        "tiposProducto": [
+          "compresión",
+          "compresion",
+          "compression"
+        ]
+      },
+      "angel": {
+        "nombre": "GYMRAT ANGELICAL",
+        "texto": "Eres un GYMRAT Angelical. Te gusta lucir pulcro, elegante y llevar todo súper ordenado. Evitas la fatiga y seguramente escuchas podcast para entrenar. \nTe preparamos una selección de prendas que sabemos que te van a gustar.",
+        "reglas": {
+          "color": [
+            "Blanco",
+            "Azul"
+          ],
+          "ejercicio": [
+            "Curl bíceps",
+            "Press banca"
+          ],
+          "frecuencia": [
+            "2-3 días a la semana",
+            "Cuando puedo"
+          ],
+          "fit": [
+            "Compresión",
+            "Holgado"
+          ]
+        },
+        "coloresProducto": [
+          "blanco",
+          "blanca",
+          "white",
+          "azul",
+          "blue"
+        ],
+        "tiposProducto": [
+          "compresión",
+          "compresion",
+          "compression",
+          "oversized",
+          "pants",
+          "jogger"
+        ]
+      },
+      "heavy": {
+        "nombre": "GYMRAT HEAVY DUTY",
+        "texto": "Eres un GYMRAT Heavy Duty. Entrenas siempre pesado y al fallo; definitivamente no te importa nada. ¿Fatiga? Para ti no existe. Escuchas de todo para entrenar, desde rock hasta pop girly. \n\nTe preparamos una selección de prendas que sabemos que te va a gustar.",
+        "reglas": {
+          "color": [
+            "Rojo"
+          ],
+          "ejercicio": [
+            "Peso Muerto",
+            "Sentadilla"
+          ],
+          "frecuencia": [
+            "7 días a la semana"
+          ],
+          "fit": [
+            "Compresión"
+          ]
+        },
+        "coloresProducto": [
+          "rojo",
+          "roja",
+          "red"
+        ],
+        "tiposProducto": [
+          "oversized",
+          "compresión",
+          "compresion",
+          "compression"
+        ]
+      }
+    },
+    "maxProductos": 8
   }
 };
 
