@@ -26,14 +26,25 @@
     const shipping=!count||free?0:rate*(c.envioPorPrenda===true||c.envioPorPrenda==='true'?count:1);
     return {subtotal:cents/100,shipping:shipping/100,total:(cents+shipping)/100,free,remaining:Math.max(0,meta-cents)/100,progress:Math.min(100,cents/meta*100),threshold:meta/100};
   };
+  // Ignore responsive variants that were published empty, so the storefront
+  // always falls back to a valid optimized size instead of a broken image.
+  const brokenImageVariants=new Set([
+    'images/optimized/06de4e28143e-800.webp',
+    'images/optimized/2e82ffe16ce2-800.webp',
+    'images/optimized/3fbbc9a12792-1080.webp',
+    'images/optimized/46cbbf8eef87-1200.webp',
+    'images/optimized/92af4e6950b3-960.webp',
+    'images/optimized/b5469b80bec9-1400.webp'
+  ]);
+  const imageItems=url=>((window.HAKI_IMAGES||{})[url]||[]).filter(v=>v&&v.src&&!brokenImageVariants.has(v.src));
   window.hakiImage=(url='',size=800)=>{
-    const items=(window.HAKI_IMAGES||{})[url];
-    if(items) return (items.find(v=>v.width>=size)||items.at(-1)).src;
+    const items=imageItems(url);
+    if(items.length) return (items.find(v=>v.width>=size)||items.at(-1)).src;
     if(!url) return 'images/producto.svg';
     if(/^(https?:|data:|blob:)/i.test(url))return url;
     if(/\.svg$/i.test(url))return url;
     return 'https://raw.githubusercontent.com/henmario99-art/HAKI/main/'+String(url).replace(/^\/?(?:\.\/)?/,'');
   };
-  window.hakiSrcset=url=>((window.HAKI_IMAGES||{})[url]||[]).map(v=>`${v.src} ${v.width}w`).join(', ');
+  window.hakiSrcset=url=>imageItems(url).map(v=>`${v.src} ${v.width}w`).join(', ');
   window.hakiSafeLink=(value,fallback='#catalogo')=>{try{const u=new URL(value,location.href);return ['https:','http:'].includes(u.protocol)?value:fallback;}catch{return fallback;}};
 })();
