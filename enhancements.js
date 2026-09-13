@@ -121,7 +121,7 @@
       <div class="haki-complement-grid" tabindex="0" aria-label="Sugerencias complementarias, desplázate horizontalmente">
         ${picks.map(item => `
           <a class="haki-complement-card" href="#producto/${encodeURIComponent(item.codigo)}">
-            <div class="haki-complement-image"><img src="${item.imagen || item.imagenRespaldo || 'images/producto.svg'}" alt="${String(item.nombre || '').replace(/"/g,'&quot;')}" loading="lazy"></div>
+            <div class="haki-complement-image"><img src="${window.hakiImage(item.imagen || item.imagenRespaldo,400)}" alt="${String(item.nombre || '').replace(/"/g,'&quot;')}" loading="lazy"></div>
             <div class="haki-complement-info"><div><span class="haki-complement-code">${item.codigo}</span><span class="haki-complement-name">${item.nombre}</span></div><span class="haki-complement-price">${money(item.precio)}</span></div>
           </a>`).join('')}
       </div>`;
@@ -223,19 +223,20 @@
     scheduled = true;
     requestAnimationFrame(() => {
       scheduled = false;
+      observer.disconnect();
       applyCardStatuses();
       enhanceDetail();
-      polishFooter();
-      const help = $('#formHelp');
-      if (help) help.textContent = 'Instagram abrirá directamente el chat de HAKI y copiará esta misma cotización para que puedas enviarla.';
+
+      ['products','newProducts','productDetail'].forEach(id=>observer.observe(document.getElementById(id),{childList:true,subtree:true}));
+
     });
   }
 
-  document.addEventListener('click', instagramQuote, true);
+
   document.addEventListener('click', autoOpenCartAfterDetailAdd);
   smoothCategoryDialog();
   const observer = new MutationObserver(enhance);
-  observer.observe(document.body, { childList:true, subtree:true });
+  ['products','newProducts','productDetail'].forEach(id=>observer.observe(document.getElementById(id),{childList:true,subtree:true}));
   window.addEventListener('hashchange', () => {
     enhance();
     setTimeout(enhance, 40);

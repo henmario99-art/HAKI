@@ -6,25 +6,7 @@
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 
-  const IMAGE_VERSION = Date.now();
-  const RAW_BASE = 'https://raw.githubusercontent.com/henmario99-art/HAKI/main/';
-
-  function freshImage(url = '') {
-    if (!url) return '';
-
-    if (
-      url.startsWith('http://') ||
-      url.startsWith('https://') ||
-      url.startsWith('data:') ||
-      url.startsWith('blob:')
-    ) {
-      return url;
-    }
-
-    const clean = String(url).replace(/^\/?(?:\.\/)?/, '');
-    return `${RAW_BASE}${clean}?v=${IMAGE_VERSION}`;
-  }
-
+  const freshImage = (url, size=800) => window.hakiImage(url,size);
   let detailCode = null;
   let lastListingHash = '#top';
   const listingPositions = new Map();
@@ -85,12 +67,12 @@
   }
 
   function saveCart() {
-    localStorage.setItem('haki_cart_v1', JSON.stringify(state.cart));
+    try { localStorage.setItem('haki_cart_v1', JSON.stringify(state.cart)); } catch {}
   }
 
   function loadCart() {
     try {
-      return JSON.parse(localStorage.getItem('haki_cart_v1')) || [];
+      const cart = JSON.parse(localStorage.getItem('haki_cart_v1')); return Array.isArray(cart) ? cart.filter(i=>i&&Number.isInteger(i.cantidad)&&i.cantidad>0) : [];
     } catch {
       return [];
     }
@@ -101,6 +83,7 @@
   }
 
   function applyConfig() {
+    applyExperience();
     $('#announcementText').textContent =
       CONFIG.anuncio || 'HECHO PARA TU SIGUIENTE NIVEL';
 
@@ -120,8 +103,9 @@
     const hero = $('#heroImage');
 
     hero.src = freshImage(
-      CONFIG.portada || CONFIG.portadaRespaldo
+      CONFIG.portada || CONFIG.portadaRespaldo, 1920
     );
+    hero.srcset = window.hakiSrcset(CONFIG.portada); hero.sizes="100vw";
 
     hero.onerror = () => {
       hero.onerror = null;
@@ -245,7 +229,7 @@
                   freshImage(fallbackFor(p))
                 )}"
                 alt="${esc(p.nombre)}"
-                loading="lazy"
+                loading="lazy" decoding="async" width="400" height="500" srcset="${esc(window.hakiSrcset(p.imagen))}" sizes="(max-width:800px) 50vw, 25vw"
               >
 
               <span class="product-number">
@@ -371,6 +355,7 @@
 
     saveCart();
     renderCart();
+    openCart();
 
     showToast(
       `${p.nombre} · ${size} añadida`
@@ -434,8 +419,7 @@
     els.cartEmpty.hidden =
       state.cart.length > 0;
 
-    els.total.textContent =
-      money(cartTotal());
+    renderShipping();
 
     els.cartItems.innerHTML = state.cart
       .map(i => {
@@ -500,7 +484,7 @@
                 data-code="${esc(i.codigo)}"
                 data-size="${esc(i.talla)}"
               >
-                ELIMINAR
+                ${esc(settings().eliminarTexto)}
               </button>
 
             </div>
@@ -608,8 +592,8 @@
       )}`;
     });
 
-    return `Hola HAKI 👋
-Quiero solicitar una cotización.
+    const totals = window.hakiTotals(cartTotal(), itemCount(), CONFIG);
+    return `${settings().saludoCotizacion}
 
 Nombre: ${name}
 Departamento: ${dept}
@@ -618,7 +602,9 @@ Municipio: ${muni}
 Productos:
 ${lines.join('\n')}
 
-Total estimado: ${money(cartTotal())}`;
+${settings().subtotalTexto}: ${money(totals.subtotal)}
+${settings().envioTexto}: ${totals.free ? settings().gratisTexto : money(totals.shipping)}
+${settings().totalTexto}: ${money(totals.total)}`;
   }
 
   function validateQuote() {
@@ -669,9 +655,7 @@ Total estimado: ${money(cartTotal())}`;
     }
 
     window.open(
-      `https://www.instagram.com/${
-        CONFIG.instagram
-      }/`,
+      `https://ig.me/m/${encodeURIComponent(String(CONFIG.instagram || '').replace(/^@/,''))}`,
       '_blank',
       'noopener'
     );
@@ -695,6 +679,7 @@ Total estimado: ${money(cartTotal())}`;
     );
   }
 
+  $('#desktopSearch').addEventListener('input', e=>{els.search.value=e.target.value;els.search.dispatchEvent(new Event('input'));});
   els.search.addEventListener(
     'input',
     e => {
@@ -705,7 +690,7 @@ Total estimado: ${money(cartTotal())}`;
         history.replaceState(null, '', '#catalogo');
         window.scrollTo({ top: 0, behavior: 'instant' });
       }
-      state.query = e.target.value;
+      state.query = e.target.value; $('#desktopSearch').value=state.query;
       state.category = 'Todos'; state.collection = null;
       setHomeVisible(!state.query);
       if (state.query) window.scrollTo({ top: 0, behavior: 'instant' });
@@ -783,7 +768,7 @@ Total estimado: ${money(cartTotal())}`;
       return;
     }
     document.title = 'HAKI — Ropa deportiva';
-    state.query = ''; els.search.value = '';
+    state.query = ''; els.search.value = ''; $('#desktopSearch').value='';
     state.category = 'Todos'; state.collection = null;
     if (hash.startsWith('categoria/')) state.category = hash.slice(10);
     if (hash.startsWith('coleccion/')) state.collection = COLLECTIONS.find(c => c.id === hash.slice(10)) || null;
@@ -816,7 +801,7 @@ Total estimado: ${money(cartTotal())}`;
       <div class="detail-layout">
         <div class="detail-media">
           <div id="detailGallery" class="detail-gallery" tabindex="0" aria-label="Fotos de ${esc(p.nombre)}">
-            ${images.map((url, i) => `<img src="${esc(freshImage(url))}" data-fallback="${esc(freshImage(fallbackFor(p)))}" alt="${esc(p.nombre)} · Foto ${i + 1}" ${i ? 'loading="lazy"' : 'fetchpriority="high"'}>`).join('')}
+            ${images.map((url, i) => `<img src="${esc(freshImage(url,1400))}" data-fallback="${esc(freshImage(fallbackFor(p)))}" alt="${esc(p.nombre)} · Foto ${i + 1}" ${i ? 'loading="lazy"' : 'fetchpriority="high"'}>`).join('')}
           </div>
           <div class="gallery-controls" ${images.length < 2 ? 'hidden' : ''}>
             <button class="header-icon" type="button" id="galleryPrev" aria-label="Foto anterior">←</button>
@@ -846,6 +831,7 @@ Total estimado: ${money(cartTotal())}`;
     $$('img[data-fallback]', detail).forEach(img => img.addEventListener('error', () => { img.src = img.dataset.fallback; }, { once: true }));
     let photo = 0;
     const gallery = $('#detailGallery');
+    setupZoom(gallery);
     function updateDots() { $$('[data-photo]', detail).forEach(btn => btn.setAttribute('aria-pressed', String(Number(btn.dataset.photo) === photo))); }
     function goPhoto(index) { photo = Math.max(0, Math.min(images.length - 1, index)); gallery.scrollTo({ left: photo * gallery.clientWidth, behavior: 'smooth' }); updateDots(); }
     $('#galleryPrev').addEventListener('click', () => goPhoto(photo - 1));
@@ -908,13 +894,77 @@ Total estimado: ${money(cartTotal())}`;
   $('.rail-next').addEventListener('click', () => $('#newProducts').scrollBy({ left: $('#newProducts').clientWidth * .8, behavior: 'smooth' }));
   document.addEventListener('keydown', e => {
     if (e.key !== 'Tab' || els.drawer.getAttribute('aria-hidden') !== 'false') return;
-    const items = $$('button:not(:disabled), input, a[href]', els.drawer);
-    const first = items[0], last = items[items.length - 1];
+    const items = $$('button:not(:disabled), input, select, summary, a[href]', els.drawer);
+    const focusable=items.filter(el=>el.getClientRects().length);
+    const first = focusable[0], last = focusable[focusable.length - 1];
     if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   });
   window.addEventListener('hashchange', route);
 
+  const settings=()=>window.hakiSettings(CONFIG);
+  let announcementTimer;
+  let announcementPaused=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let announcementIndex=0;
+  function applyExperience(){
+    const c=settings();
+    document.documentElement.dataset.theme=c.tema==='oscuro'?'oscuro':'claro';
+    document.documentElement.style.setProperty('--font-title',c.fuenteTitulos==='Horizon'?'Horizon, Poppins, sans-serif':'Poppins, sans-serif');
+    document.documentElement.style.setProperty('--font-body',c.fuenteTexto==='Horizon'?'Horizon, Poppins, sans-serif':'Poppins, sans-serif');
+    if(c.horizonUrl&&applyExperience.font!==c.horizonUrl){
+      applyExperience.font=c.horizonUrl;
+      const font=new FontFace('Horizon',`url(${JSON.stringify(window.hakiSafeLink(c.horizonUrl,''))})`,{display:'swap'});
+      font.load().then(f=>document.fonts.add(f)).catch(()=>{});
+    }
+    const texts={'#cartDrawer .eyebrow':c.carritoAntetitulo,'#cartDrawer .drawer-head h2':c.carritoTitulo,'#cartEmpty strong':c.carritoVacio,'#cartEmpty span':c.carritoAyudaVacio,'#cartNotice':c.carritoAviso,'#shippingInfo':c.envioInformacion,'#recommendationsTitle':c.sugerenciasTitulo,'#recommendationsText':c.sugerenciasTexto,'#orderSummaryTitle':c.resumenTitulo,'#subtotalLabel':c.subtotalTexto,'#shippingLabel':c.envioTexto,'#totalLabel':c.totalTexto,'#quoteForm .form-title':c.datosTitulo,'#nameLabel':c.nombreTexto,'#departmentLabel':c.departamentoTexto,'#municipalityLabel':c.municipioTexto,'#quoteForm .whatsapp':c.whatsappTexto,'#instagramQuote':c.instagramTexto,'#formHelp':c.carritoAyuda};
+    Object.entries(texts).forEach(([selector,value])=>{$(selector).textContent=value;});
+    $('#cartDrawer').setAttribute('aria-label',c.carritoTitulo);
+    [['#customerName',c.nombrePlaceholder],['#customerDepartment',c.departamentoPlaceholder],['#customerMunicipality',c.municipioPlaceholder],['#desktopSearch',c.buscarTexto],['#searchInput',c.buscarTexto]].forEach(([selector,value])=>$(selector).placeholder=value);
+    [1,2].forEach(i=>{const b=$('#heroButton'+i);b.textContent=c[i===1?'botonPortada':'botonPortada2'];b.href=window.hakiSafeLink(c[i===1?'enlacePortada':'enlacePortada2']);b.hidden=!b.textContent.trim();});
+    clearInterval(announcementTimer);
+    const announcements=[c.anuncio||'Envíos desde $1',c.anuncio2,c.anuncio3].filter(v=>String(v||'').trim());
+    announcementIndex=0;$('#announcementText').textContent=announcements[0];
+    $('#pauseAnnouncement').textContent=announcementPaused?'▶':'Ⅱ';
+    $('#pauseAnnouncement').setAttribute('aria-label',announcementPaused?'Reanudar anuncios':'Pausar anuncios');
+    announcementTimer=setInterval(()=>{if(!announcementPaused&&!document.hidden){announcementIndex=(announcementIndex+1)%announcements.length;$('#announcementText').textContent=announcements[announcementIndex];}},5000);
+  }
+  $('#pauseAnnouncement').addEventListener('click',()=>{announcementPaused=!announcementPaused;applyExperience();});
+  function renderShipping(){
+    const c=settings(),t=window.hakiTotals(cartTotal(),itemCount(),CONFIG);
+    $('#shippingMessage').textContent=t.free?c.envioListo:String(c.envioFalta).replaceAll('{monto}',money(t.remaining));
+    $('#shippingProgress').value=t.progress;$('#shippingThreshold').textContent=money(t.threshold);
+    $('#cartSubtotal').textContent=money(t.subtotal);$('#shippingAmount').textContent=t.free?c.gratisTexto:money(t.shipping);els.total.textContent=money(t.total);
+    const chosen=state.cart.map(i=>productByCode(i.codigo)).filter(Boolean);
+    const type=p=>{const v=normalize(p.categoria+' '+p.nombre);return /short|pants|jogger|pantalon|calzoneta/.test(v)?'bottom':/compresion|camis|top|centro|oversized/.test(v)?'top':'other';};
+    const complement=p=>chosen.some(q=>(type(q)==='top'&&type(p)==='bottom')||(type(q)==='bottom'&&type(p)==='top'));
+    const pool=ALL_PRODUCTS.filter(p=>!chosen.includes(p)&&Object.values(p.tallas||{}).some(Boolean)).sort((a,b)=>a.precio-b.precio);
+    // Cheapest option first; then affordable complementary pieces, without duplicates.
+    const picks=[pool[0],...pool.filter(complement),...pool].filter(Boolean).filter((p,i,a)=>a.indexOf(p)===i).slice(0,6);
+    $('#cartRecommendations').hidden=!chosen.length||t.free||!picks.length;
+    $('#recommendationItems').innerHTML=(!chosen.length||t.free?'':picks.map(p=>`<article class="recommendation"><a href="#producto/${encodeURIComponent(p.codigo)}" data-recommend-view><img src="${esc(freshImage(p.imagen,400))}" loading="lazy" decoding="async" alt="${esc(p.nombre)}" width="72" height="90"></a><div><a class="recommendation-name" href="#producto/${encodeURIComponent(p.codigo)}" data-recommend-view>${esc(p.nombre)}</a><strong>${money(p.precio)}</strong><div class="recommendation-actions"><select aria-label="${esc(c.sugerenciasTalla+' de '+p.nombre)}" data-recommend-size="${esc(p.codigo)}"><option value="">${esc(c.sugerenciasTalla)}</option>${['S','M','L','XL'].map(size=>`<option ${p.tallas?.[size]?'':'disabled'}>${size}</option>`).join('')}</select><button type="button" data-recommend-add="${esc(p.codigo)}" disabled>+ ${esc(c.sugerenciasAgregar)}</button></div></div></article>`).join(''));
+    $$('[data-recommend-size]').forEach(select=>select.addEventListener('change',()=>{$('[data-recommend-add]',select.closest('article')).disabled=!select.value;}));
+    $$('[data-recommend-add]').forEach(btn=>btn.addEventListener('click',()=>{const select=$('select',btn.closest('article'));state.selected[btn.dataset.recommendAdd]=select.value;addToCart(btn.dataset.recommendAdd);}));
+    $$('[data-recommend-view]').forEach(a=>a.addEventListener('click',closeCart));
+  }
+  function setupZoom(gallery){
+    const media=gallery.parentElement;
+    const button=document.createElement('button');button.type='button';button.className='gallery-zoom';button.textContent='+';button.setAttribute('aria-label','Ampliar imagen');button.setAttribute('aria-pressed','false');media.append(button);
+    let zoom=false;
+    const reset=()=>{$$('img',gallery).forEach(img=>{img.style.transform='';img.style.transformOrigin='';});};
+    const toggle=()=>{zoom=!zoom;gallery.classList.toggle('zoomed',zoom);button.textContent=zoom?'−':'+';button.setAttribute('aria-label',zoom?'Reducir imagen':'Ampliar imagen');button.setAttribute('aria-pressed',String(zoom));reset();if(zoom){const i=Math.round(gallery.scrollLeft/gallery.clientWidth);$$('img',gallery)[i].style.transform='scale(2)';}};
+    button.addEventListener('click',toggle);
+    gallery.addEventListener('dblclick',toggle);
+    gallery.addEventListener('pointermove',e=>{if(!zoom)return;const rect=gallery.getBoundingClientRect();const img=$$('img',gallery)[Math.round(gallery.scrollLeft/gallery.clientWidth)];img.style.transformOrigin=`${Math.max(0,Math.min(100,(e.clientX-rect.left)/rect.width*100))}% ${Math.max(0,Math.min(100,(e.clientY-rect.top)/rect.height*100))}%`;});
+    gallery.addEventListener('scroll',()=>{if(zoom){zoom=false;gallery.classList.remove('zoomed');button.textContent='+';button.setAttribute('aria-label','Ampliar imagen');button.setAttribute('aria-pressed','false');reset();}},{passive:true});
+    gallery.addEventListener('keydown',e=>{if(e.key==='Escape'&&zoom)toggle();});
+  }
+  function reconcileCart(){state.cart=state.cart.filter(i=>{const p=productByCode(i.codigo);return p&&p.tallas?.[i.talla]&&Number.isInteger(i.cantidad)&&i.cantidad>0;});saveCart();}
+  window.addEventListener('haki:catalog-updated',()=>{
+    Object.keys(CONFIG).forEach(k=>delete CONFIG[k]);Object.assign(CONFIG,window.HAKI_CONFIG);
+    ALL_PRODUCTS.splice(0,ALL_PRODUCTS.length,...window.HAKI_PRODUCTOS);COLLECTIONS.splice(0,COLLECTIONS.length,...window.hakiCollections(CONFIG));
+    reconcileCart();applyConfig();renderCollections();renderProducts();if(detailCode)renderProductDetail(productByCode(detailCode));renderCart();
+  });
+  reconcileCart();
   applyConfig();
   renderCollections();
   route();

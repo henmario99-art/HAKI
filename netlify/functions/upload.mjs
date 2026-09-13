@@ -22,6 +22,8 @@ export default async (request) => {
       name += ext;
     }
 
+    // Unique names allow browser caching while replacements appear immediately.
+    name = `${Date.now()}-${crypto.randomUUID().slice(0,8)}-${name}`;
     const path = `images/${name}`;
     const { owner, repo } = repoParts();
     let sha;

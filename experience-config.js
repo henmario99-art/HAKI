@@ -1,0 +1,39 @@
+(() => {
+  const defaults = {
+    tema:'claro', fuenteTitulos:'Horizon', fuenteTexto:'Poppins', horizonUrl:'',
+    anuncio2:'Envío gratis desde $70 en prendas', anuncio3:'Encuentra tu próximo outfit HAKI',
+    botonPortada:'EXPLORAR COLECCIÓN', enlacePortada:'#catalogo', botonPortada2:'VER NOVEDADES', enlacePortada2:'#novedades',
+    buscarTexto:'Escribe un código o nombre de prenda…',
+    carritoTitulo:'MI CARRITO', carritoAntetitulo:'TU SELECCIÓN', carritoVacio:'Tu carrito está vacío.', carritoAyudaVacio:'Elige una talla y añade tus prendas favoritas.',
+    envioMeta:70, envioCosto:1, envioPorPrenda:true,
+    envioFalta:'Te faltan {monto} para obtener envío gratis', envioListo:'¡Tienes envío gratis a todo El Salvador!',
+    envioInformacion:'Envío gratis a todo el país desde $70 en prendas. En compras menores, el costo estimado corresponde a encomienda; el envío a domicilio se confirma al cotizar.',
+    carritoAviso:'Tus prendas no están reservadas. Solicita tu cotización para confirmar disponibilidad.',
+    sugerenciasTitulo:'COMPLETA TU PEDIDO', sugerenciasTexto:'Añade una de estas prendas y acércate al envío gratis.',
+    sugerenciasAgregar:'Añadir', sugerenciasTalla:'Talla',
+    resumenTitulo:'RESUMEN DEL PEDIDO', subtotalTexto:'Subtotal de prendas', envioTexto:'Envío estimado', totalTexto:'Total estimado', gratisTexto:'GRATIS', eliminarTexto:'Eliminar',
+    datosTitulo:'DATOS PARA COTIZAR', nombreTexto:'Nombre', nombrePlaceholder:'Tu nombre', departamentoTexto:'Departamento', departamentoPlaceholder:'Ej. Santa Ana', municipioTexto:'Municipio', municipioPlaceholder:'Ej. Santa Ana',
+    whatsappTexto:'SOLICITAR POR WHATSAPP', instagramTexto:'SOLICITAR POR INSTAGRAM', carritoAyuda:'Confirma tu envío y disponibilidad al solicitar la cotización. Para Instagram, pegá el texto copiado en el chat.',
+    saludoCotizacion:'Hola HAKI 👋\nQuiero solicitar una cotización.'
+  };
+  window.HAKI_DEFAULTS=defaults;
+  window.hakiSettings=config=>({...defaults,...config});
+  window.hakiTotals=(subtotal,count,config)=>{
+    const c=window.hakiSettings(config), cents=Math.round(Number(subtotal)*100);
+    const meta=Number.isFinite(+c.envioMeta)&&+c.envioMeta>0?Math.round(+c.envioMeta*100):7000;
+    const rate=Number.isFinite(+c.envioCosto)&&+c.envioCosto>=0?Math.round(+c.envioCosto*100):100;
+    const free=count>0&&cents>=meta;
+    const shipping=!count||free?0:rate*(c.envioPorPrenda===true||c.envioPorPrenda==='true'?count:1);
+    return {subtotal:cents/100,shipping:shipping/100,total:(cents+shipping)/100,free,remaining:Math.max(0,meta-cents)/100,progress:Math.min(100,cents/meta*100),threshold:meta/100};
+  };
+  window.hakiImage=(url='',size=800)=>{
+    const items=(window.HAKI_IMAGES||{})[url];
+    if(items) return (items.find(v=>v.width>=size)||items.at(-1)).src;
+    if(!url) return 'images/producto.svg';
+    if(/^(https?:|data:|blob:)/i.test(url))return url;
+    if(/\.svg$/i.test(url))return url;
+    return 'https://raw.githubusercontent.com/henmario99-art/HAKI/main/'+String(url).replace(/^\/?(?:\.\/)?/,'');
+  };
+  window.hakiSrcset=url=>((window.HAKI_IMAGES||{})[url]||[]).map(v=>`${v.src} ${v.width}w`).join(', ');
+  window.hakiSafeLink=(value,fallback='#catalogo')=>{try{const u=new URL(value,location.href);return ['https:','http:'].includes(u.protocol)?value:fallback;}catch{return fallback;}};
+})();
