@@ -15,8 +15,8 @@ window.HAKI_CONFIG = {
   "enlacePortada": "#catalogo",
   "botonPortada2": "VER NOVEDADES",
   "enlacePortada2": "#novedades",
-  "estiloBotonPortada": "blanco",
-  "estiloBotonPortada2": "transparente",
+  "estiloBotonPortada": "transparente",
+  "estiloBotonPortada2": "blanco",
   "buscarTexto": "Escribe un código o nombre de prenda…",
   "carritoTitulo": "MI CARRITO",
   "carritoAntetitulo": "TU SELECCIÓN",
@@ -425,8 +425,7 @@ window.HAKI_PRODUCTOS = [
     "imagen2": "images/WhatsApp-Image-2026-09-11-at-2.56.24-PM.jpeg",
     "guiaTallas": "",
     "colores": [
-      "Negro",
-      "Gris"
+      "Negro"
     ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
@@ -450,7 +449,9 @@ window.HAKI_PRODUCTOS = [
     ],
     "novedad": true,
     "imagen2": "images/WhatsApp-Image-2026-09-11-at-2.58.56-PMd.jpeg",
-    "colores": [],
+    "colores": [
+      "Blanco"
+    ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
@@ -472,7 +473,9 @@ window.HAKI_PRODUCTOS = [
       "collection-1"
     ],
     "novedad": true,
-    "colores": [],
+    "colores": [
+      "Gris"
+    ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
@@ -495,7 +498,9 @@ window.HAKI_PRODUCTOS = [
     ],
     "novedad": true,
     "imagen2": "images/WhatsApp-Image-2026-09-11-at-3.01.22-PMy.jpeg",
-    "colores": [],
+    "colores": [
+      "Negro"
+    ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
@@ -517,7 +522,10 @@ window.HAKI_PRODUCTOS = [
       "collection-1"
     ],
     "novedad": true,
-    "colores": [],
+    "colores": [
+      "Negro",
+      "Rojo"
+    ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
@@ -539,7 +547,9 @@ window.HAKI_PRODUCTOS = [
       "collection-1"
     ],
     "imagen2": "images/J.jpeg",
-    "colores": [],
+    "colores": [
+      "Negro"
+    ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
@@ -561,7 +571,10 @@ window.HAKI_PRODUCTOS = [
       "collection-1"
     ],
     "imagen2": "images/G.jpeg",
-    "colores": [],
+    "colores": [
+      "Gris",
+      "Blanco"
+    ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
@@ -583,7 +596,9 @@ window.HAKI_PRODUCTOS = [
       "collection-1"
     ],
     "novedad": true,
-    "colores": [],
+    "colores": [
+      "Negro"
+    ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
@@ -605,7 +620,10 @@ window.HAKI_PRODUCTOS = [
       "collection-1"
     ],
     "novedad": true,
-    "colores": [],
+    "colores": [
+      "Gris",
+      "Blanco"
+    ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
