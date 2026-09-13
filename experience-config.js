@@ -241,22 +241,25 @@
         .catalog-filter:first-child{border-right:0!important}
         .catalog-filter summary{list-style:none;min-height:44px;padding:0 8px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;color:var(--ink);font-size:11px;font-weight:650;letter-spacing:.035em;text-transform:uppercase;user-select:none;text-decoration:none!important;border:0!important;background:transparent!important}
         .catalog-filter summary::-webkit-details-marker{display:none}
-        .catalog-filter summary span{position:relative;width:13px;height:9px;flex:0 0 13px}
-        .catalog-filter summary span::before{content:'';position:absolute;left:2px;top:0;width:7px;height:7px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg);transition:transform .18s ease,top .18s ease}
-        .catalog-filter[open] summary span::before{top:4px;transform:rotate(225deg)}
+        .catalog-filter summary span{position:relative;width:16px;height:12px;flex:0 0 16px;display:inline-block}
+        .catalog-filter summary span::before,.catalog-filter summary span::after{content:'';position:absolute;top:5px;width:8px;height:1.6px;background:currentColor;border-radius:2px;transition:transform .18s ease,top .18s ease}
+        .catalog-filter summary span::before{left:1px;transform:rotate(45deg);transform-origin:right center}
+        .catalog-filter summary span::after{right:1px;transform:rotate(-45deg);transform-origin:left center}
+        .catalog-filter[open] summary span::before{top:4px;transform:rotate(-45deg)}
+        .catalog-filter[open] summary span::after{top:4px;transform:rotate(45deg)}
         .catalog-dropdown{position:absolute;top:100%;left:0;width:200%;max-height:360px;overflow-y:auto;background:var(--surface);border:0!important;border-top:1px solid var(--line)!important;box-shadow:0 16px 34px rgba(0,0,0,.10);padding:12px 0;z-index:40}
         .catalog-filter:nth-child(2) .catalog-dropdown{left:auto;right:0}
         .catalog-dropdown a{display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:48px;padding:0 18px;color:var(--ink);text-decoration:none!important;font-size:12px;font-weight:550;border:0!important;background:transparent!important;transition:opacity .16s ease}
-        .catalog-dropdown a::after{content:'';width:7px;height:7px;flex:0 0 7px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);margin-right:3px}
+        .catalog-dropdown a::after{content:'';width:8px;height:8px;flex:0 0 8px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:rotate(-45deg);margin-right:3px}
         .catalog-dropdown a:hover{opacity:.55;text-decoration:none!important}
         :root[data-theme=oscuro] .catalog-dropdown{box-shadow:0 16px 36px rgba(0,0,0,.38)}
         .haki-chevron-back{text-decoration:none!important;display:inline-flex!important;align-items:center;gap:8px}
-        .haki-chevron-back::before{content:'';width:7px;height:7px;border-left:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg);flex:0 0 7px}
+        .haki-chevron-back::before{content:'';width:8px;height:8px;border-left:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:rotate(45deg);flex:0 0 8px}
         .rail-actions .rail-prev,.rail-actions .rail-next{font-size:0!important;position:relative}
-        .rail-actions .rail-prev::before,.rail-actions .rail-next::before{content:'';width:8px;height:8px;border-bottom:1.5px solid currentColor;display:block}
-        .rail-actions .rail-prev::before{border-left:1.5px solid currentColor;transform:rotate(45deg)}
-        .rail-actions .rail-next::before{border-right:1.5px solid currentColor;transform:rotate(-45deg)}
-        .haki-empty-cta>span{font-size:0!important;width:8px;height:8px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);display:inline-block}
+        .rail-actions .rail-prev::before,.rail-actions .rail-next::before{content:'';width:8px;height:8px;border-bottom:1.6px solid currentColor;display:block}
+        .rail-actions .rail-prev::before{border-left:1.6px solid currentColor;transform:rotate(45deg)}
+        .rail-actions .rail-next::before{border-right:1.6px solid currentColor;transform:rotate(-45deg)}
+        .haki-empty-cta>span{font-size:0!important;width:8px;height:8px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:rotate(-45deg);display:inline-block}
         @media(hover:hover) and (pointer:fine){
           .catalog-filter summary{padding-left:4px;padding-right:14px}
           .catalog-filter:hover summary{opacity:.72}
@@ -264,13 +267,16 @@
         @media(max-width:800px){
           .catalog-quick-menu{margin:0 0 18px;gap:0}
           .catalog-filter summary{min-height:40px;padding:0 4px;font-size:10px;font-weight:650;letter-spacing:.025em}
-          .catalog-filter summary span{width:12px;height:8px;flex-basis:12px}
-          .catalog-filter summary span::before{width:6px;height:6px;border-width:1.4px;left:2px}
+          .catalog-filter summary span{width:15px;height:11px;flex-basis:15px}
+          .catalog-filter summary span::before,.catalog-filter summary span::after{top:5px;width:7.5px;height:1.5px}
+          .catalog-filter summary span::before{left:0}
+          .catalog-filter summary span::after{right:0}
+          .catalog-filter[open] summary span::before,.catalog-filter[open] summary span::after{top:4px}
           .catalog-dropdown{width:200%;padding:8px 0;box-shadow:0 12px 26px rgba(0,0,0,.12)}
           .catalog-dropdown a{min-height:44px;padding:0 14px;font-size:11px}
-          .catalog-dropdown a::after{width:6px;height:6px;border-width:1.4px}
+          .catalog-dropdown a::after{width:7px;height:7px;border-width:1.5px}
         }
-        @media(prefers-reduced-motion:reduce){.catalog-filter summary span::before,.catalog-dropdown a{transition:none!important}}
+        @media(prefers-reduced-motion:reduce){.catalog-filter summary span::before,.catalog-filter summary span::after,.catalog-dropdown a{transition:none!important}}
       `;
       document.head.appendChild(style);
     }
