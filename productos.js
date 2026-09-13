@@ -579,6 +579,27 @@ window.HAKI_PRODUCTOS = [
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
+    "id": 13,
+    "codigo": "YLA-05",
+    "nombre": "WARRIOR COMPRESIÓN MORADA",
+    "precio": 22,
+    "categoria": "Shorts",
+    "imagen": "images/1789323517674-321c0010-4041_purple_007_01_15_johnny_ecomm.webp",
+    "imagenRespaldo": "images/shorts.svg",
+    "tallas": {
+      "S": false,
+      "M": false,
+      "L": true,
+      "XL": false
+    },
+    "colecciones": [
+      "collection-1"
+    ],
+    "colores": [],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
+  },
+  {
     "id": 11,
     "codigo": "YLAC1-03",
     "nombre": "SUPVILLIAN COMPRESIÓN",
@@ -628,69 +649,58 @@ window.HAKI_PRODUCTOS = [
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
-    "id": 13,
-    "codigo": "HAKI-013",
-    "nombre": "Short Performance 02",
-    "precio": 22,
-    "categoria": "Shorts",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/shorts.jpg",
-    "imagenRespaldo": "images/shorts.svg",
-    "tallas": {
-      "S": false,
-      "M": true,
-      "L": true,
-      "XL": false
-    },
-    "colecciones": [
-      "collection-2"
-    ],
-    "colores": [],
-    "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
-  },
-  {
     "id": 14,
-    "codigo": "HAKI-014",
-    "nombre": "Legging Sculpt 02",
-    "precio": 28,
+    "codigo": "YLAC2-03",
+    "nombre": "YLA-GÓTICA",
+    "precio": 25,
     "categoria": "Leggings",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/leggings.jpg",
+    "imagen": "images/1789323656075-d5468ae4-images.webp",
     "imagenRespaldo": "images/leggings.svg",
     "tallas": {
       "S": true,
       "M": true,
       "L": true,
-      "XL": true
+      "XL": false
     },
-    "colecciones": [],
-    "colores": [],
+    "colecciones": [
+      "collection-1"
+    ],
+    "colores": [
+      "Negro",
+      "Rojo"
+    ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "novedad": true
   },
   {
     "id": 15,
-    "codigo": "HAKI-015",
-    "nombre": "Compresión Long Sleeve 02",
-    "precio": 28,
+    "codigo": "GSC-06",
+    "nombre": "GYMS GRIS",
+    "precio": 25,
     "categoria": "Compresión",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-black.jpg",
+    "imagen": "images/1789323860373-c6b54775-images-1-.webp",
     "imagenRespaldo": "images/tee-black.svg",
     "tallas": {
       "S": true,
       "M": true,
       "L": true,
-      "XL": true
+      "XL": false
     },
-    "colecciones": [],
-    "colores": [],
+    "colecciones": [
+      "collection-1"
+    ],
+    "colores": [
+      "Negro"
+    ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 16,
-    "codigo": "HAKI-016",
-    "nombre": "Camiseta Motion 02",
-    "precio": 24,
+    "codigo": "GSC-04",
+    "nombre": "ONX NEGRA-AZUL",
+    "precio": 25.01,
     "categoria": "Camisetas",
     "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-gray.jpg",
     "imagenRespaldo": "images/tee-gray.svg",
@@ -703,9 +713,13 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-1"
     ],
-    "colores": [],
+    "colores": [
+      "Negro",
+      "Azul"
+    ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "imagen2": "images/1789323989419-4ef599ed-images-2-.webp"
   },
   {
     "id": 17,
