@@ -5,12 +5,12 @@
 // ============================================================
 
 window.HAKI_CONFIG = {
-  "tema": "oscuro",
-  "fuenteTitulos": "Horizon",
+  "tema": "claro",
+  "fuenteTitulos": "Poppins",
   "fuenteTexto": "Poppins",
   "horizonUrl": "",
-  "anuncio2": "Envío gratis desde $70 en prendas",
-  "anuncio3": "Encuentra tu próximo outfit HAKI",
+  "anuncio2": "Envío gratis desde $69.99 en prendas",
+  "anuncio3": "Bienvenido a la familia Haki",
   "botonPortada": "EXPLORAR COLECCIÓN",
   "enlacePortada": "#catalogo",
   "botonPortada2": "VER NOVEDADES",
@@ -20,7 +20,7 @@ window.HAKI_CONFIG = {
   "carritoAntetitulo": "TU SELECCIÓN",
   "carritoVacio": "Tu carrito está vacío.",
   "carritoAyudaVacio": "Elige una talla y añade tus prendas favoritas.",
-  "envioMeta": 70,
+  "envioMeta": 69.99,
   "envioCosto": 1,
   "envioPorPrenda": true,
   "envioFalta": "Te faltan {monto} para obtener envío gratis",
