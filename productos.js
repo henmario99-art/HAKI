@@ -579,6 +579,30 @@ window.HAKI_PRODUCTOS = [
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
+    "id": 19,
+    "codigo": "YLAC-03",
+    "nombre": "WARRIOR COMPRESIÓN ROJA",
+    "precio": 25,
+    "categoria": "Compresión",
+    "imagen": "images/1789325345114-3b68a2db-4065_black-red_0012_11_25_johnny_ecomm_ee3b524e-f0c5-406c-b6f0-6ecd4305e276.webp",
+    "imagenRespaldo": "images/tee-black.svg",
+    "tallas": {
+      "S": true,
+      "M": false,
+      "L": false,
+      "XL": false
+    },
+    "colecciones": [
+      "collection-1"
+    ],
+    "colores": [
+      "Rojo",
+      "Negro"
+    ],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
+  },
+  {
     "id": 13,
     "codigo": "YLA-05",
     "nombre": "WARRIOR COMPRESIÓN MORADA",
@@ -704,7 +728,7 @@ window.HAKI_PRODUCTOS = [
     "nombre": "ONX NEGRA-AZUL",
     "precio": 25,
     "categoria": "Camisetas",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-gray.jpg",
+    "imagen": "images/1789325270447-9b0b3c9d-ChatGPT-Image-13-sept-2026-12_47_37-p.m..webp",
     "imagenRespaldo": "images/tee-gray.svg",
     "tallas": {
       "S": true,
@@ -721,7 +745,7 @@ window.HAKI_PRODUCTOS = [
     ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "imagen2": "images/1789324317198-136bb651-images-2-.webp"
+    "imagen2": ""
   },
   {
     "id": 17,
@@ -729,7 +753,7 @@ window.HAKI_PRODUCTOS = [
     "nombre": "SUP-CENTRO GRIS",
     "precio": 20,
     "categoria": "Shorts",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/shorts.jpg",
+    "imagen": "images/1789325011477-b8218033-ChatGPT-Image-13-sept-2026-12_38_49-p.m..webp",
     "imagenRespaldo": "images/shorts.svg",
     "tallas": {
       "S": true,
@@ -745,7 +769,7 @@ window.HAKI_PRODUCTOS = [
     ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "imagen2": "images/1789324742829-a731f1ce-ChatGPT-Image-13-sept-2026-12_38_49-p.m..webp"
+    "imagen2": ""
   },
   {
     "id": 18,
@@ -771,43 +795,27 @@ window.HAKI_PRODUCTOS = [
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
-    "id": 19,
-    "codigo": "HAKI-019",
-    "nombre": "Compresión Core 02",
-    "precio": 26,
-    "categoria": "Compresión",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-black.jpg",
-    "imagenRespaldo": "images/tee-black.svg",
-    "tallas": {
-      "S": true,
-      "M": true,
-      "L": true,
-      "XL": true
-    },
-    "colecciones": [],
-    "colores": [],
-    "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
-  },
-  {
     "id": 20,
-    "codigo": "HAKI-020",
-    "nombre": "Camiseta Everyday 02",
+    "codigo": "GSC-03",
+    "nombre": "ONX ROJA",
     "precio": 25,
     "categoria": "Camisetas",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-gray.jpg",
+    "imagen": "images/1789325533912-bac14949-ChatGPT-Image-13-sept-2026-12_52_06-p.m..webp",
     "imagenRespaldo": "images/tee-gray.svg",
     "tallas": {
       "S": true,
-      "M": true,
+      "M": false,
       "L": true,
       "XL": true
     },
     "colecciones": [
       "collection-1"
     ],
-    "colores": [],
-    "masVendido": false,
+    "colores": [
+      "Negro",
+      "Rojo"
+    ],
+    "masVendido": true,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
