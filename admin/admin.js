@@ -164,6 +164,107 @@ function newProduct() {
   };
 }
 
+function moveProduct(product, nextIndex) {
+  const currentIndex = state.products.indexOf(product);
+  if (currentIndex < 0 || !state.products.length) return false;
+  const targetIndex = Math.max(0, Math.min(state.products.length - 1, Number(nextIndex) || 0));
+  if (currentIndex === targetIndex) return false;
+  state.products.splice(currentIndex, 1);
+  state.products.splice(targetIndex, 0, product);
+  return true;
+}
+
+let draggedProduct = null;
+function renderReorderList() {
+  const wrap = $('#reorderList');
+  wrap.replaceChildren();
+
+  state.products.forEach((p, index) => {
+    const row = document.createElement('article');
+    row.className = 'reorder-item';
+    row.draggable = true;
+
+    const handle = document.createElement('button');
+    handle.type = 'button';
+    handle.className = 'reorder-handle';
+    handle.textContent = '⠿';
+    handle.title = 'Arrastrar para cambiar el orden';
+    handle.setAttribute('aria-label', `Mover ${p.nombre || p.codigo}`);
+
+    const image = document.createElement('img');
+    image.className = 'reorder-thumb';
+    image.alt = '';
+    image.loading = 'lazy';
+    image.src = resolveImage(p.imagen || p.imagenRespaldo || 'images/producto.svg');
+    image.addEventListener('error', () => { image.src = resolveImage('images/producto.svg'); }, { once: true });
+
+    const info = document.createElement('div');
+    info.className = 'reorder-info';
+    const name = document.createElement('strong');
+    name.textContent = p.nombre || 'Sin nombre';
+    const code = document.createElement('small');
+    code.textContent = p.codigo || 'Sin código';
+    info.append(name, code);
+
+    const controls = document.createElement('div');
+    controls.className = 'reorder-controls';
+    const up = document.createElement('button');
+    up.type = 'button'; up.className = 'reorder-move'; up.textContent = '↑'; up.disabled = index === 0;
+    up.setAttribute('aria-label', `Subir ${p.nombre || p.codigo}`);
+    const down = document.createElement('button');
+    down.type = 'button'; down.className = 'reorder-move'; down.textContent = '↓'; down.disabled = index === state.products.length - 1;
+    down.setAttribute('aria-label', `Bajar ${p.nombre || p.codigo}`);
+    const positionLabel = document.createElement('label');
+    positionLabel.className = 'reorder-position';
+    const positionText = document.createElement('span');
+    positionText.textContent = 'Posición';
+    const position = document.createElement('input');
+    position.type = 'number'; position.min = '1'; position.max = String(state.products.length); position.value = String(index + 1);
+    position.setAttribute('aria-label', `Posición de ${p.nombre || p.codigo}`);
+    positionLabel.append(positionText, position);
+    controls.append(up, down, positionLabel);
+    row.append(handle, image, info, controls);
+
+    up.addEventListener('click', () => { if (moveProduct(p, index - 1)) renderReorderList(); });
+    down.addEventListener('click', () => { if (moveProduct(p, index + 1)) renderReorderList(); });
+    const applyPosition = () => { if (moveProduct(p, Number(position.value) - 1)) renderReorderList(); else position.value = String(state.products.indexOf(p) + 1); };
+    position.addEventListener('change', applyPosition);
+    position.addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); applyPosition(); } });
+
+    row.addEventListener('dragstart', event => {
+      draggedProduct = p;
+      row.classList.add('is-dragging');
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', String(p.codigo || p.id || index));
+    });
+    row.addEventListener('dragover', event => {
+      if (!draggedProduct || draggedProduct === p) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+      $$('.is-drop-target', wrap).forEach(item => item.classList.remove('is-drop-target'));
+      row.classList.add('is-drop-target');
+    });
+    row.addEventListener('drop', event => {
+      event.preventDefault();
+      if (!draggedProduct || draggedProduct === p) return;
+      const from = state.products.indexOf(draggedProduct);
+      const target = state.products.indexOf(p);
+      const after = event.clientY > row.getBoundingClientRect().top + row.getBoundingClientRect().height / 2;
+      let destination = target + (after ? 1 : 0);
+      if (from < destination) destination -= 1;
+      moveProduct(draggedProduct, destination);
+      draggedProduct = null;
+      renderReorderList();
+    });
+    row.addEventListener('dragend', () => {
+      draggedProduct = null;
+      $$('.reorder-item', wrap).forEach(item => item.classList.remove('is-dragging', 'is-drop-target'));
+    });
+
+    wrap.append(row);
+  });
+}
+
 function renderProducts() {
   const q = ($('#search').value || '').trim().toLowerCase();
   state.filtered = state.products.filter(p => !q || `${p.codigo} ${p.nombre} ${p.categoria}`.toLowerCase().includes(q));
@@ -174,7 +275,7 @@ function renderProducts() {
   state.filtered.forEach((p) => {
     const tpl = $('#productTemplate').content.cloneNode(true);
     const card = $('.product-card', tpl);
-    $('.product-index', tpl).textContent = String(p.id).padStart(2,'0');
+    $('.product-index', tpl).textContent = String(state.products.indexOf(p) + 1).padStart(2,'0');
     $('.product-title', tpl).textContent = p.nombre;
 
     $$('[data-field]', tpl).forEach(input => {
@@ -304,6 +405,17 @@ function fileToBase64(file) {
 
 $('#search').addEventListener('input', renderProducts);
 
+const reorderDialog = $('#reorderDialog');
+$('#reorderBtn').addEventListener('click', () => {
+  renderReorderList();
+  reorderDialog.showModal();
+});
+function closeReorderDialog() { reorderDialog.close(); }
+$('#closeReorderBtn').addEventListener('click', closeReorderDialog);
+$('#closeReorderFooterBtn').addEventListener('click', closeReorderDialog);
+reorderDialog.addEventListener('click', event => { if (event.target === reorderDialog) closeReorderDialog(); });
+reorderDialog.addEventListener('close', renderProducts);
+
 $('#addBtn').addEventListener('click', () => {
   const p = newProduct();
   state.products.unshift(p);
@@ -312,11 +424,11 @@ $('#addBtn').addEventListener('click', () => {
   window.scrollTo({ top: document.querySelector('.section-title').offsetTop - 80, behavior: 'smooth' });
 });
 
-$('#saveBtn').addEventListener('click', async () => {
+async function saveCatalog() {
   for (const input of document.querySelectorAll('#experienceSettings input')) { if (!input.reportValidity()) return; }
-  if (!confirm('¿Guardar estos cambios en el catálogo?')) return;
-  $('#saveBtn').disabled = true;
-  $('#saveBtn').textContent = 'Guardando…';
+  if (!confirm('¿Guardar estos cambios en el catálogo?')) return false;
+  const buttons = [$('#saveBtn'), $('#saveOrderBtn')];
+  buttons.forEach(button => { button.disabled = true; button.dataset.label = button.textContent; button.textContent = 'Guardando…'; });
   try {
     await api('catalog', {
       method: 'PUT',
@@ -324,12 +436,16 @@ $('#saveBtn').addEventListener('click', async () => {
     });
     toast('Cambios guardados en GitHub. El catálogo los leerá sin un deploy de producción.', true);
     setTimeout(loadCatalog, 1200);
+    return true;
   } catch (err) {
     toast(err.message);
+    return false;
   } finally {
-    $('#saveBtn').disabled = false;
-    $('#saveBtn').textContent = 'Guardar y publicar';
+    buttons.forEach(button => { button.disabled = false; button.textContent = button.dataset.label || 'Guardar y publicar'; });
   }
-});
+}
+
+$('#saveBtn').addEventListener('click', saveCatalog);
+$('#saveOrderBtn').addEventListener('click', async () => { if (await saveCatalog()) closeReorderDialog(); });
 
 checkAuth();

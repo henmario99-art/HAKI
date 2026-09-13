@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>HAKI Admin</title>
   <meta name="robots" content="noindex,nofollow">
-  <link rel="stylesheet" href="admin.css?v=2">
+  <link rel="stylesheet" href="admin.css?v=3">
   <style id="admin-product-colors">
     html{scroll-behavior:smooth}
     #productsSection{scroll-margin-top:88px}
@@ -54,6 +54,7 @@
       <section class="toolbar">
         <input id="search" type="search" placeholder="Buscar por nombre o código">
         <button id="addBtn" class="ghost" type="button">+ Agregar producto</button>
+        <button id="reorderBtn" class="ghost" type="button">↕ Ordenar prendas</button>
         <a id="jumpProductsBtn" class="ghost" href="#productsSection">Ir a productos</a>
         <button id="saveBtn" class="primary" type="button">Guardar y publicar</button>
       </section>
@@ -101,6 +102,17 @@
       <p id="globalStatus" class="status floating"></p>
     </section>
   </main>
+  <dialog id="reorderDialog" class="reorder-dialog" aria-labelledby="reorderTitle">
+    <div class="reorder-head">
+      <div><h2 id="reorderTitle">Ordenar prendas</h2><p>Arrastra una prenda o escribe su nueva posición.</p></div>
+      <button id="closeReorderBtn" class="reorder-close" type="button" aria-label="Cerrar">×</button>
+    </div>
+    <div id="reorderList" class="reorder-list" aria-label="Orden actual de las prendas"></div>
+    <div class="reorder-footer">
+      <span>El catálogo respetará este orden.</span>
+      <div><button id="closeReorderFooterBtn" class="ghost" type="button">Cerrar</button><button id="saveOrderBtn" class="primary" type="button">Guardar y publicar</button></div>
+    </div>
+  </dialog>
   <template id="productTemplate">
     <article class="product-card">
       <div class="product-head">
@@ -162,7 +174,7 @@
   <script src="../storefront-config.js?v=1"></script>
   <script src="../experience-config.js?v=3"></script>
   <script src="experience-settings.js?v=2"></script>
-  <script src="admin.js?v=6"></script>
+  <script src="admin.js?v=7"></script>
   <script src="info-settings.js?v=1"></script>
   <script src="personalization-settings.js?v=2"></script>
 </body>
