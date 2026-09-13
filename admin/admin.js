@@ -155,6 +155,7 @@ function newProduct() {
     categoria: 'Camisetas',
     novedad: false,
     colecciones: [],
+    colores: [],
     imagen: 'images/producto.svg',
     imagenRespaldo: 'images/producto.svg',
     tallas: { S:true, M:true, L:true, XL:true }
@@ -190,6 +191,21 @@ function renderProducts() {
       input.addEventListener('change', () => {
         p.tallas ||= {};
         p.tallas[size] = input.checked;
+      });
+    });
+
+    if (!Array.isArray(p.colores)) p.colores = p.color ? [p.color] : [];
+    p.colores = [...new Set(p.colores.map(String).filter(Boolean))];
+    $$('input[data-color]', tpl).forEach(input => {
+      const color = input.dataset.color;
+      const swatch = input.closest('.color-swatch');
+      input.checked = p.colores.includes(color);
+      swatch?.classList.toggle('is-selected', input.checked);
+      input.addEventListener('change', () => {
+        const colors = new Set(p.colores);
+        if (input.checked) colors.add(color); else colors.delete(color);
+        p.colores = [...colors];
+        swatch?.classList.toggle('is-selected', input.checked);
       });
     });
 
