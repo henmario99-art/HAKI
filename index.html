@@ -24,6 +24,17 @@
     :root[data-theme=oscuro] .detail-media .gallery-dots button[aria-pressed="true"] span{background:#fff}
     @media(prefers-reduced-motion:reduce){.detail-media .gallery-controls{transition:none}}
   </style>
+  <style id="category-images-step2">
+    .collection-tile{justify-content:flex-start!important;gap:16px}
+    .collection-tile .collection-image{display:block!important;flex:0 0 88px;width:88px;height:88px;overflow:hidden;background:var(--soft)}
+    .collection-tile .collection-image img{width:100%;height:100%;display:block;object-fit:cover}
+    .collection-tile h3{flex:1;min-width:0}
+    .collection-tile:after{margin-left:auto;flex:0 0 auto}
+    @media(max-width:800px){
+      .collection-tile{min-height:96px;padding:10px 0}
+      .collection-tile .collection-image{flex-basis:76px;width:76px;height:76px}
+    }
+  </style>
 </head>
 <body>
   <div class="announcement"><span id="announcementText">HECHO PARA TU SIGUIENTE NIVEL</span><span id="countryText" hidden>HAKI · EL SALVADOR</span><button id="pauseAnnouncement" type="button" aria-label="Pausar anuncios">Ⅱ</button></div>
