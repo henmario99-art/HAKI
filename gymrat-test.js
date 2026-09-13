@@ -104,8 +104,10 @@
     return score;
   }
 
-  function recommendations(profile,profileKey,cfg){
-    const allowedColors=allowedProfileColors(profile);
+  function recommendations(profile,profileKey,cfg,answers={}){
+    const selectedColor=canonicalColor(answers.color||'');
+    const fallbackColors=allowedProfileColors(profile);
+    const allowedColors=selectedColor?[selectedColor]:fallbackColors;
     const products=(window.HAKI_PRODUCTOS||[]).filter(p=>p&&p.codigo&&p.nombre);
     return products
       .filter(p=>['S','M','L','XL'].some(size=>!!p.tallas?.[size]))
@@ -149,9 +151,10 @@
   }
 
   function showResult(dialog,state){
-    const cfg=state.cfg,key=scoresFor(state.answers,cfg),profile=cfg.perfiles?.[key]||cfg.perfiles.dark,products=recommendations(profile,key,cfg),stage=dialog.querySelector('.gymrat-stage'),result=dialog.querySelector('.gymrat-result');
+    const cfg=state.cfg,key=scoresFor(state.answers,cfg),profile=cfg.perfiles?.[key]||cfg.perfiles.dark,products=recommendations(profile,key,cfg,state.answers),stage=dialog.querySelector('.gymrat-stage'),result=dialog.querySelector('.gymrat-result');
     stage.hidden=true;
-    result.innerHTML=`<span class="gymrat-result-badge">TU RESULTADO</span><h2 class="gymrat-result-title">${esc(profile.nombre||'GYMRAT')}</h2><p class="gymrat-result-copy">${esc(profile.texto||'')}</p><div class="gymrat-recs-head"><div><h3>SELECCIÓN PARA TI</h3><p>Filtrada por los colores catalogados de cada prenda.</p></div></div>${products.length?`<div class="gymrat-products">${products.map(productCard).join('')}</div>`:'<p class="gymrat-empty-recs">Todavía no hay prendas catalogadas con los colores de este perfil. Asigna colores a tus productos desde el panel de administración y no mostraremos recomendaciones de un color incorrecto.</p>'}<div class="gymrat-result-actions"><button class="gymrat-restart" type="button">REPETIR TEST</button><a class="gymrat-shop" href="#catalogo">VER TODAS LAS PRENDAS</a></div>`;
+    const selectedColor=state.answers.color||'';
+    result.innerHTML=`<span class="gymrat-result-badge">TU RESULTADO</span><h2 class="gymrat-result-title">${esc(profile.nombre||'GYMRAT')}</h2><p class="gymrat-result-copy">${esc(profile.texto||'')}</p><div class="gymrat-recs-head"><div><h3>SELECCIÓN PARA TI</h3><p>${selectedColor?`Solo prendas catalogadas en ${esc(selectedColor)}.`:'Filtrada por los colores catalogados de cada prenda.'}</p></div></div>${products.length?`<div class="gymrat-products">${products.map(productCard).join('')}</div>`:'<p class="gymrat-empty-recs">Todavía no hay prendas disponibles catalogadas con el color que elegiste. Asigna colores a tus productos desde el panel de administración y no mostraremos recomendaciones de un color incorrecto.</p>'}<div class="gymrat-result-actions"><button class="gymrat-restart" type="button">REPETIR TEST</button><a class="gymrat-shop" href="#catalogo">VER TODAS LAS PRENDAS</a></div>`;
     result.classList.add('active');result.querySelector('.gymrat-restart')?.addEventListener('click',()=>startQuiz(dialog,cfg));result.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>dialog.close()));dialog.scrollTo({top:0,behavior:reduceMotion()?'auto':'smooth'});
   }
 
