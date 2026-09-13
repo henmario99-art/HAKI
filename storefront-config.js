@@ -83,6 +83,14 @@ window.hakiCollections = config => window.HAKI_COLLECTION_DEFAULTS.map((item, in
         font-weight:600!important;
         letter-spacing:0!important;
       }
+      .catalog-dropdown a>span{
+        text-decoration:underline!important;
+        text-decoration-color:transparent!important;
+        text-underline-offset:6px!important;
+        transition:text-decoration-color .16s ease!important;
+      }
+      .catalog-dropdown a:hover>span,
+      .catalog-dropdown a:focus-visible>span{text-decoration-color:currentColor!important}
       .catalog-dropdown a::after{
         content:'›';
         flex:0 0 auto;
@@ -90,7 +98,7 @@ window.hakiCollections = config => window.HAKI_COLLECTION_DEFAULTS.map((item, in
         line-height:1;
         font-weight:400;
       }
-      .catalog-dropdown a:hover{background:var(--soft)!important}
+      .catalog-dropdown a:hover{background:transparent!important}
 
       /* En oscuro, los distintivos claros deben conservar texto negro. */
       :root[data-theme=oscuro] .product-number:not(.sold-out),

@@ -188,28 +188,14 @@
 
     const nav=document.createElement('nav');
     nav.className='catalog-quick-menu';
-    nav.setAttribute('aria-label','Filtros del catálogo');
+    nav.setAttribute('aria-label','Categorías del catálogo');
     nav.innerHTML=`
       <details class="catalog-filter catalog-filter-options">
         <summary><span class="catalog-filter-label">FILTROS</span><span class="catalog-filter-chevron" aria-hidden="true"></span></summary>
         <div class="catalog-dropdown">
-          <section class="catalog-filter-group" aria-labelledby="filterCategoryTitle">
-            <strong id="filterCategoryTitle">CATEGORÍAS</strong>
-            <a href="#catalogo" data-clear-catalog-filters>Todas las prendas</a>
-            ${categoryItems.map(item=>`<a href="${esc(item.href)}">${esc(item.label)}</a>`).join('')}
-          </section>
-          <section class="catalog-filter-group" aria-labelledby="filterColorTitle">
-            <strong id="filterColorTitle">COLORES</strong>
-            <div class="catalog-filter-choices catalog-color-choices">
-              ${['Blanco','Negro','Azul','Rosa','Rojo','Gris'].map(color=>`<button type="button" data-filter-type="color" data-filter-value="${color}" aria-pressed="false"><i class="catalog-color-dot color-${color.toLowerCase()}" aria-hidden="true"></i>${color}</button>`).join('')}
-            </div>
-          </section>
-          <section class="catalog-filter-group" aria-labelledby="filterSizeTitle">
-            <strong id="filterSizeTitle">TALLAS DISPONIBLES</strong>
-            <div class="catalog-filter-choices catalog-size-choices">
-              ${['S','M','L','XL'].map(size=>`<button type="button" data-filter-type="size" data-filter-value="${size}" aria-pressed="false">${size}</button>`).join('')}
-            </div>
-            <button class="catalog-clear-filters" type="button" data-clear-catalog-filters>Limpiar filtros</button>
+          <section class="catalog-filter-group catalog-category-links">
+            <a href="#catalogo"><span>Todas las prendas</span></a>
+            ${categoryItems.map(item=>`<a href="${esc(item.href)}"><span>${esc(item.label)}</span></a>`).join('')}
           </section>
         </div>
       </details>
@@ -238,23 +224,7 @@
         details.forEach(other=>{if(other!==detail)other.open=false;});
       });
     });
-    nav.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{
-      if(link.hasAttribute('data-clear-catalog-filters'))window.dispatchEvent(new CustomEvent('haki:catalog-filter-change',{detail:{clear:true}}));
-      details.forEach(detail=>detail.open=false);
-    }));
-    nav.querySelectorAll('[data-filter-type]').forEach(button=>button.addEventListener('click',()=>{
-      window.dispatchEvent(new CustomEvent('haki:catalog-filter-change',{detail:{type:button.dataset.filterType,value:button.dataset.filterValue}}));
-    }));
-    nav.querySelector('.catalog-clear-filters')?.addEventListener('click',()=>window.dispatchEvent(new CustomEvent('haki:catalog-filter-change',{detail:{clear:true}})));
-    window.addEventListener('haki:catalog-filter-state',event=>{
-      const active=event.detail||{};
-      nav.querySelectorAll('[data-filter-type]').forEach(button=>{
-        const selected=active[button.dataset.filterType]===button.dataset.filterValue;
-        button.classList.toggle('active',selected);
-        button.setAttribute('aria-pressed',String(selected));
-      });
-      nav.classList.toggle('has-active-filters',!!active.color||!!active.size);
-    });
+    nav.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>details.forEach(detail=>detail.open=false)));
     document.addEventListener('click',event=>{
       if(!nav.contains(event.target)) details.forEach(detail=>detail.open=false);
     });
@@ -284,23 +254,13 @@
         .catalog-filter[open] summary .catalog-filter-chevron::after{top:4px;transform:rotate(45deg)}
         .catalog-dropdown{position:absolute;top:100%;left:0;width:200%;max-height:360px;overflow-y:auto;background:var(--surface);border:0!important;border-top:1px solid var(--line)!important;box-shadow:0 16px 34px rgba(0,0,0,.10);padding:12px 0;z-index:40}
         .catalog-filter:nth-child(2) .catalog-dropdown{left:auto;right:0}
-        .catalog-dropdown a{display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:48px;padding:0 18px;color:var(--ink);text-decoration:none!important;font-size:12px;font-weight:550;border:0!important;background:transparent!important;transition:opacity .16s ease}
+        .catalog-dropdown a{display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:48px;padding:0 18px;color:var(--ink);text-decoration:none!important;font-size:12px;font-weight:550;border:0!important;background:transparent!important}
         .catalog-dropdown a::after{content:'';width:8px;height:8px;flex:0 0 8px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:rotate(-45deg);margin-right:3px}
-        .catalog-dropdown a:hover{opacity:.55;text-decoration:none!important}
-        .catalog-filter-options .catalog-dropdown{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:0;padding:18px!important}
-        .catalog-filter-group{min-width:0;padding:0 18px;border-right:1px solid var(--line)}
-        .catalog-filter-group:last-child{border-right:0}
-        .catalog-filter-group>strong{display:block;margin:0 0 12px;font-size:10px;letter-spacing:.08em;color:var(--muted)}
-        .catalog-filter-group>a{min-height:40px!important;padding:0!important;font-size:12px!important}
-        .catalog-filter-choices{display:grid;gap:6px}
-        .catalog-filter-choices button,.catalog-clear-filters{min-height:40px;padding:0 10px;border:1px solid var(--line);background:transparent;color:var(--ink);text-align:left;font-size:12px;cursor:pointer}
-        .catalog-filter-choices button{display:flex;align-items:center;gap:9px}
-        .catalog-filter-choices button:hover,.catalog-filter-choices button.active{border-color:var(--ink);background:var(--soft)}
-        .catalog-color-dot{display:inline-block;width:13px;height:13px;border-radius:50%;border:1px solid #999;flex:0 0 13px}
-        .color-blanco{background:#fff}.color-negro{background:#111}.color-azul{background:#8bbfe7}.color-rosa{background:#efbfd4}.color-rojo{background:#cf1111}.color-gris{background:#999}
-        .catalog-size-choices{grid-template-columns:repeat(2,minmax(0,1fr))}
-        .catalog-size-choices button{justify-content:center;text-align:center}
-        .catalog-clear-filters{width:100%;margin-top:10px;text-align:center;text-decoration:underline;text-underline-offset:3px;border:0}
+        .catalog-dropdown a>span{text-decoration:underline;text-decoration-color:transparent;text-underline-offset:5px;transition:text-decoration-color .16s ease}
+        .catalog-dropdown a:hover>span,.catalog-dropdown a:focus-visible>span{text-decoration-color:currentColor}
+        .catalog-filter-options .catalog-dropdown{display:block;padding:18px!important}
+        .catalog-filter-group{min-width:0;padding:0 18px;border:0}
+        .catalog-filter-group>a{min-height:44px!important;padding:0!important;font-size:12px!important}
         :root[data-theme=oscuro] .catalog-dropdown{box-shadow:0 16px 36px rgba(0,0,0,.38)}
         .haki-chevron-back{text-decoration:none!important;display:inline-flex!important;align-items:center;gap:8px}
         .haki-chevron-back::before{content:'';width:8px;height:8px;border-left:1.6px solid currentColor;border-bottom:1.6px solid currentColor;transform:rotate(45deg);flex:0 0 8px}
@@ -323,10 +283,10 @@
           .catalog-dropdown{width:200%;padding:8px 0;box-shadow:0 12px 26px rgba(0,0,0,.12)}
           .catalog-dropdown a{min-height:44px;padding:0 14px;font-size:11px}
           .catalog-dropdown a::after{width:7px;height:7px;border-width:1.5px}
-          .catalog-filter-options .catalog-dropdown{grid-template-columns:1fr;gap:22px;padding:18px!important}
+          .catalog-filter-options .catalog-dropdown{padding:18px!important}
           .catalog-filter-group{padding:0;border-right:0}
         }
-        @media(prefers-reduced-motion:reduce){.catalog-filter summary .catalog-filter-label,.catalog-filter summary .catalog-filter-chevron::before,.catalog-filter summary .catalog-filter-chevron::after,.catalog-dropdown a{transition:none!important}}
+        @media(prefers-reduced-motion:reduce){.catalog-filter summary .catalog-filter-label,.catalog-filter summary .catalog-filter-chevron::before,.catalog-filter summary .catalog-filter-chevron::after,.catalog-dropdown a>span{transition:none!important}}
       `;
       document.head.appendChild(style);
     }

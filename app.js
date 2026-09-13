@@ -15,8 +15,6 @@
     query: '',
     category: 'Todos',
     collection: null,
-    color: '',
-    size: '',
     selected: {},
     cart: loadCart()
   };
@@ -161,9 +159,6 @@
         (state.category === 'Todos' ||
           normalize(p.categoria || '') === normalize(state.category)) &&
         (!state.collection || inCollection(p, state.collection)) &&
-        (!state.color || (Array.isArray(p.colores) ? p.colores : p.color ? [p.color] : [])
-          .some(color => normalize(color) === normalize(state.color))) &&
-        (!state.size || !!p.tallas?.[state.size]) &&
         (!q ||
           normalize(
             `${p.codigo} ${p.nombre} ${p.categoria}`
@@ -174,30 +169,6 @@
   function inCollection(p, collection) {
     if (Array.isArray(p.colecciones)) return p.colecciones.includes(collection.id);
     return normalize(p.categoria || '') === normalize(collection.categoria || collection.nombre);
-  }
-
-  function usesShirtSizeTable(p) {
-    const collectionNames = (p.colecciones || [])
-      .map(id => COLLECTIONS.find(collection => collection.id === id)?.nombre || '')
-      .join(' ');
-    return /camiseta|centro/.test(normalize(`${p.categoria || ''} ${collectionNames}`));
-  }
-
-  function shirtSizeTable() {
-    return `<section class="inline-size-guide" aria-labelledby="inlineSizeGuideTitle">
-      <h2 id="inlineSizeGuideTitle">Guía de tallas</h2>
-      <div class="inline-size-guide-scroll">
-        <table>
-          <thead><tr><th scope="col">Talla USA</th><th scope="col">Pecho (cm)</th><th scope="col">Hombro (cm)</th><th scope="col">Largo (cm)</th></tr></thead>
-          <tbody>
-            <tr><th scope="row">S</th><td>84–88</td><td>39</td><td>60</td></tr>
-            <tr><th scope="row">M</th><td>88–92</td><td>40</td><td>61</td></tr>
-            <tr><th scope="row">L</th><td>89–105</td><td>41</td><td>62</td></tr>
-            <tr><th scope="row">XL</th><td>93–112</td><td>43</td><td>64</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>`;
   }
 
   function renderProducts() {
@@ -315,7 +286,7 @@
 
     $$('.product-detail-link', container).forEach(link => link.addEventListener('click', () => {
       lastListingHash = location.hash || '#top';
-      listingPositions.set(lastListingHash, { y: window.scrollY, query: state.query, category: state.category, collection: state.collection, color: state.color, size: state.size });
+      listingPositions.set(lastListingHash, { y: window.scrollY, query: state.query, category: state.category, collection: state.collection });
     }));
 
     $$('img[data-fallback]', container).forEach(img =>
@@ -807,12 +778,11 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     if (restored) {
       state.query = restored.query; els.search.value = restored.query;
       state.category = restored.category; state.collection = restored.collection;
-      state.color = restored.color || ''; state.size = restored.size || '';
       listingPositions.delete(location.hash || '#top');
     }
-    const filtered = state.category !== 'Todos' || !!state.collection || !!state.query || !!state.color || !!state.size;
+    const filtered = state.category !== 'Todos' || !!state.collection || !!state.query;
     setHomeVisible(!filtered);
-    $('#catalogTitle').textContent = state.query ? 'RESULTADOS' : state.collection?.nombre || ((state.color || state.size) ? 'PRENDAS FILTRADAS' : (filtered ? state.category : 'TODAS LAS PRENDAS'));
+    $('#catalogTitle').textContent = state.query ? 'RESULTADOS' : state.collection?.nombre || (filtered ? state.category : 'TODAS LAS PRENDAS');
     renderProducts();
     if (restored) requestAnimationFrame(() => window.scrollTo({ top: restored.y, behavior: 'instant' }));
     else if (filtered || hash === 'top' || !hash) window.scrollTo({ top: 0, behavior: 'instant' });
@@ -828,7 +798,6 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     document.title = `${p.nombre} — HAKI`;
     const images = [p.imagen || fallbackFor(p), p.imagen2].filter(Boolean);
     const selected = state.selected[p.codigo] || '';
-    const showShirtSizeTable = usesShirtSizeTable(p);
     detail.innerHTML = `
       <a class="detail-back" href="${esc(lastListingHash)}">← Volver a las prendas</a>
       <div class="detail-layout">
@@ -853,13 +822,12 @@ ${settings().totalTexto}: ${money(totals.total)}`;
           <div class="detail-options">
             <strong class="detail-price">${money(p.precio)}</strong>
             ${p.descripcion ? `<p class="detail-description">${esc(p.descripcion)}</p>` : ''}
-            <div class="detail-size-heading"><h2>Seleccioná tu talla</h2>${p.guiaTallas && !showShirtSizeTable ? '<button id="openSizeGuide" type="button" class="size-guide-link">Guía de tallas</button>' : ''}</div>
+            <div class="detail-size-heading"><h2>Seleccioná tu talla</h2></div>
             <div id="detailSizes" class="detail-sizes" role="group" aria-label="Seleccionar talla">
               ${['S','M','L','XL'].map(size => `<button type="button" class="detail-size ${selected === size ? 'selected' : ''}" data-detail-size="${size}" aria-pressed="${selected === size}" ${p.tallas?.[size] ? '' : 'disabled'}>${size}</button>`).join('')}
             </div>
             <p id="detailSizeStatus" class="detail-size-status" role="status">${selected && p.tallas?.[selected] ? `Talla ${selected} seleccionada` : ''}</p>
             <button class="solid detail-add" type="button">AÑADIR AL CARRITO</button>
-            ${showShirtSizeTable ? shirtSizeTable() : ''}
           </div>
         </div>
       </div>`;
@@ -892,14 +860,14 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       }
       addToCart(p.codigo);
     }));
-    if (p.guiaTallas && !showShirtSizeTable) $('#openSizeGuide').addEventListener('click', () => {
-      $('#sizeGuideImage').src = freshImage(p.guiaTallas);
-      $('#sizeGuideDialog').showModal();
-    });
   }
 
   $('#closeSizeGuide').addEventListener('click', () => $('#sizeGuideDialog').close());
   $('#sizeGuideDialog').addEventListener('click', e => { if (e.target === $('#sizeGuideDialog')) $('#sizeGuideDialog').close(); });
+  $('#openGlobalSizeGuide').addEventListener('click', () => {
+    closeMenu();
+    $('#sizeGuideDialog').showModal();
+  });
 
   function closeMenu() {
     $('#categoryMenu').close();
@@ -936,25 +904,6 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   });
   window.addEventListener('hashchange', route);
-  window.addEventListener('haki:catalog-filter-change', event => {
-    const detail = event.detail || {};
-    if (detail.clear) {
-      state.color = '';
-      state.size = '';
-    } else if (detail.type === 'color') {
-      state.color = state.color === detail.value ? '' : detail.value;
-    } else if (detail.type === 'size') {
-      state.size = state.size === detail.value ? '' : detail.value;
-    }
-    window.dispatchEvent(new CustomEvent('haki:catalog-filter-state', { detail: { color: state.color, size: state.size } }));
-    if (location.hash !== '#catalogo') location.hash = '#catalogo';
-    else {
-      setHomeVisible(false);
-      $('#catalogTitle').textContent = state.color || state.size ? 'PRENDAS FILTRADAS' : 'TODAS LAS PRENDAS';
-      renderProducts();
-    }
-  });
-
   const settings=()=>window.hakiSettings(CONFIG);
   let announcementTimer;
   let announcementPaused=matchMedia('(prefers-reduced-motion: reduce)').matches;

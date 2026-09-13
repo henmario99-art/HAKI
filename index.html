@@ -8,7 +8,7 @@
   <title>HAKI — Ropa deportiva</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css?v=4">
-  <link rel="stylesheet" href="enhancements.css?v=3">
+  <link rel="stylesheet" href="enhancements.css?v=4">
   <link rel="stylesheet" href="experience.css?v=1">
   <link rel="stylesheet" href="gymrat-test.css?v=2">
   <style id="detail-gallery-step1">
@@ -42,7 +42,7 @@
 
   <header class="header">
     <div class="header-side">
-      <button class="header-icon" id="openMenu" type="button" aria-label="Abrir categorías" aria-expanded="false" aria-controls="categoryMenu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h18M3 16h18"/></svg></button>
+      <button class="header-icon" id="openMenu" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="categoryMenu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h18M3 16h18"/></svg></button>
       <a class="header-icon" id="instagramHeader" href="https://www.instagram.com/hakisv1/" target="_blank" rel="noopener noreferrer" aria-label="Instagram de HAKI"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none"/></svg></a>
     </div>
     <a class="brand" href="#top" aria-label="HAKI inicio"><img class="brand-logo" src="images/haki-wordmark.svg" alt="HAKI"></a>
@@ -54,15 +54,16 @@
       <label class="search-wrap"><span class="sr-only">Buscar por código o palabra clave</span><input id="searchInput" type="search" placeholder="Buscar por código o palabra clave…" autocomplete="off"><button class="header-icon" id="closeSearch" type="button" aria-label="Cerrar búsqueda">×</button></label>
     </div>
   </header>
-  <dialog id="categoryMenu" class="category-menu" aria-labelledby="menuTitle">
-    <div class="drawer-head"><h2 id="menuTitle">CATEGORÍAS</h2><button class="header-icon" id="closeMenu" type="button" aria-label="Cerrar categorías">×</button></div>
+  <dialog id="categoryMenu" class="category-menu" aria-label="Menú principal">
+    <div class="drawer-head menu-close-only"><button class="header-icon" id="closeMenu" type="button" aria-label="Cerrar menú">×</button></div>
     <nav aria-label="Categorías de prendas">
-      <a href="#categoria/Compresi%C3%B3n">Compresión <span aria-hidden="true">→</span></a>
-      <a href="#categoria/Oversized">Oversized <span aria-hidden="true">→</span></a>
-      <a href="#categoria/Pants">Pants <span aria-hidden="true">→</span></a>
-      <a href="encomiendas.html">Encomiendas <span aria-hidden="true">→</span></a>
-      <a href="domicilios.html">Domicilios <span aria-hidden="true">→</span></a>
-      <a href="cambios-devoluciones.html">Cambios <span aria-hidden="true">→</span></a>
+      <a href="#categoria/Compresi%C3%B3n"><span class="menu-link-label">Compresión</span><span aria-hidden="true">→</span></a>
+      <a href="#categoria/Oversized"><span class="menu-link-label">Oversized</span><span aria-hidden="true">→</span></a>
+      <a href="#categoria/Pants"><span class="menu-link-label">Pants</span><span aria-hidden="true">→</span></a>
+      <button id="openGlobalSizeGuide" class="menu-nav-button" type="button"><span class="menu-link-label">Guía de tallas</span><span aria-hidden="true">→</span></button>
+      <a href="encomiendas.html"><span class="menu-link-label">Encomiendas</span><span aria-hidden="true">→</span></a>
+      <a href="domicilios.html"><span class="menu-link-label">Domicilios</span><span aria-hidden="true">→</span></a>
+      <a href="cambios-devoluciones.html"><span class="menu-link-label">Cambios</span><span aria-hidden="true">→</span></a>
     </nav>
   </dialog>
 
@@ -145,17 +146,28 @@
 
   <dialog id="sizeGuideDialog" class="size-guide-dialog" aria-labelledby="sizeGuideTitle">
     <div class="drawer-head"><h2 id="sizeGuideTitle">Guía de tallas</h2><button id="closeSizeGuide" class="header-icon" type="button" aria-label="Cerrar guía de tallas">×</button></div>
-    <img id="sizeGuideImage" alt="Guía de tallas de la prenda">
+    <p class="size-guide-description">Medidas para camisetas y centros.</p>
+    <div class="menu-size-guide-scroll">
+      <table class="menu-size-guide-table">
+        <thead><tr><th scope="col">Talla USA</th><th scope="col">Pecho (cm)</th><th scope="col">Hombro (cm)</th><th scope="col">Largo (cm)</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">S</th><td>84–88</td><td>39</td><td>60</td></tr>
+          <tr><th scope="row">M</th><td>88–92</td><td>40</td><td>61</td></tr>
+          <tr><th scope="row">L</th><td>89–105</td><td>41</td><td>62</td></tr>
+          <tr><th scope="row">XL</th><td>93–112</td><td>43</td><td>64</td></tr>
+        </tbody>
+      </table>
+    </div>
   </dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script defer src="image-manifest.js?v=1"></script>
-  <script defer src="storefront-config.js?v=2"></script>
-  <script defer src="experience-config.js?v=3"></script>
+  <script defer src="storefront-config.js?v=3"></script>
+  <script defer src="experience-config.js?v=4"></script>
   <script defer src="productos.js"></script>
   <script defer src="catalog-loader.js?v=1"></script>
-  <script defer src="app.js?v=8"></script>
-  <script defer src="enhancements.js?v=3"></script>
+  <script defer src="app.js?v=9"></script>
+  <script defer src="enhancements.js?v=4"></script>
   <script defer src="personalization.js?v=1"></script>
   <script defer src="gymrat-test.js?v=2"></script>
   <script>
