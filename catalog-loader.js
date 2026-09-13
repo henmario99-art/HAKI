@@ -5,6 +5,14 @@
   const norm=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
   const upper=value=>String(value||'').toLocaleUpperCase('es-SV');
 
+  const style=document.createElement('style');
+  style.id='haki-category-arrow-alignment';
+  style.textContent=`
+    #collectionsGrid .collection-tile{position:relative!important;align-items:center!important;padding-right:38px!important}
+    #collectionsGrid .collection-tile::after{position:absolute!important;right:0!important;top:50%!important;transform:translateY(-50%)!important;margin:0!important;align-self:auto!important}
+  `;
+  document.head.append(style);
+
   function polish(data){
     if(!data||typeof data!=='object')return data;
     data.config ||= {};
