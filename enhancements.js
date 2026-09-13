@@ -210,6 +210,8 @@
     drawer.classList.toggle('is-empty', !items.querySelector('.cart-row'));
   }
 
+  let animateProgressOnNextCartChange = false;
+
   function setupShippingProgress() {
     const native = $('#shippingProgress');
     if (!native) return;
@@ -227,7 +229,9 @@
 
     if (!native.dataset.hakiProgressObserved) {
       native.dataset.hakiProgressObserved = '1';
-      new MutationObserver(() => syncShippingProgress(false)).observe(native, {
+      new MutationObserver(() => {
+        if (!animateProgressOnNextCartChange) syncShippingProgress(false);
+      }).observe(native, {
         attributes: true,
         attributeFilter: ['value']
       });
@@ -257,6 +261,7 @@
       fill.style.transition = 'none';
       fill.style.width = '0%';
       fill.dataset.progress = '0';
+      void fill.offsetWidth;
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           fill.style.transition = '';
@@ -271,11 +276,24 @@
     fill.dataset.progress = String(target);
   }
 
-  function animateShippingOnCartOpen() {
-    const drawer = $('#cartDrawer');
-    if (!drawer || drawer.classList.contains('is-empty')) return;
+  function prepareShippingAnimationFromAdd(event) {
+    const button = event.target.closest?.('[data-add], .detail-add');
+    if (!button || button.disabled) return;
+
+    if (button.classList.contains('detail-add')) {
+      const detail = $('#productDetail');
+      if (!detail?.contains(button) || !$('.detail-size.selected:not(:disabled)', detail)) return;
+    }
+
+    animateProgressOnNextCartChange = true;
     setupShippingProgress();
-    setTimeout(() => syncShippingProgress(true), 90);
+
+    const fill = $('.haki-shipping-fill');
+    if (!fill || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    fill.style.transition = 'none';
+    fill.style.width = '0%';
+    fill.dataset.progress = '0';
+    void fill.offsetWidth;
   }
 
   function polishFooter() {
@@ -330,17 +348,21 @@
     });
   }
 
+  document.addEventListener('click', prepareShippingAnimationFromAdd, true);
   document.addEventListener('click', autoOpenCartAfterDetailAdd);
-  $('#openCart')?.addEventListener('click', animateShippingOnCartOpen);
   smoothCategoryDialog();
   const observer = new MutationObserver(enhance);
   ['products','newProducts','productDetail'].forEach(id=>observer.observe(document.getElementById(id),{childList:true,subtree:true}));
   const cartItems = $('#cartItems');
   if (cartItems) new MutationObserver(() => {
+    const animateFromAdd = animateProgressOnNextCartChange;
+    animateProgressOnNextCartChange = false;
     setupEmptyCart();
     syncEmptyCart();
     setupShippingProgress();
-    requestAnimationFrame(() => syncShippingProgress(false));
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => syncShippingProgress(animateFromAdd));
+    });
   }).observe(cartItems,{childList:true,subtree:true});
   window.addEventListener('hashchange', () => {
     enhance();
