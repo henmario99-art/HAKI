@@ -72,4 +72,102 @@
     }));
   };
   document.getElementById('openCart')?.addEventListener('click',animateShippingProgressOnManualOpen);
+
+  // Selector claro/oscuro del catálogo. La preferencia del visitante se guarda
+  // en este navegador y tiene prioridad sobre el tema configurado en el panel.
+  const THEME_KEY='haki_theme_v1';
+  const root=document.documentElement;
+  const savedTheme=(()=>{try{return localStorage.getItem(THEME_KEY)||'';}catch{return '';}})();
+  if(savedTheme==='oscuro'||savedTheme==='claro'){
+    root.dataset.theme=savedTheme;
+    if(window.HAKI_CONFIG) window.HAKI_CONFIG.tema=savedTheme;
+  }
+
+  const themeIcon=theme=>theme==='oscuro'
+    ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 15.2A8.5 8.5 0 0 1 8.8 3.8 8.5 8.5 0 1 0 20.2 15.2Z"/></svg>'
+    : '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/></svg>';
+
+  const currentTheme=()=>root.dataset.theme==='oscuro'?'oscuro':'claro';
+
+  function syncThemeButton(button){
+    if(!button)return;
+    const theme=currentTheme();
+    button.innerHTML=themeIcon(theme);
+    button.setAttribute('aria-label',theme==='oscuro'?'Cambiar a modo claro':'Cambiar a modo oscuro');
+    button.title=theme==='oscuro'?'Modo oscuro · cambiar a claro':'Modo claro · cambiar a oscuro';
+    button.setAttribute('aria-pressed',String(theme==='oscuro'));
+    const meta=document.querySelector('meta[name="theme-color"]');
+    if(meta)meta.content=theme==='oscuro'?'#151515':'#ffffff';
+  }
+
+  function applyUserTheme(theme,button,save=true){
+    const next=theme==='oscuro'?'oscuro':'claro';
+    root.dataset.theme=next;
+    if(window.HAKI_CONFIG)window.HAKI_CONFIG.tema=next;
+    if(save){try{localStorage.setItem(THEME_KEY,next);}catch{}}
+    syncThemeButton(button);
+  }
+
+  function setupThemeToggle(){
+    const headerRight=document.querySelector('.header .header-right');
+    if(!headerRight)return;
+
+    let button=document.getElementById('themeToggle');
+    if(!button){
+      button=document.createElement('button');
+      button.id='themeToggle';
+      button.className='header-icon theme-toggle';
+      button.type='button';
+      const cart=document.getElementById('openCart');
+      headerRight.insertBefore(button,cart||null);
+    }
+
+    if(!document.getElementById('haki-theme-toggle-style')){
+      const style=document.createElement('style');
+      style.id='haki-theme-toggle-style';
+      style.textContent=`
+        .theme-toggle{color:var(--ink)!important;transition:color .2s ease,transform .2s ease}
+        .theme-toggle svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+        .theme-toggle:hover{transform:rotate(8deg)}
+        :root[data-theme=oscuro] .header .header-icon,
+        :root[data-theme=oscuro] .header .header-icon svg,
+        :root[data-theme=oscuro] .header .desktop-search,
+        :root[data-theme=oscuro] .header .desktop-search svg,
+        :root[data-theme=oscuro] .theme-toggle{color:#fff!important}
+        :root[data-theme=oscuro] .header .desktop-search input{color:#fff!important}
+        :root[data-theme=oscuro] .header .desktop-search input::placeholder{color:#a9a9a9!important}
+        :root[data-theme=oscuro] .header{border-bottom-color:#303030!important}
+        :root[data-theme=oscuro] .search-panel .header-icon{color:#fff!important}
+        @media(max-width:800px){.header-right{gap:8px!important}.theme-toggle{width:40px;min-width:40px;height:40px;padding:7px}.theme-toggle svg{width:22px;height:22px}}
+        @media(prefers-reduced-motion:reduce){.theme-toggle{transition:none!important}.theme-toggle:hover{transform:none}}
+      `;
+      document.head.appendChild(style);
+    }
+
+    if(button.dataset.themeReady!=='1'){
+      button.dataset.themeReady='1';
+      button.addEventListener('click',()=>{
+        applyUserTheme(currentTheme()==='oscuro'?'claro':'oscuro',button,true);
+      });
+    }
+
+    const saved=(()=>{try{return localStorage.getItem(THEME_KEY)||'';}catch{return '';}})();
+    const configured=window.hakiSettings(window.HAKI_CONFIG||{}).tema==='oscuro'?'oscuro':'claro';
+    applyUserTheme(saved==='oscuro'||saved==='claro'?saved:configured,button,false);
+
+    if(!root.dataset.themeToggleObserved){
+      root.dataset.themeToggleObserved='1';
+      new MutationObserver(()=>{
+        const preference=(()=>{try{return localStorage.getItem(THEME_KEY)||'';}catch{return '';}})();
+        if((preference==='oscuro'||preference==='claro')&&currentTheme()!==preference){
+          root.dataset.theme=preference;
+          if(window.HAKI_CONFIG)window.HAKI_CONFIG.tema=preference;
+        }
+        syncThemeButton(button);
+      }).observe(root,{attributes:true,attributeFilter:['data-theme']});
+    }
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setupThemeToggle,{once:true});
+  else setupThemeToggle();
 })();
