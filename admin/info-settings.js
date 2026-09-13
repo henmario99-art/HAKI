@@ -164,10 +164,79 @@
   }, 250);
 })();
 
-// Keep product names/codes consistent and apply the requested home-category labels.
+// Keep product names/codes consistent, reconcile inventory and apply requested home-category labels.
 (() => {
+  const sizes = ['S', 'M', 'L', 'XL'];
   const normalizeText = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
   const upper = value => String(value || '').toLocaleUpperCase('es-SV');
+  const initialStock = {
+    'BATC-01':{S:1,M:3,L:2,XL:0},
+    'BATC-02':{S:0,M:2,L:1,XL:0},
+    'BATC-06':{S:1,M:1,L:1,XL:0},
+    'SUPC-01':{S:1,M:1,L:3,XL:0},
+    'SUPC-03':{S:1,M:1,L:2,XL:1},
+    'YLAC-01':{S:0,M:0,L:0,XL:0},
+    'YLAC-06':{S:1,M:0,L:1,XL:0},
+    'YLAC-03':{S:2,M:3,L:1,XL:1},
+    'GSC-06':{S:0,M:0,L:0,XL:0},
+    'GSC-04':{S:0,M:0,L:1,XL:0},
+    'GSC-03':{S:2,M:2,L:3,XL:2},
+    'GSC-08':{S:1,M:0,L:2,XL:0},
+    'GSL1-03':{S:0,M:1,L:0,XL:0},
+    'SUPH-06':{S:1,M:1,L:2,XL:0},
+    'SUPH-01':{S:0,M:1,L:1,XL:0},
+    'BDC1:1-09':{S:0,M:1,L:1,XL:0},
+    'BDC1:1-01':{S:1,M:1,L:0,XL:0},
+    'BDC-06':{S:1,M:0,L:0,XL:0},
+    'BDC-03':{S:2,M:0,L:0,XL:0},
+    'BDC-01':{S:1,M:0,L:0,XL:0},
+    'BDH-01':{S:1,M:0,L:0,XL:0},
+    'BATL-01':{S:0,M:0,L:1,XL:1},
+    'BATL-02':{S:1,M:1,L:1,XL:0},
+    'SUPL-01':{S:0,M:1,L:0,XL:0},
+    'GSL-06':{S:0,M:1,L:0,XL:0},
+    'YLAF-01':{S:2,M:3,L:2,XL:2},
+    'YLAF-03':{S:1,M:1,L:1,XL:0},
+    'YLAF1-01':{S:2,M:3,L:2,XL:2},
+    'YLAF2-01':{S:1,M:2,L:2,XL:1},
+    'YLAF1-02':{S:0,M:0,L:0,XL:0},
+    'ARG':{S:0,M:0,L:0,XL:0},
+    'POR':{S:0,M:0,L:0,XL:0},
+    'AOTF-02':{S:1,M:0,L:0,XL:1},
+    'AOTF-01':{S:1,M:0,L:0,XL:0},
+    'AOTF-03':{S:1,M:0,L:0,XL:0},
+    'YLAO-01':{S:0,M:0,L:1,XL:0},
+    'GLD-01':{S:1,M:1,L:1,XL:1},
+    'YLAP-01':{S:1,M:1,L:2,XL:1},
+    'AOTP-06':{S:1,M:0,L:0,XL:0},
+    'YLAP4-01':{S:0,M:1,L:2,XL:1}
+  };
+
+  const stockStyle = document.createElement('style');
+  stockStyle.id = 'admin-stock-count-style';
+  stockStyle.textContent = '.admin-stock-count{display:inline-flex;align-items:center;justify-content:center;min-width:30px;margin-left:4px;padding:2px 6px;border-radius:999px;background:#ececea;color:#555;font-size:10px;font-weight:800;line-height:1.3}html[data-theme=oscuro] .admin-stock-count{background:#333;color:#ddd}';
+  document.head.append(stockStyle);
+
+  function hasSavedStock(product) {
+    return product?.stock && sizes.every(size => Number.isFinite(Number(product.stock[size])));
+  }
+
+  function applyInventory(product) {
+    if (!product) return false;
+    const code = upper(product.codigo);
+    const source = hasSavedStock(product) ? product.stock : initialStock[code];
+    if (!source) return false;
+    let changed = !hasSavedStock(product);
+    product.stock ||= {};
+    product.tallas ||= {};
+    sizes.forEach(size => {
+      const count = Math.max(0, Math.floor(Number(source[size]) || 0));
+      if (Number(product.stock[size]) !== count) { product.stock[size] = count; changed = true; }
+      const available = count > 0;
+      if (product.tallas[size] !== available) { product.tallas[size] = available; changed = true; }
+    });
+    return changed;
+  }
 
   function polishAdminState() {
     let changed = false;
@@ -175,7 +244,7 @@
       state.config.colecciones.forEach(collection => {
         const name = normalizeText(collection?.nombre);
         let next = collection?.nombre || '';
-        if (name === 'accesorios') next = 'Shorts y Pants';
+        if (collection?.id === 'collection-4' && (name === 'accesorios' || name === 'shorts y pants')) next = 'Oversized';
         if (name === 'camisas, centros' || name === 'camisas centros') next = 'Camisas y Centros';
         if (collection && collection.nombre !== next) {
           collection.nombre = next;
@@ -190,9 +259,33 @@
         const name = upper(product.nombre);
         if (product.codigo !== code) { product.codigo = code; changed = true; }
         if (product.nombre !== name) { product.nombre = name; changed = true; }
+        if (applyInventory(product)) changed = true;
       });
     }
     return changed;
+  }
+
+  function decorateStockCounts() {
+    if (!Array.isArray(state?.filtered)) return;
+    const cards = [...document.querySelectorAll('#products .product-card')];
+    cards.forEach((card, index) => {
+      const product = state.filtered[index];
+      if (!product?.stock) return;
+      card.querySelectorAll('input[data-size]').forEach(input => {
+        const size = input.dataset.size;
+        const label = input.closest('label');
+        if (!label) return;
+        let badge = label.querySelector('.admin-stock-count');
+        if (!badge) {
+          badge = document.createElement('small');
+          badge.className = 'admin-stock-count';
+          label.append(badge);
+        }
+        const count = Math.max(0, Number(product.stock[size]) || 0);
+        badge.textContent = `${count} u.`;
+        label.title = `Stock talla ${size}: ${count}`;
+      });
+    });
   }
 
   const originalNewProduct = newProduct;
@@ -211,16 +304,30 @@
     if (next !== input.value) input.value = next;
   }, true);
 
+  document.addEventListener('change', event => {
+    const input = event.target;
+    if (!(input instanceof HTMLInputElement) || !input.matches('#products input[data-size]')) return;
+    const card = input.closest('.product-card');
+    const cards = [...document.querySelectorAll('#products .product-card')];
+    const product = state.filtered?.[cards.indexOf(card)];
+    if (!product?.stock) return;
+    const size = input.dataset.size;
+    product.stock[size] = input.checked ? Math.max(1, Number(product.stock[size]) || 0) : 0;
+    requestAnimationFrame(decorateStockCounts);
+  }, true);
+
   let lastConfigRef = null;
   let lastProductsRef = null;
   setInterval(() => {
     if (!state?.config || !Array.isArray(state?.products)) return;
-    if (state.config === lastConfigRef && state.products === lastProductsRef) return;
-    lastConfigRef = state.config;
-    lastProductsRef = state.products;
-    if (polishAdminState()) {
-      renderCollectionSettings();
-      renderProducts();
+    if (state.config !== lastConfigRef || state.products !== lastProductsRef) {
+      lastConfigRef = state.config;
+      lastProductsRef = state.products;
+      if (polishAdminState()) {
+        renderCollectionSettings();
+        renderProducts();
+      }
     }
-  }, 80);
+    decorateStockCounts();
+  }, 120);
 })();
