@@ -748,6 +748,76 @@ window.HAKI_PRODUCTOS = [
     "imagen2": ""
   },
   {
+    "id": 20,
+    "codigo": "GSC-03",
+    "nombre": "ONX ROJA",
+    "precio": 25,
+    "categoria": "Camisetas",
+    "imagen": "images/1789325533912-bac14949-ChatGPT-Image-13-sept-2026-12_52_06-p.m..webp",
+    "imagenRespaldo": "images/tee-gray.svg",
+    "tallas": {
+      "S": true,
+      "M": true,
+      "L": true,
+      "XL": true
+    },
+    "colecciones": [
+      "collection-1"
+    ],
+    "colores": [
+      "Negro",
+      "Rojo"
+    ],
+    "masVendido": true,
+    "etiquetaMasVendido": "MÁS VENDIDO"
+  },
+  {
+    "id": 23,
+    "codigo": "GSC-08",
+    "nombre": "ONX VERDE",
+    "precio": 25,
+    "categoria": "Shorts",
+    "imagen": "images/1789326388009-3686b0fa-ChatGPT-Image-13-sept-2026-12_59_52-p.m..webp",
+    "imagenRespaldo": "images/shorts.svg",
+    "tallas": {
+      "S": true,
+      "M": false,
+      "L": true,
+      "XL": false
+    },
+    "colecciones": [
+      "collection-1"
+    ],
+    "colores": [
+      "Negro"
+    ],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
+  },
+  {
+    "id": 24,
+    "codigo": "GSL1-03",
+    "nombre": "ONX GORRO ROJO",
+    "precio": 30,
+    "categoria": "Leggings",
+    "imagen": "images/1789326262410-3f181837-ChatGPT-Image-13-sept-2026-01_04_11-p.m..webp",
+    "imagenRespaldo": "images/leggings.svg",
+    "tallas": {
+      "S": false,
+      "M": true,
+      "L": false,
+      "XL": false
+    },
+    "colecciones": [
+      "collection-2"
+    ],
+    "colores": [
+      "Negro"
+    ],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO"
+  },
+  {
     "id": 17,
     "codigo": "SUPH-06",
     "nombre": "SUP-CENTRO GRIS",
@@ -795,30 +865,6 @@ window.HAKI_PRODUCTOS = [
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
-    "id": 20,
-    "codigo": "GSC-03",
-    "nombre": "ONX ROJA",
-    "precio": 25,
-    "categoria": "Camisetas",
-    "imagen": "images/1789325533912-bac14949-ChatGPT-Image-13-sept-2026-12_52_06-p.m..webp",
-    "imagenRespaldo": "images/tee-gray.svg",
-    "tallas": {
-      "S": true,
-      "M": false,
-      "L": true,
-      "XL": true
-    },
-    "colecciones": [
-      "collection-1"
-    ],
-    "colores": [
-      "Negro",
-      "Rojo"
-    ],
-    "masVendido": true,
-    "etiquetaMasVendido": "MÁS VENDIDO"
-  },
-  {
     "id": 21,
     "codigo": "BDC1:1-09",
     "nombre": "BREATHE DIVINITY 1:1",
@@ -861,52 +907,6 @@ window.HAKI_PRODUCTOS = [
     "colores": [
       "Negro",
       "Rojo"
-    ],
-    "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
-  },
-  {
-    "id": 23,
-    "codigo": "GSC-08",
-    "nombre": "ONX VERDE",
-    "precio": 25,
-    "categoria": "Shorts",
-    "imagen": "images/1789326388009-3686b0fa-ChatGPT-Image-13-sept-2026-12_59_52-p.m..webp",
-    "imagenRespaldo": "images/shorts.svg",
-    "tallas": {
-      "S": true,
-      "M": false,
-      "L": true,
-      "XL": false
-    },
-    "colecciones": [
-      "collection-1"
-    ],
-    "colores": [
-      "Negro"
-    ],
-    "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
-  },
-  {
-    "id": 24,
-    "codigo": "GSL1-03",
-    "nombre": "ONX GORRO ROJO",
-    "precio": 30,
-    "categoria": "Leggings",
-    "imagen": "images/1789326262410-3f181837-ChatGPT-Image-13-sept-2026-01_04_11-p.m..webp",
-    "imagenRespaldo": "images/leggings.svg",
-    "tallas": {
-      "S": false,
-      "M": true,
-      "L": false,
-      "XL": false
-    },
-    "colecciones": [
-      "collection-2"
-    ],
-    "colores": [
-      "Negro"
     ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
@@ -984,89 +984,106 @@ window.HAKI_PRODUCTOS = [
   },
   {
     "id": 28,
-    "codigo": "HAKI-028",
-    "nombre": "Legging Active 03",
-    "precio": 27,
-    "categoria": "Leggings",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/leggings.jpg",
+    "codigo": "BDH-01",
+    "nombre": "BREATHE CENTRO",
+    "precio": 18,
+    "categoria": "",
+    "imagen": "images/1789333438996-e8d8c5e8-7a277e3c-449c-45c2-9bb2-98c237612a43_Original.jpeg",
     "imagenRespaldo": "images/leggings.svg",
     "tallas": {
-      "S": false,
-      "M": true,
-      "L": true,
-      "XL": true
+      "S": true,
+      "M": false,
+      "L": false,
+      "XL": false
     },
-    "colecciones": [],
-    "colores": [],
+    "colecciones": [
+      "collection-1"
+    ],
+    "colores": [
+      "Negro"
+    ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 29,
-    "codigo": "HAKI-029",
-    "nombre": "Compresión Core 03",
+    "codigo": "BATL-01",
+    "nombre": "BAT MANGA LARGA",
     "precio": 26,
     "categoria": "Compresión",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-black.jpg",
+    "imagen": "images/1789333559919-45d7099d-IMG_2441.jpeg",
     "imagenRespaldo": "images/tee-black.svg",
+    "tallas": {
+      "S": false,
+      "M": false,
+      "L": true,
+      "XL": true
+    },
+    "colecciones": [
+      "collection-2"
+    ],
+    "colores": [
+      "Negro"
+    ],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "imagen2": "images/1789333575155-f8aaa80c-IMG_9899.jpeg"
+  },
+  {
+    "id": 30,
+    "codigo": "BATL-02",
+    "nombre": "BATMAN BLANCA MANGA LARGA",
+    "precio": 26,
+    "categoria": "Camisetas",
+    "imagen": "images/1789333855677-8bb55aa8-IMG_2432.jpeg",
+    "imagenRespaldo": "images/tee-gray.svg",
     "tallas": {
       "S": true,
       "M": true,
       "L": true,
       "XL": false
     },
-    "colecciones": [],
-    "colores": [],
-    "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
-  },
-  {
-    "id": 30,
-    "codigo": "HAKI-030",
-    "nombre": "Camiseta Everyday 03",
-    "precio": 25,
-    "categoria": "Camisetas",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-gray.jpg",
-    "imagenRespaldo": "images/tee-gray.svg",
-    "tallas": {
-      "S": true,
-      "M": true,
-      "L": true,
-      "XL": true
-    },
     "colecciones": [
-      "collection-1"
+      "collection-2"
     ],
-    "colores": [],
+    "colores": [
+      "Blanco"
+    ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "imagen2": "images/1789333870425-25e8b747-IMG_1809.jpeg"
   },
   {
     "id": 31,
-    "codigo": "HAKI-031",
-    "nombre": "Compresión Essential 04",
+    "codigo": "SUPL-01",
+    "nombre": "SUP NEGRA MANGA LARGA",
     "precio": 26,
     "categoria": "Compresión",
     "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-black.jpg",
     "imagenRespaldo": "images/tee-black.svg",
     "tallas": {
-      "S": true,
+      "S": false,
       "M": true,
-      "L": true,
-      "XL": true
+      "L": false,
+      "XL": false
     },
-    "colecciones": [],
-    "colores": [],
+    "colecciones": [
+      "collection-2"
+    ],
+    "colores": [
+      "Negro"
+    ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "imagen2": "images/1789333945224-651d7c80-IMG_2443.jpeg"
   },
   {
     "id": 32,
-    "codigo": "HAKI-032",
-    "nombre": "Camiseta Training 04",
-    "precio": 25,
+    "codigo": "GSL-06",
+    "nombre": "STORM MANGA LARGA",
+    "precio": 26,
     "categoria": "Camisetas",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-gray.jpg",
+    "imagen": "images/1789334025584-18a080f9-IMG_2454.jpeg",
     "imagenRespaldo": "images/tee-gray.svg",
     "tallas": {
       "S": true,
@@ -1075,17 +1092,21 @@ window.HAKI_PRODUCTOS = [
       "XL": true
     },
     "colecciones": [
-      "collection-1"
+      "collection-2"
     ],
-    "colores": [],
+    "colores": [
+      "Gris",
+      "Negro"
+    ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "imagen2": "images/1789334036579-225605c0-IMG_2455.jpeg"
   },
   {
     "id": 33,
-    "codigo": "HAKI-033",
-    "nombre": "Short Performance 04",
-    "precio": 22,
+    "codigo": "YLAF-01",
+    "nombre": "BOXY SKULL",
+    "precio": 26,
     "categoria": "Shorts",
     "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/shorts.jpg",
     "imagenRespaldo": "images/shorts.svg",
