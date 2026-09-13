@@ -5,7 +5,24 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>HAKI Admin</title>
   <meta name="robots" content="noindex,nofollow">
-  <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet" href="admin.css?v=2">
+  <style id="admin-product-colors">
+    html{scroll-behavior:smooth}
+    #productsSection{scroll-margin-top:88px}
+    .product-color-setting{margin-top:18px;padding-top:16px;border-top:1px solid #e4e4e4}
+    .product-color-setting>strong{display:block;margin-bottom:5px;font-size:13px}
+    .product-color-setting>p{margin:0 0 12px;color:#777;font-size:12px;line-height:1.45}
+    .color-swatches{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .color-swatch{position:relative;width:36px;height:36px;display:inline-block;border-radius:50%;border:1px solid var(--swatch-border,#bbb);background:var(--swatch,#eee);cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}
+    .color-swatch:hover{transform:translateY(-1px)}
+    .color-swatch input{position:absolute;opacity:0;pointer-events:none}
+    .color-swatch.is-selected{box-shadow:0 0 0 2px #fff,0 0 0 4px #111}
+    .color-swatch.is-selected::after{content:'✓';position:absolute;inset:0;display:grid;place-items:center;font-size:13px;font-weight:900;color:#fff;text-shadow:0 1px 2px #0005}
+    .color-swatch[data-color="Blanco"].is-selected::after,.color-swatch[data-color="Azul"].is-selected::after,.color-swatch[data-color="Rosa"].is-selected::after{color:#111;text-shadow:none}
+    html[data-theme=oscuro] .product-color-setting{border-top-color:#444}
+    html[data-theme=oscuro] .color-swatch.is-selected{box-shadow:0 0 0 2px #242424,0 0 0 4px #fff}
+    @media(max-width:700px){#jumpProductsBtn{flex:1 1 auto;text-align:center}.color-swatch{width:34px;height:34px}}
+  </style>
 </head>
 <body>
   <main class="shell">
@@ -37,6 +54,7 @@
       <section class="toolbar">
         <input id="search" type="search" placeholder="Buscar por nombre o código">
         <button id="addBtn" class="ghost" type="button">+ Agregar producto</button>
+        <a id="jumpProductsBtn" class="ghost" href="#productsSection">Ir a productos</a>
         <button id="saveBtn" class="primary" type="button">Guardar y publicar</button>
       </section>
 
@@ -72,7 +90,7 @@
         <div id="infoSettings" class="collection-settings"></div>
       </section>
 
-      <section>
+      <section id="productsSection">
         <div class="section-title">
           <h2>Productos</h2>
           <span id="count"></span>
@@ -119,6 +137,18 @@
         <label class="check-label"><input class="new-arrival-check" type="checkbox"> Mostrar en NOVEDADES</label>
         <fieldset><legend>Mostrar en categorías de inicio</legend><div class="collection-choices"></div></fieldset>
       </div>
+      <section class="product-color-setting">
+        <strong>Color de la prenda</strong>
+        <p>Selecciona uno o más colores. GYMRAT TEST usará únicamente estos colores para recomendar la prenda.</p>
+        <div class="color-swatches" aria-label="Colores de la prenda">
+          <label class="color-swatch" data-color="Blanco" title="Blanco" style="--swatch:#f7f7f3;--swatch-border:#bdbdb8"><input type="checkbox" data-color="Blanco" aria-label="Blanco"></label>
+          <label class="color-swatch" data-color="Negro" title="Negro" style="--swatch:#111;--swatch-border:#111"><input type="checkbox" data-color="Negro" aria-label="Negro"></label>
+          <label class="color-swatch" data-color="Azul" title="Azul" style="--swatch:#b9d9f1;--swatch-border:#9dbed8"><input type="checkbox" data-color="Azul" aria-label="Azul"></label>
+          <label class="color-swatch" data-color="Rosa" title="Rosa" style="--swatch:#f0cddd;--swatch-border:#ddb6c8"><input type="checkbox" data-color="Rosa" aria-label="Rosa"></label>
+          <label class="color-swatch" data-color="Rojo" title="Rojo" style="--swatch:#cf1111;--swatch-border:#cf1111"><input type="checkbox" data-color="Rojo" aria-label="Rojo"></label>
+          <label class="color-swatch" data-color="Gris" title="Gris" style="--swatch:#a7a7a4;--swatch-border:#91918e"><input type="checkbox" data-color="Gris" aria-label="Gris"></label>
+        </div>
+      </section>
       <div class="sizes">
         <label><input type="checkbox" data-size="S"> S</label>
         <label><input type="checkbox" data-size="M"> M</label>
@@ -130,7 +160,8 @@
   <script src="../storefront-config.js?v=1"></script>
   <script src="../experience-config.js?v=1"></script>
   <script src="experience-settings.js?v=1"></script>
-  <script src="admin.js?v=4"></script>
+  <script src="admin.js?v=5"></script>
   <script src="info-settings.js?v=1"></script>
+  <script src="personalization-settings.js?v=2"></script>
 </body>
 </html>
