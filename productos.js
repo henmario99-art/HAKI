@@ -1108,28 +1108,31 @@ window.HAKI_PRODUCTOS = [
     "nombre": "BOXY SKULL",
     "precio": 26,
     "categoria": "Shorts",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/shorts.jpg",
+    "imagen": "images/1789334255106-dca28e24-IMG_5027.webp",
     "imagenRespaldo": "images/shorts.svg",
     "tallas": {
-      "S": false,
+      "S": true,
       "M": true,
       "L": true,
-      "XL": false
+      "XL": true
     },
     "colecciones": [
-      "collection-2"
+      "collection-4"
     ],
-    "colores": [],
-    "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "colores": [
+      "Negro"
+    ],
+    "masVendido": true,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "novedad": true
   },
   {
     "id": 34,
-    "codigo": "HAKI-034",
-    "nombre": "Legging Sculpt 04",
-    "precio": 28,
+    "codigo": "YLAF1-01",
+    "nombre": "BOXY SERPIENTE",
+    "precio": 26,
     "categoria": "Leggings",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/leggings.jpg",
+    "imagen": "images/1789334422705-1ad6047c-IMG_0957.jpeg",
     "imagenRespaldo": "images/leggings.svg",
     "tallas": {
       "S": true,
@@ -1137,59 +1140,25 @@ window.HAKI_PRODUCTOS = [
       "L": true,
       "XL": true
     },
-    "colecciones": [],
-    "colores": [],
-    "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "colecciones": [
+      "collection-4"
+    ],
+    "colores": [
+      "Negro"
+    ],
+    "masVendido": true,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "imagen2": "images/1789334437869-4e51e8e7-64c7ae95-a57e-4798-99bb-b578c8d51c80.jpeg",
+    "novedad": true
   },
   {
     "id": 35,
-    "codigo": "HAKI-035",
-    "nombre": "Compresión Long Sleeve 04",
-    "precio": 28,
+    "codigo": "YLAF-03",
+    "nombre": "BOXY SKULL ROJA",
+    "precio": 26,
     "categoria": "Compresión",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-black.jpg",
+    "imagen": "images/1789334536065-131410ad-IMG_5028.webp",
     "imagenRespaldo": "images/tee-black.svg",
-    "tallas": {
-      "S": true,
-      "M": true,
-      "L": true,
-      "XL": true
-    },
-    "colecciones": [],
-    "colores": [],
-    "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
-  },
-  {
-    "id": 36,
-    "codigo": "HAKI-036",
-    "nombre": "Camiseta Motion 04",
-    "precio": 24,
-    "categoria": "Camisetas",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-gray.jpg",
-    "imagenRespaldo": "images/tee-gray.svg",
-    "tallas": {
-      "S": true,
-      "M": true,
-      "L": true,
-      "XL": true
-    },
-    "colecciones": [
-      "collection-1"
-    ],
-    "colores": [],
-    "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
-  },
-  {
-    "id": 37,
-    "codigo": "HAKI-037",
-    "nombre": "Short Training 04",
-    "precio": 23,
-    "categoria": "Shorts",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/shorts.jpg",
-    "imagenRespaldo": "images/shorts.svg",
     "tallas": {
       "S": true,
       "M": true,
@@ -1197,57 +1166,22 @@ window.HAKI_PRODUCTOS = [
       "XL": false
     },
     "colecciones": [
-      "collection-2"
+      "collection-4"
     ],
-    "colores": [],
+    "colores": [
+      "Rojo"
+    ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "novedad": true
   },
   {
-    "id": 38,
-    "codigo": "HAKI-038",
-    "nombre": "Legging Active 04",
-    "precio": 27,
-    "categoria": "Leggings",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/leggings.jpg",
-    "imagenRespaldo": "images/leggings.svg",
-    "tallas": {
-      "S": false,
-      "M": true,
-      "L": true,
-      "XL": true
-    },
-    "colecciones": [],
-    "colores": [],
-    "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
-  },
-  {
-    "id": 39,
-    "codigo": "HAKI-039",
-    "nombre": "Compresión Core 04",
+    "id": 36,
+    "codigo": "YLAF2-01",
+    "nombre": "YLA-BOXY NEGRA",
     "precio": 26,
-    "categoria": "Compresión",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-black.jpg",
-    "imagenRespaldo": "images/tee-black.svg",
-    "tallas": {
-      "S": true,
-      "M": true,
-      "L": true,
-      "XL": true
-    },
-    "colecciones": [],
-    "colores": [],
-    "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
-  },
-  {
-    "id": 40,
-    "codigo": "HAKI-040",
-    "nombre": "Camiseta Everyday 04",
-    "precio": 25,
     "categoria": "Camisetas",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-gray.jpg",
+    "imagen": "images/1789334709291-6b8efe22-IMG_5030.jpeg",
     "imagenRespaldo": "images/tee-gray.svg",
     "tallas": {
       "S": true,
@@ -1256,11 +1190,111 @@ window.HAKI_PRODUCTOS = [
       "XL": true
     },
     "colecciones": [
+      "collection-4"
+    ],
+    "colores": [
+      "Negro"
+    ],
+    "masVendido": true,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "novedad": true
+  },
+  {
+    "id": 37,
+    "codigo": "YLAF1-02",
+    "nombre": "YLA-BOXY BLANCO",
+    "precio": 26,
+    "categoria": "",
+    "imagen": "images/1789334797949-5420a940-IMG_5031.jpeg",
+    "imagenRespaldo": "images/shorts.svg",
+    "tallas": {
+      "S": true,
+      "M": true,
+      "L": true,
+      "XL": true
+    },
+    "colecciones": [
+      "collection-4"
+    ],
+    "colores": [
+      "Blanco"
+    ],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "novedad": true
+  },
+  {
+    "id": 38,
+    "codigo": "YLAO-06",
+    "nombre": "YLA- CENTRO OVER",
+    "precio": 26,
+    "categoria": "Leggings",
+    "imagen": "images/1789334909788-e06abe21-IMG_5032.jpeg",
+    "imagenRespaldo": "images/leggings.svg",
+    "tallas": {
+      "S": true,
+      "M": true,
+      "L": true,
+      "XL": true
+    },
+    "colecciones": [
+      "collection-4",
       "collection-1"
     ],
-    "colores": [],
+    "colores": [
+      "Negro",
+      "Gris"
+    ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "novedad": true
+  },
+  {
+    "id": 39,
+    "codigo": "ARG",
+    "nombre": "YLA-ARGENTINA",
+    "precio": 30,
+    "categoria": "",
+    "imagen": "images/1789335087857-a95e6627-IMG_5033.jpeg",
+    "imagenRespaldo": "images/tee-black.svg",
+    "tallas": {
+      "S": true,
+      "M": true,
+      "L": true,
+      "XL": true
+    },
+    "colecciones": [
+      "collection-4"
+    ],
+    "colores": [
+      "Azul"
+    ],
+    "masVendido": true,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "novedad": true
+  },
+  {
+    "id": 40,
+    "codigo": "POR",
+    "nombre": "YLA-PORTUGAL",
+    "precio": 30,
+    "categoria": "Camisetas",
+    "imagen": "images/1789335119078-6a612ad7-IMG_5034.jpeg",
+    "imagenRespaldo": "images/tee-gray.svg",
+    "tallas": {
+      "S": true,
+      "M": true,
+      "L": true,
+      "XL": true
+    },
+    "colecciones": [
+      "collection-1",
+      "collection-4"
+    ],
+    "colores": [],
+    "masVendido": true,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "novedad": true
   },
   {
     "id": 41,
