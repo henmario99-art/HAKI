@@ -871,7 +871,7 @@ window.HAKI_PRODUCTOS = [
     "nombre": "ONX VERDE",
     "precio": 25,
     "categoria": "Shorts",
-    "imagen": "images/1789326037474-19d819e5-D_NQ_NP_652050-MLM111009971349_042026-O.webp",
+    "imagen": "images/1789326388009-3686b0fa-ChatGPT-Image-13-sept-2026-12_59_52-p.m..webp",
     "imagenRespaldo": "images/shorts.svg",
     "tallas": {
       "S": true,
@@ -913,62 +913,72 @@ window.HAKI_PRODUCTOS = [
   },
   {
     "id": 25,
-    "codigo": "HAKI-025",
-    "nombre": "Compresión Long Sleeve 03",
-    "precio": 28,
+    "codigo": "BDC-06",
+    "nombre": "BREATHE NEGRO",
+    "precio": 22,
     "categoria": "Compresión",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-black.jpg",
+    "imagen": "images/1789326754845-5afdad05-frente.webp",
     "imagenRespaldo": "images/tee-black.svg",
     "tallas": {
       "S": true,
-      "M": true,
-      "L": true,
+      "M": false,
+      "L": false,
       "XL": false
-    },
-    "colecciones": [],
-    "colores": [],
-    "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
-  },
-  {
-    "id": 26,
-    "codigo": "HAKI-026",
-    "nombre": "Camiseta Motion 03",
-    "precio": 24,
-    "categoria": "Camisetas",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-gray.jpg",
-    "imagenRespaldo": "images/tee-gray.svg",
-    "tallas": {
-      "S": true,
-      "M": true,
-      "L": true,
-      "XL": true
     },
     "colecciones": [
       "collection-1"
     ],
-    "colores": [],
+    "colores": [
+      "Negro"
+    ],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "imagen2": "images/1789326760143-0feee96c-espalda.webp"
+  },
+  {
+    "id": 26,
+    "codigo": "BDC-03",
+    "nombre": "BREATHE ROJA",
+    "precio": 22,
+    "categoria": "Camisetas",
+    "imagen": "images/1789326828484-c0cd5d8a-FRENTE-BD.webp",
+    "imagenRespaldo": "images/tee-gray.svg",
+    "tallas": {
+      "S": true,
+      "M": false,
+      "L": false,
+      "XL": false
+    },
+    "colecciones": [
+      "collection-1"
+    ],
+    "colores": [
+      "Rojo"
+    ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 27,
-    "codigo": "HAKI-027",
-    "nombre": "Short Training 03",
-    "precio": 23,
+    "codigo": "BDC-01",
+    "nombre": "BREATHE CRUZ",
+    "precio": 22,
     "categoria": "Shorts",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/shorts.jpg",
+    "imagen": "images/1789327006544-7be3b3ae-b3958769-a5db-43b9-bcfa-748bc1375e1d.webp",
     "imagenRespaldo": "images/shorts.svg",
     "tallas": {
       "S": true,
-      "M": true,
-      "L": true,
-      "XL": true
+      "M": false,
+      "L": false,
+      "XL": false
     },
     "colecciones": [
-      "collection-2"
+      "collection-1"
     ],
-    "colores": [],
+    "colores": [
+      "Rojo",
+      "Negro"
+    ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
