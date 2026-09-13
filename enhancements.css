@@ -62,6 +62,7 @@ html body #collectionsSection #collectionsGrid .collection-tile h3{display:block
 
 /* Guía de camisetas y centros abierta desde el menú principal */
 .size-guide-dialog{width:min(680px,calc(100vw - 32px));max-width:680px;padding:24px;background:var(--surface,#fff);color:var(--ink,#111);border:0}.size-guide-description{margin:4px 0 22px;color:var(--muted,#666);font-size:13px}.menu-size-guide-scroll{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}.menu-size-guide-table{width:100%;min-width:500px;border-collapse:collapse;background:var(--surface,#fff);color:var(--ink,#111);font-size:13px;line-height:1.35}.menu-size-guide-table th,.menu-size-guide-table td{padding:14px 8px;border-bottom:1px solid var(--line,#ddd);text-align:left;white-space:nowrap}.menu-size-guide-table thead th{font-weight:750}.menu-size-guide-table tbody th{font-weight:500}
+.detail-size-heading .size-guide-link{margin-left:auto;padding:0;color:var(--ink,#111);font-weight:600;text-underline-offset:5px;white-space:nowrap}
 
 .cart-row{grid-template-columns:74px minmax(0,1fr) auto!important;gap:14px!important;padding:18px 0!important}
 .cart-thumb{width:74px!important;height:92px!important;object-fit:cover!important}

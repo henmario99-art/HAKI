@@ -171,6 +171,13 @@
     return normalize(p.categoria || '') === normalize(collection.categoria || collection.nombre);
   }
 
+  function usesShirtSizeGuide(p) {
+    const collectionNames = (p.colecciones || [])
+      .map(id => COLLECTIONS.find(collection => collection.id === id)?.nombre || '')
+      .join(' ');
+    return /camiseta|centro/.test(normalize(`${p.categoria || ''} ${collectionNames}`));
+  }
+
   function renderProducts() {
     const list = visibleProducts();
 
@@ -798,6 +805,7 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     document.title = `${p.nombre} — HAKI`;
     const images = [p.imagen || fallbackFor(p), p.imagen2].filter(Boolean);
     const selected = state.selected[p.codigo] || '';
+    const showSizeGuide = usesShirtSizeGuide(p);
     detail.innerHTML = `
       <a class="detail-back" href="${esc(lastListingHash)}">← Volver a las prendas</a>
       <div class="detail-layout">
@@ -822,7 +830,7 @@ ${settings().totalTexto}: ${money(totals.total)}`;
           <div class="detail-options">
             <strong class="detail-price">${money(p.precio)}</strong>
             ${p.descripcion ? `<p class="detail-description">${esc(p.descripcion)}</p>` : ''}
-            <div class="detail-size-heading"><h2>Seleccioná tu talla</h2></div>
+            <div class="detail-size-heading"><h2>Seleccioná tu talla</h2>${showSizeGuide ? '<button id="openSizeGuide" type="button" class="size-guide-link">Guía de tallas</button>' : ''}</div>
             <div id="detailSizes" class="detail-sizes" role="group" aria-label="Seleccionar talla">
               ${['S','M','L','XL'].map(size => `<button type="button" class="detail-size ${selected === size ? 'selected' : ''}" data-detail-size="${size}" aria-pressed="${selected === size}" ${p.tallas?.[size] ? '' : 'disabled'}>${size}</button>`).join('')}
             </div>
@@ -860,6 +868,7 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       }
       addToCart(p.codigo);
     }));
+    if (showSizeGuide) $('#openSizeGuide').addEventListener('click', () => $('#sizeGuideDialog').showModal());
   }
 
   $('#closeSizeGuide').addEventListener('click', () => $('#sizeGuideDialog').close());

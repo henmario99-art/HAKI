@@ -74,7 +74,7 @@ window.hakiCollections = config => window.HAKI_COLLECTION_DEFAULTS.map((item, in
         padding:0 22px!important;
         display:flex!important;
         align-items:center!important;
-        justify-content:space-between!important;
+        justify-content:flex-start!important;
         gap:18px!important;
         border:0!important;
         background:transparent!important;
@@ -94,6 +94,8 @@ window.hakiCollections = config => window.HAKI_COLLECTION_DEFAULTS.map((item, in
       .catalog-dropdown a::after{
         content:'›';
         flex:0 0 auto;
+        margin-left:8px!important;
+        margin-right:0!important;
         font-size:27px;
         line-height:1;
         font-weight:400;
