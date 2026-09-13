@@ -820,11 +820,11 @@ window.HAKI_PRODUCTOS = [
   },
   {
     "id": 21,
-    "codigo": "HAKI-021",
-    "nombre": "Compresión Essential 03",
-    "precio": 26,
+    "codigo": "BDC1:1-09",
+    "nombre": "BREATHE DIVINITY 1:1",
+    "precio": 45,
     "categoria": "Compresión",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-black.jpg",
+    "imagen": "images/1789325730011-4e8cd8ff-IMG_2383-_1_.webp",
     "imagenRespaldo": "images/tee-black.svg",
     "tallas": {
       "S": true,
@@ -832,69 +832,82 @@ window.HAKI_PRODUCTOS = [
       "L": true,
       "XL": false
     },
-    "colecciones": [],
-    "colores": [],
+    "colecciones": [
+      "collection-1"
+    ],
+    "colores": [
+      "Negro"
+    ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 22,
-    "codigo": "HAKI-022",
-    "nombre": "Camiseta Training 03",
-    "precio": 25,
+    "codigo": "BDC1:1-01",
+    "nombre": "BREATHE DIVINITI 1:1 RED",
+    "precio": 45,
     "categoria": "Camisetas",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/tee-gray.jpg",
+    "imagen": "images/1789325825389-d70a1b03-IMG_2423.webp",
     "imagenRespaldo": "images/tee-gray.svg",
     "tallas": {
       "S": true,
       "M": true,
-      "L": true,
-      "XL": true
+      "L": false,
+      "XL": false
     },
     "colecciones": [
       "collection-1"
     ],
-    "colores": [],
+    "colores": [
+      "Negro",
+      "Rojo"
+    ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 23,
-    "codigo": "HAKI-023",
-    "nombre": "Short Performance 03",
-    "precio": 22,
+    "codigo": "GSC-08",
+    "nombre": "ONX VERDE",
+    "precio": 25,
     "categoria": "Shorts",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/shorts.jpg",
+    "imagen": "images/1789326037474-19d819e5-D_NQ_NP_652050-MLM111009971349_042026-O.webp",
     "imagenRespaldo": "images/shorts.svg",
     "tallas": {
-      "S": false,
-      "M": true,
+      "S": true,
+      "M": false,
       "L": true,
-      "XL": true
+      "XL": false
     },
     "colecciones": [
-      "collection-2"
+      "collection-1"
     ],
-    "colores": [],
+    "colores": [
+      "Negro"
+    ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
   {
     "id": 24,
-    "codigo": "HAKI-024",
-    "nombre": "Legging Sculpt 03",
-    "precio": 28,
+    "codigo": "GSL1-03",
+    "nombre": "ONX GORRO ROJO",
+    "precio": 30,
     "categoria": "Leggings",
-    "imagen": "https://haki-sport-catalog.henmario99.chatgpt.site/images/leggings.jpg",
+    "imagen": "images/1789326262410-3f181837-ChatGPT-Image-13-sept-2026-01_04_11-p.m..webp",
     "imagenRespaldo": "images/leggings.svg",
     "tallas": {
-      "S": true,
+      "S": false,
       "M": true,
-      "L": true,
-      "XL": true
+      "L": false,
+      "XL": false
     },
-    "colecciones": [],
-    "colores": [],
+    "colecciones": [
+      "collection-2"
+    ],
+    "colores": [
+      "Negro"
+    ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO"
   },
