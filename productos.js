@@ -83,7 +83,7 @@ window.HAKI_PRODUCTOS = [
       "collection-1"
     ],
     "novedad": true,
-    "imagen2": "images/images-3-.jpeg",
+    "imagen2": "",
     "guiaTallas": "images/TALLAS-COMPRESION.jpg"
   },
   {
