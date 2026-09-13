@@ -7,6 +7,7 @@
     { value: 'Gris', hex: '#a7a7a4', border: '#91918e' },
     { value: 'Rosa', hex: '#f0cddd', border: '#ddb6c8' }
   ];
+  let migratedConfig = null;
 
   function ensureStyles() {
     if (document.getElementById('haki-product-tools-style')) return;
@@ -19,8 +20,8 @@
       .color-swatches{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
       .color-swatch{position:relative;width:34px;height:34px;border-radius:50%;border:1px solid var(--swatch-border,#bbb);background:var(--swatch,#eee);cursor:pointer;padding:0;box-shadow:0 0 0 0 transparent;transition:transform .15s ease,box-shadow .15s ease}
       .color-swatch:hover{transform:translateY(-1px)}
-      .color-swatch.is-selected{box-shadow:0 0 0 2px var(--card,#fff),0 0 0 4px #111}
-      .color-swatch.is-selected::after{content:'✓';position:absolute;inset:0;display:grid;place-items:center;font-size:13px;font-weight:900;color:var(--check,#fff);text-shadow:0 1px 2px #0005}
+      .color-swatch.is-selected{box-shadow:0 0 0 2px #fff,0 0 0 4px #111}
+      .color-swatch.is-selected::after{content:'✓';position:absolute;inset:0;display:grid;place-items:center;font-size:13px;font-weight:900;color:#fff;text-shadow:0 1px 2px #0005}
       .color-swatch[data-color='Blanco'].is-selected::after,.color-swatch[data-color='Azul'].is-selected::after,.color-swatch[data-color='Rosa'].is-selected::after{color:#111;text-shadow:none}
       .color-swatch input{position:absolute;opacity:0;pointer-events:none}
       html[data-theme=oscuro] .product-color-setting{border-top-color:#444}
@@ -46,9 +47,7 @@
   }
 
   function normalizeColors(product) {
-    if (!Array.isArray(product.colores)) {
-      product.colores = product.color ? [product.color] : [];
-    }
+    if (!Array.isArray(product.colores)) product.colores = product.color ? [product.color] : [];
     product.colores = [...new Set(product.colores.map(String).filter(Boolean))];
     return product.colores;
   }
@@ -58,10 +57,9 @@
     const colors = normalizeColors(product);
     const wrap = document.createElement('section');
     wrap.className = 'product-color-setting';
-    wrap.innerHTML = '<strong>Color de la prenda</strong><p>Selecciona uno o más colores. GYMRAT TEST usará esta información para recomendar prendas correctamente.</p>';
+    wrap.innerHTML = '<strong>Color de la prenda</strong><p>Selecciona uno o más colores. GYMRAT TEST solo recomendará prendas que tengan un color asignado compatible.</p>';
     const swatches = document.createElement('div');
     swatches.className = 'color-swatches';
-
     COLOR_OPTIONS.forEach(option => {
       const label = document.createElement('label');
       label.className = `color-swatch${colors.includes(option.value) ? ' is-selected' : ''}`;
@@ -82,34 +80,37 @@
       label.appendChild(input);
       swatches.appendChild(label);
     });
-
     wrap.appendChild(swatches);
     const placement = card.querySelector('.product-placement');
-    if (placement) placement.insertAdjacentElement('afterend', wrap);
-    else card.appendChild(wrap);
+    if (placement) placement.insertAdjacentElement('afterend', wrap); else card.appendChild(wrap);
   }
 
   function syncProductColorPickers() {
     if (typeof state === 'undefined' || !Array.isArray(state.filtered)) return;
-    const cards = [...document.querySelectorAll('#products .product-card')];
-    cards.forEach((card, index) => renderCardColorPicker(card, state.filtered[index]));
+    [...document.querySelectorAll('#products .product-card')].forEach((card, index) => renderCardColorPicker(card, state.filtered[index]));
+  }
+
+  function migrateLegacyGymratColors() {
+    if (typeof state === 'undefined' || !state?.config || migratedConfig === state.config) return;
+    const dark = state.config.gymrat?.perfiles?.dark;
+    if (!dark || !Array.isArray(dark.coloresProducto)) return;
+    const values = dark.coloresProducto.map(value => String(value).toLowerCase());
+    const legacy = ['negro','negra','black','gris','gray'];
+    if (values.length && values.every(value => legacy.includes(value)) && values.some(value => value === 'gris' || value === 'gray')) dark.coloresProducto = ['Negro'];
+    migratedConfig = state.config;
   }
 
   function setupObserver() {
     const products = document.getElementById('products');
     if (!products || products.dataset.colorObserver === '1') return;
     products.dataset.colorObserver = '1';
-    new MutationObserver(() => requestAnimationFrame(syncProductColorPickers))
-      .observe(products, { childList: true });
+    new MutationObserver(() => requestAnimationFrame(syncProductColorPickers)).observe(products, { childList: true });
   }
 
   function init() {
-    ensureStyles();
-    setupJumpButton();
-    setupObserver();
-    requestAnimationFrame(syncProductColorPickers);
+    ensureStyles(); setupJumpButton(); setupObserver(); requestAnimationFrame(syncProductColorPickers);
+    setInterval(() => { migrateLegacyGymratColors(); syncProductColorPickers(); }, 350);
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
-  else init();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true }); else init();
 })();
