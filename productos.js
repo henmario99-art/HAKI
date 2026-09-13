@@ -81,8 +81,8 @@ window.HAKI_CONFIG = {
     },
     {
       "id": "collection-4",
-      "nombre": "Shorts y Pants",
-      "imagen": "images/TaperedDoubleProngLiftingBeltGSBlackAmethistI1B7O_BD0D_0115.webp",
+      "nombre": "Oversized",
+      "imagen": "images/1789339434564-1611c50c-IMG_5027.webp",
       "categoria": "Hoodies"
     }
   ],
