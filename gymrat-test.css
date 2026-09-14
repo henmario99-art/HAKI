@@ -56,3 +56,9 @@
 @media(max-width:800px){.gymrat-shell{min-height:560px;padding:20px}.gymrat-stage{padding-top:30px}.gymrat-products{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 9px}.gymrat-question-title{font-size:34px}.gymrat-option{min-height:50px}.gymrat-result-copy{font-size:13px}.gymrat-result-actions>*{flex:1 1 150px}}
 @media(max-width:460px){.gymrat-dialog{width:100vw;max-width:none;height:100dvh;max-height:100dvh;border-radius:0}.gymrat-shell{min-height:100dvh;padding:18px 16px 26px}.gymrat-stage{padding-top:24px}.gymrat-question-title{font-size:31px}.gymrat-head-title{font-size:19px}.gymrat-option{min-height:48px}.gymrat-result-title{font-size:44px}.gymrat-product-image{border-radius:10px}}
 @media(prefers-reduced-motion:reduce){.gymrat-progress-fill,.gymrat-option,.gymrat-product-image img{transition:none!important}.gymrat-question-view,.gymrat-result,.gymrat-reveal{animation:none!important}.gymrat-reveal-orbit::before{animation:none!important}}
+
+/* Product detail loading: static placeholder, no repeating shimmer or page pulse. */
+#productDetail .detail-media.haki-image-loading::before{animation:none!important;background-image:none!important;background:#ececea!important;opacity:1!important}
+:root[data-theme=oscuro] #productDetail .detail-media.haki-image-loading::before{background:#151515!important}
+#productDetail.haki-detail-entering .detail-layout{animation:none!important}
+#productDetail .detail-gallery img{transition:opacity .22s ease!important}
