@@ -30,7 +30,7 @@
   };
 })();
 
-// Stable product-detail loading state: one static placeholder, then reveal the decoded image once.
+// Stable product-detail loading state: one static placeholder, then reveal only after decode.
 (() => {
   const style = document.createElement('style');
   style.id = 'haki-image-loading-transition';
@@ -69,6 +69,15 @@
     });
   }
 
+  function revealWhenDecoded(image, media) {
+    if (!image || !media) return;
+    if (typeof image.decode !== 'function') {
+      settle(media);
+      return;
+    }
+    image.decode().catch(() => {}).finally(() => settle(media));
+  }
+
   function prepareDetailImage() {
     if (!detail || detail.hidden) return;
     const media = detail.querySelector('.detail-media');
@@ -76,14 +85,15 @@
     if (!media || !image || image.dataset.hakiLoadingReady === '1') return;
 
     image.dataset.hakiLoadingReady = '1';
+    media.classList.remove('haki-image-loaded');
+    media.classList.add('haki-image-loading');
+
     if (image.complete && image.naturalWidth > 0) {
-      settle(media);
+      revealWhenDecoded(image, media);
       return;
     }
 
-    media.classList.remove('haki-image-loaded');
-    media.classList.add('haki-image-loading');
-    image.addEventListener('load', () => settle(media), { once:true });
+    image.addEventListener('load', () => revealWhenDecoded(image, media), { once:true });
     image.addEventListener('error', () => settle(media), { once:true });
   }
 
@@ -103,7 +113,9 @@
     warmed.add(src);
     const preload = new Image();
     preload.decoding = 'async';
+    preload.fetchPriority = 'high';
     preload.src = src;
+    preload.decode?.().catch(() => {});
   }
 
   // Warm the exact same 1400px URL that the PDP uses, based on user intent.
