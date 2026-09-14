@@ -1,3 +1,35 @@
+// Optimize every local raster image through Netlify Image CDN, including uploads not present in the legacy manifest.
+(() => {
+  const legacyItems = url => ((window.HAKI_IMAGES || {})[url] || []).filter(v => v && v.src && v.width);
+  const isRemote = url => /^(https?:|data:|blob:)/i.test(String(url || ''));
+  const isSvg = url => /\.svg(?:[?#]|$)/i.test(String(url || ''));
+  const netlifyImage = (url = '', size = 800) => {
+    const clean = String(url || '').replace(/^\/?(?:\.\/)?/, '');
+    if (!clean) return 'images/producto.svg';
+    const width = Math.max(160, Math.min(1920, Math.round(Number(size) || 800)));
+    return `/.netlify/images?url=${encodeURIComponent('/' + clean)}&w=${width}&q=80`;
+  };
+  const originalHakiImage = window.hakiImage;
+  const originalSrcset = window.hakiSrcset;
+
+  window.hakiImage = (url = '', size = 800) => {
+    const items = legacyItems(url);
+    if (items.length && typeof originalHakiImage === 'function') return originalHakiImage(url, size);
+    if (!url) return 'images/producto.svg';
+    if (isRemote(url) || isSvg(url)) return typeof originalHakiImage === 'function' ? originalHakiImage(url, size) : url;
+    return netlifyImage(url, size);
+  };
+
+  window.hakiSrcset = url => {
+    const items = legacyItems(url);
+    if (items.length && typeof originalSrcset === 'function') return originalSrcset(url);
+    if (!url || isRemote(url) || isSvg(url)) return '';
+    return [400, 800, 1200]
+      .map(width => `${netlifyImage(url, width)} ${width}w`)
+      .join(', ');
+  };
+})();
+
 // Render the bundled/cached catalog immediately, refresh current data in the background.
 (() => {
   const key='haki_catalog_cache_v2';
