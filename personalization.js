@@ -79,8 +79,8 @@
   window.addEventListener('haki:catalog-updated', applyTypography);
 })();
 
-// App-like catalog return: preserve the exact product-card DOM (and decoded images)
-// while app.js restores route state. This avoids rebuilding <img> elements on Back.
+// Persistent catalog view, modeled after app-like client-side navigation:
+// when returning from a PDP, keep the exact grid DOM and decoded <img> elements mounted.
 (() => {
   const normalizeHash = value => {
     const hash = String(value || '').replace(/^#/, '');
@@ -120,14 +120,14 @@
   `;
   document.head.appendChild(containmentStyle);
 
-  // Remember which exact listing the user came from. Works for taps and keyboard activation.
+  // Remember the exact list route before the browser changes the hash to #producto/…
   document.addEventListener('click', event => {
     const link = event.target.closest?.('.product-detail-link');
     if (!link || !link.hash.startsWith('#producto/')) return;
     sourceHash = normalizeHash(location.hash);
   }, true);
 
-  // If live catalog data changes while a product is open, prefer fresh DOM on return.
+  // If actual catalog data changes, do not preserve stale cards on a later return.
   window.addEventListener('haki:catalog-updated', () => {
     sourceVersion += 1;
     sourceHash = '';
@@ -146,20 +146,52 @@
     const versionAtCapture = sourceVersion;
     const detailCode = oldHash.slice('#producto/'.length);
     const selectedSize = document.querySelector('#productDetail .detail-size.selected')?.dataset.detailSize || '';
+    const innerHTMLDescriptor = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
+    let blockedRender = false;
+    let preserved = null;
 
-    // Move, don't clone: detached <img> nodes keep their decoded bitmap and listeners.
-    const preserved = document.createDocumentFragment();
-    while (products.firstChild) preserved.appendChild(products.firstChild);
+    // Preferred path: keep every existing card mounted and temporarily make renderProductList()
+    // a no-op for this one route restoration. app.js can still restore state/title/scroll normally.
+    try {
+      if (innerHTMLDescriptor?.get) {
+        Object.defineProperty(products, 'innerHTML', {
+          configurable: true,
+          get() { return innerHTMLDescriptor.get.call(this); },
+          set() { /* Preserve existing catalog DOM during browser Back. */ }
+        });
+        Object.defineProperty(products, 'querySelectorAll', {
+          configurable: true,
+          value() { return []; }
+        });
+        blockedRender = true;
+      }
+    } catch {
+      try { delete products.innerHTML; } catch {}
+      try { delete products.querySelectorAll; } catch {}
+    }
 
-    // app.js now runs its normal route restoration synchronously. Before the browser can paint,
-    // discard the temporary rebuilt grid and put the original nodes back in exactly one microtask.
+    // Compatibility fallback for browsers that do not allow the temporary element overrides.
+    if (!blockedRender) {
+      preserved = document.createDocumentFragment();
+      while (products.firstChild) preserved.appendChild(products.firstChild);
+    }
+
+    // app.js restores the route synchronously in the same hashchange dispatch. A microtask runs
+    // before the next paint, so users never see an intermediate/rebuilt product grid.
     queueMicrotask(() => {
-      if (versionAtCapture !== sourceVersion || normalizeHash(location.hash) !== sourceHash) return;
-      products.replaceChildren(preserved);
+      if (blockedRender) {
+        try { delete products.innerHTML; } catch {}
+        try { delete products.querySelectorAll; } catch {}
+      } else if (preserved) {
+        products.replaceChildren(preserved);
+      }
 
-      // A size selected on the PDP should still be reflected on the preserved card.
+      if (versionAtCapture !== sourceVersion || normalizeHash(location.hash) !== sourceHash) return;
+
+      // Keep a size selected on the PDP in sync without rebuilding the card.
       if (detailCode && selectedSize) {
-        document.querySelectorAll(`#products article.product[data-code="${CSS.escape(detailCode)}"]`).forEach(card => {
+        const escapedCode = window.CSS?.escape ? CSS.escape(detailCode) : detailCode.replace(/["\\]/g, '\\$&');
+        document.querySelectorAll(`#products article.product[data-code="${escapedCode}"]`).forEach(card => {
           card.querySelectorAll('.size-option').forEach(option => {
             const active = option.dataset.size === selectedSize;
             option.classList.toggle('selected', active);
