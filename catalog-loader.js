@@ -197,3 +197,15 @@
   window.addEventListener('DOMContentLoaded',()=>{refresh();setInterval(refresh,60000);});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});
 })();
+
+// iOS browsers all use WebKit. Load the targeted navigation layer only there so Android/desktop stay untouched.
+(() => {
+  const ua = navigator.userAgent || '';
+  const isIOS = /iP(?:hone|ad|od)/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (!isIOS || document.getElementById('haki-ios-safari-fix-loader')) return;
+  const script = document.createElement('script');
+  script.id = 'haki-ios-safari-fix-loader';
+  script.src = 'ios-safari-fix.js?v=1';
+  script.defer = true;
+  document.head.appendChild(script);
+})();
