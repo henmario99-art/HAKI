@@ -18,7 +18,7 @@
     X-Content-Type-Options = "nosniff"
 
 [[headers]]
-  for = "/images/optimized/*"
+  for = "/images/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
