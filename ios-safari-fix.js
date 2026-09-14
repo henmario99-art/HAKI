@@ -16,7 +16,7 @@
     html.haki-ios-webkit .collection-image,
     html.haki-ios-webkit #productDetail .detail-media{
       overflow:hidden;
-      contain:none;
+      contain:paint;
     }
     html.haki-ios-webkit .product-image img,
     html.haki-ios-webkit .collection-image img{
@@ -42,7 +42,10 @@
       overflow-y:auto;
       overscroll-behavior-y:contain;
       background:var(--surface,#fff);
+      isolation:isolate;
+      contain:paint;
     }
+    html.haki-ios-webkit #productDetail .detail-gallery{contain:paint}
     html.haki-ios-webkit body.haki-ios-product-open .detail-summary{top:0}
   `;
   document.head.appendChild(style);

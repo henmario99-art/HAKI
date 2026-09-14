@@ -381,6 +381,11 @@
 
   function leaveIOSDetail() {
     if (!iosListing) return;
+    const detail = $('#productDetail');
+    // Retire the scroll layer before removing its fixed positioning. Keep the
+    // listing nodes and their decoded images intact for the return transition.
+    detail.hidden = true;
+    detail.replaceChildren();
     iosListing.forEach(({ el, inert }) => { if (el) el.inert = inert; });
     iosListing = null;
     document.body.classList.remove('haki-ios-product-open');
@@ -985,6 +990,27 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   });
+  function navigateIOSProductLink(event) {
+    if (!isIOS || event.defaultPrevented || event.button > 0 ||
+        event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const link = event.target.closest?.('a[href]');
+    if (!link || link.hasAttribute('download') ||
+        (link.target && link.target !== '_self')) return;
+    const destination = new URL(link.href, location.href);
+    if (destination.origin !== location.origin ||
+        destination.pathname !== location.pathname ||
+        destination.search !== location.search || !destination.hash) return;
+    // Leave unrelated links and custom controls to their own handlers.
+    if (!detailCode && !destination.hash.startsWith('#producto/')) return;
+    event.preventDefault();
+    if (destination.hash === location.hash) return;
+    // pushState avoids native fragment scrolling between click and hashchange.
+    // Back/Forward still use the normal history stack and the popstate router.
+    history.pushState(null, '', destination.href);
+    route();
+  }
+  document.addEventListener('click', navigateIOSProductLink);
+
   window.addEventListener('hashchange', route);
   if (isIOS) window.addEventListener('popstate', route);
   const settings=()=>window.hakiSettings(CONFIG);
