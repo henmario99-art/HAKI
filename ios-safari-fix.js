@@ -79,16 +79,24 @@
   });
   scheduleRootTop();
 
-  // Remember the exact place where a customer entered a collection, then make the
-  // listing's back link return to that category section instead of #top.
+  // Remember the exact place where a customer entered a collection, then make any
+  // return path (link, browser Back button, or Safari edge gesture) land there.
   let categoryReturnY = null;
   let returningToCategories = false;
+  let previousHash = location.hash || '#top';
   const isFilteredCategoryHash = hash => /^#(?:coleccion|categoria)\//.test(hash || '');
   const categoriesFallbackY = () => {
     const section = document.getElementById('collectionsSection');
     if (!section) return 0;
     const headerHeight = document.querySelector('.header')?.getBoundingClientRect().height || 0;
     return Math.max(0, section.getBoundingClientRect().top + window.scrollY - headerHeight - 8);
+  };
+  const restoreCategoriesPosition = () => {
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const targetY = Number.isFinite(categoryReturnY) ? categoryReturnY : categoriesFallbackY();
+      window.scrollTo({ top: targetY, left: 0, behavior: 'instant' });
+      returningToCategories = false;
+    }));
   };
 
   document.addEventListener('click', event => {
@@ -113,12 +121,23 @@
     location.hash = '#collectionsSection';
   }, true);
 
+  // This fires before app.js's iOS popstate router because this file is loaded first.
+  // Wait two paint frames so app.js can unhide Home/Collections, then restore the
+  // exact viewport where the collection tile was tapped.
+  window.addEventListener('popstate', () => {
+    const nextHash = location.hash || '#top';
+    if (isFilteredCategoryHash(previousHash) && !isFilteredCategoryHash(nextHash)) {
+      returningToCategories = true;
+      restoreCategoriesPosition();
+    }
+    previousHash = nextHash;
+  });
+
   window.addEventListener('hashchange', () => {
-    if (!returningToCategories || location.hash !== '#collectionsSection') return;
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      const targetY = Number.isFinite(categoryReturnY) ? categoryReturnY : categoriesFallbackY();
-      window.scrollTo({ top: targetY, left: 0, behavior: 'instant' });
-      returningToCategories = false;
-    }));
+    const nextHash = location.hash || '#top';
+    if (returningToCategories && nextHash === '#collectionsSection') {
+      restoreCategoriesPosition();
+    }
+    previousHash = nextHash;
   });
 })();
