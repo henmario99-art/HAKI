@@ -78,4 +78,54 @@
     if (!event.persisted) scheduleRootTop();
   });
   scheduleRootTop();
+
+  // Category return is intentionally minimal. We only remember where the tile was
+  // opened and restore that Y after app.js has completed its normal history route.
+  const isCategoryHash = hash => /^#(?:coleccion|categoria)\//.test(hash || '');
+  let categoryReturnY = null;
+  let previousHash = location.hash || '#top';
+
+  document.addEventListener('click', event => {
+    const link = event.target.closest?.('a[href]');
+    if (!link || event.defaultPrevented || event.button > 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+    let destination;
+    try { destination = new URL(link.href, location.href); }
+    catch { return; }
+
+    if (destination.origin !== location.origin || destination.pathname !== location.pathname || destination.search !== location.search) return;
+
+    if (!isCategoryHash(location.hash) && isCategoryHash(destination.hash)) {
+      categoryReturnY = window.scrollY;
+      return;
+    }
+
+    // The existing back link should use the same history entry as the browser's
+    // Back gesture when this category was entered from the catalogue.
+    if (link.matches('.back-home') && isCategoryHash(location.hash) && Number.isFinite(categoryReturnY)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      history.back();
+    }
+  }, true);
+
+  window.addEventListener('popstate', () => {
+    const nextHash = location.hash || '#top';
+    const shouldRestore = isCategoryHash(previousHash) && !isCategoryHash(nextHash) && Number.isFinite(categoryReturnY);
+    previousHash = nextHash;
+    if (!shouldRestore) return;
+
+    const targetY = categoryReturnY;
+    // app.js handles the same popstate synchronously after this listener. Defer the
+    // scroll until its Home/Collections sections have been made visible again.
+    setTimeout(() => {
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        window.scrollTo({ top: targetY, left: 0, behavior: 'instant' });
+      }));
+    }, 0);
+  });
+
+  window.addEventListener('hashchange', () => {
+    previousHash = location.hash || '#top';
+  });
 })();
