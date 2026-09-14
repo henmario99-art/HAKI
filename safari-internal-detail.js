@@ -1,32 +1,33 @@
-// Safari-only product navigation: use a real document navigation for PDPs.
-// This keeps iPhone's native back-swipe, but avoids animating two states of the
-// same DOM tree (the source of the one-frame product/catalogue overlap).
+// Safari-only iPhone product navigation stabilization.
+// Keep HAKI's normal product history entry, but take control of the left-edge
+// back gesture so WebKit never starts its buggy interactive history snapshot.
 (() => {
   const ua = navigator.userAgent || '';
   const isIOSWebKit = window.hakiIOSWebKit === true;
   const isSafari = isIOSWebKit && /Safari/i.test(ua) && !/(CriOS|FxiOS|EdgiOS|OPiOS|DuckDuckGo)/i.test(ua);
   if (!isSafari) return;
 
-  const PRODUCT_PATH = '/product';
-  const isProductDocument = /\/product(?:\.html)?\/?$/.test(location.pathname);
-  const RETURN_KEY = 'haki:safari-product-return';
+  // Recover cleanly from the separate /product route used by the previous test.
+  // No new navigation will use that route after this version.
+  if (/\/product(?:\.html)?\/?$/.test(location.pathname)) {
+    const target = new URL('/', location.origin);
+    target.hash = location.hash || '#top';
+    location.replace(target.href);
+    return;
+  }
 
-  // app.js switches iOS to manual restoration for the old same-document router.
-  // Safari PDPs are now separate documents, so native restoration is preferable.
-  try { history.scrollRestoration = 'auto'; } catch {}
+  document.documentElement.classList.add('haki-safari-custom-back');
 
   const style = document.createElement('style');
-  style.id = 'haki-safari-real-document-style';
+  style.id = 'haki-safari-custom-back-style';
   style.textContent = `
-    html.haki-safari-real-product body.haki-ios-product-open #homeHero,
-    html.haki-safari-real-product body.haki-ios-product-open #novedades,
-    html.haki-safari-real-product body.haki-ios-product-open #collectionsSection,
-    html.haki-safari-real-product body.haki-ios-product-open #catalogo,
-    html.haki-safari-real-product body.haki-ios-product-open .footer{
-      visibility:hidden!important;
-      pointer-events:none!important;
+    html.haki-safari-custom-back body.haki-ios-product-open #productDetail{
+      will-change:transform;
+      backface-visibility:hidden;
+      -webkit-backface-visibility:hidden;
+      transform:translate3d(0,0,0);
     }
-    html.haki-safari-real-product body.haki-ios-product-open #productDetail .detail-back{
+    html.haki-safari-custom-back body.haki-ios-product-open #productDetail .detail-back{
       display:flex!important;
       position:sticky!important;
       top:0!important;
@@ -45,111 +46,169 @@
     :root[data-theme='oscuro'] body.haki-ios-product-open #productDetail .detail-back{
       border-bottom-color:rgba(255,255,255,.14);
     }
+    html.haki-safari-custom-back body.haki-edge-back-active{
+      overflow:hidden!important;
+    }
   `;
   document.head.appendChild(style);
-  if (isProductDocument) document.documentElement.classList.add('haki-safari-real-product');
 
-  const sameOriginURL = link => {
-    try {
-      const url = new URL(link.href, location.href);
-      return url.origin === location.origin ? url : null;
-    } catch {
-      return null;
-    }
-  };
+  const EDGE = 34;
+  const COMMIT_RATIO = 0.24;
+  const FAST_VELOCITY = 0.48;
+  let openedFromCatalogue = false;
+  let gesture = null;
+  let finishing = false;
 
-  const saveReturnState = () => {
-    try {
-      sessionStorage.setItem(RETURN_KEY, JSON.stringify({
-        href: location.href,
-        y: window.scrollY,
-        time: Date.now()
-      }));
-    } catch {}
-  };
+  const detail = () => document.getElementById('productDetail');
+  const detailOpen = () => document.body.classList.contains('haki-ios-product-open') && !detail()?.hidden;
 
-  const readReturnState = () => {
-    try { return JSON.parse(sessionStorage.getItem(RETURN_KEY) || 'null'); }
-    catch { return null; }
-  };
-
-  const productURLFor = destination => {
-    const url = new URL(PRODUCT_PATH, location.origin);
-    let code = '';
-    try { code = decodeURIComponent(destination.hash.replace(/^#producto\//, '')); } catch {}
-    // The query makes product-to-product navigation a true document navigation too.
-    if (code) url.searchParams.set('product', code);
-    url.hash = destination.hash;
-    return url;
-  };
-
-  // On the catalogue page, replace only product-link navigation. app.js's capture
-  // listener runs first and can preserve any internal state; this listener prevents
-  // its bubble-phase pushState router from handling the click afterwards.
-  if (!isProductDocument) {
-    document.addEventListener('click', event => {
-      if (event.defaultPrevented || event.button > 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-      const link = event.target.closest?.('a[href]');
-      if (!link || link.hasAttribute('download') || (link.target && link.target !== '_self')) return;
-      const destination = sameOriginURL(link);
-      if (!destination || !destination.hash.startsWith('#producto/')) return;
-
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      saveReturnState();
-      location.assign(productURLFor(destination).href);
-    }, true);
-
-    // If Safari had to recreate the catalogue instead of restoring it from BFCache,
-    // put the shopper back at the exact scroll position saved before opening the PDP.
-    window.addEventListener('pageshow', () => {
-      const saved = readReturnState();
-      if (!saved || !Number.isFinite(saved.y)) return;
-      const savedURL = new URL(saved.href, location.href);
-      if (savedURL.pathname !== location.pathname || savedURL.search !== location.search || savedURL.hash !== location.hash) return;
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        if (Math.abs(window.scrollY - saved.y) > 2) window.scrollTo({ top: saved.y, behavior: 'instant' });
-      }));
-    });
-    return;
-  }
-
-  // Product document: keep the visible Back control permanently available and
-  // consume the real browser history entry. Native edge-swipe uses the same entry.
-  document.addEventListener('click', event => {
-    const back = event.target.closest?.('#productDetail .detail-back');
-    if (!back || !document.body.classList.contains('haki-ios-product-open')) return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    const saved = readReturnState();
-    if (saved) history.back();
-    else location.assign(new URL('/index.html', location.origin).href);
-  }, true);
-
-  // Product recommendations should also remain true document navigations instead
-  // of returning to the old same-document hash router.
+  // This runs before app.js's bubble listener. We do not cancel the click: app.js
+  // still creates the normal pushState entry, so Safari's toolbar Back remains valid.
   document.addEventListener('click', event => {
     if (event.defaultPrevented || event.button > 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     const link = event.target.closest?.('a[href]');
-    if (!link || link.matches('#productDetail .detail-back') || link.hasAttribute('download') || (link.target && link.target !== '_self')) return;
-    const destination = sameOriginURL(link);
-    if (!destination) return;
+    if (!link) return;
+    let destination;
+    try { destination = new URL(link.href, location.href); } catch { return; }
+    if (destination.origin !== location.origin || destination.pathname !== location.pathname || destination.search !== location.search) return;
+    if (!detailOpen() && destination.hash.startsWith('#producto/')) openedFromCatalogue = true;
+  }, true);
 
-    if (destination.hash.startsWith('#producto/')) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      location.assign(productURLFor(destination).href);
+  const clearVisualState = () => {
+    const panel = detail();
+    document.body.classList.remove('haki-edge-back-active');
+    if (!panel) return;
+    panel.style.transition = '';
+    panel.style.transform = '';
+    panel.style.boxShadow = '';
+  };
+
+  const closeWithoutExternalHistory = () => {
+    const panel = detail();
+    const back = panel?.querySelector('.detail-back');
+    const destination = back ? new URL(back.href, location.href) : new URL('#top', location.href);
+    const oldURL = location.href;
+    history.replaceState(history.state, '', destination.href);
+    let event;
+    try { event = new HashChangeEvent('hashchange', { oldURL, newURL: destination.href }); }
+    catch { event = new Event('hashchange'); }
+    window.dispatchEvent(event);
+  };
+
+  const finishBack = () => {
+    if (finishing) return;
+    finishing = true;
+    const panel = detail();
+    if (!panel) {
+      finishing = false;
       return;
     }
+    const width = Math.max(window.innerWidth, panel.getBoundingClientRect().width || 0);
+    panel.style.transition = 'transform 170ms cubic-bezier(.22,.78,.24,1)';
+    panel.style.transform = `translate3d(${width}px,0,0)`;
+    panel.style.boxShadow = '-16px 0 32px rgba(0,0,0,.10)';
 
-    // Header/menu links from a PDP should return to the real catalogue document,
-    // not reveal the hidden catalogue living underneath the product route.
-    if (destination.pathname === location.pathname && destination.hash) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      const catalogue = new URL('/index.html', location.origin);
-      catalogue.hash = destination.hash;
-      location.assign(catalogue.href);
-    }
+    window.setTimeout(() => {
+      if (openedFromCatalogue) history.back();
+      else closeWithoutExternalHistory();
+      // app.js handles the real view change. Reset only after that has had a frame.
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        clearVisualState();
+        finishing = false;
+        openedFromCatalogue = false;
+      }));
+    }, 165);
+  };
+
+  const cancelBack = () => {
+    const panel = detail();
+    if (!panel) return;
+    panel.style.transition = 'transform 180ms cubic-bezier(.22,.78,.24,1)';
+    panel.style.transform = 'translate3d(0,0,0)';
+    panel.style.boxShadow = '';
+    window.setTimeout(clearVisualState, 190);
+  };
+
+  // WebKit gives its browser-level Back gesture priority at the left edge. On iOS,
+  // cancelling touchstart is the reliable way to keep that gesture inside the page.
+  // We then reproduce the same left-to-right interaction on the product sheet.
+  window.addEventListener('touchstart', event => {
+    if (!detailOpen() || finishing || event.touches.length !== 1) return;
+    const touch = event.touches[0];
+    if (touch.clientX > EDGE) return;
+
+    event.preventDefault();
+    const now = performance.now();
+    gesture = {
+      startX: touch.clientX,
+      startY: touch.clientY,
+      x: touch.clientX,
+      y: touch.clientY,
+      lastX: touch.clientX,
+      lastT: now,
+      velocity: 0,
+      horizontal: false
+    };
+    const panel = detail();
+    panel.style.transition = 'none';
+    panel.style.transform = 'translate3d(0,0,0)';
+    document.body.classList.add('haki-edge-back-active');
+  }, { capture:true, passive:false });
+
+  window.addEventListener('touchmove', event => {
+    if (!gesture || event.touches.length !== 1) return;
+    event.preventDefault();
+    const touch = event.touches[0];
+    const dx = Math.max(0, touch.clientX - gesture.startX);
+    const dy = touch.clientY - gesture.startY;
+    const now = performance.now();
+    const dt = Math.max(1, now - gesture.lastT);
+    gesture.velocity = (touch.clientX - gesture.lastX) / dt;
+    gesture.lastX = touch.clientX;
+    gesture.lastT = now;
+    gesture.x = touch.clientX;
+    gesture.y = touch.clientY;
+
+    if (!gesture.horizontal && dx > 6 && Math.abs(dx) >= Math.abs(dy) * 0.7) gesture.horizontal = true;
+    if (!gesture.horizontal) return;
+
+    const panel = detail();
+    const width = Math.max(1, window.innerWidth);
+    const eased = Math.min(width, dx);
+    panel.style.transform = `translate3d(${eased}px,0,0)`;
+    panel.style.boxShadow = eased > 4 ? '-16px 0 32px rgba(0,0,0,.10)' : '';
+  }, { capture:true, passive:false });
+
+  const endGesture = () => {
+    if (!gesture) return;
+    const panel = detail();
+    const rect = panel?.getBoundingClientRect();
+    const distance = rect ? Math.max(0, rect.left) : Math.max(0, gesture.x - gesture.startX);
+    const shouldCommit = gesture.horizontal &&
+      (distance >= window.innerWidth * COMMIT_RATIO || gesture.velocity >= FAST_VELOCITY);
+    gesture = null;
+    if (shouldCommit) finishBack();
+    else cancelBack();
+  };
+
+  window.addEventListener('touchend', endGesture, { capture:true, passive:false });
+  window.addEventListener('touchcancel', endGesture, { capture:true, passive:false });
+
+  // The visible Back control uses the same controlled transition. No WebKit snapshot.
+  document.addEventListener('click', event => {
+    const back = event.target.closest?.('#productDetail .detail-back');
+    if (!back || !detailOpen()) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    finishBack();
   }, true);
+
+  // Safari toolbar Back/Forward can still operate normally. Clean up any gesture
+  // transform if the browser changes history by a non-swipe control.
+  window.addEventListener('popstate', () => {
+    gesture = null;
+    finishing = false;
+    clearVisualState();
+    if (!location.hash.startsWith('#producto/')) openedFromCatalogue = false;
+  });
 })();
