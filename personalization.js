@@ -78,3 +78,89 @@
 
   window.addEventListener('haki:catalog-updated', applyTypography);
 })();
+
+// Keep the already-rendered product photos visually in place while the catalog DOM is rebuilt
+// after leaving a product detail. This removes the brief gray/white flash on browser-back/swipe-back.
+(() => {
+  const STYLE_ID = 'haki-seamless-catalog-return';
+  let cleanupTimer = 0;
+
+  const hashFromUrl = value => {
+    try { return decodeURIComponent(new URL(value, location.href).hash.slice(1)); }
+    catch { return ''; }
+  };
+
+  function removeFallbacks() {
+    clearTimeout(cleanupTimer);
+    document.getElementById(STYLE_ID)?.remove();
+  }
+
+  function captureCurrentCardImages() {
+    const cards = [...document.querySelectorAll('#products article.product[data-code]')];
+    if (!cards.length) return false;
+
+    const rules = cards.map(card => {
+      const img = card.querySelector('.product-image img');
+      const src = img?.currentSrc || img?.src || '';
+      const code = card.dataset.code || '';
+      if (!src || !code) return '';
+      const escapedCode = window.CSS?.escape ? CSS.escape(code) : code.replace(/["\\]/g, '\\$&');
+      return `#products article.product[data-code="${escapedCode}"] .product-image{background-image:url(${JSON.stringify(src)})!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;}`;
+    }).filter(Boolean);
+
+    if (!rules.length) return false;
+
+    let style = document.getElementById(STYLE_ID);
+    if (!style) {
+      style = document.createElement('style');
+      style.id = STYLE_ID;
+      document.head.appendChild(style);
+    }
+    style.textContent = rules.join('\n');
+    return true;
+  }
+
+  function clearWhenReplacementImagesAreReady() {
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const images = [...document.querySelectorAll('#products .product-image img')];
+      if (!images.length) {
+        cleanupTimer = setTimeout(removeFallbacks, 500);
+        return;
+      }
+
+      let pending = images.filter(img => !(img.complete && img.naturalWidth > 0)).length;
+      if (!pending) {
+        cleanupTimer = setTimeout(removeFallbacks, 80);
+        return;
+      }
+
+      let finished = false;
+      const done = () => {
+        if (finished) return;
+        pending -= 1;
+        if (pending <= 0) {
+          finished = true;
+          cleanupTimer = setTimeout(removeFallbacks, 80);
+        }
+      };
+
+      images.forEach(img => {
+        if (img.complete && img.naturalWidth > 0) return;
+        img.addEventListener('load', done, { once: true });
+        img.addEventListener('error', done, { once: true });
+      });
+
+      cleanupTimer = setTimeout(removeFallbacks, 3500);
+    }));
+  }
+
+  window.addEventListener('hashchange', event => {
+    const oldHash = hashFromUrl(event.oldURL);
+    const newHash = hashFromUrl(event.newURL);
+    const leavingDetail = oldHash.startsWith('producto/') && !newHash.startsWith('producto/');
+    if (!leavingDetail) return;
+
+    clearTimeout(cleanupTimer);
+    if (captureCurrentCardImages()) clearWhenReplacementImagesAreReady();
+  }, true);
+})();
