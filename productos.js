@@ -626,7 +626,7 @@ window.HAKI_PRODUCTOS = [
   {
     "id": 11,
     "codigo": "YLAC1-03",
-    "nombre": "SUPVILLIAN COMPRESIÓN",
+    "nombre": "SUPVILLIAN NEGRO",
     "precio": 25,
     "categoria": "Compresión",
     "imagen": "images/YLAGlobalSuperShoot-75.jpg",
@@ -701,7 +701,7 @@ window.HAKI_PRODUCTOS = [
   {
     "id": 15,
     "codigo": "GSC-06",
-    "nombre": "GYMS GRIS",
+    "nombre": "STORM GRIS",
     "precio": 25,
     "categoria": "Compresión",
     "imagen": "images/1789324298834-0f608730-images-StormMuscleFitSeamlessT_ShirtGSBlackGSPitchGreyA3B5N_BB3J_0716_V2_1920x.webp",
@@ -1086,10 +1086,10 @@ window.HAKI_PRODUCTOS = [
     "imagen": "images/1789334025584-18a080f9-IMG_2454.jpeg",
     "imagenRespaldo": "images/tee-gray.svg",
     "tallas": {
-      "S": true,
+      "S": false,
       "M": true,
-      "L": true,
-      "XL": true
+      "L": false,
+      "XL": false
     },
     "colecciones": [
       "collection-2"
