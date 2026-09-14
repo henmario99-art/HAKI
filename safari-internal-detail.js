@@ -7,8 +7,8 @@
   const isSafari = isIOSWebKit && /Safari/i.test(ua) && !/(CriOS|FxiOS|EdgiOS|OPiOS|DuckDuckGo)/i.test(ua);
   if (!isSafari) return;
 
-  const PRODUCT_PATH = '/product.html';
-  const isProductDocument = location.pathname.endsWith('/product.html');
+  const PRODUCT_PATH = '/product';
+  const isProductDocument = /\/product(?:\.html)?\/?$/.test(location.pathname);
   const RETURN_KEY = 'haki:safari-product-return';
 
   // app.js switches iOS to manual restoration for the old same-document router.
@@ -42,7 +42,6 @@
       font-weight:700;
       letter-spacing:.01em;
     }
-    :root[data-theme='oscuro'] html.haki-safari-real-product body.haki-ios-product-open #productDetail .detail-back,
     :root[data-theme='oscuro'] body.haki-ios-product-open #productDetail .detail-back{
       border-bottom-color:rgba(255,255,255,.14);
     }
@@ -144,7 +143,7 @@
     }
 
     // Header/menu links from a PDP should return to the real catalogue document,
-    // not reveal the hidden catalogue living underneath product.html.
+    // not reveal the hidden catalogue living underneath the product route.
     if (destination.pathname === location.pathname && destination.hash) {
       event.preventDefault();
       event.stopImmediatePropagation();
