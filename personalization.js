@@ -79,88 +79,96 @@
   window.addEventListener('haki:catalog-updated', applyTypography);
 })();
 
-// Keep the already-rendered product photos visually in place while the catalog DOM is rebuilt
-// after leaving a product detail. This removes the brief gray/white flash on browser-back/swipe-back.
+// App-like catalog return: preserve the exact product-card DOM (and decoded images)
+// while app.js restores route state. This avoids rebuilding <img> elements on Back.
 (() => {
-  const STYLE_ID = 'haki-seamless-catalog-return';
-  let cleanupTimer = 0;
-
-  const hashFromUrl = value => {
-    try { return decodeURIComponent(new URL(value, location.href).hash.slice(1)); }
-    catch { return ''; }
+  const normalizeHash = value => {
+    const hash = String(value || '').replace(/^#/, '');
+    return hash ? `#${hash}` : '#top';
   };
 
-  function removeFallbacks() {
-    clearTimeout(cleanupTimer);
-    document.getElementById(STYLE_ID)?.remove();
-  }
+  const hashFromUrl = value => {
+    try { return normalizeHash(new URL(value, location.href).hash); }
+    catch { return '#top'; }
+  };
 
-  function captureCurrentCardImages() {
-    const cards = [...document.querySelectorAll('#products article.product[data-code]')];
-    if (!cards.length) return false;
+  let sourceHash = '';
+  let sourceVersion = 0;
 
-    const rules = cards.map(card => {
-      const img = card.querySelector('.product-image img');
-      const src = img?.currentSrc || img?.src || '';
-      const code = card.dataset.code || '';
-      if (!src || !code) return '';
-      const escapedCode = window.CSS?.escape ? CSS.escape(code) : code.replace(/["\\]/g, '\\$&');
-      return `#products article.product[data-code="${escapedCode}"] .product-image{background-image:url(${JSON.stringify(src)})!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;}`;
-    }).filter(Boolean);
-
-    if (!rules.length) return false;
-
-    let style = document.getElementById(STYLE_ID);
-    if (!style) {
-      style = document.createElement('style');
-      style.id = STYLE_ID;
-      document.head.appendChild(style);
+  const containmentStyle = document.createElement('style');
+  containmentStyle.id = 'haki-image-paint-containment';
+  containmentStyle.textContent = `
+    .product-image,
+    .collection-image,
+    #productDetail .detail-media,
+    #productDetail .detail-gallery{
+      overflow:hidden!important;
+      contain:paint;
+      isolation:isolate;
     }
-    style.textContent = rules.join('\n');
-    return true;
-  }
+    .product-image img,
+    .collection-image img,
+    #productDetail .detail-gallery img{
+      display:block;
+      max-width:100%;
+      max-height:100%;
+    }
+    #products .product-image{
+      background-color:var(--soft,#eee);
+      background-image:none!important;
+    }
+  `;
+  document.head.appendChild(containmentStyle);
 
-  function clearWhenReplacementImagesAreReady() {
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      const images = [...document.querySelectorAll('#products .product-image img')];
-      if (!images.length) {
-        cleanupTimer = setTimeout(removeFallbacks, 500);
-        return;
-      }
+  // Remember which exact listing the user came from. Works for taps and keyboard activation.
+  document.addEventListener('click', event => {
+    const link = event.target.closest?.('.product-detail-link');
+    if (!link || !link.hash.startsWith('#producto/')) return;
+    sourceHash = normalizeHash(location.hash);
+  }, true);
 
-      let pending = images.filter(img => !(img.complete && img.naturalWidth > 0)).length;
-      if (!pending) {
-        cleanupTimer = setTimeout(removeFallbacks, 80);
-        return;
-      }
-
-      let finished = false;
-      const done = () => {
-        if (finished) return;
-        pending -= 1;
-        if (pending <= 0) {
-          finished = true;
-          cleanupTimer = setTimeout(removeFallbacks, 80);
-        }
-      };
-
-      images.forEach(img => {
-        if (img.complete && img.naturalWidth > 0) return;
-        img.addEventListener('load', done, { once: true });
-        img.addEventListener('error', done, { once: true });
-      });
-
-      cleanupTimer = setTimeout(removeFallbacks, 3500);
-    }));
-  }
+  // If live catalog data changes while a product is open, prefer fresh DOM on return.
+  window.addEventListener('haki:catalog-updated', () => {
+    sourceVersion += 1;
+    sourceHash = '';
+  });
 
   window.addEventListener('hashchange', event => {
     const oldHash = hashFromUrl(event.oldURL);
     const newHash = hashFromUrl(event.newURL);
-    const leavingDetail = oldHash.startsWith('producto/') && !newHash.startsWith('producto/');
-    if (!leavingDetail) return;
+    const leavingDetail = oldHash.startsWith('#producto/') && !newHash.startsWith('#producto/');
+    const returningToSource = sourceHash && newHash === sourceHash;
+    if (!leavingDetail || !returningToSource) return;
 
-    clearTimeout(cleanupTimer);
-    if (captureCurrentCardImages()) clearWhenReplacementImagesAreReady();
+    const products = document.getElementById('products');
+    if (!products || !products.childNodes.length) return;
+
+    const versionAtCapture = sourceVersion;
+    const detailCode = oldHash.slice('#producto/'.length);
+    const selectedSize = document.querySelector('#productDetail .detail-size.selected')?.dataset.detailSize || '';
+
+    // Move, don't clone: detached <img> nodes keep their decoded bitmap and listeners.
+    const preserved = document.createDocumentFragment();
+    while (products.firstChild) preserved.appendChild(products.firstChild);
+
+    // app.js now runs its normal route restoration synchronously. Before the browser can paint,
+    // discard the temporary rebuilt grid and put the original nodes back in exactly one microtask.
+    queueMicrotask(() => {
+      if (versionAtCapture !== sourceVersion || normalizeHash(location.hash) !== sourceHash) return;
+      products.replaceChildren(preserved);
+
+      // A size selected on the PDP should still be reflected on the preserved card.
+      if (detailCode && selectedSize) {
+        document.querySelectorAll(`#products article.product[data-code="${CSS.escape(detailCode)}"]`).forEach(card => {
+          card.querySelectorAll('.size-option').forEach(option => {
+            const active = option.dataset.size === selectedSize;
+            option.classList.toggle('selected', active);
+            option.setAttribute('aria-pressed', String(active));
+          });
+          const add = card.querySelector('[data-add]');
+          if (add) add.disabled = false;
+        });
+      }
+    });
   }, true);
 })();
