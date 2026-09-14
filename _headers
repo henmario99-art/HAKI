@@ -10,3 +10,5 @@
   Cache-Control: no-cache, no-store, must-revalidate
 /product.html
   Cache-Control: no-cache, no-store, must-revalidate
+
+# publish marker: category-fix-2026-09-14-1503
