@@ -1,6 +1,7 @@
-// Safari-only product detail navigation.
-// Keeps product pages inside the current document so iOS Safari never performs
-// its native history transition/snapshot when returning to the catalogue.
+// Safari-only navigation stabilization.
+// Keep Safari's native history entry for product pages so the iPhone back-swipe
+// continues to work, while preventing the live catalogue from painting under the
+// product layer during the gesture.
 (() => {
   const ua = navigator.userAgent || '';
   const isIOSWebKit = window.hakiIOSWebKit === true;
@@ -8,96 +9,80 @@
   if (!isSafari) return;
 
   const root = document.documentElement;
-  root.classList.add('haki-safari-internal-detail');
+  root.classList.add('haki-safari-history-detail');
 
   const style = document.createElement('style');
-  style.id = 'haki-safari-internal-detail-style';
+  style.id = 'haki-safari-history-detail-style';
   style.textContent = `
-    html.haki-safari-internal-detail body.haki-ios-product-open #productDetail .detail-back{
-      display:inline-flex!important;
+    /* Preserve catalogue layout/scroll position but do not let its live pixels
+       show beneath Safari's native back-swipe snapshot. */
+    html.haki-safari-history-detail body.haki-ios-product-open #homeHero,
+    html.haki-safari-history-detail body.haki-ios-product-open #novedades,
+    html.haki-safari-history-detail body.haki-ios-product-open #collectionsSection,
+    html.haki-safari-history-detail body.haki-ios-product-open #catalogo,
+    html.haki-safari-history-detail body.haki-ios-product-open .footer{
+      visibility:hidden!important;
+      pointer-events:none!important;
+    }
+
+    /* The catalogue's generic stylesheet hides this link. On Safari we keep a
+       persistent native-looking back control at the top of the product sheet. */
+    html.haki-safari-history-detail body.haki-ios-product-open #productDetail .detail-back{
+      display:flex!important;
+      position:sticky!important;
+      top:0!important;
+      z-index:45!important;
       align-items:center;
-      min-height:44px;
-      margin:0 0 14px;
-      padding:0 16px;
+      width:100%;
+      min-height:46px;
+      margin:0!important;
+      padding:0 16px!important;
+      border-bottom:1px solid rgba(0,0,0,.09);
+      background:var(--surface,#fff)!important;
       font-size:12px;
       font-weight:700;
-      letter-spacing:.02em;
-      background:var(--surface,#fff);
-      position:relative;
-      z-index:3;
+      letter-spacing:.01em;
+      -webkit-backdrop-filter:none;
+      backdrop-filter:none;
+    }
+    :root[data-theme='oscuro'] body.haki-ios-product-open #productDetail .detail-back{
+      border-bottom-color:rgba(255,255,255,.14);
     }
   `;
   document.head.appendChild(style);
 
-  const sameDocumentDestination = link => {
-    try {
-      const destination = new URL(link.href, location.href);
-      if (destination.origin !== location.origin ||
-          destination.pathname !== location.pathname ||
-          destination.search !== location.search ||
-          !destination.hash) return null;
-      return destination;
-    } catch {
-      return null;
-    }
-  };
+  let openedFromCatalogue = false;
 
-  const routeWithReplacement = hash => {
-    const oldURL = location.href;
-    const base = location.href.split('#')[0];
-    const nextURL = `${base}${hash}`;
-    if (nextURL === oldURL) return;
-
-    history.replaceState(history.state, '', nextURL);
-
-    let event;
-    try {
-      event = new HashChangeEvent('hashchange', { oldURL, newURL: nextURL });
-    } catch {
-      event = new Event('hashchange');
-    }
-    window.dispatchEvent(event);
-  };
-
-  // app.js already registered its capture listener before this file executes.
-  // That listener records the catalogue scroll/filter state first. We then stop
-  // the click before app.js's bubble listener can push a Safari history entry.
+  // app.js owns the actual product navigation and uses pushState on iOS. We only
+  // remember that this product entry came from inside HAKI; we do not cancel it.
   document.addEventListener('click', event => {
     if (event.defaultPrevented || event.button > 0 ||
         event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-
     const link = event.target.closest?.('a[href]');
-    if (!link || link.hasAttribute('download') ||
-        (link.target && link.target !== '_self')) return;
-
-    const destination = sameDocumentDestination(link);
-    if (!destination) return;
-
-    const detailOpen = document.body.classList.contains('haki-ios-product-open') ||
-      location.hash.startsWith('#producto/');
-    const opensProduct = destination.hash.startsWith('#producto/');
-
-    // Outside a product page, only product links are changed. All other Safari
-    // navigation remains exactly as it was before this fix.
-    if (!detailOpen && !opensProduct) return;
-
-    event.preventDefault();
-    event.stopImmediatePropagation();
-
-    // Recommendations can open from the cart. Close it before showing the PDP.
-    if (opensProduct && document.body.classList.contains('cart-open')) {
-      document.getElementById('closeCart')?.click();
+    if (!link) return;
+    let destination;
+    try { destination = new URL(link.href, location.href); } catch { return; }
+    if (destination.origin !== location.origin ||
+        destination.pathname !== location.pathname ||
+        destination.search !== location.search) return;
+    if (!document.body.classList.contains('haki-ios-product-open') &&
+        destination.hash.startsWith('#producto/')) {
+      openedFromCatalogue = true;
     }
-
-    routeWithReplacement(destination.hash);
   }, true);
 
-  // Escape is useful with an external keyboard and mirrors the visible back link.
-  document.addEventListener('keydown', event => {
-    if (event.key !== 'Escape' || !document.body.classList.contains('haki-ios-product-open')) return;
-    const back = document.querySelector('#productDetail .detail-back');
-    if (!back) return;
+  // When the visible back control is used after entering from the catalogue,
+  // consume the product history entry instead of creating another listing entry.
+  document.addEventListener('click', event => {
+    const back = event.target.closest?.('#productDetail .detail-back');
+    if (!back || !document.body.classList.contains('haki-ios-product-open') || !openedFromCatalogue) return;
     event.preventDefault();
-    routeWithReplacement(new URL(back.href, location.href).hash || '#top');
+    event.stopImmediatePropagation();
+    history.back();
+  }, true);
+
+  // A successful native swipe/back returns to the catalogue and closes the PDP.
+  window.addEventListener('popstate', () => {
+    if (!location.hash.startsWith('#producto/')) openedFromCatalogue = false;
   });
 })();
