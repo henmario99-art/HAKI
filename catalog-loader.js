@@ -30,78 +30,9 @@
   };
 })();
 
-// Stable product-detail loading state: one static placeholder, then reveal only after decode.
+// Preload the detail image on user intent. Native image painting handles decode;
+// never hide an already available image and reveal it again on the next frame.
 (() => {
-  const style = document.createElement('style');
-  style.id = 'haki-image-loading-transition';
-  style.textContent = `
-    #productDetail .detail-media{
-      position:relative;
-      overflow:hidden;
-      background:#ececea;
-    }
-    :root[data-theme=oscuro] #productDetail .detail-media{
-      background:#151515;
-    }
-    #productDetail .detail-gallery{
-      position:relative;
-      z-index:1;
-    }
-    #productDetail .detail-gallery img{
-      transition:opacity .18s ease;
-    }
-    #productDetail .detail-media.haki-image-loading .detail-gallery img:first-child{
-      opacity:0;
-    }
-    @media(prefers-reduced-motion:reduce){
-      #productDetail .detail-gallery img{transition:none!important}
-    }
-  `;
-  document.head.append(style);
-
-  const detail = document.getElementById('productDetail');
-
-  function settle(media) {
-    if (!media) return;
-    requestAnimationFrame(() => {
-      media.classList.remove('haki-image-loading');
-      media.classList.add('haki-image-loaded');
-    });
-  }
-
-  function revealWhenDecoded(image, media) {
-    if (!image || !media) return;
-    if (typeof image.decode !== 'function') {
-      settle(media);
-      return;
-    }
-    image.decode().catch(() => {}).finally(() => settle(media));
-  }
-
-  function prepareDetailImage() {
-    if (!detail || detail.hidden) return;
-    const media = detail.querySelector('.detail-media');
-    const image = media?.querySelector('.detail-gallery img:first-child');
-    if (!media || !image || image.dataset.hakiLoadingReady === '1') return;
-
-    image.dataset.hakiLoadingReady = '1';
-    media.classList.remove('haki-image-loaded');
-    media.classList.add('haki-image-loading');
-
-    if (image.complete && image.naturalWidth > 0) {
-      revealWhenDecoded(image, media);
-      return;
-    }
-
-    image.addEventListener('load', () => revealWhenDecoded(image, media), { once:true });
-    image.addEventListener('error', () => settle(media), { once:true });
-  }
-
-  if (detail) {
-    new MutationObserver(prepareDetailImage).observe(detail, { childList:true, subtree:true });
-    prepareDetailImage();
-  }
-
   const warmed = new Set();
   function preloadDetail(link) {
     const card = link?.closest?.('[data-code]');
@@ -196,16 +127,4 @@
   }
   window.addEventListener('DOMContentLoaded',()=>{refresh();setInterval(refresh,60000);});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});
-})();
-
-// iOS browsers all use WebKit. Load the targeted navigation layer only there so Android/desktop stay untouched.
-(() => {
-  const ua = navigator.userAgent || '';
-  const isIOS = /iP(?:hone|ad|od)/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  if (!isIOS || document.getElementById('haki-ios-safari-fix-loader')) return;
-  const script = document.createElement('script');
-  script.id = 'haki-ios-safari-fix-loader';
-  script.src = 'ios-safari-fix.js?v=1';
-  script.defer = true;
-  document.head.appendChild(script);
 })();

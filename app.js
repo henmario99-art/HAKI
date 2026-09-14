@@ -10,6 +10,15 @@
   let detailCode = null;
   let lastListingHash = '#top';
   const listingPositions = new Map();
+  const renderedLists = new WeakMap();
+  const isIOS = window.hakiIOSWebKit === true;
+  const listingSections = ['homeHero', 'novedades', 'collectionsSection', 'catalogo'];
+  let iosListing = null;
+  let routedHash = null;
+
+  // The router is the sole owner of scroll restoration on iOS. In particular,
+  // Safari must not scroll the document underneath the product sheet on Back.
+  if (isIOS) history.scrollRestoration = 'manual';
 
   const state = {
     query: '',
@@ -195,6 +204,12 @@
   }
 
   function renderProductList(container, list) {
+    const signature = JSON.stringify(list);
+    if (renderedLists.get(container) === signature) {
+      syncCardSelections(container);
+      return;
+    }
+    renderedLists.set(container, signature);
     container.innerHTML = list
       .map(p => {
         const selected = state.selected[p.codigo] || '';
@@ -291,11 +306,6 @@
       })
       .join('');
 
-    $$('.product-detail-link', container).forEach(link => link.addEventListener('click', () => {
-      lastListingHash = location.hash || '#top';
-      listingPositions.set(lastListingHash, { y: window.scrollY, query: state.query, category: state.category, collection: state.collection });
-    }));
-
     $$('img[data-fallback]', container).forEach(img =>
       img.addEventListener(
         'error',
@@ -333,6 +343,47 @@
         addToCart(btn.dataset.add)
       )
     );
+  }
+
+  function syncCardSelections(container) {
+    $$('article.product[data-code]', container).forEach(card => {
+      const selected = state.selected[card.dataset.code];
+      $$('.size-option', card).forEach(option => {
+        const active = !option.disabled && option.dataset.size === selected;
+        option.classList.toggle('selected', active);
+        option.setAttribute('aria-pressed', String(active));
+      });
+      $('[data-add]', card).disabled = !productByCode(card.dataset.code)?.tallas?.[selected];
+    });
+  }
+
+  // Capture all product entry points (including quiz/cart recommendations) before
+  // the native fragment navigation. A recommendation inside a PDP is not a list.
+  document.addEventListener('click', event => {
+    const link = event.target.closest?.('a[href*="#producto/"]');
+    if (!link || detailCode || event.defaultPrevented || event.button > 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    lastListingHash = location.hash || '#top';
+    listingPositions.set(lastListingHash, { y: window.scrollY, query: state.query, category: state.category, collection: state.collection });
+  }, true);
+
+  function enterIOSDetail() {
+    if (!isIOS || iosListing) return;
+    iosListing = [...listingSections.map(id => document.getElementById(id)), $('.footer')].map(el => {
+      const saved = { el, inert: el?.inert || false };
+      if (el) el.inert = true;
+      return saved;
+    });
+    // Measure the sticky header: the announcement has already scrolled away
+    // when a customer opens a product from further down the catalog.
+    document.documentElement.style.setProperty('--haki-detail-top', `${$('.header').getBoundingClientRect().bottom}px`);
+    document.body.classList.add('haki-ios-product-open');
+  }
+
+  function leaveIOSDetail() {
+    if (!iosListing) return;
+    iosListing.forEach(({ el, inert }) => { if (el) el.inert = inert; });
+    iosListing = null;
+    document.body.classList.remove('haki-ios-product-open');
   }
 
   function addToCart(code) {
@@ -693,10 +744,12 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     'input',
     e => {
       if (detailCode) {
+        leaveIOSDetail();
         detailCode = null;
         $('#productDetail').hidden = true; $('#catalogo').hidden = false;
         document.body.classList.remove('detail-view');
         history.replaceState(null, '', '#catalogo');
+        routedHash = '#catalogo';
         window.scrollTo({ top: 0, behavior: 'instant' });
       }
       state.query = e.target.value; $('#desktopSearch').value=state.query;
@@ -762,14 +815,30 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     $('.rail-actions').hidden = !fresh.length;
   }
 
-  function route() {
+  function route(event) {
+    const currentHash = location.hash || '#top';
+    // Safari sends popstate and hashchange for one history traversal. Render it
+    // once, at popstate, before the browser's native swipe snapshot is dismissed.
+    if (isIOS && event && currentHash === routedHash) return;
+    routedHash = currentHash;
+    const wasDetail = !!detailCode;
     let hash;
     try { hash = decodeURIComponent(location.hash.slice(1)); } catch { hash = ''; }
     closeMenu(); closeSearch(); $('#sizeGuideDialog').close();
     detailCode = hash.startsWith('producto/') ? hash.slice(9) : null;
     $('#productDetail').hidden = !detailCode;
+    document.body.classList.toggle('detail-view', !!detailCode && !isIOS);
+    if (isIOS && detailCode) {
+      // Keep the listing in layout at its original scroll position, with the
+      // same image elements. Only the product sheet has its own scroll offset.
+      if (!els.products.childNodes.length) renderProducts();
+      enterIOSDetail();
+      renderProductDetail(productByCode(detailCode));
+      $('#productDetail').scrollTop = 0;
+      return;
+    }
+    leaveIOSDetail();
     $('#catalogo').hidden = !!detailCode;
-    document.body.classList.toggle('detail-view', !!detailCode);
     if (detailCode) {
       setHomeVisible(false);
       renderProductDetail(productByCode(detailCode));
@@ -781,17 +850,21 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     state.category = 'Todos'; state.collection = null;
     if (hash.startsWith('categoria/')) state.category = hash.slice(10);
     if (hash.startsWith('coleccion/')) state.collection = COLLECTIONS.find(c => c.id === hash.slice(10)) || null;
-    const restored = listingPositions.get(location.hash || '#top');
+    const restored = wasDetail ? listingPositions.get(location.hash || '#top') : null;
     if (restored) {
       state.query = restored.query; els.search.value = restored.query;
+      $('#desktopSearch').value = restored.query;
       state.category = restored.category; state.collection = restored.collection;
-      listingPositions.delete(location.hash || '#top');
     }
     const filtered = state.category !== 'Todos' || !!state.collection || !!state.query;
     setHomeVisible(!filtered);
     $('#catalogTitle').textContent = state.query ? 'RESULTADOS' : state.collection?.nombre || (filtered ? state.category : 'TODAS LAS PRENDAS');
     renderProducts();
-    if (restored) requestAnimationFrame(() => window.scrollTo({ top: restored.y, behavior: 'instant' }));
+    syncCardSelections($('#newProducts'));
+    if (restored && isIOS) {
+      if (Math.abs(window.scrollY - restored.y) > 1) window.scrollTo({ top: restored.y, behavior: 'instant' });
+    }
+    else if (restored) requestAnimationFrame(() => window.scrollTo({ top: restored.y, behavior: 'instant' }));
     else if (filtered || hash === 'top' || !hash) window.scrollTo({ top: 0, behavior: 'instant' });
     else if (hash === 'catalogo') els.products.closest('section').scrollIntoView();
   }
@@ -811,7 +884,7 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       <div class="detail-layout">
         <div class="detail-media">
           <div id="detailGallery" class="detail-gallery" tabindex="0" aria-label="Fotos de ${esc(p.nombre)}">
-            ${images.map((url, i) => `<img src="${esc(freshImage(url,1400))}" data-fallback="${esc(freshImage(fallbackFor(p)))}" alt="${esc(p.nombre)} · Foto ${i + 1}" ${i ? 'loading="lazy"' : 'fetchpriority="high"'}>`).join('')}
+            ${images.map((url, i) => `<img src="${esc(freshImage(url,1400))}" data-fallback="${esc(freshImage(fallbackFor(p)))}" alt="${esc(p.nombre)} · Foto ${i + 1}" width="400" height="500" decoding="async" ${i ? 'loading="lazy"' : 'fetchpriority="high"'}>`).join('')}
           </div>
           <div class="gallery-controls" ${images.length < 2 ? 'hidden' : ''}>
             <button class="header-icon" type="button" id="galleryPrev" aria-label="Foto anterior">←</button>
@@ -913,6 +986,7 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   });
   window.addEventListener('hashchange', route);
+  if (isIOS) window.addEventListener('popstate', route);
   const settings=()=>window.hakiSettings(CONFIG);
   let announcementTimer;
   let announcementPaused=matchMedia('(prefers-reduced-motion: reduce)').matches;
