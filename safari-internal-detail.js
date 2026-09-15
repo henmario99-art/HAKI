@@ -1,4 +1,4 @@
-// Safari-only iPhone product navigation stabilization.
+// Safari-only iPhone product and category navigation stabilization.
 // Keep HAKI's normal product history entry, but take control of the left-edge
 // back gesture so WebKit never starts its buggy interactive history snapshot.
 (() => {
@@ -119,6 +119,7 @@
 
   const detail = () => document.getElementById('productDetail');
   const detailOpen = () => document.body.classList.contains('haki-ios-product-open') && !detail()?.hidden;
+  const categoryOpen = () => !detailOpen() && /^#(?:coleccion|categoria)\//.test(location.hash);
 
   const beginViewportSettling = (duration = 260) => {
     clearTimeout(settleTimer);
@@ -155,7 +156,9 @@
 
   const closeWithoutExternalHistory = () => {
     const panel = detail();
-    const back = panel?.querySelector('.detail-back');
+    const back = categoryOpen()
+      ? document.querySelector('#catalogo .back-home')
+      : panel?.querySelector('.detail-back');
     const destination = back ? new URL(back.href, location.href) : new URL('#top', location.href);
     const oldURL = location.href;
     history.replaceState(history.state, '', destination.href);
@@ -168,30 +171,16 @@
   const finishBack = () => {
     if (finishing) return;
     finishing = true;
-    const panel = detail();
-    if (!panel) {
+    // Navigate immediately. Waiting for a second slide animation added latency
+    // and could expose an outgoing image before the router restored the listing.
+    beginViewportSettling(180);
+    if (history.state?.hakiNavigation?.parent || openedFromCatalogue) {
+      history.back();
+    } else {
+      closeWithoutExternalHistory();
+      clearVisualState();
       finishing = false;
-      return;
     }
-    syncVisualViewport();
-    const width = Math.max(window.innerWidth, panel.getBoundingClientRect().width || 0);
-    panel.style.transition = 'transform 170ms cubic-bezier(.22,.78,.24,1)';
-    panel.style.transform = `translate3d(${width}px,0,0)`;
-    panel.style.boxShadow = '-16px 0 32px rgba(0,0,0,.10)';
-
-    window.setTimeout(() => {
-      // Keep a neutral strip over Safari's transient bottom viewport while WebKit
-      // settles the toolbar. This prevents the retired PDP image from flashing there.
-      beginViewportSettling(280);
-      if (openedFromCatalogue) history.back();
-      else closeWithoutExternalHistory();
-      // app.js handles the real view change. Reset only after that has had a frame.
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        clearVisualState();
-        finishing = false;
-        openedFromCatalogue = false;
-      }));
-    }, 165);
   };
 
   const cancelBack = () => {
@@ -207,7 +196,7 @@
   // cancelling touchstart is the reliable way to keep that gesture inside the page.
   // We then reproduce the same left-to-right interaction on the product sheet.
   window.addEventListener('touchstart', event => {
-    if (!detailOpen() || finishing || event.touches.length !== 1) return;
+    if ((!detailOpen() && !categoryOpen()) || finishing || event.touches.length !== 1) return;
     const touch = event.touches[0];
     if (touch.clientX > EDGE) return;
 
@@ -215,6 +204,7 @@
     syncVisualViewport();
     const now = performance.now();
     gesture = {
+      category: categoryOpen(),
       startX: touch.clientX,
       startY: touch.clientY,
       x: touch.clientX,
@@ -224,9 +214,11 @@
       velocity: 0,
       horizontal: false
     };
-    const panel = detail();
-    panel.style.transition = 'none';
-    panel.style.transform = 'translate3d(0,0,0)';
+    if (!gesture.category) {
+      const panel = detail();
+      panel.style.transition = 'none';
+      panel.style.transform = 'translate3d(0,0,0)';
+    }
     document.body.classList.add('haki-edge-back-active');
   }, { capture:true, passive:false });
 
@@ -246,6 +238,9 @@
 
     if (!gesture.horizontal && dx > 6 && Math.abs(dx) >= Math.abs(dy) * 0.7) gesture.horizontal = true;
     if (!gesture.horizontal) return;
+    // Categories share the document scroller. Keep their surface intact until
+    // commit, rather than invoking Safari's native history image/snapshot swipe.
+    if (gesture.category) return;
 
     const panel = detail();
     const width = Math.max(1, window.innerWidth);
@@ -256,23 +251,27 @@
 
   const endGesture = () => {
     if (!gesture) return;
-    const panel = detail();
-    const rect = panel?.getBoundingClientRect();
-    const distance = rect ? Math.max(0, rect.left) : Math.max(0, gesture.x - gesture.startX);
+    const category = gesture.category;
+    const distance = Math.max(0, gesture.x - gesture.startX);
     const shouldCommit = gesture.horizontal &&
       (distance >= window.innerWidth * COMMIT_RATIO || gesture.velocity >= FAST_VELOCITY);
     gesture = null;
     if (shouldCommit) finishBack();
+    else if (category) clearVisualState();
     else cancelBack();
   };
 
   window.addEventListener('touchend', endGesture, { capture:true, passive:false });
-  window.addEventListener('touchcancel', endGesture, { capture:true, passive:false });
+  window.addEventListener('touchcancel', () => {
+    gesture = null;
+    clearVisualState();
+  }, { capture:true, passive:false });
 
   // The visible Back control uses the same controlled transition. No WebKit snapshot.
   document.addEventListener('click', event => {
-    const back = event.target.closest?.('#productDetail .detail-back');
-    if (!back || !detailOpen()) return;
+    if (event.defaultPrevented || event.button > 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const back = event.target.closest?.('#productDetail .detail-back, #catalogo .back-home');
+    if (!back || (!detailOpen() && !categoryOpen())) return;
     event.preventDefault();
     event.stopImmediatePropagation();
     finishBack();
@@ -283,7 +282,7 @@
   window.addEventListener('popstate', () => {
     gesture = null;
     finishing = false;
-    beginViewportSettling(280);
+    beginViewportSettling(180);
     clearVisualState();
     if (!location.hash.startsWith('#producto/')) openedFromCatalogue = false;
   });
