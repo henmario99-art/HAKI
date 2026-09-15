@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#f5f5f3">
+  <title>HAKI Ventas</title>
+  <link rel="stylesheet" href="sales.css?v=3">
+</head>
+<body>
+  <main class="sales-shell">
+    <header class="sales-topbar">
+      <div><div class="sales-brand">HAKI</div><p>Ventas e inventario</p></div>
+      <a class="button secondary" href="/admin/">Administrador</a>
+    </header>
+
+    <nav class="sales-tabs" aria-label="Panel de ventas">
+      <button class="tab is-active" data-tab="sales" type="button">Ventas</button>
+      <button class="tab" data-tab="inventory" type="button">Inventario</button>
+    </nav>
+
+    <section id="salesView">
+      <div class="week-toolbar">
+        <div class="week-nav">
+          <button id="prevWeek" class="icon-button" type="button" aria-label="Semana anterior">←</button>
+          <div><strong id="weekTitle">Semana</strong><span id="weekRange"></span></div>
+          <button id="nextWeek" class="icon-button" type="button" aria-label="Semana siguiente">→</button>
+        </div>
+        <div class="week-actions">
+          <button id="todayWeek" class="button secondary" type="button">Esta semana</button>
+          <button id="newSale" class="button primary" type="button">+ Nueva venta</button>
+        </div>
+      </div>
+
+      <section class="metrics" aria-label="Resumen de la semana">
+        <article><span>Vendido</span><strong id="metricSales">$0.00</strong></article>
+        <article><span>Prendas</span><strong id="metricUnits">0</strong></article>
+        <article><span>Pendiente de cobro</span><strong id="metricPending">$0.00</strong></article>
+        <article><span>Pedidos</span><strong id="metricOrders">0</strong></article>
+      </section>
+
+      <section id="saleEditor" class="sale-editor" hidden>
+        <form id="saleForm">
+          <header class="editor-head">
+            <div><span class="eyebrow">HAKI</span><h1 id="saleDialogTitle">Nueva venta</h1></div>
+            <button id="closeDialog" class="editor-close" type="button" aria-label="Cerrar editor">×</button>
+          </header>
+
+          <div class="editor-fields">
+            <label class="field-date">Día que retiró el cliente<input id="salePickupDate" type="date" required></label>
+            <label>Canal<select id="saleChannel"><option>Instagram</option><option>WhatsApp</option><option>Messenger</option><option>Otro</option></select></label>
+            <label>Cliente<input id="saleClient" autocomplete="off"></label>
+            <label>Lugar y horario<input id="salePlace" autocomplete="off" placeholder="Ej. Agencia San Miguel, 1:00 a 3:00"></label>
+          </div>
+
+          <section class="items-section">
+            <div class="section-row"><div><h2>Pedido</h2><p>Selecciona una prenda, talla y cantidad.</p></div><button id="addItem" class="text-action" type="button">+ Añadir prenda</button></div>
+            <div id="items" class="items"></div>
+          </section>
+
+          <div class="order-meta">
+            <label>Envío ($)<input id="saleShipping" type="number" min="0" step="0.01" value="0" inputmode="decimal"></label>
+            <label>Encomienda<select id="saleDelivery"><option>Pedido Express</option><option>C807</option><option>Delivery</option><option>Domicilio</option><option>Encomienda</option><option>Otro</option></select></label>
+            <label>Estado<select id="saleState"><option>Pendiente</option><option>Retirado</option><option>Cancelado</option><option>No retirado</option></select></label>
+            <label>Dinero<select id="saleMoney"><option>Pendiente</option><option>En caja</option><option>No retiró</option></select></label>
+          </div>
+
+          <div class="sale-total"><span>Subtotal <strong id="saleSubtotal">$0.00</strong></span><span>Envío <strong id="saleShippingTotal">$0.00</strong></span><span class="grand-total">Total <strong id="saleTotal">$0.00</strong></span></div>
+
+          <footer class="editor-actions">
+            <button id="deleteSale" class="button danger" type="button" hidden>Eliminar venta</button>
+            <div class="dialog-spacer"></div>
+            <button class="button secondary" id="cancelDialog" type="button">Cancelar</button>
+            <button class="button primary" id="saveSale" type="submit">Guardar venta</button>
+          </footer>
+        </form>
+      </section>
+
+      <div id="days" class="days"></div>
+    </section>
+
+    <section id="inventoryView" hidden>
+      <div class="inventory-head"><div><h1>Inventario privado</h1><p>Estas cantidades solo se ven en el administrador y no se muestran en el catálogo público.</p></div><input id="inventorySearch" type="search" placeholder="Buscar prenda o código"></div>
+      <div id="inventoryList" class="inventory-list"></div>
+    </section>
+
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+  </main>
+
+  <template id="itemTemplate">
+    <article class="item-row">
+      <label class="item-product">Prenda<select data-item="product"></select></label>
+      <div class="item-pair">
+        <label>Talla<select data-item="size"><option>S</option><option>M</option><option>L</option><option>XL</option></select></label>
+        <label>Cant.<input data-item="qty" type="number" min="1" step="1" value="1" inputmode="numeric"></label>
+      </div>
+      <div class="item-pair item-bottom">
+        <label>Precio<input data-item="price" type="number" min="0" step="0.01" inputmode="decimal"></label>
+        <div class="stock-note" data-item="stock"></div>
+        <button class="remove-item" data-item="remove" type="button" aria-label="Quitar prenda">×</button>
+      </div>
+    </article>
+  </template>
+
+  <script src="sales.js?v=3"></script>
+</body>
+</html>
