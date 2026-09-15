@@ -1,14 +1,11 @@
-// Safari-only iPhone product and category navigation stabilization.
-// Keep HAKI's normal product history entry, but take control of the left-edge
-// back gesture so WebKit never starts its buggy interactive history snapshot.
+// iPhone/WebKit navigation stabilization for HAKI.
+// Categories and product detail are real in-page layers. We intercept WebKit's
+// left-edge history swipe and reproduce it with live DOM surfaces, so Safari and
+// Chrome never expose stale/blank browser snapshots during catalog navigation.
 (() => {
-  const ua = navigator.userAgent || '';
   const isIOSWebKit = window.hakiIOSWebKit === true;
-  const isSafari = isIOSWebKit && /Safari/i.test(ua) && !/(CriOS|FxiOS|EdgiOS|OPiOS|DuckDuckGo)/i.test(ua);
-  if (!isSafari) return;
+  if (!isIOSWebKit) return;
 
-  // Recover cleanly from the separate /product route used by the previous test.
-  // No new navigation will use that route after this version.
   if (/\/product(?:\.html)?\/?$/.test(location.pathname)) {
     const target = new URL('/', location.origin);
     target.hash = location.hash || '#top';
@@ -17,26 +14,27 @@
   }
 
   const root = document.documentElement;
-  root.classList.add('haki-safari-custom-back');
+  root.classList.add('haki-ios-layered-navigation');
 
   const style = document.createElement('style');
-  style.id = 'haki-safari-custom-back-style';
+  style.id = 'haki-ios-layered-navigation-style';
   style.textContent = `
-    html.haki-safari-custom-back{
-      --haki-safari-bottom-ui:0px;
-      --haki-safari-visual-height:100dvh;
-      --haki-safari-category-top:0px;
-      scroll-padding-bottom:calc(var(--haki-safari-bottom-ui) + env(safe-area-inset-bottom));
+    html.haki-ios-layered-navigation{
+      --haki-ios-bottom-ui:0px;
+      --haki-ios-visual-height:100dvh;
+      --haki-ios-category-top:0px;
+      scroll-padding-bottom:calc(var(--haki-ios-bottom-ui) + env(safe-area-inset-bottom));
     }
-    html.haki-safari-custom-back body.haki-ios-product-open #productDetail{
+
+    html.haki-ios-layered-navigation body.haki-ios-product-open #productDetail{
       will-change:transform;
       backface-visibility:hidden;
       -webkit-backface-visibility:hidden;
       transform:translate3d(0,0,0);
-      bottom:var(--haki-safari-bottom-ui)!important;
-      max-height:var(--haki-safari-visual-height);
+      bottom:var(--haki-ios-bottom-ui)!important;
+      max-height:var(--haki-ios-visual-height);
     }
-    html.haki-safari-custom-back body.haki-ios-product-open #productDetail .detail-back{
+    html.haki-ios-layered-navigation body.haki-ios-product-open #productDetail .detail-back{
       display:flex!important;
       position:sticky!important;
       top:0!important;
@@ -56,20 +54,24 @@
       border-bottom-color:rgba(255,255,255,.14);
     }
 
-    /* Safari-only category sheet.
-       The page underneath is frozen at the exact source position while #catalogo
-       becomes its own scroll layer, matching the already-stable product detail. */
-    html.haki-safari-custom-back body.haki-safari-category-open{
+    html.haki-ios-layered-navigation body.haki-ios-category-open{
       overflow:hidden!important;
-      overscroll-behavior:none;
+      overscroll-behavior:none!important;
     }
-    html.haki-safari-custom-back body.haki-safari-category-open #catalogo{
+    html.haki-ios-layered-navigation body.haki-ios-category-open #homeHero[hidden]{
+      display:grid!important;
+    }
+    html.haki-ios-layered-navigation body.haki-ios-category-open #novedades[hidden],
+    html.haki-ios-layered-navigation body.haki-ios-category-open #collectionsSection[hidden]{
+      display:block!important;
+    }
+    html.haki-ios-layered-navigation body.haki-ios-category-open #catalogo{
       display:block!important;
       position:fixed!important;
-      top:var(--haki-safari-category-top)!important;
+      top:var(--haki-ios-category-top)!important;
       left:0!important;
       right:0!important;
-      bottom:var(--haki-safari-bottom-ui)!important;
+      bottom:var(--haki-ios-bottom-ui)!important;
       z-index:28!important;
       width:100%!important;
       max-width:none!important;
@@ -83,23 +85,26 @@
       background:var(--surface,#fff)!important;
       isolation:isolate;
       contain:paint;
-      transform:translateZ(0);
+      transform:translate3d(0,0,0);
       backface-visibility:hidden;
       -webkit-backface-visibility:hidden;
+      will-change:transform;
     }
-    html.haki-safari-custom-back body.haki-safari-category-open.haki-ios-product-open #catalogo{
+    html.haki-ios-layered-navigation body.haki-ios-category-open.haki-ios-product-open #catalogo{
       pointer-events:none;
     }
 
-    html.haki-safari-custom-back body.haki-edge-back-active{
+    html.haki-ios-layered-navigation body.haki-edge-back-active{
       overflow:hidden!important;
+      touch-action:none!important;
     }
-    #hakiSafariBottomGuard{
+
+    #hakiIOSBottomGuard{
       position:fixed;
       left:0;
       right:0;
       bottom:0;
-      height:max(var(--haki-safari-bottom-ui), env(safe-area-inset-bottom));
+      height:max(var(--haki-ios-bottom-ui), env(safe-area-inset-bottom));
       min-height:0;
       z-index:2147483000;
       pointer-events:none;
@@ -110,50 +115,50 @@
       backface-visibility:hidden;
       -webkit-backface-visibility:hidden;
     }
-    :root[data-theme='oscuro'] #hakiSafariBottomGuard{
+    :root[data-theme='oscuro'] #hakiIOSBottomGuard{
       background:var(--surface,#111);
     }
-    body.haki-edge-back-active #hakiSafariBottomGuard,
-    body.haki-safari-return-settling #hakiSafariBottomGuard{
+    body.haki-edge-back-active #hakiIOSBottomGuard,
+    body.haki-ios-return-settling #hakiIOSBottomGuard{
       opacity:1;
+    }
+
+    @media (prefers-reduced-motion:reduce){
+      html.haki-ios-layered-navigation #catalogo,
+      html.haki-ios-layered-navigation #productDetail{
+        transition:none!important;
+      }
     }
   `;
   document.head.appendChild(style);
 
   const bottomGuard = document.createElement('div');
-  bottomGuard.id = 'hakiSafariBottomGuard';
+  bottomGuard.id = 'hakiIOSBottomGuard';
   bottomGuard.setAttribute('aria-hidden', 'true');
   document.body.appendChild(bottomGuard);
 
-  const EDGE = 34;
-  const COMMIT_RATIO = 0.24;
-  const FAST_VELOCITY = 0.48;
-  let openedFromCatalogue = false;
+  const EDGE = 36;
+  const COMMIT_RATIO = 0.23;
+  const FAST_VELOCITY = 0.46;
+  const EXIT_MS = 165;
+  const positions = new Map();
+
+  let categoryLayer = null;
+  let lastCategoryParentY = 0;
   let gesture = null;
   let finishing = false;
   let settleTimer = 0;
-  let categoryLayer = null;
-  let lastCategoryParentY = 0;
-  let lastCategoryScrollTop = 0;
-  let resetCategoryScrollAfterClick = false;
+  let clickedCategory = false;
 
   const detail = () => document.getElementById('productDetail');
   const catalog = () => document.getElementById('catalogo');
-  const detailOpen = () => document.body.classList.contains('haki-ios-product-open') && !detail()?.hidden;
+  const detailOpen = () =>
+    document.body.classList.contains('haki-ios-product-open') && !detail()?.hidden;
   const categoryHash = hash => /^#(?:coleccion|categoria)\//.test(hash || '');
-  const categoryOpen = () => !detailOpen() && categoryHash(location.hash);
-  const categoryLayerActive = () => document.body.classList.contains('haki-safari-category-open');
-
-  const updateCategoryGeometry = () => {
-    if (!categoryLayerActive()) return;
-    const header = document.querySelector('.header');
-    const visualTop = window.visualViewport?.offsetTop || 0;
-    const headerBottom = header?.getBoundingClientRect().bottom || visualTop;
-    root.style.setProperty(
-      '--haki-safari-category-top',
-      `${Math.ceil(Math.max(visualTop, headerBottom))}px`
-    );
-  };
+  const categoryOpen = () =>
+    categoryHash(location.hash) && document.body.classList.contains('haki-ios-category-open');
+  const entryKey = () =>
+    history.state?.hakiNavigation?.key || `${location.pathname}${location.hash || '#top'}`;
 
   const syncVisualViewport = () => {
     const vv = window.visualViewport;
@@ -165,63 +170,187 @@
     const visualTop = vv?.offsetTop || 0;
     const bottomUI = Math.max(0, layoutHeight - (visualTop + visualHeight));
 
-    root.style.setProperty('--haki-safari-bottom-ui', `${Math.ceil(bottomUI)}px`);
-    root.style.setProperty('--haki-safari-visual-height', `${Math.ceil(visualHeight)}px`);
-    updateCategoryGeometry();
+    root.style.setProperty('--haki-ios-bottom-ui', `${Math.ceil(bottomUI)}px`);
+    root.style.setProperty('--haki-ios-visual-height', `${Math.ceil(visualHeight)}px`);
+
+    if (document.body.classList.contains('haki-ios-category-open')) {
+      const header = document.querySelector('.header');
+      const headerBottom = header?.getBoundingClientRect().bottom || visualTop;
+      root.style.setProperty(
+        '--haki-ios-category-top',
+        `${Math.ceil(Math.max(visualTop, headerBottom))}px`
+      );
+    }
   };
 
-  const openCategoryLayer = (parentY = window.scrollY) => {
+  const beginViewportSettling = (duration = 220) => {
+    clearTimeout(settleTimer);
+    syncVisualViewport();
+    document.body.classList.add('haki-ios-return-settling');
+    settleTimer = window.setTimeout(() => {
+      requestAnimationFrame(() => {
+        syncVisualViewport();
+        document.body.classList.remove('haki-ios-return-settling');
+      });
+    }, duration);
+  };
+
+  const saveCategoryPosition = () => {
+    if (!categoryLayer) return;
+    const node = catalog();
+    const saved = {
+      parentY: categoryLayer.parentY,
+      scrollTop: node?.scrollTop || 0
+    };
+    categoryLayer.scrollTop = saved.scrollTop;
+    positions.set(categoryLayer.key || entryKey(), saved);
+  };
+
+  const openCategoryLayer = ({ parentY, scrollTop } = {}) => {
     const node = catalog();
     if (!node) return;
 
-    if (categoryLayer) {
-      updateCategoryGeometry();
-      return;
+    const key = entryKey();
+    const remembered = positions.get(key);
+    const baseY = Math.max(
+      0,
+      Number.isFinite(parentY)
+        ? parentY
+        : Number.isFinite(remembered?.parentY)
+          ? remembered.parentY
+          : lastCategoryParentY || window.scrollY
+    );
+    const listY = Math.max(
+      0,
+      Number.isFinite(scrollTop)
+        ? scrollTop
+        : Number.isFinite(remembered?.scrollTop)
+          ? remembered.scrollTop
+          : 0
+    );
+
+    if (!categoryLayer) {
+      categoryLayer = { key, parentY: baseY, scrollTop: listY };
+      lastCategoryParentY = baseY;
+      document.body.classList.add('haki-ios-category-open');
+    } else {
+      categoryLayer.key = key;
+      categoryLayer.parentY = baseY;
+      categoryLayer.scrollTop = listY;
     }
 
-    const body = document.body;
-    const y = Math.max(0, Number.isFinite(parentY) ? parentY : window.scrollY);
-    categoryLayer = {
-      parentY: y,
-      categoryScrollTop: lastCategoryScrollTop
-    };
-    lastCategoryParentY = y;
-
-    body.classList.add('haki-safari-category-open');
-    updateCategoryGeometry();
-
-    // A newly opened category starts at its own top, without changing the page
-    // scroll that is frozen underneath.
-    node.scrollTop = 0;
+    syncVisualViewport();
+    window.scrollTo({ top: baseY, left: 0, behavior: 'instant' });
+    node.style.transition = '';
+    node.style.transform = 'translate3d(0,0,0)';
+    node.style.boxShadow = '';
+    node.scrollTop = listY;
   };
 
   const closeCategoryLayer = () => {
-    if (!categoryLayer) {
-      document.body.classList.remove('haki-safari-category-open');
-      return;
-    }
-
-    const data = categoryLayer;
     const node = catalog();
-    if (node) lastCategoryScrollTop = node.scrollTop;
-    lastCategoryParentY = data.parentY;
+    if (categoryLayer) {
+      saveCategoryPosition();
+      lastCategoryParentY = categoryLayer.parentY;
+    }
+    const baseY = categoryLayer?.parentY ?? lastCategoryParentY ?? window.scrollY;
     categoryLayer = null;
 
-    document.body.classList.remove('haki-safari-category-open');
-    root.style.removeProperty('--haki-safari-category-top');
+    document.body.classList.remove('haki-ios-category-open');
+    root.style.removeProperty('--haki-ios-category-top');
 
-    // Restore before the next paint. The home/catalog source never has to be
-    // reconstructed visually after Safari has already exposed it.
-    window.scrollTo({ top: data.parentY, left: 0, behavior: 'instant' });
-    if (node) node.scrollTop = 0;
+    if (node) {
+      node.style.transition = '';
+      node.style.transform = '';
+      node.style.boxShadow = '';
+      node.scrollTop = 0;
+    }
+    window.scrollTo({ top: Math.max(0, baseY), left: 0, behavior: 'instant' });
   };
 
-  const restoreCategoryLayerScroll = () => {
-    if (!categoryLayer || !categoryHash(location.hash)) return;
-    const node = catalog();
-    if (!node) return;
-    updateCategoryGeometry();
-    node.scrollTop = Math.max(0, categoryLayer.categoryScrollTop || lastCategoryScrollTop || 0);
+  const clearSurfaceStyles = surface => {
+    if (!surface) return;
+    surface.style.transition = '';
+    surface.style.transform = '';
+    surface.style.boxShadow = '';
+  };
+
+  const clearGestureState = () => {
+    document.body.classList.remove('haki-edge-back-active');
+    clearSurfaceStyles(detail());
+    if (categoryOpen()) {
+      const node = catalog();
+      if (node) node.style.transform = 'translate3d(0,0,0)';
+      if (node) node.style.boxShadow = '';
+      if (node) node.style.transition = '';
+    }
+  };
+
+  const activeSurface = () => {
+    if (detailOpen()) return { type: 'detail', node: detail() };
+    if (categoryOpen()) return { type: 'category', node: catalog() };
+    return null;
+  };
+
+  const fallbackDestination = type => {
+    if (type === 'category') {
+      const back = document.querySelector('#catalogo .back-home');
+      return back ? new URL(back.href, location.href) : new URL('#top', location.href);
+    }
+    const back = detail()?.querySelector('.detail-back');
+    return back ? new URL(back.href, location.href) : new URL('#catalogo', location.href);
+  };
+
+  const navigateWithoutExternalHistory = type => {
+    const destination = fallbackDestination(type);
+    const oldURL = location.href;
+    history.replaceState(history.state, '', destination.href);
+    let event;
+    try {
+      event = new HashChangeEvent('hashchange', { oldURL, newURL: destination.href });
+    } catch {
+      event = new Event('hashchange');
+    }
+    window.dispatchEvent(event);
+  };
+
+  const completeBack = type => {
+    const hasParent = !!history.state?.hakiNavigation?.parent;
+    if (hasParent) history.back();
+    else navigateWithoutExternalHistory(type);
+  };
+
+  const finishBack = (surface = activeSurface()) => {
+    if (finishing || !surface?.node) return;
+    finishing = true;
+
+    if (surface.type === 'category') saveCategoryPosition();
+
+    const node = surface.node;
+    const width = Math.max(window.innerWidth, node.getBoundingClientRect().width || 0);
+    node.style.transition = `transform ${EXIT_MS}ms cubic-bezier(.22,.78,.24,1)`;
+    node.style.transform = `translate3d(${width}px,0,0)`;
+    node.style.boxShadow = '-16px 0 32px rgba(0,0,0,.10)';
+    beginViewportSettling(EXIT_MS + 90);
+
+    window.setTimeout(() => {
+      completeBack(surface.type);
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        clearGestureState();
+        finishing = false;
+      }));
+    }, EXIT_MS);
+  };
+
+  const cancelBack = surface => {
+    if (!surface?.node) {
+      clearGestureState();
+      return;
+    }
+    surface.node.style.transition = 'transform 180ms cubic-bezier(.22,.78,.24,1)';
+    surface.node.style.transform = 'translate3d(0,0,0)';
+    surface.node.style.boxShadow = '';
+    window.setTimeout(clearGestureState, 190);
   };
 
   syncVisualViewport();
@@ -231,125 +360,62 @@
   window.addEventListener('orientationchange', () => requestAnimationFrame(syncVisualViewport), { passive:true });
   window.addEventListener('pageshow', () => requestAnimationFrame(syncVisualViewport));
 
-  const beginViewportSettling = (duration = 260) => {
-    clearTimeout(settleTimer);
-    syncVisualViewport();
-    document.body.classList.add('haki-safari-return-settling');
-    settleTimer = window.setTimeout(() => {
-      requestAnimationFrame(() => {
-        syncVisualViewport();
-        document.body.classList.remove('haki-safari-return-settling');
-      });
-    }, duration);
-  };
-
-  // This runs before app.js's bubble listener. app.js still owns normal history,
-  // while Safari gets a fixed category layer before any layout-changing route runs.
   document.addEventListener('click', event => {
-    if (event.defaultPrevented || event.button > 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    if (
+      event.defaultPrevented ||
+      event.button > 0 ||
+      event.metaKey || event.ctrlKey || event.shiftKey || event.altKey
+    ) return;
+
     const link = event.target.closest?.('a[href]');
     if (!link) return;
+
     let destination;
     try { destination = new URL(link.href, location.href); } catch { return; }
-    if (destination.origin !== location.origin || destination.pathname !== location.pathname || destination.search !== location.search) return;
+    if (
+      destination.origin !== location.origin ||
+      destination.pathname !== location.pathname ||
+      destination.search !== location.search
+    ) return;
 
-    if (!detailOpen() && categoryHash(destination.hash)) {
-      if (!categoryLayerActive()) openCategoryLayer(window.scrollY);
-      resetCategoryScrollAfterClick = destination.hash !== location.hash;
+    if (categoryHash(destination.hash) && !detailOpen()) {
+      const changing = destination.hash !== location.hash;
+      if (!categoryOpen()) {
+        openCategoryLayer({ parentY: window.scrollY, scrollTop: 0 });
+      }
+      clickedCategory = changing;
     }
 
-    if (categoryHash(location.hash) && destination.hash.startsWith('#producto/')) {
-      openedFromCatalogue = true;
-      if (categoryLayer) categoryLayer.categoryScrollTop = catalog()?.scrollTop || 0;
-    } else if (!detailOpen() && destination.hash.startsWith('#producto/')) {
-      openedFromCatalogue = true;
+    if (categoryOpen() && destination.hash.startsWith('#producto/')) {
+      saveCategoryPosition();
     }
   }, true);
 
-  // app.js's click router is registered earlier and runs first in bubble phase.
-  // Finish the category-sheet bookkeeping in the same task, before Safari paints.
   document.addEventListener('click', () => {
-    if (!categoryLayerActive() || !categoryHash(location.hash)) {
-      resetCategoryScrollAfterClick = false;
-      return;
+    if (categoryHash(location.hash) && document.body.classList.contains('haki-ios-category-open')) {
+      const remembered = positions.get(entryKey());
+      const parentY = categoryLayer?.parentY ?? remembered?.parentY ?? lastCategoryParentY;
+      const scrollTop = clickedCategory ? 0 : (remembered?.scrollTop ?? categoryLayer?.scrollTop ?? 0);
+      openCategoryLayer({ parentY, scrollTop });
+      positions.set(entryKey(), { parentY: categoryLayer.parentY, scrollTop: catalog()?.scrollTop || 0 });
     }
-    updateCategoryGeometry();
-    if (categoryLayer) {
-      window.scrollTo({ top: categoryLayer.parentY, left: 0, behavior: 'instant' });
-    }
-    if (resetCategoryScrollAfterClick) {
-      const node = catalog();
-      if (node) node.scrollTop = 0;
-      if (categoryLayer) categoryLayer.categoryScrollTop = 0;
-    }
-    resetCategoryScrollAfterClick = false;
+    clickedCategory = false;
   });
 
-  const clearVisualState = () => {
-    const panel = detail();
-    document.body.classList.remove('haki-edge-back-active');
-    if (!panel) return;
-    panel.style.transition = '';
-    panel.style.transform = '';
-    panel.style.boxShadow = '';
-  };
-
-  const closeWithoutExternalHistory = () => {
-    const panel = detail();
-    const back = categoryOpen()
-      ? document.querySelector('#catalogo .back-home')
-      : panel?.querySelector('.detail-back');
-    const destination = back ? new URL(back.href, location.href) : new URL('#top', location.href);
-    const oldURL = location.href;
-    history.replaceState(history.state, '', destination.href);
-    let event;
-    try { event = new HashChangeEvent('hashchange', { oldURL, newURL: destination.href }); }
-    catch { event = new Event('hashchange'); }
-    window.dispatchEvent(event);
-  };
-
-  const finishBack = () => {
-    if (finishing) return;
-    finishing = true;
-
-    if (categoryOpen() && categoryLayer) {
-      categoryLayer.categoryScrollTop = catalog()?.scrollTop || 0;
-    }
-
-    // Navigate immediately. The category itself is now a fixed layer, so its
-    // height cannot make Safari collapse/expand the page during this history step.
-    beginViewportSettling(180);
-    if (history.state?.hakiNavigation?.parent || openedFromCatalogue) {
-      history.back();
-    } else {
-      closeWithoutExternalHistory();
-      clearVisualState();
-      finishing = false;
-    }
-  };
-
-  const cancelBack = () => {
-    const panel = detail();
-    if (!panel) return;
-    panel.style.transition = 'transform 180ms cubic-bezier(.22,.78,.24,1)';
-    panel.style.transform = 'translate3d(0,0,0)';
-    panel.style.boxShadow = '';
-    window.setTimeout(clearVisualState, 190);
-  };
-
-  // WebKit gives its browser-level Back gesture priority at the left edge. On iOS,
-  // cancelling touchstart keeps that gesture inside the page without removing it:
-  // HAKI reproduces the same interaction and commits normal browser history.
   window.addEventListener('touchstart', event => {
-    if ((!detailOpen() && !categoryOpen()) || finishing || event.touches.length !== 1) return;
+    if (finishing || event.touches.length !== 1) return;
+    const surface = activeSurface();
+    if (!surface?.node) return;
+
     const touch = event.touches[0];
     if (touch.clientX > EDGE) return;
 
     event.preventDefault();
     syncVisualViewport();
+
     const now = performance.now();
     gesture = {
-      category: categoryOpen(),
+      surface,
       startX: touch.clientX,
       startY: touch.clientY,
       x: touch.clientX,
@@ -359,20 +425,31 @@
       velocity: 0,
       horizontal: false
     };
-    if (!gesture.category) {
-      const panel = detail();
-      panel.style.transition = 'none';
-      panel.style.transform = 'translate3d(0,0,0)';
-    }
+
+    surface.node.style.transition = 'none';
+    surface.node.style.transform = 'translate3d(0,0,0)';
+    surface.node.style.boxShadow = '';
     document.body.classList.add('haki-edge-back-active');
   }, { capture:true, passive:false });
 
   window.addEventListener('touchmove', event => {
     if (!gesture || event.touches.length !== 1) return;
-    event.preventDefault();
+
     const touch = event.touches[0];
     const dx = Math.max(0, touch.clientX - gesture.startX);
     const dy = touch.clientY - gesture.startY;
+
+    if (
+      !gesture.horizontal &&
+      dx > 6 &&
+      Math.abs(dx) >= Math.abs(dy) * 0.72
+    ) {
+      gesture.horizontal = true;
+    }
+
+    if (!gesture.horizontal) return;
+    event.preventDefault();
+
     const now = performance.now();
     const dt = Math.max(1, now - gesture.lastT);
     gesture.velocity = (touch.clientX - gesture.lastX) / dt;
@@ -381,69 +458,79 @@
     gesture.x = touch.clientX;
     gesture.y = touch.clientY;
 
-    if (!gesture.horizontal && dx > 6 && Math.abs(dx) >= Math.abs(dy) * 0.7) gesture.horizontal = true;
-    if (!gesture.horizontal) return;
-    // The category sheet remains visually intact until commit. Safari never gets
-    // an opportunity to expose its stale history snapshot underneath it.
-    if (gesture.category) return;
-
-    const panel = detail();
     const width = Math.max(1, window.innerWidth);
     const eased = Math.min(width, dx);
-    panel.style.transform = `translate3d(${eased}px,0,0)`;
-    panel.style.boxShadow = eased > 4 ? '-16px 0 32px rgba(0,0,0,.10)' : '';
+    gesture.surface.node.style.transform = `translate3d(${eased}px,0,0)`;
+    gesture.surface.node.style.boxShadow =
+      eased > 4 ? '-16px 0 32px rgba(0,0,0,.10)' : '';
   }, { capture:true, passive:false });
 
-  const endGesture = () => {
+  const endGesture = cancelled => {
     if (!gesture) return;
-    const category = gesture.category;
-    const distance = Math.max(0, gesture.x - gesture.startX);
-    const shouldCommit = gesture.horizontal &&
-      (distance >= window.innerWidth * COMMIT_RATIO || gesture.velocity >= FAST_VELOCITY);
+    const current = gesture;
     gesture = null;
-    if (shouldCommit) finishBack();
-    else if (category) clearVisualState();
-    else cancelBack();
+
+    if (cancelled || !current.horizontal) {
+      cancelBack(current.surface);
+      return;
+    }
+
+    const distance = Math.max(0, current.x - current.startX);
+    const shouldCommit =
+      distance >= window.innerWidth * COMMIT_RATIO ||
+      current.velocity >= FAST_VELOCITY;
+
+    if (shouldCommit) finishBack(current.surface);
+    else cancelBack(current.surface);
   };
 
-  window.addEventListener('touchend', endGesture, { capture:true, passive:false });
-  window.addEventListener('touchcancel', () => {
-    gesture = null;
-    clearVisualState();
-  }, { capture:true, passive:false });
+  window.addEventListener('touchend', () => endGesture(false), { capture:true, passive:false });
+  window.addEventListener('touchcancel', () => endGesture(true), { capture:true, passive:false });
 
-  // The visible Back control uses the same controlled history transition.
   document.addEventListener('click', event => {
-    if (event.defaultPrevented || event.button > 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    if (
+      event.defaultPrevented ||
+      event.button > 0 ||
+      event.metaKey || event.ctrlKey || event.shiftKey || event.altKey
+    ) return;
+
     const back = event.target.closest?.('#productDetail .detail-back, #catalogo .back-home');
-    if (!back || (!detailOpen() && !categoryOpen())) return;
+    const surface = activeSurface();
+    if (!back || !surface) return;
+
     event.preventDefault();
     event.stopImmediatePropagation();
-    finishBack();
+    finishBack(surface);
   }, true);
 
   const afterHistoryRoute = () => {
     gesture = null;
     finishing = false;
     beginViewportSettling(180);
-    clearVisualState();
 
     if (categoryHash(location.hash)) {
-      if (!categoryLayerActive()) openCategoryLayer(lastCategoryParentY || window.scrollY);
-      if (categoryLayer) {
-        window.scrollTo({ top: categoryLayer.parentY, left: 0, behavior: 'instant' });
-      }
-      restoreCategoryLayerScroll();
-    } else if (!location.hash.startsWith('#producto/') && categoryLayerActive()) {
+      const remembered = positions.get(entryKey());
+      openCategoryLayer({
+        parentY: remembered?.parentY ?? lastCategoryParentY ?? window.scrollY,
+        scrollTop: remembered?.scrollTop ?? 0
+      });
+    } else if (!location.hash.startsWith('#producto/') && categoryLayer) {
       closeCategoryLayer();
     }
 
-    if (!location.hash.startsWith('#producto/')) openedFromCatalogue = false;
+    clearGestureState();
   };
 
-  // app.js registered both listeners first, so its route has already completed
-  // when these run. All layer restoration therefore happens before the next paint.
   window.addEventListener('popstate', afterHistoryRoute);
   window.addEventListener('hashchange', afterHistoryRoute);
 
+  if (categoryHash(location.hash)) {
+    requestAnimationFrame(() => {
+      openCategoryLayer({ parentY: window.scrollY, scrollTop: 0 });
+      positions.set(entryKey(), {
+        parentY: categoryLayer?.parentY || 0,
+        scrollTop: catalog()?.scrollTop || 0
+      });
+    });
+  }
 })();
