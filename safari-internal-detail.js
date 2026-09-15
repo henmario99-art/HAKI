@@ -99,6 +99,18 @@
       touch-action:none!important;
     }
 
+    #hakiIOSCatalogPlaceholder{
+      display:block;
+      width:100%;
+      min-width:0;
+      padding:0;
+      border:0;
+      margin:0;
+      visibility:hidden;
+      pointer-events:none;
+      contain:strict;
+    }
+
     #hakiIOSBottomGuard{
       position:fixed;
       left:0;
@@ -144,6 +156,7 @@
   const positions = new Map();
 
   let categoryLayer = null;
+  let catalogPlaceholder = null;
   let lastCategoryParentY = 0;
   let gesture = null;
   let finishing = false;
@@ -159,6 +172,32 @@
     categoryHash(location.hash) && document.body.classList.contains('haki-ios-category-open');
   const entryKey = () =>
     history.state?.hakiNavigation?.key || `${location.pathname}${location.hash || '#top'}`;
+
+  // When #catalogo becomes fixed it normally disappears from document flow.
+  // On iPhone that shortens the page instantly, forcing WebKit to clamp scrollY
+  // and making the footer/background jump upward during the Back animation.
+  // Keep an invisible block with the exact previous footprint until #catalogo
+  // returns to normal flow. The document height therefore never changes mid-swipe.
+  const holdCatalogFlow = () => {
+    if (catalogPlaceholder) return;
+    const node = catalog();
+    if (!node?.parentNode) return;
+
+    const rect = node.getBoundingClientRect();
+    const height = Math.max(0, Math.ceil(rect.height || node.offsetHeight || 0));
+    const spacer = document.createElement('div');
+    spacer.id = 'hakiIOSCatalogPlaceholder';
+    spacer.setAttribute('aria-hidden', 'true');
+    spacer.style.height = `${height}px`;
+    node.parentNode.insertBefore(spacer, node);
+    catalogPlaceholder = spacer;
+  };
+
+  const releaseCatalogFlow = () => {
+    if (!catalogPlaceholder) return;
+    catalogPlaceholder.remove();
+    catalogPlaceholder = null;
+  };
 
   const syncVisualViewport = () => {
     const vv = window.visualViewport;
@@ -230,6 +269,10 @@
     );
 
     if (!categoryLayer) {
+      // Measure while the catalog is still a normal flow element. Inserting the
+      // spacer and fixing the catalog happen in the same task, so there is never
+      // a rendered frame with either missing or duplicated page height.
+      holdCatalogFlow();
       categoryLayer = { key, parentY: baseY, scrollTop: listY };
       lastCategoryParentY = baseY;
       document.body.classList.add('haki-ios-category-open');
@@ -256,6 +299,8 @@
     const baseY = categoryLayer?.parentY ?? lastCategoryParentY ?? window.scrollY;
     categoryLayer = null;
 
+    // Return the real catalog to document flow before removing its placeholder.
+    // Both changes occur synchronously, leaving the background footprint constant.
     document.body.classList.remove('haki-ios-category-open');
     root.style.removeProperty('--haki-ios-category-top');
 
@@ -265,6 +310,7 @@
       node.style.boxShadow = '';
       node.scrollTop = 0;
     }
+    releaseCatalogFlow();
     window.scrollTo({ top: Math.max(0, baseY), left: 0, behavior: 'instant' });
   };
 
