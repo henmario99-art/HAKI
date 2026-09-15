@@ -23,3 +23,91 @@
   const note=document.createElement('p');note.textContent='Horizon necesita su archivo para uso web. Hasta cargarlo se muestra Poppins. Los anuncios cambian cada 5 segundos. El botón derecho de la portada se configura en la sección GYMRAT TEST.';card.append(note);
   document.querySelector('#adminView .config-card').after(card);
 })();
+
+// Mantiene el editor de cada producto compacto: los controles menos usados viven dentro de “Categorías”.
+(() => {
+  const STYLE_ID='haki-admin-compact-extras';
+
+  function addStyles(){
+    if(document.getElementById(STYLE_ID))return;
+    const style=document.createElement('style');
+    style.id=STYLE_ID;
+    style.textContent=`
+      .product-compact-details .compact-extra-options{padding:0 16px 16px}
+      .product-compact-details .compact-extra-options .product-placement{margin-top:0}
+      .product-compact-details .compact-extra-options .product-color-setting{margin-top:16px}
+      @media(max-width:700px){.product-compact-details .compact-extra-options{padding:0 14px 14px}}
+    `;
+    document.head.append(style);
+  }
+
+  function replacePinkAndAddGreen(root){
+    if(!root?.querySelector)return;
+    const pink=root.querySelector('.color-swatch[data-color="Rosa"],.color-swatch[data-color="Rosado"]');
+    if(pink){
+      pink.dataset.color='Morado';
+      pink.title='Morado';
+      pink.style.setProperty('--swatch','#8153a6');
+      pink.style.setProperty('--swatch-border','#684287');
+      const input=pink.querySelector('input[data-color]');
+      if(input){input.dataset.color='Morado';input.setAttribute('aria-label','Morado');}
+    }
+    const colors=root.querySelector('.color-swatches');
+    if(colors&&!colors.querySelector('.color-swatch[data-color="Verde"]')){
+      const green=document.createElement('label');
+      green.className='color-swatch';
+      green.dataset.color='Verde';
+      green.title='Verde';
+      green.style.setProperty('--swatch','#3f7f4b');
+      green.style.setProperty('--swatch-border','#32663c');
+      green.innerHTML='<input type="checkbox" data-color="Verde" aria-label="Verde">';
+      colors.append(green);
+    }
+  }
+
+  function groupProductOptions(root){
+    if(!root?.querySelector)return;
+    replacePinkAndAddGreen(root);
+    const details=root.querySelector('.product-compact-details');
+    if(!details)return;
+    let extras=details.querySelector('.compact-extra-options');
+    if(!extras){
+      extras=document.createElement('div');
+      extras.className='compact-extra-options';
+      details.append(extras);
+    }
+    const placement=root.querySelector('.product-placement');
+    const colors=root.querySelector('.product-color-setting');
+    if(placement&&placement.parentElement!==extras)extras.append(placement);
+    if(colors&&colors.parentElement!==extras)extras.append(colors);
+  }
+
+  function migrateLegacyPink(){
+    try{
+      if(typeof state==='undefined'||!Array.isArray(state.products))return;
+      let changed=false;
+      state.products.forEach(product=>{
+        if(!Array.isArray(product?.colores))return;
+        const next=[...new Set(product.colores.map(color=>{
+          const value=String(color||'').trim();
+          if(/^rosa(?:do)?$/i.test(value)){changed=true;return 'Morado';}
+          return value;
+        }).filter(Boolean))];
+        if(next.length!==product.colores.length||next.some((value,index)=>value!==product.colores[index]))product.colores=next;
+      });
+      if(changed&&typeof renderProducts==='function')renderProducts();
+    }catch{}
+  }
+
+  addStyles();
+  replacePinkAndAddGreen(document.querySelector('#productTemplate')?.content);
+
+  const apply=()=>{
+    groupProductOptions(document.querySelector('#productTemplate')?.content);
+    document.querySelectorAll('#products .product-card').forEach(groupProductOptions);
+    migrateLegacyPink();
+  };
+
+  setTimeout(apply,0);
+  setInterval(apply,400);
+})();
