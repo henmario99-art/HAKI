@@ -11,14 +11,37 @@
   let lastListingHash = '#top';
   const listingPositions = new Map();
   const renderedLists = new WeakMap();
+  const listingNodes = new Map();
   const isIOS = window.hakiIOSWebKit === true;
   const listingSections = ['homeHero', 'novedades', 'collectionsSection', 'catalogo'];
   let iosListing = null;
   let routedHash = null;
+  let routedEntry = null;
+  let entrySequence = 0;
+  const navigationSession = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const isCategoryHash = hash => /^#(?:coleccion|categoria)\//.test(hash || '');
+  const isCatalogHash = hash => /^#(?:producto\/|coleccion\/|categoria\/|top$|catalogo$|novedades$|collectionsSection$)/.test(hash || '');
 
-  // The router is the sole owner of scroll restoration on iOS. In particular,
-  // Safari must not scroll the document underneath the product sheet on Back.
-  if (isIOS) history.scrollRestoration = 'manual';
+  function navigationEntry() {
+    const hash = location.hash || '#top';
+    let entry = history.state?.hakiNavigation;
+    if (!entry || entry.hash !== hash) {
+      entry = { key: `${navigationSession}-${++entrySequence}`, hash };
+      history.replaceState({ ...history.state, hakiNavigation: entry }, '', location.href);
+    }
+    return entry;
+  }
+
+  function rememberListing() {
+    if (detailCode || !routedEntry) return;
+    listingPositions.set(routedEntry, {
+      y: window.scrollY, query: state.query,
+      category: state.category, collection: state.collection
+    });
+  }
+
+  // One owner on every device: native restoration must not race the router.
+  history.scrollRestoration = 'manual';
 
   const state = {
     query: '',
@@ -209,6 +232,25 @@
       syncCardSelections(container);
       return;
     }
+    // Keep a few visited listings' real image nodes and event handlers. Returning
+    // from a category should not replace/redecode the entire product grid.
+    if (container === els.products) {
+      const previous = renderedLists.get(container);
+      if (previous) {
+        const fragment = document.createDocumentFragment();
+        while (container.firstChild) fragment.append(container.firstChild);
+        listingNodes.set(previous, fragment);
+      }
+      const cached = listingNodes.get(signature);
+      if (cached) {
+        listingNodes.delete(signature);
+        container.replaceChildren(cached);
+        renderedLists.set(container, signature);
+        syncCardSelections(container);
+        return;
+      }
+      while (listingNodes.size > 5) listingNodes.delete(listingNodes.keys().next().value);
+    }
     renderedLists.set(container, signature);
     container.innerHTML = list
       .map(p => {
@@ -357,13 +399,15 @@
     });
   }
 
-  // Capture all product entry points (including quiz/cart recommendations) before
-  // the native fragment navigation. A recommendation inside a PDP is not a list.
+  // Capture before menu handlers or a fragment change can alter the layout.
   document.addEventListener('click', event => {
-    const link = event.target.closest?.('a[href*="#producto/"]');
+    const link = event.target.closest?.('a[href]');
     if (!link || detailCode || event.defaultPrevented || event.button > 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-    lastListingHash = location.hash || '#top';
-    listingPositions.set(lastListingHash, { y: window.scrollY, query: state.query, category: state.category, collection: state.collection });
+    const destination = new URL(link.href, location.href);
+    if (destination.origin !== location.origin || destination.pathname !== location.pathname ||
+        destination.search !== location.search || !isCatalogHash(destination.hash)) return;
+    rememberListing();
+    if (destination.hash.startsWith('#producto/')) lastListingHash = location.hash || '#top';
   }, true);
 
   function enterIOSDetail() {
@@ -755,6 +799,7 @@ ${settings().totalTexto}: ${money(totals.total)}`;
         document.body.classList.remove('detail-view');
         history.replaceState(null, '', '#catalogo');
         routedHash = '#catalogo';
+        routedEntry = navigationEntry().key;
         window.scrollTo({ top: 0, behavior: 'instant' });
       }
       state.query = e.target.value; $('#desktopSearch').value=state.query;
@@ -822,11 +867,14 @@ ${settings().totalTexto}: ${money(totals.total)}`;
 
   function route(event) {
     const currentHash = location.hash || '#top';
-    // Safari sends popstate and hashchange for one history traversal. Render it
-    // once, at popstate, before the browser's native swipe snapshot is dismissed.
-    if (isIOS && event && currentHash === routedHash) return;
+    const entry = navigationEntry();
+    // A traversal emits both events on mobile browsers. Restore before paint,
+    // once per history entry, including separate visits to the same category.
+    if (event && currentHash === routedHash && entry.key === routedEntry) return;
+    if (event) rememberListing();
     routedHash = currentHash;
-    const wasDetail = !!detailCode;
+    routedEntry = entry.key;
+    const restored = listingPositions.get(entry.key);
     let hash;
     try { hash = decodeURIComponent(location.hash.slice(1)); } catch { hash = ''; }
     closeMenu(); closeSearch(); $('#sizeGuideDialog').close();
@@ -855,7 +903,6 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     state.category = 'Todos'; state.collection = null;
     if (hash.startsWith('categoria/')) state.category = hash.slice(10);
     if (hash.startsWith('coleccion/')) state.collection = COLLECTIONS.find(c => c.id === hash.slice(10)) || null;
-    const restored = wasDetail ? listingPositions.get(location.hash || '#top') : null;
     if (restored) {
       state.query = restored.query; els.search.value = restored.query;
       $('#desktopSearch').value = restored.query;
@@ -866,12 +913,11 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     $('#catalogTitle').textContent = state.query ? 'RESULTADOS' : state.collection?.nombre || (filtered ? state.category : 'TODAS LAS PRENDAS');
     renderProducts();
     syncCardSelections($('#newProducts'));
-    if (restored && isIOS) {
+    if (restored) {
       if (Math.abs(window.scrollY - restored.y) > 1) window.scrollTo({ top: restored.y, behavior: 'instant' });
     }
-    else if (restored) requestAnimationFrame(() => window.scrollTo({ top: restored.y, behavior: 'instant' }));
     else if (filtered || hash === 'top' || !hash) window.scrollTo({ top: 0, behavior: 'instant' });
-    else if (hash === 'catalogo') els.products.closest('section').scrollIntoView();
+    else document.getElementById(hash)?.scrollIntoView({ behavior: 'instant', block: 'start' });
   }
 
   function renderProductDetail(p) {
@@ -990,8 +1036,8 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
     else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
   });
-  function navigateIOSProductLink(event) {
-    if (!isIOS || event.defaultPrevented || event.button > 0 ||
+  function navigateCatalogLink(event) {
+    if (event.defaultPrevented || event.button > 0 ||
         event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     const link = event.target.closest?.('a[href]');
     if (!link || link.hasAttribute('download') ||
@@ -1000,19 +1046,29 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     if (destination.origin !== location.origin ||
         destination.pathname !== location.pathname ||
         destination.search !== location.search || !destination.hash) return;
-    // Leave unrelated links and custom controls to their own handlers.
-    if (!detailCode && !destination.hash.startsWith('#producto/')) return;
+    // Leave the quiz, external destinations and custom controls alone.
+    if (!isCatalogHash(destination.hash)) return;
     event.preventDefault();
+    const source = navigationEntry();
+    const isBack = (link.matches('.back-home') && isCategoryHash(location.hash)) ||
+      (link.matches('.detail-back') && !!detailCode);
+    if (isBack && source.parent && listingPositions.has(source.parent)) {
+      history.back();
+      return;
+    }
     if (destination.hash === location.hash) return;
     // pushState avoids native fragment scrolling between click and hashchange.
     // Back/Forward still use the normal history stack and the popstate router.
-    history.pushState(null, '', destination.href);
+    history.pushState({ hakiNavigation: {
+      key: `${navigationSession}-${++entrySequence}`, hash: destination.hash,
+      parent: source.key
+    } }, '', destination.href);
     route();
   }
-  document.addEventListener('click', navigateIOSProductLink);
+  document.addEventListener('click', navigateCatalogLink);
 
   window.addEventListener('hashchange', route);
-  if (isIOS) window.addEventListener('popstate', route);
+  window.addEventListener('popstate', route);
   const settings=()=>window.hakiSettings(CONFIG);
   let announcementTimer;
   let announcementPaused=matchMedia('(prefers-reduced-motion: reduce)').matches;
