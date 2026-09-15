@@ -8,106 +8,22 @@
     'Carrito y sugerencias':[['carritoTitulo','Título del carrito'],['carritoAntetitulo','Texto superior'],['carritoVacio','Carrito vacío'],['carritoAyudaVacio','Ayuda con carrito vacío'],['carritoAviso','Aviso de disponibilidad','textarea'],['sugerenciasTitulo','Título de sugerencias'],['sugerenciasTexto','Descripción de sugerencias'],['sugerenciasAgregar','Botón añadir sugerencia'],['sugerenciasTalla','Selector de talla'],['eliminarTexto','Botón eliminar']],
     'Resumen y cotización':[['resumenTitulo','Título del resumen'],['subtotalTexto','Etiqueta subtotal'],['envioTexto','Etiqueta envío estimado'],['totalTexto','Etiqueta total estimado'],['gratisTexto','Etiqueta envío gratis'],['datosTitulo','Título de datos'],['nombreTexto','Etiqueta nombre'],['nombrePlaceholder','Ejemplo de nombre'],['departamentoTexto','Etiqueta departamento'],['departamentoPlaceholder','Ejemplo de departamento'],['municipioTexto','Etiqueta municipio'],['municipioPlaceholder','Ejemplo de municipio'],['whatsappTexto','Botón WhatsApp'],['instagramTexto','Botón Instagram'],['carritoAyuda','Nota inferior del carrito','textarea'],['saludoCotizacion','Inicio del mensaje de cotización','textarea']]
   };
-  Object.entries(groups).forEach(([title,fields])=>{
-    const details=document.createElement('details');details.open=title==='Apariencia';const summary=document.createElement('summary');summary.textContent=title;details.append(summary);
-    const grid=document.createElement('div');grid.className='grid config-grid';
-    fields.forEach(([key,text,type])=>{
-      const label=document.createElement('label');label.textContent=text;
-      const input=document.createElement(type==='textarea'?'textarea':type?.includes('|')?'select':'input');input.dataset.config=key;
-      if(type?.includes('|'))type.split('|').forEach(value=>{const o=document.createElement('option');o.value=value;o.textContent=value==='true'?'Sí, por prenda':value==='false'?'No, por pedido':value.charAt(0).toUpperCase()+value.slice(1);input.append(o);});
-      if(type==='number'){input.type='number';input.min=key==='envioMeta'?'0.01':'0';input.step='0.01';}
-      if(type==='textarea'){input.rows=3;label.className='wide';}
-      label.append(input);grid.append(label);
-    });details.append(grid);card.append(details);
-  });
-  const note=document.createElement('p');note.textContent='Horizon necesita su archivo para uso web. Hasta cargarlo se muestra Poppins. Los anuncios cambian cada 5 segundos. El botón derecho de la portada se configura en la sección GYMRAT TEST.';card.append(note);
-  document.querySelector('#adminView .config-card').after(card);
+  Object.entries(groups).forEach(([title,fields])=>{const details=document.createElement('details');details.open=title==='Apariencia';const summary=document.createElement('summary');summary.textContent=title;details.append(summary);const grid=document.createElement('div');grid.className='grid config-grid';fields.forEach(([key,text,type])=>{const label=document.createElement('label');label.textContent=text;const input=document.createElement(type==='textarea'?'textarea':type?.includes('|')?'select':'input');input.dataset.config=key;if(type?.includes('|'))type.split('|').forEach(value=>{const o=document.createElement('option');o.value=value;o.textContent=value==='true'?'Sí, por prenda':value==='false'?'No, por pedido':value.charAt(0).toUpperCase()+value.slice(1);input.append(o)});if(type==='number'){input.type='number';input.min=key==='envioMeta'?'0.01':'0';input.step='0.01'}if(type==='textarea'){input.rows=3;label.className='wide'}label.append(input);grid.append(label)});details.append(grid);card.append(details)});
+  const note=document.createElement('p');note.textContent='Horizon necesita su archivo para uso web. Hasta cargarlo se muestra Poppins. Los anuncios cambian cada 5 segundos. El botón derecho de la portada se configura en la sección GYMRAT TEST.';card.append(note);document.querySelector('#adminView .config-card').after(card);
 })();
-
-// Mantiene el editor de cada producto compacto: los controles menos usados viven dentro de “Categorías”.
 (() => {
-  const STYLE_ID='haki-admin-compact-extras';
-
-  function addStyles(){
-    if(document.getElementById(STYLE_ID))return;
-    const style=document.createElement('style');
-    style.id=STYLE_ID;
-    style.textContent=`
-      .product-compact-details .compact-extra-options{padding:0 16px 16px}
-      .product-compact-details .compact-extra-options .product-placement{margin-top:0}
-      .product-compact-details .compact-extra-options .product-color-setting{margin-top:16px}
-      @media(max-width:700px){.product-compact-details .compact-extra-options{padding:0 14px 14px}}
-    `;
-    document.head.append(style);
-  }
-
-  function replacePinkAndAddGreen(root){
-    if(!root?.querySelector)return;
-    const pink=root.querySelector('.color-swatch[data-color="Rosa"],.color-swatch[data-color="Rosado"]');
-    if(pink){
-      pink.dataset.color='Morado';
-      pink.title='Morado';
-      pink.style.setProperty('--swatch','#8153a6');
-      pink.style.setProperty('--swatch-border','#684287');
-      const input=pink.querySelector('input[data-color]');
-      if(input){input.dataset.color='Morado';input.setAttribute('aria-label','Morado');}
-    }
-    const colors=root.querySelector('.color-swatches');
-    if(colors&&!colors.querySelector('.color-swatch[data-color="Verde"]')){
-      const green=document.createElement('label');
-      green.className='color-swatch';
-      green.dataset.color='Verde';
-      green.title='Verde';
-      green.style.setProperty('--swatch','#3f7f4b');
-      green.style.setProperty('--swatch-border','#32663c');
-      green.innerHTML='<input type="checkbox" data-color="Verde" aria-label="Verde">';
-      colors.append(green);
-    }
-  }
-
-  function groupProductOptions(root){
-    if(!root?.querySelector)return;
-    replacePinkAndAddGreen(root);
-    const details=root.querySelector('.product-compact-details');
-    if(!details)return;
-    let extras=details.querySelector('.compact-extra-options');
-    if(!extras){
-      extras=document.createElement('div');
-      extras.className='compact-extra-options';
-      details.append(extras);
-    }
-    const placement=root.querySelector('.product-placement');
-    const colors=root.querySelector('.product-color-setting');
-    if(placement&&placement.parentElement!==extras)extras.append(placement);
-    if(colors&&colors.parentElement!==extras)extras.append(colors);
-  }
-
-  function migrateLegacyPink(){
-    try{
-      if(typeof state==='undefined'||!Array.isArray(state.products))return;
-      let changed=false;
-      state.products.forEach(product=>{
-        if(!Array.isArray(product?.colores))return;
-        const next=[...new Set(product.colores.map(color=>{
-          const value=String(color||'').trim();
-          if(/^rosa(?:do)?$/i.test(value)){changed=true;return 'Morado';}
-          return value;
-        }).filter(Boolean))];
-        if(next.length!==product.colores.length||next.some((value,index)=>value!==product.colores[index]))product.colores=next;
-      });
-      if(changed&&typeof renderProducts==='function')renderProducts();
-    }catch{}
-  }
-
-  addStyles();
-  replacePinkAndAddGreen(document.querySelector('#productTemplate')?.content);
-
-  const apply=()=>{
-    groupProductOptions(document.querySelector('#productTemplate')?.content);
-    document.querySelectorAll('#products .product-card').forEach(groupProductOptions);
-    migrateLegacyPink();
-  };
-
-  setTimeout(apply,0);
-  setInterval(apply,400);
+  const STYLE_ID='haki-admin-compact-extras';function addStyles(){if(document.getElementById(STYLE_ID))return;const style=document.createElement('style');style.id=STYLE_ID;style.textContent=`.product-compact-details .compact-extra-options{padding:0 16px 16px}.product-compact-details .compact-extra-options .product-placement{margin-top:0}.product-compact-details .compact-extra-options .product-color-setting{margin-top:16px}@media(max-width:700px){.product-compact-details .compact-extra-options{padding:0 14px 14px}}`;document.head.append(style)}
+  function replacePinkAndAddGreen(root){if(!root?.querySelector)return;const pink=root.querySelector('.color-swatch[data-color="Rosa"],.color-swatch[data-color="Rosado"]');if(pink){pink.dataset.color='Morado';pink.title='Morado';pink.style.setProperty('--swatch','#8153a6');pink.style.setProperty('--swatch-border','#684287');const input=pink.querySelector('input[data-color]');if(input){input.dataset.color='Morado';input.setAttribute('aria-label','Morado')}}const colors=root.querySelector('.color-swatches');if(colors&&!colors.querySelector('.color-swatch[data-color="Verde"]')){const green=document.createElement('label');green.className='color-swatch';green.dataset.color='Verde';green.title='Verde';green.style.setProperty('--swatch','#3f7f4b');green.style.setProperty('--swatch-border','#32663c');green.innerHTML='<input type="checkbox" data-color="Verde" aria-label="Verde">';colors.append(green)}}
+  function groupProductOptions(root){if(!root?.querySelector)return;replacePinkAndAddGreen(root);const details=root.querySelector('.product-compact-details');if(!details)return;let extras=details.querySelector('.compact-extra-options');if(!extras){extras=document.createElement('div');extras.className='compact-extra-options';details.append(extras)}const placement=root.querySelector('.product-placement');const colors=root.querySelector('.product-color-setting');if(placement&&placement.parentElement!==extras)extras.append(placement);if(colors&&colors.parentElement!==extras)extras.append(colors)}
+  function migrateLegacyPink(){try{if(typeof state==='undefined'||!Array.isArray(state.products))return;let changed=false;state.products.forEach(product=>{if(!product)return;if(Array.isArray(product.colores)){const next=[...new Set(product.colores.map(color=>{const value=String(color||'').trim();if(/^rosa(?:do)?$/i.test(value)){changed=true;return 'Morado'}return value}).filter(Boolean))];if(next.length!==product.colores.length||next.some((value,index)=>value!==product.colores[index]))product.colores=next}});if(changed&&typeof renderProducts==='function')renderProducts()}catch{}}
+  addStyles();replacePinkAndAddGreen(document.querySelector('#productTemplate')?.content);const apply=()=>{groupProductOptions(document.querySelector('#productTemplate')?.content);document.querySelectorAll('#products .product-card').forEach(groupProductOptions);migrateLegacyPink()};setTimeout(apply,0);setInterval(apply,400);
+})();
+(() => {
+  const STYLE_ID='haki-private-inventory-style';let inventory=null;let loading=false;
+  function addStyles(){if(document.getElementById(STYLE_ID))return;const style=document.createElement('style');style.id=STYLE_ID;style.textContent=`.private-inventory{margin-top:16px;padding:15px;border:1px solid #dcdcd7;border-radius:14px;background:#fafaf8}.private-inventory-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:11px}.private-inventory-head strong{font-size:13px}.private-inventory-head span{font-size:11px;color:#777}.private-stock-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.private-stock-grid label{font-size:11px;font-weight:800;color:#666}.private-stock-grid input{margin-top:4px;text-align:center}.private-inventory-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px}.private-stock-total{font-size:12px;color:#666}.private-inventory .private-save-stock{min-height:40px}html[data-theme=oscuro] .private-inventory{background:#222;border-color:#444}.admin-sales-link{white-space:nowrap}@media(max-width:700px){.private-stock-grid{gap:6px}.private-inventory{padding:12px}.private-inventory-footer{align-items:stretch;flex-direction:column}.private-inventory .private-save-stock{width:100%}}`;document.head.append(style)}
+  function addSalesLink(){const actions=document.querySelector('.top-actions');if(!actions||actions.querySelector('.admin-sales-link'))return;const link=document.createElement('a');link.className='ghost admin-sales-link';link.href='/admin/sales.html';link.textContent='Ventas';actions.prepend(link)}
+  async function loadInventory(){if(loading||inventory)return;loading=true;try{const data=await api('sales?mode=inventory',{method:'GET'});inventory=data.inventory||{};enhanceCards()}catch(error){console.warn('No se pudo cargar inventario privado',error)}finally{loading=false}}
+  function stockFor(id){return inventory?.[String(id)]||{S:0,M:0,L:0,XL:0}}function productForCard(card){const code=card.querySelector('[data-field="codigo"]')?.value||'';return Array.isArray(state?.products)?state.products.find(product=>String(product.codigo)===String(code)):null}
+  function enhanceCard(card){if(card.querySelector('.private-inventory'))return;const product=productForCard(card);if(!product)return;const stock=stockFor(product.id);const section=document.createElement('section');section.className='private-inventory';section.dataset.productId=product.id;section.innerHTML=`<div class="private-inventory-head"><strong>Inventario privado</strong><span>Solo administrador</span></div><div class="private-stock-grid">${['S','M','L','XL'].map(size=>`<label>${size}<input type="number" min="0" step="1" value="${Number(stock[size])||0}" data-private-size="${size}"></label>`).join('')}</div><div class="private-inventory-footer"><span class="private-stock-total">Total: <b>0</b> unidades</span><button class="ghost private-save-stock" type="button">Guardar inventario</button></div>`;const updateTotal=()=>{section.querySelector('.private-stock-total b').textContent=String([...section.querySelectorAll('[data-private-size]')].reduce((sum,input)=>sum+Math.max(0,Math.trunc(Number(input.value)||0)),0))};section.querySelectorAll('[data-private-size]').forEach(input=>input.addEventListener('input',updateTotal));updateTotal();section.querySelector('.private-save-stock').addEventListener('click',async event=>{const button=event.currentTarget;button.disabled=true;try{const next={};section.querySelectorAll('[data-private-size]').forEach(input=>next[input.dataset.privateSize]=Math.max(0,Math.trunc(Number(input.value)||0)));const data=await api('sales?mode=inventory',{method:'PUT',body:JSON.stringify({productId:product.id,stock:next})});inventory=data.inventory||inventory;toast('Inventario guardado',true)}catch(error){toast(error.message)}finally{button.disabled=false}});const sizes=card.querySelector('.sizes');if(sizes)sizes.after(section);else card.append(section)}
+  function enhanceCards(){document.querySelectorAll('#products .product-card').forEach(enhanceCard)}addStyles();addSalesLink();setInterval(()=>{addSalesLink();const admin=document.querySelector('#adminView');if(!admin||admin.hidden)return;if(!inventory)loadInventory();else enhanceCards()},400);
 })();
