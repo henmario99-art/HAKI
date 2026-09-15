@@ -1,4 +1,5 @@
-// Flujo móvil de ventas: el formulario ocupa su propio recorrido y los días reaparecen al salir.
+// Flujo del panel de ventas: la semana normal siempre muestra sus 7 días.
+// Los días se ocultan únicamente mientras se crea o edita una venta.
 (() => {
   const days = document.querySelector('#days');
   const editor = document.querySelector('#saleEditor');
@@ -8,7 +9,11 @@
     days.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
+  // Al entrar al panel/semanas, siempre debe verse la semana completa.
+  if (editor.hidden) days.hidden = false;
+
   showEditor = function () {
+    // Solo durante el registro/edición ocultamos las tarjetas de los 7 días.
     days.hidden = true;
     editor.hidden = false;
     requestAnimationFrame(() => editor.scrollIntoView({ behavior: 'smooth', block: 'start' }));
@@ -22,8 +27,8 @@
     scrollToDays();
   };
 
-  // Los listeners originales de cerrar/cancelar guardaron la función anterior por referencia.
-  // Este segundo listener restaura siempre el listado de días después de cerrar el editor.
+  // Los listeners originales guardaron la referencia anterior de hideEditor.
+  // Forzamos la restauración de la semana completa al cerrar o cancelar.
   ['closeDialog', 'cancelDialog'].forEach(id => {
     document.getElementById(id)?.addEventListener('click', () => {
       days.hidden = false;
