@@ -37,6 +37,13 @@ function validDate(value) {
   return Number.isNaN(parsed.getTime()) ? '' : date;
 }
 
+function validTimestamp(value) {
+  const raw = text(value, 40);
+  if (!raw) return '';
+  const parsed = new Date(raw);
+  return Number.isNaN(parsed.getTime()) ? '' : parsed.toISOString();
+}
+
 function weekStartFor(dateValue) {
   const iso = validDate(dateValue);
   if (!iso) throw new Error('Fecha inválida.');
@@ -54,6 +61,10 @@ function addDays(iso, days) {
 
 function weekKey(weekStart) {
   return `week/${weekStart}`;
+}
+
+function expenseKey(weekStart) {
+  return `expenses/${weekStart}`;
 }
 
 function normalizeStock(value = {}) {
@@ -76,6 +87,11 @@ function normalizeItem(item, index) {
 
 function isC807Delivery(value) {
   return text(value, 60).toLowerCase().includes('c807');
+}
+
+function isEncomienda(value) {
+  const delivery = text(value, 60).toLowerCase();
+  return delivery.includes('pedido express') || delivery.includes('c807');
 }
 
 function calculateC807Commission(amount) {
@@ -112,6 +128,8 @@ function normalizeSale(input = {}, id = null, previous = null) {
     fechaRetiro: validDate(input.fechaRetiro) || '',
     cliente: text(input.cliente, 140),
     lugarHorario: text(input.lugarHorario, 300),
+    destinoDriveId: text(input.destinoDriveId ?? previous?.destinoDriveId, 120),
+    destinoImagen: text(input.destinoImagen ?? previous?.destinoImagen, 500),
     items,
     envio: Number(envio.toFixed(2)),
     subtotal: Number(subtotal.toFixed(2)),
@@ -121,7 +139,27 @@ function normalizeSale(input = {}, id = null, previous = null) {
     comisionC807: Number(comisionC807.toFixed(2)),
     estado,
     dinero,
+    cobroSolicitadoAt: validTimestamp(input.cobroSolicitadoAt) || validTimestamp(previous?.cobroSolicitadoAt),
+    cobroCanceladoAt: validTimestamp(input.cobroCanceladoAt) || validTimestamp(previous?.cobroCanceladoAt),
     notas: text(input.notas, 600),
+  };
+}
+
+function normalizeExpense(input = {}, id = null, previous = null) {
+  const fecha = validDate(input.fecha || previous?.fecha);
+  if (!fecha) throw new Error('Selecciona una fecha para el gasto.');
+  const monto = number(input.monto ?? previous?.monto, 0);
+  if (monto <= 0) throw new Error('El gasto debe ser mayor que $0.');
+  return {
+    id: id || previous?.id || randomUUID(),
+    fecha,
+    categoria: text(input.categoria || previous?.categoria || 'Otros', 80),
+    descripcion: text(input.descripcion || previous?.descripcion, 260),
+    monto: Number(monto.toFixed(2)),
+    metodo: text(input.metodo || previous?.metodo || '', 80),
+    notas: text(input.notas || previous?.notas, 400),
+    createdAt: previous?.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   };
 }
 
@@ -204,6 +242,32 @@ async function mutateWeek(start, mutator) {
   });
 }
 
+async function getExpenses(start) {
+  const value = await store().get(expenseKey(start), { type: 'json', consistency: 'strong' });
+  return Array.isArray(value) ? value : [];
+}
+
+async function mutateExpenses(start, mutator) {
+  return mutateJSON(expenseKey(start), [], expenses => mutator(Array.isArray(expenses) ? expenses : []));
+}
+
+async function getReceivables(anchorDate, weeks = 26) {
+  const currentStart = weekStartFor(anchorDate);
+  const count = Math.min(52, Math.max(1, int(weeks, 1)));
+  const all = [];
+  for (let i = 0; i < count; i += 1) {
+    const start = addDays(currentStart, i * -7);
+    const sales = await getWeek(start);
+    for (const sale of sales) {
+      if (sale?.dinero !== 'Pendiente') continue;
+      if (sale?.estado !== 'Retirado') continue;
+      if (!isEncomienda(sale?.entrega)) continue;
+      all.push({ ...sale, weekStart: start });
+    }
+  }
+  return all.sort((a, b) => String(b.fechaRetiro || b.fecha).localeCompare(String(a.fechaRetiro || a.fecha)));
+}
+
 function findSale(sales, id) {
   return sales.find(sale => sale?.id === id) || null;
 }
@@ -223,6 +287,57 @@ export default async (request) => {
       const body = await bodyJson(request);
       const inventory = await setInventory(body?.productId, body?.stock);
       return json({ ok: true, inventory });
+    }
+
+    if (request.method === 'GET' && mode === 'expenses') {
+      const requested = url.searchParams.get('weekStart') || weekStartFor(new Date().toISOString().slice(0, 10));
+      const start = weekStartFor(requested);
+      return json({ weekStart: start, expenses: await getExpenses(start) });
+    }
+
+    if (request.method === 'POST' && mode === 'expenses') {
+      const body = await bodyJson(request);
+      const expense = normalizeExpense(body?.expense || body);
+      const start = weekStartFor(expense.fecha);
+      await mutateExpenses(start, list => {
+        list.push(expense);
+        return list;
+      });
+      return json({ ok: true, expense, weekStart: start }, 201);
+    }
+
+    if (request.method === 'PUT' && mode === 'expenses') {
+      const body = await bodyJson(request);
+      const input = body?.expense || body;
+      const id = text(input?.id, 80);
+      const previousStart = weekStartFor(body?.previousWeekStart || input?.fecha);
+      const previousList = await getExpenses(previousStart);
+      const previous = previousList.find(item => item?.id === id);
+      if (!previous) throw new Error('No se encontró el gasto.');
+      const expense = normalizeExpense(input, id, previous);
+      const nextStart = weekStartFor(expense.fecha);
+      if (nextStart === previousStart) {
+        await mutateExpenses(previousStart, list => list.map(item => item.id === id ? expense : item));
+      } else {
+        await mutateExpenses(previousStart, list => list.filter(item => item.id !== id));
+        await mutateExpenses(nextStart, list => { list.push(expense); return list; });
+      }
+      return json({ ok: true, expense, weekStart: nextStart });
+    }
+
+    if (request.method === 'DELETE' && mode === 'expenses') {
+      const body = await bodyJson(request);
+      const id = text(body?.id, 80);
+      const start = weekStartFor(body?.weekStart);
+      if (!id) throw new Error('Falta el identificador del gasto.');
+      await mutateExpenses(start, list => list.filter(item => item.id !== id));
+      return json({ ok: true });
+    }
+
+    if (request.method === 'GET' && mode === 'receivables') {
+      const anchor = validDate(url.searchParams.get('anchor')) || new Date().toISOString().slice(0, 10);
+      const weeks = Number(url.searchParams.get('weeks') || 26);
+      return json({ receivables: await getReceivables(anchor, weeks) });
     }
 
     if (request.method === 'GET') {
