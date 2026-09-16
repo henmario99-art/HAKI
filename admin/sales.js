@@ -5,6 +5,7 @@ const money=value=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD
 const weekdays=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
 const months=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const state={products:[],inventory:{},sales:[],weekStart:'',editing:null,previousWeekStart:''};
+const C807_GUIDE_COST=4.15;
 
 async function api(path,options={}){const res=await fetch(`${API}/${path}`,{credentials:'same-origin',headers:{'content-type':'application/json',...(options.headers||{})},...options});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.error||`Error ${res.status}`);return data}
 function toast(message,error=false){const el=$('#status');el.textContent=message;el.classList.toggle('error',error);el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),2800)}
@@ -15,10 +16,19 @@ function mondayOf(value){const d=value instanceof Date?new Date(value):parseDate
 function formatDate(iso,withYear=false){const d=parseDate(iso);return `${d.getDate()} de ${months[d.getMonth()]}${withYear?` de ${d.getFullYear()}`:''}`}
 function stockFor(productId){return state.inventory[String(productId)]||{S:0,M:0,L:0,XL:0}}
 function isActiveSale(sale){return !['Cancelado','No retirado'].includes(sale.estado)}
-function escapeHtml(value=''){return String(value).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]))}
+function escapeHtml(value=''){return String(value).replace(/[&<>\"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[ch]))}
 function badgeClass(value){const v=String(value||'').toLowerCase();if(v.includes('whats'))return'whatsapp';if(v.includes('mess'))return'messenger';return'instagram'}
 function stateClass(value){if(value==='Retirado')return'done';if(value==='Cancelado'||value==='No retirado')return'cancelled';return'pending'}
 function moneyClass(value){return value==='En caja'?'done':value==='No retiró'?'cancelled':'pending'}
+function isC807Delivery(value){return String(value||'').toLowerCase().includes('c807')}
+function c807Commission(total,delivery,moneyState){
+  if(!isC807Delivery(delivery)||moneyState!=='Pendiente')return 0;
+  const amount=Math.max(0,Number(total)||0);
+  if(amount<=0)return 0;
+  if(amount<=25)return 1;
+  return Number((amount*.04).toFixed(2));
+}
+function c807GuideCost(delivery){return isC807Delivery(delivery)?C807_GUIDE_COST:0}
 
 async function ensureAuth(){try{const auth=await api('auth',{method:'GET'});if(!auth.authenticated)location.href='/admin/'}catch{location.href='/admin/'}}
 async function loadProducts(){const data=await api('catalog',{method:'GET'});state.products=data.products||[]}
@@ -40,9 +50,9 @@ function renderWeek(){
     const head=document.createElement('header');head.className='day-head';head.innerHTML=`<div><h2>${weekdays[i]}</h2><span>${formatDate(date)}</span></div><button class="day-new" type="button">+ Venta</button>`;
     $('.day-new',head).addEventListener('click',()=>openNewSale(date));section.append(head);
     if(!sales.length){const empty=document.createElement('div');empty.className='empty-day';empty.textContent='Sin ventas registradas.';section.append(empty);days.append(section);continue}
-    const table=document.createElement('table');table.className='sale-table';table.innerHTML='<thead><tr><th>Canal</th><th>Cliente</th><th>Pedido</th><th>Total</th><th>Entrega</th><th>Estado</th><th>Dinero</th></tr></thead>';
+    const table=document.createElement('table');table.className='sale-table';table.innerHTML='<thead><tr><th>Canal</th><th>Cliente</th><th>Pedido</th><th>Total</th><th>Comisión</th><th>Entrega</th><th>Estado</th><th>Dinero</th></tr></thead>';
     const body=document.createElement('tbody');
-    sales.forEach(sale=>{const tr=document.createElement('tr');tr.dataset.sale=sale.id;const items=(sale.items||[]).map(i=>`${i.codigo} ${i.talla}${Number(i.cantidad)>1?` ×${i.cantidad}`:''}`);tr.innerHTML=`<td data-label="Canal"><span class="badge ${badgeClass(sale.canal)}">${escapeHtml(sale.canal)}</span></td><td data-label="Cliente">${escapeHtml(sale.cliente||'—')}</td><td data-label="Pedido" class="order-summary"><strong>${escapeHtml(items.slice(0,2).join(' · ')||'—')}</strong>${items.length>2?`<small>+${items.length-2} más</small>`:''}</td><td data-label="Total"><strong>${money(sale.total)}</strong></td><td data-label="Entrega">${escapeHtml(sale.entrega||'—')}</td><td data-label="Estado"><span class="badge ${stateClass(sale.estado)}">${escapeHtml(sale.estado)}</span></td><td data-label="Dinero"><span class="badge ${moneyClass(sale.dinero)}">${escapeHtml(sale.dinero)}</span></td>`;tr.addEventListener('click',()=>openEditSale(sale));body.append(tr)});
+    sales.forEach(sale=>{const tr=document.createElement('tr');tr.dataset.sale=sale.id;const items=(sale.items||[]).map(i=>`${i.codigo} ${i.talla}${Number(i.cantidad)>1?` ×${i.cantidad}`:''}`);const commission=c807Commission(sale.total,sale.entrega,sale.dinero);tr.innerHTML=`<td data-label="Canal"><span class="badge ${badgeClass(sale.canal)}">${escapeHtml(sale.canal)}</span></td><td data-label="Cliente">${escapeHtml(sale.cliente||'—')}</td><td data-label="Pedido" class="order-summary"><strong>${escapeHtml(items.slice(0,2).join(' · ')||'—')}</strong>${items.length>2?`<small>+${items.length-2} más</small>`:''}</td><td data-label="Total"><strong>${money(sale.total)}</strong></td><td data-label="Comisión">${isC807Delivery(sale.entrega)?`<strong>${money(commission)}</strong>`:'—'}</td><td data-label="Entrega">${escapeHtml(sale.entrega||'—')}</td><td data-label="Estado"><span class="badge ${stateClass(sale.estado)}">${escapeHtml(sale.estado)}</span></td><td data-label="Dinero"><span class="badge ${moneyClass(sale.dinero)}">${escapeHtml(sale.dinero)}</span></td>`;tr.addEventListener('click',()=>openEditSale(sale));body.append(tr)});
     table.append(body);section.append(table);days.append(section)
   }
 }
@@ -53,7 +63,26 @@ function renderInventory(){if(!state.products.length)return;const q=($('#invento
 function productOptions(selectedId=''){return state.products.map(p=>`<option value="${p.id}" ${String(p.id)===String(selectedId)?'selected':''}>${escapeHtml(p.codigo)} — ${escapeHtml(p.nombre)}</option>`).join('')}
 function addItemRow(item={}){const tpl=$('#itemTemplate').content.cloneNode(true);const row=$('.item-row',tpl);const product=$('[data-item="product"]',row);product.innerHTML='<option value="">Selecciona una prenda</option>'+productOptions(item.productId);const size=$('[data-item="size"]',row);size.value=item.talla||'S';const qty=$('[data-item="qty"]',row);qty.value=item.cantidad||1;const price=$('[data-item="price"]',row);price.value=item.precio??'';const updateProduct=()=>{const p=state.products.find(x=>String(x.id)===product.value);if(p)price.value=Number(p.precio||0).toFixed(2);updateStockNote(row);updateTotals()};product.addEventListener('change',updateProduct);size.addEventListener('change',()=>updateStockNote(row));qty.addEventListener('input',()=>{updateStockNote(row);updateTotals()});price.addEventListener('input',updateTotals);$('[data-item="remove"]',row).addEventListener('click',()=>{row.remove();if(!$('#items').children.length)addItemRow();updateTotals()});$('#items').append(row);updateStockNote(row);updateTotals()}
 function updateStockNote(row){const productId=$('[data-item="product"]',row).value;const size=$('[data-item="size"]',row).value;const qty=Math.max(1,Number($('[data-item="qty"]',row).value)||1);const note=$('[data-item="stock"]',row);if(!productId){note.textContent='';note.classList.remove('low');return}const current=Number(stockFor(productId)[size])||0;const reserved=state.editing?(state.editing.items||[]).filter(i=>String(i.productId)===String(productId)&&i.talla===size).reduce((sum,i)=>sum+(Number(i.cantidad)||0),0):0;const available=current+reserved;note.textContent=`Disponible: ${available}`;note.classList.toggle('low',qty>available)}
-function updateTotals(){const subtotal=$$('.item-row',$('#items')).reduce((sum,row)=>sum+(Number($('[data-item="qty"]',row).value)||0)*(Number($('[data-item="price"]',row).value)||0),0);const shipping=Number($('#saleShipping').value)||0;$('#saleSubtotal').textContent=money(subtotal);$('#saleShippingTotal').textContent=money(shipping);$('#saleTotal').textContent=money(subtotal+shipping)}
+function updateTotals(){
+  const subtotal=$$('.item-row',$('#items')).reduce((sum,row)=>sum+(Number($('[data-item="qty"]',row).value)||0)*(Number($('[data-item="price"]',row).value)||0),0);
+  const shipping=Number($('#saleShipping').value)||0;
+  const total=subtotal+shipping;
+  const delivery=$('#saleDelivery').value;
+  const moneyState=$('#saleMoney').value;
+  const isC807=isC807Delivery(delivery);
+  const commission=c807Commission(total,delivery,moneyState);
+  $('#saleSubtotal').textContent=money(subtotal);
+  $('#saleShippingTotal').textContent=money(shipping);
+  $('#saleTotal').textContent=money(total);
+  const guideWrap=$('#saleC807GuideWrap');
+  const commissionWrap=$('#saleC807CommissionWrap');
+  if(guideWrap)guideWrap.hidden=!isC807;
+  if(commissionWrap)commissionWrap.hidden=!isC807;
+  const guideValue=$('#saleC807Guide');
+  const commissionValue=$('#saleC807Commission');
+  if(guideValue)guideValue.textContent=money(c807GuideCost(delivery));
+  if(commissionValue)commissionValue.textContent=money(commission);
+}
 
 function resetForm(){$('#saleForm').reset();$('#items').replaceChildren();$('#saleShipping').value='0';state.editing=null;state.previousWeekStart='';$('#deleteSale').hidden=true;$('#saleDialogTitle').textContent='Nueva venta';updateTotals()}
 function showEditor(){const editor=$('#saleEditor');editor.hidden=false;requestAnimationFrame(()=>editor.scrollIntoView({behavior:'smooth',block:'start'}))}
@@ -72,6 +101,8 @@ $('#newSale').addEventListener('click',()=>{const today=isoDate(new Date());open
 $('#inventorySearch').addEventListener('input',renderInventory);
 $('#addItem').addEventListener('click',()=>addItemRow());
 $('#saleShipping').addEventListener('input',updateTotals);
+$('#saleDelivery').addEventListener('change',updateTotals);
+$('#saleMoney').addEventListener('change',updateTotals);
 $('#closeDialog').addEventListener('click',hideEditor);
 $('#cancelDialog').addEventListener('click',hideEditor);
 $('#deleteSale').addEventListener('click',deleteSale);
