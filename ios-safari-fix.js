@@ -48,6 +48,12 @@
     html.haki-ios-webkit #productDetail .detail-gallery{contain:paint}
     html.haki-ios-webkit body.haki-ios-product-open .detail-summary{top:0}
 
+    /* Category layers already start below the sticky header. Remove the large
+       mobile catalog top padding so the heading does not get a second gap. */
+    html.haki-ios-webkit.haki-ios-layered-navigation body.haki-ios-category-open #catalogo{
+      padding-top:24px!important;
+    }
+
     /*
       Safari category navigation is implemented as a fixed live layer. The
       previous home/category grid must never paint underneath that layer while
@@ -86,6 +92,34 @@
       opacity:1;
       visibility:visible;
     }
+
+    /* A frozen copy of the visible category is kept below product detail while
+       Safari performs the interactive Back gesture. It prevents the white
+       compositor frame / bottom-to-top repaint seen on some product returns. */
+    #hakiIOSListingSnapshot{
+      position:fixed!important;
+      top:var(--haki-ios-category-top,0px)!important;
+      left:0!important;
+      right:0!important;
+      bottom:var(--haki-ios-bottom-ui,0px)!important;
+      z-index:28!important;
+      width:100%!important;
+      max-width:none!important;
+      height:auto!important;
+      margin:0!important;
+      padding-top:24px!important;
+      overflow-x:hidden!important;
+      overflow-y:hidden!important;
+      pointer-events:none!important;
+      background:var(--surface,#fff)!important;
+      isolation:isolate;
+      contain:paint;
+      transform:translate3d(0,0,0)!important;
+      backface-visibility:hidden;
+      -webkit-backface-visibility:hidden;
+    }
+    #hakiIOSListingSnapshot *{pointer-events:none!important}
+    :root[data-theme='oscuro'] #hakiIOSListingSnapshot{background:var(--surface,#111)!important}
   `;
   document.head.appendChild(style);
 
@@ -93,6 +127,50 @@
   categoryUnderlay.id = 'hakiIOSCategoryUnderlay';
   categoryUnderlay.setAttribute('aria-hidden', 'true');
   document.body.appendChild(categoryUnderlay);
+
+  let listingSnapshot = null;
+  const removeListingSnapshot = () => {
+    listingSnapshot?.remove();
+    listingSnapshot = null;
+  };
+  const captureListingSnapshot = () => {
+    if (!document.body.classList.contains('haki-ios-category-open')) return;
+    const source = document.getElementById('catalogo');
+    if (!source) return;
+    removeListingSnapshot();
+    const snapshot = source.cloneNode(true);
+    snapshot.id = 'hakiIOSListingSnapshot';
+    snapshot.hidden = false;
+    snapshot.inert = true;
+    snapshot.setAttribute('aria-hidden', 'true');
+    snapshot.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
+    snapshot.querySelectorAll('a,button,input,select,textarea,summary').forEach(node => {
+      node.tabIndex = -1;
+      node.setAttribute('aria-hidden', 'true');
+    });
+    document.body.appendChild(snapshot);
+    const scrollTop = source.scrollTop;
+    snapshot.scrollTop = scrollTop;
+    requestAnimationFrame(() => { snapshot.scrollTop = scrollTop; });
+    listingSnapshot = snapshot;
+  };
+  const retireListingSnapshot = () => {
+    if (location.hash.startsWith('#producto/')) return;
+    requestAnimationFrame(() => requestAnimationFrame(removeListingSnapshot));
+  };
+
+  // This listener is registered before app.js, so the visible category is copied
+  // before the router changes the hash or WebKit starts building the detail layer.
+  document.addEventListener('click', event => {
+    const link = event.target.closest?.('a[href]');
+    if (!link || !document.body.classList.contains('haki-ios-category-open')) return;
+    let destination;
+    try { destination = new URL(link.href, location.href); } catch { return; }
+    if (destination.hash.startsWith('#producto/')) captureListingSnapshot();
+  }, true);
+  window.addEventListener('hashchange', retireListingSnapshot);
+  window.addEventListener('popstate', retireListingSnapshot);
+  window.addEventListener('pageshow', retireListingSnapshot);
 
   const header = document.querySelector('.header');
   const updateHeader = () => {
