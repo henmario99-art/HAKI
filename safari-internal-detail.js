@@ -1,9 +1,7 @@
 // HAKI Safari navigation guard.
-// The old implementation turned categories into fixed compositor layers and
-// animated those layers manually. That caused duplicated grids, top gaps and
-// bottom-to-top repaints in iOS Safari. Categories now stay in normal document
-// flow. This file only suppresses Safari's problematic edge-history preview and
-// performs a direct in-app Back action for category/product views.
+// Categories stay in normal document flow. We suppress WebKit's interactive
+// history screenshot at the left edge and use programmatic history traversal,
+// which lets app.js restore the exact category entry and scroll position.
 (() => {
   if (window.hakiIOSWebKit !== true) return;
 
@@ -20,8 +18,10 @@
   const FAST_VELOCITY = 0.5;
 
   let gesture = null;
+  let pendingParent = null;
 
-  const isCategory = () => /^#(?:coleccion|categoria)\//.test(location.hash || '');
+  const isCategoryHash = hash => /^#(?:coleccion|categoria)\//.test(hash || '');
+  const isCategory = () => isCategoryHash(location.hash);
   const isDetail = () =>
     location.hash.startsWith('#producto/') &&
     document.body.classList.contains('haki-ios-product-open');
@@ -41,26 +41,77 @@
     return back ? new URL(back.href, location.href) : new URL('#top', location.href);
   };
 
-  const navigateBack = type => {
-    const destination = destinationFor(type);
-
-    // We intentionally replace the current hash instead of allowing Safari to
-    // display its cached interactive history screenshot. app.js receives a
-    // synthetic hashchange and restores the correct list/scroll synchronously.
+  const replaceTo = destination => {
     const oldURL = location.href;
     history.replaceState(history.state, '', destination.href);
-
     let event;
     try {
-      event = new HashChangeEvent('hashchange', {
-        oldURL,
-        newURL: destination.href
-      });
+      event = new HashChangeEvent('hashchange', { oldURL, newURL: destination.href });
     } catch {
       event = new Event('hashchange');
     }
     window.dispatchEvent(event);
   };
+
+  const navigateBack = type => {
+    const destination = destinationFor(type);
+    const parent = history.state?.hakiSafariParent;
+
+    // When the view was opened from inside HAKI, traverse to the real parent
+    // history entry. Because the native gesture was cancelled, Safari performs
+    // no screenshot slide; app.js gets the original navigation key and restores
+    // the exact saved list/scroll position.
+    if (parent && parent === destination.hash) {
+      history.back();
+      return;
+    }
+
+    // Direct/deep links have no in-app parent. Stay inside HAKI rather than
+    // accidentally leaving the site.
+    replaceTo(destination);
+  };
+
+  // Mark the parent hash before a normal internal category/product link creates
+  // its new history entry. After hashchange we attach that relationship to the
+  // new entry without changing the URL.
+  document.addEventListener('click', event => {
+    if (
+      event.defaultPrevented ||
+      event.button > 0 ||
+      event.metaKey || event.ctrlKey || event.shiftKey || event.altKey
+    ) return;
+
+    const link = event.target.closest?.('a[href]');
+    if (!link) return;
+
+    let destination;
+    try { destination = new URL(link.href, location.href); } catch { return; }
+    if (
+      destination.origin !== location.origin ||
+      destination.pathname !== location.pathname ||
+      destination.search !== location.search
+    ) return;
+
+    const targetIsCategory = isCategoryHash(destination.hash);
+    const targetIsProduct = destination.hash.startsWith('#producto/');
+    if (!targetIsCategory && !targetIsProduct) return;
+    if (destination.hash === location.hash) return;
+
+    pendingParent = {
+      target: destination.hash,
+      parent: location.hash || '#top'
+    };
+  }, true);
+
+  window.addEventListener('hashchange', () => {
+    if (!pendingParent || pendingParent.target !== location.hash) return;
+    history.replaceState(
+      { ...history.state, hakiSafariParent: pendingParent.parent },
+      '',
+      location.href
+    );
+    pendingParent = null;
+  });
 
   window.addEventListener('touchstart', event => {
     if (event.touches.length !== 1) return;
@@ -70,7 +121,7 @@
     const touch = event.touches[0];
     if (touch.clientX > EDGE) return;
 
-    // Prevent WebKit from starting its browser-level history snapshot gesture.
+    // Cancel Safari's browser-level interactive history preview at its source.
     event.preventDefault();
     const now = performance.now();
     gesture = {
@@ -96,7 +147,6 @@
     if (!gesture.horizontal && dx > 7 && Math.abs(dx) > Math.abs(dy) * 0.9) {
       gesture.horizontal = true;
     }
-
     if (gesture.horizontal) event.preventDefault();
 
     const now = performance.now();
@@ -112,7 +162,6 @@
     if (!gesture) return;
     const current = gesture;
     gesture = null;
-
     if (cancelled || !current.horizontal) return;
 
     const distance = Math.max(0, current.x - current.startX);
@@ -126,9 +175,6 @@
   window.addEventListener('touchend', () => endGesture(false), { capture:true, passive:false });
   window.addEventListener('touchcancel', () => endGesture(true), { capture:true, passive:false });
 
-  // Use the same direct navigation for visible Back controls. No surface
-  // animation is performed; the existing category/product DOM is revealed in
-  // one frame, preserving already decoded images and the saved scroll position.
   document.addEventListener('click', event => {
     if (
       event.defaultPrevented ||
