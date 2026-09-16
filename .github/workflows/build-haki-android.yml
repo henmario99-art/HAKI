@@ -1,0 +1,66 @@
+name: Build HAKI Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [haki-app-android]
+
+permissions:
+  contents: read
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Prepare mobile web bundle
+        run: |
+          rm -rf mobile/www
+          mkdir -p mobile/www
+          rsync -a ./ mobile/www/ \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude 'mobile' \
+            --exclude 'admin' \
+            --exclude 'README.md' \
+            --exclude '_headers' \
+            --exclude '_redirects'
+
+      - name: Install Capacitor
+        working-directory: mobile
+        run: npm install
+
+      - name: Create Android project
+        working-directory: mobile
+        run: npx cap add android
+
+      - name: Sync app
+        working-directory: mobile
+        run: npx cap sync android
+
+      - name: Build debug APK
+        working-directory: mobile/android
+        run: chmod +x gradlew && ./gradlew assembleDebug
+
+      - name: Rename APK
+        run: cp mobile/android/app/build/outputs/apk/debug/app-debug.apk HAKI-v1.0-Android.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: HAKI-v1.0-Android
+          path: HAKI-v1.0-Android.apk
+          retention-days: 30
