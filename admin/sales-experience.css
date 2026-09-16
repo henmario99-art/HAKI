@@ -39,7 +39,23 @@ body.sale-editor-mode .sale-editor{display:block!important;margin:0 auto;backgro
 .product-picker-price{font-weight:850;font-size:14px;white-space:nowrap}
 .product-picker-empty{padding:26px 12px;text-align:center;color:#74746f}
 
+/* Miniaturas dentro del inventario privado */
+.inventory-product{display:grid;grid-template-columns:62px minmax(0,1fr);grid-template-rows:auto auto;column-gap:12px;align-items:center}
+.inventory-product-image{grid-column:1;grid-row:1/3;width:62px;height:62px;object-fit:cover;border-radius:11px;background:#f0f0ed;border:1px solid #e2e2de}
+.inventory-product strong{grid-column:2;grid-row:1;align-self:end;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.inventory-product small{grid-column:2;grid-row:2;align-self:start;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* El resumen ahora puede contener Total a cobrar y Destino sin perder legibilidad */
+.sale-table td[data-label="Destino"]{max-width:220px}
+.sale-table td[data-label="Destino"]{overflow-wrap:anywhere}
+
 @media(min-width:701px){
   .product-picker-overlay{align-items:center;padding:24px}
   .product-picker-sheet{border-radius:22px;max-height:min(760px,88dvh)}
+}
+
+@media(max-width:700px){
+  .inventory-product{grid-column:1/-1}
+  .inventory-product-image{width:58px;height:58px}
+  .sale-table td[data-label="Destino"]{max-width:none}
 }
