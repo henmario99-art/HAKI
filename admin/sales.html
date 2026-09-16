@@ -62,12 +62,12 @@
 
           <div class="order-meta">
             <label>Envío ($)<input id="saleShipping" type="number" min="0" step="0.01" value="0" inputmode="decimal"></label>
-            <label>Encomienda<select id="saleDelivery"><option>Pedido Express</option><option>C807</option><option>Delivery</option><option>Domicilio</option><option>Encomienda</option><option>Otro</option></select></label>
+            <label>Encomienda<select id="saleDelivery"><option>Pedido Express</option><option value="C807">C807 Xpress</option><option>Delivery</option><option>Domicilio</option><option>Encomienda</option><option>Otro</option></select></label>
             <label>Estado<select id="saleState"><option>Pendiente</option><option>Retirado</option><option>Cancelado</option><option>No retirado</option></select></label>
             <label>Dinero<select id="saleMoney"><option>Pendiente</option><option>En caja</option><option>No retiró</option></select></label>
           </div>
 
-          <div class="sale-total"><span>Subtotal <strong id="saleSubtotal">$0.00</strong></span><span>Envío <strong id="saleShippingTotal">$0.00</strong></span><span class="grand-total">Total <strong id="saleTotal">$0.00</strong></span></div>
+          <div class="sale-total"><span>Subtotal <strong id="saleSubtotal">$0.00</strong></span><span>Envío <strong id="saleShippingTotal">$0.00</strong></span><span id="saleC807GuideWrap" hidden>Costo guía C807 <strong id="saleC807Guide">$4.15</strong></span><span id="saleC807CommissionWrap" hidden>Comisión C807 <strong id="saleC807Commission">$0.00</strong></span><span class="grand-total">Total <strong id="saleTotal">$0.00</strong></span></div>
 
           <footer class="editor-actions">
             <button id="deleteSale" class="button danger" type="button" hidden>Eliminar venta</button>
@@ -104,7 +104,7 @@
     </article>
   </template>
 
-  <script src="sales.js?v=4"></script>
+  <script src="sales.js?v=5"></script>
   <script src="sales-flow.js?v=2"></script>
 </body>
 </html>
