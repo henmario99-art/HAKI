@@ -1,18 +1,23 @@
-/* HAKI ventas móvil v2: navegación compacta, semanas 1-7 del mes y días colapsables. */
+/* HAKI ventas móvil v2: navegación compacta, semanas lunes-domingo y vistas independientes. */
 .sales-topbar.haki-mobile-topbar{align-items:center;margin-bottom:10px}
 .sales-topbar.haki-mobile-topbar>div p{display:none}
 .sales-topbar.haki-mobile-topbar .sales-brand{font-size:34px;letter-spacing:.08em}
 .haki-admin-back{width:48px;height:48px;border:1px solid var(--line);border-radius:14px;background:#fff;display:grid;place-items:center;font-size:30px;line-height:1;color:#111;text-decoration:none;box-shadow:0 7px 20px #00000008}
 
+/* Cada apartado principal es una pantalla propia. Evita que Inventario quede debajo de Ventas. */
+#salesView[hidden],#inventoryView[hidden],#collectionsView[hidden],#expensesView[hidden],#dashboardView[hidden]{display:none!important}
+#inventoryView.haki-inventory-page{width:100%}
+
 .sales-tabs.haki-primary-tabs{display:grid;grid-template-columns:1fr 1fr;overflow:visible;border-bottom:1px solid var(--soft);margin:0 0 18px;padding:0}
 .sales-tabs.haki-primary-tabs .tab{border:0;border-radius:0;background:transparent;color:#111;min-height:54px;padding:0 10px;font-size:18px;font-weight:650;position:relative}
 .sales-tabs.haki-primary-tabs .tab.is-active{background:transparent;color:#111}
 .sales-tabs.haki-primary-tabs .tab.is-active::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:#111;border-radius:2px}
-.haki-sales-menu-toggle{display:inline-flex;align-items:center;gap:9px;justify-content:center}
+.haki-sales-menu-toggle{display:inline-flex;align-items:center;gap:9px;justify-content:center;pointer-events:none}
 .haki-sales-menu-toggle .chevron{font-size:17px;transition:transform .2s ease}
 .haki-sales-menu-toggle[aria-expanded="true"] .chevron{transform:rotate(180deg)}
 
-.haki-admin-menu{position:absolute;z-index:3500;top:126px;right:max(16px,calc((100vw - 900px)/2));width:min(330px,calc(100vw - 32px));background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 24px 60px #0003}
+/* Menú desplegable de Ventas: Gasto, Dashboard y Cobros. */
+.haki-admin-menu{position:absolute;z-index:3500;top:126px;left:max(16px,calc((100vw - 900px)/2));width:min(330px,calc(100vw - 32px));background:#fff;border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 24px 60px #0003}
 .haki-admin-menu[hidden]{display:none!important}
 .haki-admin-menu-head{padding:4px 6px 14px;border-bottom:1px solid var(--soft)}
 .haki-admin-menu-head strong{display:block;font-size:23px;letter-spacing:.04em}.haki-admin-menu-head span{display:block;color:var(--muted);margin-top:2px}
@@ -21,9 +26,12 @@
 .haki-admin-menu-item:last-child{border-bottom:0}.haki-admin-menu-icon{font-size:23px;text-align:center}.haki-admin-menu-arrow{font-size:24px;color:#777;text-align:right}
 .haki-admin-menu-backdrop{position:fixed;inset:0;z-index:3400;background:#0002}.haki-admin-menu-backdrop[hidden]{display:none!important}
 
+/* Mes + semana. La semana siempre contiene lunes, martes ... domingo. */
 .week-toolbar.haki-period-toolbar{display:block;margin-bottom:14px}
 .week-toolbar.haki-period-toolbar .week-nav{width:100%;display:grid;grid-template-columns:52px 1fr 52px;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:15px;padding:8px;box-shadow:0 8px 24px #00000008}
-.week-toolbar.haki-period-toolbar .week-nav>div{text-align:center}.week-toolbar.haki-period-toolbar .week-nav strong{font-size:19px}.week-toolbar.haki-period-toolbar .week-nav span{display:none}
+.week-toolbar.haki-period-toolbar .week-nav>div{text-align:center;display:flex;flex-direction:column;align-items:center}
+.week-toolbar.haki-period-toolbar .week-nav strong{font-size:19px;order:2}
+.week-toolbar.haki-period-toolbar .week-nav span{display:block!important;color:var(--muted);font-size:13px;font-weight:650;margin-bottom:2px;order:1}
 .week-toolbar.haki-period-toolbar .icon-button{width:44px;height:44px;border:0;background:transparent;font-size:25px}
 .week-toolbar.haki-period-toolbar .week-actions{display:none!important}
 
@@ -33,6 +41,7 @@
 .metrics.haki-bottom-metrics span{font-size:11px}.metrics.haki-bottom-metrics strong{font-size:22px;margin-top:7px}
 
 #salesView.haki-sales-home{display:flex;flex-direction:column}
+#salesView.haki-sales-home[hidden]{display:none!important}
 #salesView.haki-sales-home .week-toolbar{order:1}
 #salesView.haki-sales-home #saleEditor{order:2}
 #salesView.haki-sales-home #days{order:3}
@@ -40,20 +49,19 @@
 
 #days.haki-days-list{display:grid;gap:10px}
 .haki-day-card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:visible;box-shadow:0 7px 22px #00000006}
-.haki-day-toggle{width:100%;border:0;background:#fff;display:grid;grid-template-columns:44px minmax(0,1fr) auto 22px;align-items:center;gap:10px;padding:15px;text-align:left;cursor:pointer;border-radius:16px}
-.haki-day-icon{font-size:22px;text-align:center;color:#4f5358}.haki-day-copy strong{font-size:17px}.haki-day-copy small{display:block;color:var(--muted);margin-top:2px;font-size:12px}.haki-day-count{font-size:11px;font-weight:800;color:var(--muted);background:#f1f1ee;border-radius:999px;padding:5px 8px;white-space:nowrap}.haki-day-arrow{font-size:25px;color:#777;transition:transform .2s ease}.haki-day-card.is-open .haki-day-arrow{transform:rotate(90deg)}
+.haki-day-toggle{width:100%;border:0;background:#fff;display:grid;grid-template-columns:minmax(0,1fr) auto 22px;align-items:center;gap:10px;padding:15px;text-align:left;cursor:pointer;border-radius:16px}
+.haki-day-copy strong{font-size:18px}.haki-day-copy small{display:block;color:var(--muted);margin-top:2px;font-size:12px}.haki-day-count{font-size:11px;font-weight:800;color:var(--muted);background:#f1f1ee;border-radius:999px;padding:5px 8px;white-space:nowrap}.haki-day-arrow{font-size:25px;color:#777;transition:transform .2s ease}.haki-day-card.is-open .haki-day-arrow{transform:rotate(90deg)}
 .haki-day-detail{border-top:1px solid var(--soft);padding:12px}.haki-day-detail[hidden]{display:none!important}.haki-day-actions{display:flex;justify-content:flex-end;margin-bottom:10px}.haki-day-new{border:0;background:#111;color:#fff;border-radius:11px;padding:9px 12px;font-weight:800}
 .haki-day-empty{padding:12px 4px;color:var(--muted);font-size:13px}
 .haki-sale-mini{border:1px solid var(--soft);border-radius:13px;padding:11px;margin-top:8px;display:grid;grid-template-columns:1fr auto;gap:6px 12px;cursor:pointer;background:#fff}
 .haki-sale-mini:first-of-type{margin-top:0}.haki-sale-mini strong{font-size:14px}.haki-sale-mini .amount{font-weight:900}.haki-sale-mini small{color:var(--muted);font-size:11px}.haki-sale-mini .meta{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}.haki-sale-mini .pill{display:inline-flex;border-radius:999px;background:#f0f0ed;padding:4px 7px;font-size:10px;font-weight:800}.haki-sale-mini .pill.pending{background:#fff1c7;color:#7b5b00}.haki-sale-mini .pill.done{background:#dcf5e5;color:#126b39}.haki-sale-mini .pill.cancelled{background:#fde2df;color:#9d2a1e}
 
-/* Cuando se abre Cobros/Gastos/Dashboard, mantenemos la cabecera limpia. */
 body.haki-suite-open .week-toolbar,body.haki-suite-open .metrics,body.haki-suite-open #days{display:none!important}
 
 @media(max-width:700px){
   .sales-shell{padding-top:max(18px,env(safe-area-inset-top))}
   .sales-topbar.haki-mobile-topbar .sales-brand{font-size:32px}
-  .haki-admin-menu{top:108px;right:12px;width:calc(100vw - 24px)}
-  .haki-day-toggle{grid-template-columns:38px minmax(0,1fr) auto 18px;padding:14px 12px}
+  .haki-admin-menu{top:108px;left:12px;right:auto;width:calc(100vw - 24px)}
+  .haki-day-toggle{grid-template-columns:minmax(0,1fr) auto 18px;padding:14px 12px}
   .metrics.haki-bottom-metrics{margin-top:16px}
 }
