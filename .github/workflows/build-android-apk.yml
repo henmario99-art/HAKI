@@ -38,7 +38,13 @@ jobs:
             .android-build/chunks/12-13.b64 \
             .android-build/chunks/14-15.b64 \
             .android-build/chunks/16-17.b64 \
-            .android-build/chunks/18-19.b64 \
+            .android-build/chunks/18.b64 \
+            .android-build/chunks/19a.b64 \
+            .android-build/chunks/19b0.b64 \
+            .android-build/chunks/19b1.b64 \
+            .android-build/chunks/19b2.b64 \
+            .android-build/chunks/19b3a.b64 \
+            .android-build/chunks/19b3b.b64 \
             > /tmp/haki_app_src.tgz.b64
           base64 --decode /tmp/haki_app_src.tgz.b64 > /tmp/haki_app_src.tgz
           echo "14d21904312e75229675b49841c036f7707f94cf390aa938b8fdc6f717e1a09a  /tmp/haki_app_src.tgz" | sha256sum -c -
