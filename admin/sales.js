@@ -16,7 +16,7 @@ function mondayOf(value){const d=value instanceof Date?new Date(value):parseDate
 function formatDate(iso,withYear=false){const d=parseDate(iso);return `${d.getDate()} de ${months[d.getMonth()]}${withYear?` de ${d.getFullYear()}`:''}`}
 function stockFor(productId){return state.inventory[String(productId)]||{S:0,M:0,L:0,XL:0}}
 function isActiveSale(sale){return !['Cancelado','No retirado'].includes(sale.estado)}
-function escapeHtml(value=''){return String(value).replace(/[&<>\"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[ch]))}
+function escapeHtml(value=''){return String(value).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]))}
 function badgeClass(value){const v=String(value||'').toLowerCase();if(v.includes('whats'))return'whatsapp';if(v.includes('mess'))return'messenger';return'instagram'}
 function stateClass(value){if(value==='Retirado')return'done';if(value==='Cancelado'||value==='No retirado')return'cancelled';return'pending'}
 function moneyClass(value){return value==='En caja'?'done':value==='No retiró'?'cancelled':'pending'}
