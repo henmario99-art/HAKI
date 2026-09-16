@@ -21,12 +21,23 @@ function badgeClass(value){const v=String(value||'').toLowerCase();if(v.includes
 function stateClass(value){if(value==='Retirado')return'done';if(value==='Cancelado'||value==='No retirado')return'cancelled';return'pending'}
 function moneyClass(value){return value==='En caja'?'done':value==='No retiró'?'cancelled':'pending'}
 function isC807Delivery(value){return String(value||'').toLowerCase().includes('c807')}
-function c807Commission(total,delivery,moneyState){
-  if(!isC807Delivery(delivery)||moneyState!=='Pendiente')return 0;
-  const amount=Math.max(0,Number(total)||0);
-  if(amount<=0)return 0;
-  if(amount<=25)return 1;
-  return Number((amount*.04).toFixed(2));
+function calculateC807Commission(amount){
+  const total=Math.max(0,Number(amount)||0);
+  if(total<=0)return 0;
+  if(total<=25)return 1;
+  return Number((total*.04).toFixed(2));
+}
+function saleC807Commission(sale){
+  if(!isC807Delivery(sale?.entrega))return 0;
+  const stored=Number(sale?.comisionC807);
+  if(Number.isFinite(stored)&&stored>=0)return stored;
+  return sale?.dinero==='Pendiente'?calculateC807Commission(sale?.total):0;
+}
+function editorC807Commission(total,delivery,moneyState){
+  if(!isC807Delivery(delivery)||moneyState==='No retiró')return 0;
+  const stored=Number(state.editing?.comisionC807);
+  if(moneyState==='En caja')return Number.isFinite(stored)&&stored>0?stored:0;
+  return calculateC807Commission(total);
 }
 function c807GuideCost(delivery){return isC807Delivery(delivery)?C807_GUIDE_COST:0}
 
@@ -52,7 +63,7 @@ function renderWeek(){
     if(!sales.length){const empty=document.createElement('div');empty.className='empty-day';empty.textContent='Sin ventas registradas.';section.append(empty);days.append(section);continue}
     const table=document.createElement('table');table.className='sale-table';table.innerHTML='<thead><tr><th>Canal</th><th>Cliente</th><th>Pedido</th><th>Total</th><th>Comisión</th><th>Entrega</th><th>Estado</th><th>Dinero</th></tr></thead>';
     const body=document.createElement('tbody');
-    sales.forEach(sale=>{const tr=document.createElement('tr');tr.dataset.sale=sale.id;const items=(sale.items||[]).map(i=>`${i.codigo} ${i.talla}${Number(i.cantidad)>1?` ×${i.cantidad}`:''}`);const commission=c807Commission(sale.total,sale.entrega,sale.dinero);tr.innerHTML=`<td data-label="Canal"><span class="badge ${badgeClass(sale.canal)}">${escapeHtml(sale.canal)}</span></td><td data-label="Cliente">${escapeHtml(sale.cliente||'—')}</td><td data-label="Pedido" class="order-summary"><strong>${escapeHtml(items.slice(0,2).join(' · ')||'—')}</strong>${items.length>2?`<small>+${items.length-2} más</small>`:''}</td><td data-label="Total"><strong>${money(sale.total)}</strong></td><td data-label="Comisión">${isC807Delivery(sale.entrega)?`<strong>${money(commission)}</strong>`:'—'}</td><td data-label="Entrega">${escapeHtml(sale.entrega||'—')}</td><td data-label="Estado"><span class="badge ${stateClass(sale.estado)}">${escapeHtml(sale.estado)}</span></td><td data-label="Dinero"><span class="badge ${moneyClass(sale.dinero)}">${escapeHtml(sale.dinero)}</span></td>`;tr.addEventListener('click',()=>openEditSale(sale));body.append(tr)});
+    sales.forEach(sale=>{const tr=document.createElement('tr');tr.dataset.sale=sale.id;const items=(sale.items||[]).map(i=>`${i.codigo} ${i.talla}${Number(i.cantidad)>1?` ×${i.cantidad}`:''}`);const commission=saleC807Commission(sale);tr.innerHTML=`<td data-label="Canal"><span class="badge ${badgeClass(sale.canal)}">${escapeHtml(sale.canal)}</span></td><td data-label="Cliente">${escapeHtml(sale.cliente||'—')}</td><td data-label="Pedido" class="order-summary"><strong>${escapeHtml(items.slice(0,2).join(' · ')||'—')}</strong>${items.length>2?`<small>+${items.length-2} más</small>`:''}</td><td data-label="Total"><strong>${money(sale.total)}</strong></td><td data-label="Comisión">${isC807Delivery(sale.entrega)?`<strong>${money(commission)}</strong>`:'—'}</td><td data-label="Entrega">${escapeHtml(sale.entrega||'—')}</td><td data-label="Estado"><span class="badge ${stateClass(sale.estado)}">${escapeHtml(sale.estado)}</span></td><td data-label="Dinero"><span class="badge ${moneyClass(sale.dinero)}">${escapeHtml(sale.dinero)}</span></td>`;tr.addEventListener('click',()=>openEditSale(sale));body.append(tr)});
     table.append(body);section.append(table);days.append(section)
   }
 }
@@ -70,7 +81,7 @@ function updateTotals(){
   const delivery=$('#saleDelivery').value;
   const moneyState=$('#saleMoney').value;
   const isC807=isC807Delivery(delivery);
-  const commission=c807Commission(total,delivery,moneyState);
+  const commission=editorC807Commission(total,delivery,moneyState);
   $('#saleSubtotal').textContent=money(subtotal);
   $('#saleShippingTotal').textContent=money(shipping);
   $('#saleTotal').textContent=money(total);
