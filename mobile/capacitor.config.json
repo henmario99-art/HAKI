@@ -1,0 +1,7 @@
+{
+  "appId": "com.haki.sv",
+  "appName": "HAKI",
+  "webDir": "www",
+  "server": {"androidScheme": "https"},
+  "android": {"allowMixedContent": false}
+}
