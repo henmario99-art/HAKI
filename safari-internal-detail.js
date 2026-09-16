@@ -1,7 +1,7 @@
-// HAKI Safari navigation guard.
-// Categories stay in normal document flow. We suppress WebKit's interactive
-// history screenshot at the left edge and use programmatic history traversal,
-// which lets app.js restore the exact category entry and scroll position.
+// HAKI Safari edge-swipe guard.
+// app.js is the single owner of navigation history and exact scroll restoration.
+// This file only suppresses Safari's problematic interactive screenshot gesture
+// and converts a completed edge swipe into a normal history.back().
 (() => {
   if (window.hakiIOSWebKit !== true) return;
 
@@ -16,12 +16,9 @@
   const COMMIT_DISTANCE = 72;
   const COMMIT_RATIO = 0.18;
   const FAST_VELOCITY = 0.5;
-
   let gesture = null;
-  let pendingParent = null;
 
-  const isCategoryHash = hash => /^#(?:coleccion|categoria)\//.test(hash || '');
-  const isCategory = () => isCategoryHash(location.hash);
+  const isCategory = () => /^#(?:coleccion|categoria)\//.test(location.hash || '');
   const isDetail = () =>
     location.hash.startsWith('#producto/') &&
     document.body.classList.contains('haki-ios-product-open');
@@ -32,7 +29,7 @@
     return null;
   };
 
-  const destinationFor = type => {
+  const fallbackDestination = type => {
     if (type === 'detail') {
       const back = document.querySelector('#productDetail .detail-back');
       return back ? new URL(back.href, location.href) : new URL('#catalogo', location.href);
@@ -41,77 +38,21 @@
     return back ? new URL(back.href, location.href) : new URL('#top', location.href);
   };
 
-  const replaceTo = destination => {
-    const oldURL = location.href;
-    history.replaceState(history.state, '', destination.href);
-    let event;
-    try {
-      event = new HashChangeEvent('hashchange', { oldURL, newURL: destination.href });
-    } catch {
-      event = new Event('hashchange');
-    }
-    window.dispatchEvent(event);
-  };
-
-  const navigateBack = type => {
-    const destination = destinationFor(type);
-    const parent = history.state?.hakiSafariParent;
-
-    // When the view was opened from inside HAKI, traverse to the real parent
-    // history entry. Because the native gesture was cancelled, Safari performs
-    // no screenshot slide; app.js gets the original navigation key and restores
-    // the exact saved list/scroll position.
-    if (parent && parent === destination.hash) {
+  const commitBack = type => {
+    // Every internal HAKI navigation created by app.js stores the exact parent
+    // entry key. Let the browser traverse that real entry; app.js will restore
+    // the corresponding category/home state and exact scroll position.
+    if (history.state?.hakiNavigation?.parent) {
       history.back();
       return;
     }
 
-    // Direct/deep links have no in-app parent. Stay inside HAKI rather than
-    // accidentally leaving the site.
-    replaceTo(destination);
-  };
-
-  // Mark the parent hash before a normal internal category/product link creates
-  // its new history entry. After hashchange we attach that relationship to the
-  // new entry without changing the URL.
-  document.addEventListener('click', event => {
-    if (
-      event.defaultPrevented ||
-      event.button > 0 ||
-      event.metaKey || event.ctrlKey || event.shiftKey || event.altKey
-    ) return;
-
-    const link = event.target.closest?.('a[href]');
-    if (!link) return;
-
-    let destination;
-    try { destination = new URL(link.href, location.href); } catch { return; }
-    if (
-      destination.origin !== location.origin ||
-      destination.pathname !== location.pathname ||
-      destination.search !== location.search
-    ) return;
-
-    const targetIsCategory = isCategoryHash(destination.hash);
-    const targetIsProduct = destination.hash.startsWith('#producto/');
-    if (!targetIsCategory && !targetIsProduct) return;
+    // Direct/deep links do not have an in-app parent. Use the visible fallback
+    // destination without installing a second navigation/history system.
+    const destination = fallbackDestination(type);
     if (destination.hash === location.hash) return;
-
-    pendingParent = {
-      target: destination.hash,
-      parent: location.hash || '#top'
-    };
-  }, true);
-
-  window.addEventListener('hashchange', () => {
-    if (!pendingParent || pendingParent.target !== location.hash) return;
-    history.replaceState(
-      { ...history.state, hakiSafariParent: pendingParent.parent },
-      '',
-      location.href
-    );
-    pendingParent = null;
-  });
+    location.hash = destination.hash;
+  };
 
   window.addEventListener('touchstart', event => {
     if (event.touches.length !== 1) return;
@@ -121,7 +62,7 @@
     const touch = event.touches[0];
     if (touch.clientX > EDGE) return;
 
-    // Cancel Safari's browser-level interactive history preview at its source.
+    // Prevent WebKit from starting its native snapshot/slide transition.
     event.preventDefault();
     const now = performance.now();
     gesture = {
@@ -129,7 +70,6 @@
       startX: touch.clientX,
       startY: touch.clientY,
       x: touch.clientX,
-      y: touch.clientY,
       lastX: touch.clientX,
       lastT: now,
       velocity: 0,
@@ -155,7 +95,6 @@
     gesture.lastX = touch.clientX;
     gesture.lastT = now;
     gesture.x = touch.clientX;
-    gesture.y = touch.clientY;
   }, { capture:true, passive:false });
 
   const endGesture = cancelled => {
@@ -169,27 +108,12 @@
       distance >= Math.max(COMMIT_DISTANCE, window.innerWidth * COMMIT_RATIO) ||
       current.velocity >= FAST_VELOCITY;
 
-    if (shouldGoBack) navigateBack(current.type);
+    if (shouldGoBack) commitBack(current.type);
   };
 
   window.addEventListener('touchend', () => endGesture(false), { capture:true, passive:false });
   window.addEventListener('touchcancel', () => endGesture(true), { capture:true, passive:false });
 
-  document.addEventListener('click', event => {
-    if (
-      event.defaultPrevented ||
-      event.button > 0 ||
-      event.metaKey || event.ctrlKey || event.shiftKey || event.altKey
-    ) return;
-
-    const back = event.target.closest?.('#productDetail .detail-back, #catalogo .back-home');
-    if (!back) return;
-
-    const type = back.closest('#productDetail') ? 'detail' : (isCategory() ? 'category' : null);
-    if (!type) return;
-
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    navigateBack(type);
-  }, true);
+  // Deliberately do NOT intercept .detail-back or .back-home clicks here.
+  // app.js handles those links and owns the parent-entry/scroll restoration.
 })();
