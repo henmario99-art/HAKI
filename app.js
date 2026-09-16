@@ -15,6 +15,9 @@
   const isIOS = window.hakiIOSWebKit === true;
   const listingSections = ['homeHero', 'novedades', 'collectionsSection', 'catalogo'];
   let iosListing = null;
+  let iosCategory = null;
+  let iosHome = null;
+  const iosCategoryViews = new Map();
   let routedHash = null;
   let routedEntry = null;
   let entrySequence = 0;
@@ -35,7 +38,7 @@
   function rememberListing() {
     if (detailCode || !routedEntry) return;
     listingPositions.set(routedEntry, {
-      y: window.scrollY, query: state.query,
+      y: iosCategory ? iosCategory.scrollTop : window.scrollY, query: state.query,
       category: state.category, collection: state.collection
     });
   }
@@ -409,6 +412,77 @@
     rememberListing();
     if (destination.hash.startsWith('#producto/')) lastListingHash = location.hash || '#top';
   }, true);
+
+  // A category uses the same fixed scroll surface as a product. The home
+  // document stays connected, decoded and at its original window.scrollY.
+  // Only the active catalog owns the public IDs used by the shared controls.
+  function catalogIds(catalog, active) {
+    [catalog, ...catalog.querySelectorAll('[id], [data-catalog-id]')].forEach(el => {
+      const id = el.dataset.catalogId || el.id;
+      if (!id) return;
+      el.dataset.catalogId = id;
+      if (active) el.id = id;
+      else el.removeAttribute('id');
+    });
+  }
+
+  function bindCatalog(catalog) {
+    els.products = catalog.querySelector('#products');
+    els.count = catalog.querySelector('#productCount');
+    els.notice = catalog.querySelector('#resultNotice');
+    window.dispatchEvent(new Event('haki:listing-surface'));
+  }
+
+  function enterIOSCategory(key) {
+    if (!isIOS || iosCategory?.dataset.entryKey === key) return;
+    if (!iosHome) {
+      const catalog = $('#catalogo');
+      // Direct category links also need a populated home behind the sheet.
+      if (!els.products.childNodes.length) renderProducts();
+      iosHome = {
+        catalog,
+        sections: [...listingSections.map(id => document.getElementById(id)), $('.footer')]
+          .map(el => ({ el, inert: el?.inert || false }))
+      };
+      iosHome.sections.forEach(({el}) => { if (el) el.inert = true; });
+      catalogIds(catalog, false);
+    }
+    if (iosCategory) {
+      catalogIds(iosCategory, false);
+      iosCategory.hidden = true;
+    }
+    let catalog = iosCategoryViews.get(key);
+    if (!catalog) {
+      catalog = document.createElement('section');
+      catalog.className = 'catalog haki-ios-category-sheet';
+      catalog.id = 'catalogo';
+      catalog.dataset.entryKey = key;
+      catalog.innerHTML = `<div class="catalog-heading"><div>
+        <a class="back-home haki-chevron-back" href="#top">Volver al inicio</a>
+        <h2 id="catalogTitle"></h2></div><span class="product-count" id="productCount"></span></div>
+        <p class="notice" id="resultNotice" role="status"></p><div class="products" id="products"></div>`;
+      iosCategoryViews.set(key, catalog);
+      $('#productDetail').before(catalog);
+    }
+    iosCategory = catalog;
+    catalogIds(catalog, true);
+    catalog.hidden = false;
+    bindCatalog(catalog);
+    document.documentElement.style.setProperty('--haki-detail-top', `${$('.header').getBoundingClientRect().bottom}px`);
+    document.body.classList.add('haki-ios-category-open');
+  }
+
+  function leaveIOSCategory() {
+    if (!iosCategory) return;
+    iosCategory.hidden = true;
+    catalogIds(iosCategory, false);
+    iosCategory = null;
+    catalogIds(iosHome.catalog, true);
+    iosHome.sections.forEach(({el, inert}) => { if (el) el.inert = inert; });
+    bindCatalog(iosHome.catalog);
+    iosHome = null;
+    document.body.classList.remove('haki-ios-category-open');
+  }
 
   function enterIOSDetail() {
     if (!isIOS || iosListing) return;
@@ -802,6 +876,7 @@ ${settings().totalTexto}: ${money(totals.total)}`;
         routedEntry = navigationEntry().key;
         window.scrollTo({ top: 0, behavior: 'instant' });
       }
+      leaveIOSCategory();
       state.query = e.target.value; $('#desktopSearch').value=state.query;
       state.category = 'Todos'; state.collection = null;
       setHomeVisible(!state.query);
@@ -848,6 +923,7 @@ ${settings().totalTexto}: ${money(totals.total)}`;
   );
 
   function setHomeVisible(show) {
+    if (iosCategory) return;
     ['homeHero', 'novedades', 'collectionsSection'].forEach(id => { document.getElementById(id).hidden = !show; });
     document.body.classList.toggle('collection-view', !show);
   }
@@ -891,6 +967,10 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       return;
     }
     leaveIOSDetail();
+    if (isIOS) {
+      if (isCategoryHash(currentHash)) enterIOSCategory(entry.key);
+      else leaveIOSCategory();
+    }
     $('#catalogo').hidden = !!detailCode;
     if (detailCode) {
       setHomeVisible(false);
@@ -913,6 +993,10 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     $('#catalogTitle').textContent = state.query ? 'RESULTADOS' : state.collection?.nombre || (filtered ? state.category : 'TODAS LAS PRENDAS');
     renderProducts();
     syncCardSelections($('#newProducts'));
+    if (iosCategory) {
+      iosCategory.scrollTop = restored?.y || 0;
+      return;
+    }
     if (restored) {
       if (Math.abs(window.scrollY - restored.y) > 1) window.scrollTo({ top: restored.y, behavior: 'instant' });
     }

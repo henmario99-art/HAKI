@@ -229,7 +229,7 @@
       if(!nav.contains(event.target)) details.forEach(detail=>detail.open=false);
     });
 
-    const backHome=document.querySelector('.back-home');
+    const backHome=catalog.querySelector('.back-home');
     if(backHome){
       backHome.textContent='Volver al inicio';
       backHome.classList.add('haki-chevron-back');
@@ -291,6 +291,8 @@
       document.head.appendChild(style);
     }
   }
+
+  window.addEventListener('haki:listing-surface', setupCatalogMenus);
 
   if(document.readyState==='loading'){
     document.addEventListener('DOMContentLoaded',setupThemeToggle,{once:true});

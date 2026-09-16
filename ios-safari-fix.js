@@ -1,7 +1,6 @@
 // HAKI iOS/WebKit layout baseline.
-// Categories remain in normal document flow. Only product detail becomes a
-// dedicated fixed scroll surface. This avoids WebKit compositing two product
-// grids during category navigation and makes returns reveal the existing list.
+// Categories and products use fixed scroll surfaces over the connected home.
+// Returning reveals the original content without changing its root scroll.
 (() => {
   const ua = navigator.userAgent || '';
   const isIOS = /iP(?:hone|ad|od)/i.test(ua) ||
@@ -34,25 +33,28 @@
       transition:none!important;
     }
 
-    /* A filtered/category catalog is a normal page section on iPhone. The
-       default mobile catalog padding is intentionally reduced so its heading
-       starts naturally below the sticky header instead of leaving a large gap. */
-    html.haki-ios-webkit body.collection-view #catalogo{
-      position:relative!important;
-      inset:auto!important;
-      width:auto!important;
-      height:auto!important;
-      max-height:none!important;
-      margin:0 auto!important;
-      padding-top:24px!important;
-      overflow:visible!important;
-      transform:none!important;
-      box-shadow:none!important;
-      contain:none!important;
-      will-change:auto!important;
+    html.haki-ios-webkit body.haki-ios-category-open{
+      overflow:hidden!important;
     }
+    html.haki-ios-webkit .haki-ios-category-sheet{
+      position:fixed!important;
+      left:0!important;right:0!important;
+      top:var(--haki-detail-top,76px)!important;bottom:0!important;
+      z-index:40!important;
+      width:100%!important;max-width:none!important;
+      margin:0!important;padding:24px 4%!important;
+      overflow-x:hidden!important;overflow-y:auto!important;
+      overscroll-behavior:contain;
+      -webkit-overflow-scrolling:touch;
+      background:var(--surface,#fff)!important;
+      isolation:isolate;contain:paint;
+      transform:translateZ(0);
+      backface-visibility:hidden;
+      -webkit-backface-visibility:hidden;
+    }
+    html.haki-ios-webkit .haki-ios-category-sheet .back-home{display:inline-block}
 
-    /* Product detail is the only iOS navigation layer. The catalog underneath
+    /* Product detail sits above the active listing surface. The catalog underneath
        remains untouched at its exact scroll position and with the same decoded
        image nodes, so returning cannot repaint the list from bottom to top. */
     html.haki-ios-webkit body.haki-ios-product-open{
@@ -115,7 +117,8 @@
 
   const header = document.querySelector('.header');
   const updateDetailTop = () => {
-    if (!document.body.classList.contains('haki-ios-product-open')) return;
+    if (!document.body.classList.contains('haki-ios-product-open') &&
+        !document.body.classList.contains('haki-ios-category-open')) return;
     const top = header?.getBoundingClientRect().bottom || 0;
     root.style.setProperty('--haki-detail-top', `${Math.max(0, Math.ceil(top))}px`);
   };

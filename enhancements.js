@@ -352,6 +352,7 @@
   document.addEventListener('click', autoOpenCartAfterDetailAdd);
   smoothCategoryDialog();
   const observer = new MutationObserver(enhance);
+  window.addEventListener('haki:listing-surface', enhance);
   ['products','newProducts','productDetail'].forEach(id=>observer.observe(document.getElementById(id),{childList:true,subtree:true}));
   const cartItems = $('#cartItems');
   if (cartItems) new MutationObserver(() => {
