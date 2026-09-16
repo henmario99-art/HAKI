@@ -3,7 +3,7 @@
 #adminView .admin-home-topbar .brand{font-size:31px;letter-spacing:.09em}
 #adminView .admin-home-subtitle{display:none}
 #adminView .top-actions{gap:8px}
-#adminView .admin-home-sales{background:#caff3d!important;color:#111!important;border-color:#9fd31f!important;font-weight:900;box-shadow:none}
+#adminView .admin-home-sales{background:#a7eaba!important;color:#111!important;border-color:#8fd8aa!important;font-weight:900;box-shadow:none}
 #adminView .admin-home-catalog-link,#adminView .admin-home-logout{font-size:12px;padding:9px 11px}
 
 #adminView .admin-home-toolbar{position:static;display:grid;grid-template-columns:1fr 1fr;gap:10px;background:transparent;padding:0;margin-bottom:18px}
@@ -28,7 +28,7 @@
 html[data-theme=oscuro] #adminView .admin-home-toolbar .admin-home-search{background-color:#151515!important}
 html[data-theme=oscuro] #adminView .admin-home-accordion{border-color:#444}
 html[data-theme=oscuro] #adminView .admin-nested-settings{border-color:#444}
-html[data-theme=oscuro] #adminView .admin-home-sales{background:#caff3d!important;color:#111!important;border-color:#9fd31f!important}
+html[data-theme=oscuro] #adminView .admin-home-sales{background:#a7eaba!important;color:#111!important;border-color:#8fd8aa!important}
 html[data-theme=oscuro] #adminView .admin-home-save{background:#f1f1ed!important;color:#111!important;border-color:#f1f1ed!important}
 
 @media(max-width:700px){
