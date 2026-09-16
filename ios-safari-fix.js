@@ -47,8 +47,52 @@
     }
     html.haki-ios-webkit #productDetail .detail-gallery{contain:paint}
     html.haki-ios-webkit body.haki-ios-product-open .detail-summary{top:0}
+
+    /*
+      Safari category navigation is implemented as a fixed live layer. The
+      previous home/category grid must never paint underneath that layer while
+      it is being dragged to the right, otherwise WebKit exposes both image
+      surfaces in the same frame. Keep the old sections genuinely hidden and
+      paint a compositor-stable surface below the category instead.
+    */
+    html.haki-ios-webkit.haki-ios-layered-navigation body.haki-ios-category-open #homeHero[hidden],
+    html.haki-ios-webkit.haki-ios-layered-navigation body.haki-ios-category-open #novedades[hidden],
+    html.haki-ios-webkit.haki-ios-layered-navigation body.haki-ios-category-open #collectionsSection[hidden]{
+      display:none!important;
+    }
+    #hakiIOSCategoryUnderlay{
+      position:fixed;
+      top:var(--haki-ios-category-top,0px);
+      left:0;
+      right:0;
+      bottom:var(--haki-ios-bottom-ui,0px);
+      z-index:27;
+      pointer-events:none;
+      background:var(--surface,#fff);
+      opacity:0;
+      visibility:hidden;
+      contain:paint;
+      isolation:isolate;
+      transform:translate3d(0,0,0);
+      backface-visibility:hidden;
+      -webkit-backface-visibility:hidden;
+    }
+    :root[data-theme='oscuro'] #hakiIOSCategoryUnderlay{
+      background:var(--surface,#111);
+    }
+    html.haki-ios-webkit body.haki-ios-category-open #hakiIOSCategoryUnderlay,
+    html.haki-ios-webkit body.haki-edge-back-active #hakiIOSCategoryUnderlay,
+    html.haki-ios-webkit body.haki-ios-return-settling #hakiIOSCategoryUnderlay{
+      opacity:1;
+      visibility:visible;
+    }
   `;
   document.head.appendChild(style);
+
+  const categoryUnderlay = document.createElement('div');
+  categoryUnderlay.id = 'hakiIOSCategoryUnderlay';
+  categoryUnderlay.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(categoryUnderlay);
 
   const header = document.querySelector('.header');
   const updateHeader = () => {
