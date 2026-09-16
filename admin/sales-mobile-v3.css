@@ -1,9 +1,9 @@
 /* Etiquetas de mes y semana editables sin cambiar la lógica de fechas. */
 .week-toolbar.haki-period-toolbar .week-nav>div{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0}
-.week-toolbar.haki-period-toolbar .week-nav span#weekRange{display:block!important;color:var(--muted);font-size:12px;line-height:1.2;text-transform:none}
+.week-toolbar.haki-period-toolbar .week-nav span#weekRange{display:block!important;color:#111;font-size:12px;line-height:1.2;text-transform:none}
 .haki-editable-period-label{cursor:text;border-radius:7px;padding:2px 6px;outline:0;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.haki-editable-period-label:hover{background:#f3f3f0}
-.haki-editable-period-label:focus{background:#fff;border:1px dashed #999;box-shadow:0 0 0 3px #00000008;overflow:visible;text-overflow:clip}
+.haki-editable-period-label:hover{background:#ffffff55}
+.haki-editable-period-label:focus{background:#ffffff99;border:1px dashed #6ebfe9;box-shadow:0 0 0 3px #7dccf32c;overflow:visible;text-overflow:clip}
 #weekTitle.haki-editable-period-label{font-weight:850}
 #weekRange.haki-editable-period-label{font-weight:650}
 
@@ -20,16 +20,25 @@
 .haki-admin-menu-icon.bill{font-size:25px}
 .haki-admin-menu-icon.chart{font-size:23px}
 
-/* Celeste claro para mes y semana. */
+/* El celeste ocupa todo el recuadro de mes/semana, no solo las palabras. */
 :root{--haki-sales-blue:#bfe8fe;--haki-sales-blue-border:#9fd8f7}
-#weekTitle.haki-editable-period-label,#weekRange.haki-editable-period-label{display:inline-flex!important;align-items:center;justify-content:center;width:max-content;max-width:100%;margin-inline:auto;background:var(--haki-sales-blue)!important;color:#111!important;border:1px solid var(--haki-sales-blue-border);border-radius:9px;padding:4px 9px}
-#weekTitle.haki-editable-period-label:focus,#weekRange.haki-editable-period-label:focus{background:#d9f2ff!important;border-color:#6ebfe9;box-shadow:0 0 0 3px #7dccf32c}
+.week-toolbar.haki-period-toolbar .week-nav{background:var(--haki-sales-blue)!important;border-color:var(--haki-sales-blue-border)!important}
+.week-toolbar.haki-period-toolbar .week-nav .icon-button{background:transparent!important;color:#111!important}
+#weekTitle.haki-editable-period-label,#weekRange.haki-editable-period-label{display:inline-flex!important;align-items:center;justify-content:center;width:max-content;max-width:100%;margin-inline:auto;background:transparent!important;color:#111!important;border:0!important;border-radius:7px;padding:3px 7px}
+#weekTitle.haki-editable-period-label:focus,#weekRange.haki-editable-period-label:focus{background:#ffffff8f!important;border:1px dashed #6ebfe9!important;box-shadow:0 0 0 3px #7dccf32c}
 
-/* Inventario: acción global para guardar/recargar cambios. */
-.inventory-tools{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:flex-end}
-.inventory-tools #inventorySearch{width:min(360px,100%)}
-.inventory-update-button{white-space:nowrap;min-height:48px}
+/* Flecha desplegable de Ventas más visible. */
+.haki-sales-menu-toggle{gap:12px}
+.haki-sales-menu-toggle .chevron{font-size:29px!important;font-weight:900;line-height:.8;display:inline-block;transform-origin:center}
+.haki-sales-menu-toggle[aria-expanded="true"] .chevron{transform:rotate(180deg)}
+
+/* Inventario: encabezado limpio, regreso a Ventas y actualización por prenda. */
+.inventory-head{align-items:center!important}
+.inventory-head>div:first-child{display:flex;align-items:center}
+.inventory-back-sales{display:inline-flex;align-items:center;gap:8px;min-height:46px;border:1px solid var(--line);background:#fff;color:#111;border-radius:12px;padding:10px 14px;font:inherit;font-weight:850;cursor:pointer}
+.inventory-back-sales .arrow{font-size:22px;line-height:1}
 .inventory-row.is-dirty{border-color:#8abfe0;box-shadow:0 0 0 2px #bfe8fe55}
+.inventory-item-update{grid-column:1/-1!important;width:100%;min-height:46px;margin-top:4px;background:#111!important;color:#fff!important;border-color:#111!important;border-radius:12px;font-weight:850}
 
 /* Dashboard: opción de reinicio. */
 .dashboard-reset-button{white-space:nowrap}
@@ -39,12 +48,14 @@
   .suite-header{padding-top:50px}
   .suite-back-sales{padding:8px 11px;border-radius:11px}
   .suite-title-icon{width:34px;height:34px;flex-basis:34px}
-  .week-toolbar.haki-period-toolbar .week-nav span#weekRange{font-size:11px}
-  #weekTitle.haki-editable-period-label{font-size:18px}
-  #weekRange.haki-editable-period-label{font-size:11px!important}
-  .inventory-tools{width:100%;display:grid;grid-template-columns:1fr}
-  .inventory-tools #inventorySearch{width:100%}
-  .inventory-update-button{width:100%}
+  .week-toolbar.haki-period-toolbar .week-nav span#weekRange{font-size:12px!important}
+  #weekTitle.haki-editable-period-label{font-size:20px}
+  #weekRange.haki-editable-period-label{font-size:12px!important}
+  .inventory-head{align-items:stretch!important;flex-direction:column!important;gap:12px!important}
+  .inventory-head>div:first-child{width:100%}
+  .inventory-back-sales{width:max-content}
+  #inventorySearch{width:100%!important}
+  .inventory-row .inventory-item-update{grid-column:1/-1!important;width:100%}
   #dashboardView .suite-actions{width:100%}
   #dashboardView .suite-actions .button{flex:1 1 140px}
 }
