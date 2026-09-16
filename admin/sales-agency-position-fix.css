@@ -1,0 +1,40 @@
+/* Mantiene las sugerencias del destino pegadas a su campo, también en iPhone. */
+.destination-field{
+  position:relative!important;
+  overflow:visible!important;
+}
+.destination-field:focus-within{
+  z-index:2500!important;
+}
+.destination-field .destination-results{
+  position:absolute!important;
+  left:0!important;
+  right:0!important;
+  top:calc(100% + 6px)!important;
+  bottom:auto!important;
+  width:100%!important;
+  max-height:min(320px,42dvh)!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  z-index:2600!important;
+  margin:0!important;
+}
+.sale-editor,
+.sale-editor form,
+.editor-fields{
+  overflow:visible!important;
+}
+
+@media(max-width:700px){
+  .destination-field .destination-results{
+    position:absolute!important;
+    left:0!important;
+    right:0!important;
+    top:calc(100% + 5px)!important;
+    bottom:auto!important;
+    width:100%!important;
+    max-height:min(290px,38dvh)!important;
+    border-radius:14px!important;
+  }
+}
