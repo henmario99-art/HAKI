@@ -1,0 +1,11 @@
+/* Ajuste de color solicitado para el acceso Ventas del administrador. */
+#adminView .admin-home-sales{
+  background:#a7eaba!important;
+  color:#111!important;
+  border-color:#8fd8aa!important;
+}
+html[data-theme=oscuro] #adminView .admin-home-sales{
+  background:#a7eaba!important;
+  color:#111!important;
+  border-color:#8fd8aa!important;
+}
