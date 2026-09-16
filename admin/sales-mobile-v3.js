@@ -167,7 +167,7 @@
 (() => {
   if (typeof api !== 'function' || typeof state !== 'object') return;
 
-  // Reiniciar Dashboard: vuelve a la semana actual y fuerza el recálculo.
+  // Dashboard: vuelve a la semana actual y recalcula sin borrar registros.
   const dashboard = document.querySelector('#dashboardView');
   const dashboardActions = dashboard?.querySelector('.suite-actions');
   if (dashboard && dashboardActions && !dashboardActions.querySelector('.dashboard-reset-button')) {
@@ -186,87 +186,112 @@
     dashboardActions.prepend(reset);
   }
 
-  // Inventario: permite guardar de una sola vez los campos modificados desde Ventas.
   const inventoryView = document.querySelector('#inventoryView');
   const inventoryHead = inventoryView?.querySelector('.inventory-head');
   const inventoryList = document.querySelector('#inventoryList');
   const inventorySearch = document.querySelector('#inventorySearch');
+  if (!inventoryView || !inventoryHead || !inventoryList || !inventorySearch) return;
 
-  if (inventoryView && inventoryHead && inventoryList && inventorySearch) {
-    let tools = inventoryHead.querySelector('.inventory-tools');
-    if (!tools) {
-      tools = document.createElement('div');
-      tools.className = 'inventory-tools';
-      inventorySearch.replaceWith(tools);
-      tools.append(inventorySearch);
-    }
-
-    let updateButton = tools.querySelector('.inventory-update-button');
-    if (!updateButton) {
-      updateButton = document.createElement('button');
-      updateButton.type = 'button';
-      updateButton.className = 'button primary inventory-update-button';
-      updateButton.textContent = 'Actualizar inventario';
-      tools.append(updateButton);
-    }
-
-    inventoryList.addEventListener('input', event => {
-      const input = event.target.closest('[data-stock]');
-      if (!input) return;
-      input.closest('.inventory-row')?.classList.add('is-dirty');
-    });
-
-    function productForRow(row) {
-      const code = row.querySelector('.inventory-product small')?.textContent?.trim() || '';
-      return Array.isArray(state.products)
-        ? state.products.find(product => String(product.codigo || '').trim() === code)
-        : null;
-    }
-
-    function stockForRow(row) {
-      const next = {};
-      row.querySelectorAll('[data-stock]').forEach(input => {
-        next[input.dataset.stock] = Math.max(0, Math.trunc(Number(input.value) || 0));
+  // Quita “Inventario privado” y su explicación. En ese espacio queda Regresar a Ventas.
+  const infoBlock = inventoryHead.firstElementChild;
+  if (infoBlock) {
+    infoBlock.querySelectorAll('h1,p').forEach(node => node.remove());
+    if (!infoBlock.querySelector('.inventory-back-sales')) {
+      const back = document.createElement('button');
+      back.type = 'button';
+      back.className = 'inventory-back-sales';
+      back.innerHTML = '<span class="arrow" aria-hidden="true">←</span><span>Ventas</span>';
+      back.addEventListener('click', () => {
+        document.querySelector('.haki-admin-menu')?.setAttribute('hidden', '');
+        document.querySelector('.haki-admin-menu-backdrop')?.setAttribute('hidden', '');
+        document.body.classList.remove('haki-suite-open');
+        if (typeof switchTab === 'function') switchTab('sales');
+        else document.querySelector('.sales-tabs [data-tab="sales"]')?.click();
+        window.scrollTo({ top: 0, behavior: 'auto' });
       });
-      return next;
+      infoBlock.append(back);
+    }
+  }
+
+  // Elimina cualquier botón global de versiones anteriores.
+  inventoryHead.querySelectorAll('.inventory-update-button').forEach(button => button.remove());
+  const tools = inventoryHead.querySelector('.inventory-tools');
+  if (tools && tools.children.length === 1 && tools.firstElementChild === inventorySearch) {
+    tools.replaceWith(inventorySearch);
+  }
+
+  function productForRow(row) {
+    const code = row.querySelector('.inventory-product small')?.textContent?.trim() || '';
+    return Array.isArray(state.products)
+      ? state.products.find(product => String(product.codigo || '').trim() === code)
+      : null;
+  }
+
+  function stockForRow(row) {
+    const next = {};
+    row.querySelectorAll('[data-stock]').forEach(input => {
+      next[input.dataset.stock] = Math.max(0, Math.trunc(Number(input.value) || 0));
+    });
+    return next;
+  }
+
+  async function updateRow(row, button) {
+    if (button.disabled) return;
+    const product = productForRow(row);
+    if (!product) {
+      if (typeof toast === 'function') toast('No se pudo identificar la prenda.', true);
+      return;
     }
 
-    updateButton.addEventListener('click', async () => {
-      if (updateButton.disabled) return;
-      updateButton.disabled = true;
-      const originalText = updateButton.textContent;
-      updateButton.textContent = 'Actualizando…';
+    button.disabled = true;
+    const previousText = button.textContent;
+    button.textContent = 'Actualizando…';
+    try {
+      const next = stockForRow(row);
+      const data = await api('sales?mode=inventory', {
+        method: 'PUT',
+        body: JSON.stringify({ productId: product.id, stock: next }),
+      });
+      state.inventory = data.inventory || state.inventory;
+      row.classList.remove('is-dirty');
+      const total = row.querySelector('.inventory-total');
+      if (total) total.textContent = String(Object.values(next).reduce((sum, value) => sum + value, 0));
+      if (typeof toast === 'function') toast(`${product.nombre} actualizado`);
+    } catch (error) {
+      if (typeof toast === 'function') toast(error.message || 'No se pudo actualizar esta prenda', true);
+    } finally {
+      button.disabled = false;
+      button.textContent = previousText;
+    }
+  }
 
-      try {
-        const dirtyRows = [...inventoryList.querySelectorAll('.inventory-row.is-dirty')];
-
-        if (!dirtyRows.length) {
-          const data = await api('sales?mode=inventory', { method: 'GET' });
-          state.inventory = data.inventory || state.inventory || {};
-          if (typeof renderInventory === 'function') renderInventory();
-          if (typeof toast === 'function') toast('Inventario actualizado');
-          return;
-        }
-
-        for (const row of dirtyRows) {
-          const product = productForRow(row);
-          if (!product) continue;
-          const data = await api('sales?mode=inventory', {
-            method: 'PUT',
-            body: JSON.stringify({ productId: product.id, stock: stockForRow(row) }),
-          });
-          state.inventory = data.inventory || state.inventory;
-          row.classList.remove('is-dirty');
-        }
-
-        if (typeof renderInventory === 'function') renderInventory();
-        if (typeof toast === 'function') toast('Inventario guardado y actualizado');
-      } catch (error) {
-        if (typeof toast === 'function') toast(error.message || 'No se pudo actualizar el inventario', true);
-      } finally {
-        updateButton.disabled = false;
-        updateButton.textContent = originalText;
-      }
+  function decorateInventoryRows() {
+    inventoryList.querySelectorAll('.inventory-row').forEach(row => {
+      if (row.querySelector('.inventory-item-update')) return;
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'button primary inventory-item-update';
+      button.textContent = 'Actualizar inventario';
+      button.addEventListener('click', () => updateRow(row, button));
+      row.append(button);
     });
   }
+
+  inventoryList.addEventListener('input', event => {
+    const input = event.target.closest('[data-stock]');
+    if (!input) return;
+    input.closest('.inventory-row')?.classList.add('is-dirty');
+  });
+
+  let decorateQueued = false;
+  const inventoryObserver = new MutationObserver(() => {
+    if (decorateQueued) return;
+    decorateQueued = true;
+    requestAnimationFrame(() => {
+      decorateQueued = false;
+      decorateInventoryRows();
+    });
+  });
+  inventoryObserver.observe(inventoryList, { childList: true, subtree: true });
+  decorateInventoryRows();
 })();
