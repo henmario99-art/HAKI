@@ -1,0 +1,44 @@
+/* Interfaz principal compacta inspirada en el boceto del administrador. */
+#adminView .admin-home-topbar{align-items:center;margin-bottom:18px}
+#adminView .admin-home-topbar .brand{font-size:31px;letter-spacing:.09em}
+#adminView .admin-home-subtitle{display:none}
+#adminView .top-actions{gap:8px}
+#adminView .admin-home-sales{background:#caff3d!important;color:#111!important;border-color:#9fd31f!important;font-weight:900;box-shadow:none}
+#adminView .admin-home-catalog-link,#adminView .admin-home-logout{font-size:12px;padding:9px 11px}
+
+#adminView .admin-home-toolbar{position:static;display:grid;grid-template-columns:1fr 1fr;gap:10px;background:transparent;padding:0;margin-bottom:18px}
+#adminView .admin-home-toolbar .admin-home-search{grid-column:1/-1;min-height:48px;border-radius:12px;padding-left:42px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='19' height='19' viewBox='0 0 24 24' fill='none' stroke='%23777' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E") no-repeat 14px center}
+#adminView .admin-home-action,#adminView .admin-home-save{width:100%;min-height:46px;border-radius:12px;font-weight:800;text-align:center}
+#adminView .admin-home-save{background:#111!important;color:#fff!important;border-color:#111!important}
+
+#adminView .admin-home-accordion{padding:0;margin:0;border:0;border-bottom:1px solid #ddd;border-radius:0;background:transparent;box-shadow:none}
+#adminView .admin-accordion-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;border:0;background:transparent;color:inherit;padding:17px 2px;text-align:left;font-size:18px;font-weight:800;cursor:pointer}
+#adminView .admin-accordion-chevron{font-size:23px;line-height:1;transition:transform .18s ease}
+#adminView .admin-home-accordion.is-open .admin-accordion-chevron{transform:rotate(180deg)}
+#adminView .admin-accordion-body{padding:2px 0 18px}
+#adminView .admin-accordion-body[hidden]{display:none!important}
+#adminView .admin-accordion-body>p:first-child{margin-top:0}
+#adminView .admin-nested-settings{margin-top:18px;border-top:1px solid #e3e3e3;padding-top:12px}
+#adminView .admin-nested-settings>summary{cursor:pointer;font-weight:800;padding:10px 0}
+#adminView .admin-nested-settings[open]>summary{margin-bottom:12px}
+
+#adminView #productsSection{margin-top:28px}
+#adminView #productsSection>.section-title{padding-top:6px}
+
+html[data-theme=oscuro] #adminView .admin-home-toolbar .admin-home-search{background-color:#151515!important}
+html[data-theme=oscuro] #adminView .admin-home-accordion{border-color:#444}
+html[data-theme=oscuro] #adminView .admin-nested-settings{border-color:#444}
+html[data-theme=oscuro] #adminView .admin-home-sales{background:#caff3d!important;color:#111!important;border-color:#9fd31f!important}
+html[data-theme=oscuro] #adminView .admin-home-save{background:#f1f1ed!important;color:#111!important;border-color:#f1f1ed!important}
+
+@media(max-width:700px){
+  .shell{padding:16px}
+  #adminView .admin-home-topbar{align-items:center}
+  #adminView .admin-home-topbar .brand{font-size:30px}
+  #adminView .top-actions{flex-wrap:nowrap}
+  #adminView .admin-home-catalog-link,#adminView .admin-home-logout{display:none}
+  #adminView .admin-home-sales{min-width:118px;text-align:center;padding:11px 18px}
+  #adminView .admin-home-toolbar{grid-template-columns:1fr 1fr;gap:9px}
+  #adminView .admin-home-action,#adminView .admin-home-save{padding:11px 9px}
+  #adminView .admin-accordion-toggle{font-size:17px;padding:16px 1px}
+}
