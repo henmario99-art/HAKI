@@ -41,7 +41,10 @@
       save.classList.add('admin-home-save');
     }
 
-    [search, products, reorder, add, save].filter(Boolean).forEach(node => toolbar.append(node));
+    if (toolbar.dataset.homeOrder !== '1') {
+      [search, products, reorder, add, save].filter(Boolean).forEach(node => toolbar.append(node));
+      toolbar.dataset.homeOrder = '1';
+    }
   }
 
   function prepareTopbar() {
@@ -122,7 +125,7 @@
     const experience = document.getElementById('experienceSettings');
     const typography = document.getElementById('typographySettings');
     const gymrat = document.getElementById('gymratSettings');
-    const info = [...admin.querySelectorAll('.config-card')].find(card => {
+    const info = document.getElementById('shippingChangesSettings') || [...admin.querySelectorAll('.config-card')].find(card => {
       if (card.id === 'experienceSettings' || card.id === 'typographySettings' || card.id === 'gymratSettings' || card.id === 'generalSettingsCard') return false;
       const heading = card.querySelector(':scope > h2');
       return heading && /encomiendas|domicilios|cambios/i.test(heading.textContent);
@@ -137,9 +140,12 @@
 
     const products = document.getElementById('productsSection');
     if (!products) return;
-    [general, experience, typography, gymrat, info].filter(Boolean).forEach(card => {
-      products.parentElement.insertBefore(card, products);
-    });
+    const desired = [general, experience, typography, gymrat, info].filter(Boolean);
+    const parent = products.parentElement;
+    const current = [...parent.children].filter(node => desired.includes(node));
+    const correctOrder = current.length === desired.length && current.every((node, index) => node === desired[index]);
+    const directlyBeforeProducts = desired.length ? desired[desired.length - 1].nextElementSibling === products : true;
+    if (!correctOrder || !directlyBeforeProducts) desired.forEach(card => parent.insertBefore(card, products));
   }
 
   function enhance() {
@@ -149,8 +155,16 @@
     organizeSettings();
   }
 
-  const observer = new MutationObserver(() => requestAnimationFrame(enhance));
+  let queued = false;
+  const observer = new MutationObserver(() => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      enhance();
+    });
+  });
   observer.observe(admin, { childList: true, subtree: true });
-  setInterval(enhance, 500);
+  setInterval(enhance, 700);
   enhance();
 })();
