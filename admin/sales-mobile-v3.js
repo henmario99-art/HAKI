@@ -39,10 +39,16 @@
     return key ? (all[key] || {}) : {};
   }
 
+  function setTextIfNeeded(field, value) {
+    if (!field || document.activeElement === field) return;
+    const next = String(value || '');
+    if (field.textContent !== next) field.textContent = next;
+  }
+
   function applyLabels() {
     const stored = storedForCurrentPeriod();
-    if (title && document.activeElement !== title) title.textContent = stored.week || defaultWeekLabel();
-    if (month && document.activeElement !== month) month.textContent = stored.month || defaultMonthLabel();
+    setTextIfNeeded(title, stored.week || defaultWeekLabel());
+    setTextIfNeeded(month, stored.month || defaultMonthLabel());
   }
 
   function persistField(field, keyName, fallback) {
@@ -91,12 +97,14 @@
   makeEditable(title, 'semana', 'week', defaultWeekLabel);
   makeEditable(month, 'mes', 'month', defaultMonthLabel);
 
-  // Cuando se navega a otra semana, sales-mobile-v2 actualiza los textos.
-  // El observador aplica solo la etiqueta personalizada de esa semana; nunca
-  // toca las fechas ni los datos que se cargan de lunes a domingo.
+  let applyQueued = false;
   const observer = new MutationObserver(() => {
-    if (document.activeElement === title || document.activeElement === month) return;
-    requestAnimationFrame(applyLabels);
+    if (document.activeElement === title || document.activeElement === month || applyQueued) return;
+    applyQueued = true;
+    requestAnimationFrame(() => {
+      applyQueued = false;
+      applyLabels();
+    });
   });
   if (title) observer.observe(title, { childList: true, characterData: true, subtree: true });
   if (month) observer.observe(month, { childList: true, characterData: true, subtree: true });
