@@ -1,0 +1,28 @@
+/* Etiquetas de mes y semana editables sin cambiar la lógica de fechas. */
+.week-toolbar.haki-period-toolbar .week-nav>div{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0}
+.week-toolbar.haki-period-toolbar .week-nav span#weekRange{display:block!important;color:var(--muted);font-size:12px;line-height:1.2;text-transform:none}
+.haki-editable-period-label{cursor:text;border-radius:7px;padding:2px 6px;outline:0;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.haki-editable-period-label:hover{background:#f3f3f0}
+.haki-editable-period-label:focus{background:#fff;border:1px dashed #999;box-shadow:0 0 0 3px #00000008;overflow:visible;text-overflow:clip}
+#weekTitle.haki-editable-period-label{font-weight:850}
+#weekRange.haki-editable-period-label{font-weight:650}
+
+/* Cabeceras de Cobros, Gastos y Dashboard con regreso directo a Ventas. */
+.suite-header{position:relative;padding-top:52px}
+.suite-back-sales{position:absolute;left:0;top:0;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;padding:9px 12px;font:inherit;font-weight:800;cursor:pointer}
+.suite-back-sales>span:first-child{font-size:19px;line-height:1}
+.suite-header h1{display:flex;align-items:center;gap:10px}
+.suite-title-icon{width:36px;height:36px;flex:0 0 36px;border:1px solid var(--line);border-radius:10px;display:inline-grid;place-items:center;background:#fff;font-size:20px;font-weight:900;line-height:1}
+.suite-title-icon.cash{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.suite-title-icon.bill{font-size:23px}
+.suite-title-icon.chart{font-size:21px}
+.haki-admin-menu-icon.cash{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:900}
+.haki-admin-menu-icon.bill{font-size:25px}
+.haki-admin-menu-icon.chart{font-size:23px}
+
+@media(max-width:700px){
+  .suite-header{padding-top:50px}
+  .suite-back-sales{padding:8px 11px;border-radius:11px}
+  .suite-title-icon{width:34px;height:34px;flex-basis:34px}
+  .week-toolbar.haki-period-toolbar .week-nav span#weekRange{font-size:11px}
+}
