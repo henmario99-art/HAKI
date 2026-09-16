@@ -7,6 +7,7 @@ const INVENTORY_KEY = 'inventory';
 const SIZES = ['S', 'M', 'L', 'XL'];
 const SALE_STATES = new Set(['Pendiente', 'Retirado', 'Cancelado', 'No retirado']);
 const MONEY_STATES = new Set(['Pendiente', 'En caja', 'No retiró']);
+const C807_GUIDE_COST = 4.15;
 
 function store() {
   return getStore({ name: STORE_NAME, consistency: 'strong' });
@@ -73,7 +74,18 @@ function normalizeItem(item, index) {
   return { productId, codigo, nombre, talla, cantidad, precio: Number(precio.toFixed(2)) };
 }
 
-function normalizeSale(input = {}, id = null) {
+function isC807Delivery(value) {
+  return text(value, 60).toLowerCase().includes('c807');
+}
+
+function calculateC807Commission(amount) {
+  const total = number(amount, 0);
+  if (total <= 0) return 0;
+  if (total <= 25) return 1;
+  return Number((total * 0.04).toFixed(2));
+}
+
+function normalizeSale(input = {}, id = null, previous = null) {
   const fecha = validDate(input.fecha);
   if (!fecha) throw new Error('Selecciona una fecha para la venta.');
   const items = Array.isArray(input.items) ? input.items.map(normalizeItem) : [];
@@ -82,6 +94,16 @@ function normalizeSale(input = {}, id = null) {
   const dinero = MONEY_STATES.has(input.dinero) ? input.dinero : 'Pendiente';
   const envio = number(input.envio, 0);
   const subtotal = items.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
+  const total = Number((subtotal + envio).toFixed(2));
+  const entrega = text(input.entrega || 'Pedido Express', 60);
+  const usesC807 = isC807Delivery(entrega);
+  const previousCommission = number(previous?.comisionC807, 0);
+  let comisionC807 = 0;
+  if (usesC807 && dinero === 'Pendiente') {
+    comisionC807 = calculateC807Commission(total);
+  } else if (usesC807 && dinero === 'En caja' && previousCommission > 0) {
+    comisionC807 = previousCommission;
+  }
   return {
     id: id || randomUUID(),
     fecha,
@@ -93,8 +115,10 @@ function normalizeSale(input = {}, id = null) {
     items,
     envio: Number(envio.toFixed(2)),
     subtotal: Number(subtotal.toFixed(2)),
-    total: Number((subtotal + envio).toFixed(2)),
-    entrega: text(input.entrega || 'Pedido Express', 60),
+    total,
+    entrega,
+    costoGuiaC807: usesC807 ? C807_GUIDE_COST : 0,
+    comisionC807: Number(comisionC807.toFixed(2)),
     estado,
     dinero,
     notas: text(input.notas, 600),
@@ -237,7 +261,7 @@ export default async (request) => {
       const previousSales = await getWeek(previousStart);
       const previous = findSale(previousSales, id);
       if (!previous) throw new Error('No se encontró la venta que intentas editar.');
-      const sale = normalizeSale(saleInput, id);
+      const sale = normalizeSale(saleInput, id, previous);
       sale.createdAt = previous.createdAt || new Date().toISOString();
       sale.updatedAt = new Date().toISOString();
       const nextStart = weekStartFor(sale.fecha);
