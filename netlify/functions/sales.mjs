@@ -89,9 +89,8 @@ function isC807Delivery(value) {
   return text(value, 60).toLowerCase().includes('c807');
 }
 
-function isEncomienda(value) {
-  const delivery = text(value, 60).toLowerCase();
-  return delivery.includes('pedido express') || delivery.includes('c807');
+function isPedidoExpress(value) {
+  return text(value, 60).toLowerCase().includes('pedido express');
 }
 
 function calculateC807Commission(amount) {
@@ -260,8 +259,8 @@ async function getReceivables(anchorDate, weeks = 26) {
     const sales = await getWeek(start);
     for (const sale of sales) {
       if (sale?.dinero !== 'Pendiente') continue;
-      if (sale?.estado !== 'Retirado') continue;
-      if (!isEncomienda(sale?.entrega)) continue;
+      if (!reservesStock(sale)) continue;
+      if (!isPedidoExpress(sale?.entrega)) continue;
       all.push({ ...sale, weekStart: start });
     }
   }
