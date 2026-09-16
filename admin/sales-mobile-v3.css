@@ -20,9 +20,31 @@
 .haki-admin-menu-icon.bill{font-size:25px}
 .haki-admin-menu-icon.chart{font-size:23px}
 
+/* Celeste claro para mes y semana. */
+:root{--haki-sales-blue:#bfe8fe;--haki-sales-blue-border:#9fd8f7}
+#weekTitle.haki-editable-period-label,#weekRange.haki-editable-period-label{display:inline-flex!important;align-items:center;justify-content:center;width:max-content;max-width:100%;margin-inline:auto;background:var(--haki-sales-blue)!important;color:#111!important;border:1px solid var(--haki-sales-blue-border);border-radius:9px;padding:4px 9px}
+#weekTitle.haki-editable-period-label:focus,#weekRange.haki-editable-period-label:focus{background:#d9f2ff!important;border-color:#6ebfe9;box-shadow:0 0 0 3px #7dccf32c}
+
+/* Inventario: acción global para guardar/recargar cambios. */
+.inventory-tools{display:flex;align-items:center;gap:9px;flex-wrap:wrap;justify-content:flex-end}
+.inventory-tools #inventorySearch{width:min(360px,100%)}
+.inventory-update-button{white-space:nowrap;min-height:48px}
+.inventory-row.is-dirty{border-color:#8abfe0;box-shadow:0 0 0 2px #bfe8fe55}
+
+/* Dashboard: opción de reinicio. */
+.dashboard-reset-button{white-space:nowrap}
+#dashboardView .suite-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
 @media(max-width:700px){
   .suite-header{padding-top:50px}
   .suite-back-sales{padding:8px 11px;border-radius:11px}
   .suite-title-icon{width:34px;height:34px;flex-basis:34px}
   .week-toolbar.haki-period-toolbar .week-nav span#weekRange{font-size:11px}
+  #weekTitle.haki-editable-period-label{font-size:18px}
+  #weekRange.haki-editable-period-label{font-size:11px!important}
+  .inventory-tools{width:100%;display:grid;grid-template-columns:1fr}
+  .inventory-tools #inventorySearch{width:100%}
+  .inventory-update-button{width:100%}
+  #dashboardView .suite-actions{width:100%}
+  #dashboardView .suite-actions .button{flex:1 1 140px}
 }
