@@ -93,12 +93,12 @@
 
     <section id="collectionsView" class="suite-view" hidden>
       <header class="suite-header">
-        <div><h1>Cobros por encomienda</h1><p>Pedidos que ya fueron entregados al cliente por Pedido Express o C807 y cuyo dinero todavía no ha entrado a caja.</p></div>
+        <div><h1>Cobros de Pedido Express</h1><p>Pedidos Express cuyo dinero todavía no ha entrado a caja. C807 no se incluye en esta tabla.</p></div>
         <div class="suite-actions"><button id="refreshCollections" class="button secondary" type="button">Actualizar</button></div>
       </header>
       <section class="suite-summary">
         <article><span>Total pendiente</span><strong id="collectionsTotal">$0.00</strong></article>
-        <article><span>Encomiendas pendientes</span><strong id="collectionsCount">0</strong></article>
+        <article><span>Pedidos pendientes</span><strong id="collectionsCount">0</strong></article>
       </section>
       <div id="collectionsList"></div>
     </section>
@@ -164,8 +164,9 @@
   <script src="sales.js?v=6"></script>
   <script src="sales-product-picker.js?v=1"></script>
   <script src="sales-rules.js?v=1"></script>
-  <script src="sales-destinations.js?v=1"></script>
+  <script src="sales-destinations.js?v=3"></script>
   <script src="sales-suite.js?v=1"></script>
+  <script src="sales-agency-search-fix.js?v=1"></script>
   <script src="sales-flow.js?v=3"></script>
 </body>
 </html>
