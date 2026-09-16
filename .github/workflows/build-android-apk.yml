@@ -1,0 +1,92 @@
+name: Build HAKI Android APK
+
+on:
+  push:
+    branches:
+      - android-app-v1
+    paths:
+      - ".android-build/**"
+      - ".github/workflows/build-android-apk.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout source branch
+        uses: actions/checkout@v4
+
+      - name: Reconstruct HAKI v1.0 source
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat \
+            .android-build/chunks/00.b64 \
+            .android-build/chunks/01.b64 \
+            .android-build/chunks/02.b64 \
+            .android-build/chunks/03.b64 \
+            .android-build/chunks/04.b64 \
+            .android-build/chunks/05.b64 \
+            .android-build/chunks/06.b64 \
+            .android-build/chunks/07.b64 \
+            .android-build/chunks/08.b64 \
+            .android-build/chunks/09.b64 \
+            .android-build/chunks/10.b64 \
+            .android-build/chunks/11.b64 \
+            .android-build/chunks/12-13.b64 \
+            .android-build/chunks/14-15.b64 \
+            .android-build/chunks/16-17.b64 \
+            .android-build/chunks/18-19.b64 \
+            > /tmp/haki_app_src.tgz.b64
+          base64 --decode /tmp/haki_app_src.tgz.b64 > /tmp/haki_app_src.tgz
+          echo "14d21904312e75229675b49841c036f7707f94cf390aa938b8fdc6f717e1a09a  /tmp/haki_app_src.tgz" | sha256sum -c -
+          mkdir -p mobile-src
+          tar -xzf /tmp/haki_app_src.tgz -C mobile-src
+          test -f mobile-src/package.json
+          test -f mobile-src/capacitor.config.json
+          test -d mobile-src/www
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Install JavaScript dependencies
+        working-directory: mobile-src
+        run: npm install
+
+      - name: Create Android native project
+        working-directory: mobile-src
+        run: |
+          npx cap add android
+          npx cap sync android
+
+      - name: Build debug APK
+        working-directory: mobile-src/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Prepare HAKI APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp mobile-src/android/app/build/outputs/apk/debug/app-debug.apk HAKI-v1.0-debug.apk
+          test -s HAKI-v1.0-debug.apk
+          sha256sum HAKI-v1.0-debug.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HAKI-Android-v1.0
+          path: HAKI-v1.0-debug.apk
+          if-no-files-found: error
+          retention-days: 30
