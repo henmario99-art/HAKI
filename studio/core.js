@@ -6,7 +6,7 @@ H.toast=msg=>{const t=H.$('#toast');t.textContent=msg;t.classList.add('show');cl
 H.status=msg=>H.$('#status').textContent=msg;
 H.uid=()=>`h${Date.now().toString(36)}${Math.random().toString(36).slice(2,7)}`;
 H.active=()=>H.canvas.getActiveObject();
-H.isImage=o=>!!o&&(o.type==='image'||o.hakiKind==='mockup'||o.hakiKind==='design');
+H.isImage=o=>!!o&&o.type==='image';
 H.objectName=o=>o?.hakiName||(o?.type==='i-text'?'Texto':o?.type==='rect'?'Rectángulo':o?.type==='circle'?'Círculo':o?.type==='path'?'Pincel':o?.type==='image'?'Imagen':'Capa');
 H.addMeta=(o,kind,name)=>{o.hakiId=H.uid();o.hakiKind=kind;o.hakiName=name;o.hakiVisible=true;return o};
 H.escapeHtml=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
