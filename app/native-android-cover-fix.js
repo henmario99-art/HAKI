@@ -8,7 +8,7 @@
     if (!source) return;
 
     const target = typeof window.hakiImage === 'function'
-      ? window.hakiImage(source, 1920)
+      ? window.hakiImage(source, matchMedia('(max-width:800px)').matches ? 1280 : 1920)
       : source;
 
     if (target && hero.getAttribute('src') !== target) hero.setAttribute('src', target);
