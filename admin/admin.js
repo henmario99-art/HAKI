@@ -96,7 +96,7 @@ async function loadCatalog() {
 }
 
 function fillConfig() {
-  $('[data-config]').forEach(input => {
+  document.querySelectorAll('[data-config]').forEach(input => {
     input.value = state.config[input.dataset.config] ?? '';
     input.oninput = () => { state.config[input.dataset.config] = input.type==='number'?Number(input.value):input.value; if(input.dataset.config==='tema')document.documentElement.dataset.theme=input.value; };
     if(input.dataset.config==='tema')document.documentElement.dataset.theme=input.value;
