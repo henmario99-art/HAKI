@@ -96,11 +96,23 @@ async function loadCatalog() {
 }
 
 function fillConfig() {
-  $$('[data-config]').forEach(input => {
+  $('[data-config]').forEach(input => {
     input.value = state.config[input.dataset.config] ?? '';
     input.oninput = () => { state.config[input.dataset.config] = input.type==='number'?Number(input.value):input.value; if(input.dataset.config==='tema')document.documentElement.dataset.theme=input.value; };
     if(input.dataset.config==='tema')document.documentElement.dataset.theme=input.value;
   });
+  refreshCoverPreview();
+}
+
+function refreshCoverPreview() {
+  const preview = $('#coverPreview');
+  if (!preview) return;
+  const source = state.config.portada || state.config.portadaRespaldo || 'images/hero-fallback.svg';
+  preview.onerror = () => {
+    preview.onerror = null;
+    preview.src = resolveImage('images/hero-fallback.svg');
+  };
+  preview.src = `${resolveImage(source)}?v=${Date.now()}`;
 }
 
 function normalized(value='') {
@@ -402,6 +414,30 @@ function fileToBase64(file) {
     reader.readAsDataURL(file);
   });
 }
+
+$('#coverFile')?.addEventListener('change', async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  try {
+    e.target.disabled = true;
+    toast('Subiendo foto de portada…');
+    const data = await api('upload', {
+      method: 'POST',
+      body: JSON.stringify({ name: file.name, mime: file.type, base64: await fileToBase64(file) })
+    });
+    state.config.portada = data.path;
+    state.config.portadaRespaldo = data.path;
+    const pathInput = $('#coverPath');
+    if (pathInput) pathInput.value = data.path;
+    refreshCoverPreview();
+    toast('Foto de portada subida. Pulsa “Guardar y publicar” para aplicarla.', true);
+  } catch (err) {
+    toast(err.message);
+  } finally {
+    e.target.disabled = false;
+    e.target.value = '';
+  }
+});
 
 $('#search').addEventListener('input', renderProducts);
 
