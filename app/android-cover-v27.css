@@ -1,0 +1,16 @@
+/* HAKI Android v27 — portada blindada contra src/srcset/config/cache */
+@media (max-width: 800px) {
+  #homeHero .hero-photo {
+    background-image: url("assets/portada-haki-v15.webp") !important;
+    background-size: cover !important;
+    background-position: 50% 50% !important;
+    background-repeat: no-repeat !important;
+    background-color: #0b0b0b !important;
+  }
+  #homeHero .hero-photo > #heroImage,
+  #homeHero .hero-photo > #heroVideo {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+  }
+}

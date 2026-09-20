@@ -1,23 +1,22 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <script src="pwa-mode.js"></script>
-  <link rel="manifest" href="manifest.webmanifest">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8"><script src="../pwa-mode.js"></script><link rel="manifest" href="../manifest.webmanifest">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#111111">
-  <meta name="haki-release" content="2026-09-16-category-product-parity-v12">
+  <meta name="haki-release" content="pwa-v28-video-interface">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="HAKI">
   <meta name="description" content="Encuentra tu próxima prenda. Explora el catálogo deportivo de HAKI y solicita tu cotización.">
   <title>HAKI — Ropa deportiva</title>
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-  <link rel="stylesheet" href="styles.css?v=4">
-  <link rel="stylesheet" href="enhancements.css?v=5">
-  <link rel="stylesheet" href="experience.css?v=1">
-  <link rel="stylesheet" href="gymrat-test.css?v=3">
+  <link rel="icon" href="https://cdn.jsdelivr.net/gh/henmario99-art/HAKI@main/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.jsdelivr.net/gh/henmario99-art/HAKI@main/apple-touch-icon.png">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="enhancements.css">
+  <link rel="stylesheet" href="experience.css">
+  <link rel="stylesheet" href="gymrat-test.css">
+  <link rel="stylesheet" href="doufu-runtime.css?v=1">
   <style id="detail-gallery-step1">
     .detail-back{display:none!important}
     #galleryPrev,#galleryNext{display:none!important}
@@ -43,6 +42,11 @@
       .collection-tile .collection-image{flex-basis:76px;width:76px;height:76px}
     }
   </style>
+  <link rel="stylesheet" href="app-motion.css">
+  <link rel="stylesheet" href="app-visual.css">
+  <link rel="stylesheet" href="app-detail.css">
+  <link rel="stylesheet" href="cover-v15.css">
+  <link rel="stylesheet" href="android-cover-v27.css?v=27">
 </head>
 <body>
   <div class="announcement"><span id="announcementText">HECHO PARA TU SIGUIENTE NIVEL</span><span id="countryText" hidden>HAKI · EL SALVADOR</span><button id="pauseAnnouncement" type="button" aria-label="Pausar anuncios">Ⅱ</button></div>
@@ -50,12 +54,12 @@
   <header class="header">
     <div class="header-side">
       <button class="header-icon" id="openMenu" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="categoryMenu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h18M3 16h18"/></svg></button>
-      <a class="header-icon" id="instagramHeader" href="https://www.instagram.com/hakisv1/" target="_blank" rel="noopener noreferrer" aria-label="Instagram de HAKI"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none"/></svg></a>
+      <a class="header-icon" id="instagramHeader" href="https://www.instagram.com/haki__sv/" target="_blank" rel="noopener noreferrer" aria-label="Instagram de HAKI"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none"/></svg></a>
     </div>
-    <a class="brand" href="#top" aria-label="HAKI inicio"><img class="brand-logo" src="images/haki-wordmark.svg" alt="HAKI"></a>
+    <a class="brand" href="#top" aria-label="HAKI inicio"><img class="brand-logo" src="https://cdn.jsdelivr.net/gh/henmario99-art/HAKI@main/images/haki-wordmark.svg" alt="HAKI"></a>
     <div class="header-side header-right">
       <label class="desktop-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg><input id="desktopSearch" type="search" aria-label="Buscar prendas por código o nombre" placeholder="Escribe un código o nombre de prenda…"></label><button class="header-icon" id="openSearch" type="button" aria-label="Buscar prendas" aria-expanded="false" aria-controls="searchPanel"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
-      <button class="header-icon bag" id="openCart" type="button" aria-label="Abrir mi cotización"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16v13H4zM8 8V6a4 4 0 0 1 8 0v2"/></svg><b id="cartCount">0</b></button>
+      <button class="header-icon bag" id="openCart" type="button" aria-label="Abrir mi cotización"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1 13H6L5 8Z"/><path d="M9 8V5a3 3 0 0 1 6 0v3"/></svg><b id="cartCount">0</b></button>
     </div>
     <div id="searchPanel" class="search-panel" hidden>
       <label class="search-wrap"><span class="sr-only">Buscar por código o palabra clave</span><input id="searchInput" type="search" placeholder="Buscar por código o palabra clave…" autocomplete="off"><button class="header-icon" id="closeSearch" type="button" aria-label="Cerrar búsqueda">×</button></label>
@@ -77,7 +81,7 @@
   <main id="top">
     <section class="hero" id="homeHero">
       <div class="hero-photo">
-        <img id="heroImage" src="images/optimized/927243238ebd-1919.webp" srcset="images/optimized/927243238ebd-640.webp 640w, images/optimized/927243238ebd-1279.webp 1279w, images/optimized/927243238ebd-1919.webp 1919w" sizes="100vw" alt="HAKI ropa deportiva" fetchpriority="high">
+        <img id="heroImage" src="assets/portada-haki-v15.webp" alt="HAKI ropa deportiva" fetchpriority="high">
         <video id="heroVideo" muted playsinline loop autoplay hidden aria-label="Portada HAKI"></video>
       </div>
       <div class="hero-copy">
@@ -89,19 +93,19 @@
     </section>
 
     <section id="novedades" class="new-arrivals" aria-labelledby="newTitle">
-      <div class="section-heading"><h2 id="newTitle">NOVEDADES</h2><div class="rail-actions"><button class="header-icon rail-prev" type="button" aria-label="Prendas anteriores">←</button><button class="header-icon rail-next" type="button" aria-label="Prendas siguientes">→</button></div></div>
+      <div class="section-heading"><div><p class="app-eyebrow">RECIÉN LLEGADO</p><h2 id="newTitle">NOVEDADES</h2></div><div class="rail-actions"><button class="header-icon rail-prev" type="button" aria-label="Prendas anteriores">←</button><button class="header-icon rail-next" type="button" aria-label="Prendas siguientes">→</button></div></div>
       <div id="newProducts" class="product-rail" tabindex="0" aria-label="Novedades, desliza horizontalmente"></div>
       <p id="newEmpty" class="empty-message" hidden>Próximamente, nuevos ingresos.</p>
     </section>
 
     <section id="collectionsSection" class="collections" aria-labelledby="collectionsTitle">
-      <div class="section-heading"><h2 id="collectionsTitle">EXPLORA POR CATEGORÍA</h2></div>
+      <div class="section-heading"><div><p class="app-eyebrow">ENCUENTRA TU ESTILO</p><h2 id="collectionsTitle">CATEGORÍAS</h2></div></div>
       <div id="collectionsGrid" class="collections-grid"></div>
     </section>
 
     <section id="catalogo" class="catalog">
       <div class="catalog-heading">
-        <div><a class="back-home" href="#top">← Volver al inicio</a><h2 id="catalogTitle">TODAS LAS PRENDAS</h2></div>
+        <div><a class="back-home haki-chevron-back" href="#top" aria-label="Volver a las prendas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m7-7-7 7 7 7"/></svg></a><h2 id="catalogTitle">TODAS LAS PRENDAS</h2></div>
         <span class="product-count" id="productCount">50 productos</span>
       </div>
       <p class="notice" id="resultNotice" role="status"></p>
@@ -112,16 +116,16 @@
 
   <footer class="footer">
     <div class="footer-identity">
-      <a class="footer-brand" href="#top"><img class="brand-logo" src="images/haki-wordmark.svg" alt="HAKI"></a>
+      <a class="footer-brand" href="#top"><img class="brand-logo" src="https://cdn.jsdelivr.net/gh/henmario99-art/HAKI@main/images/haki-wordmark.svg" alt="HAKI"></a>
       <nav class="footer-service-links" aria-label="Información de compra">
-        <a href="encomiendas.html" target="_blank" rel="noopener noreferrer">Encomiendas</a>
-        <a href="domicilios.html" target="_blank" rel="noopener noreferrer">Domicilios</a>
-        <a href="cambios-devoluciones.html" target="_blank" rel="noopener noreferrer">Cambios</a>
+        <a href="encomiendas.html" target="_self">Encomiendas</a>
+        <a href="domicilios.html" target="_self">Domicilios</a>
+        <a href="cambios-devoluciones.html" target="_self">Cambios</a>
       </nav>
     </div>
     <p>FUERZA · MOVIMIENTO · ACTITUD</p>
     <nav class="footer-links" aria-label="Redes sociales de HAKI">
-      <a id="instagramFooter" href="https://www.instagram.com/hakisv1/" target="_blank" rel="noopener noreferrer">Instagram</a>
+      <a id="instagramFooter" href="https://www.instagram.com/haki__sv/" target="_blank" rel="noopener noreferrer">Instagram</a>
       <a id="whatsappFooter" href="https://wa.me/50360228002" target="_blank" rel="noopener noreferrer">WhatsApp</a>
       <a id="facebookFooter" target="_blank" rel="noopener noreferrer" hidden>Facebook</a>
       <a id="tiktokFooter" target="_blank" rel="noopener noreferrer" hidden>TikTok</a>
@@ -141,8 +145,10 @@
     <form class="quote-form" id="quoteForm">
       <p class="form-title">DATOS PARA COTIZAR</p>
       <label><span id="nameLabel">Nombre</span><input id="customerName" required placeholder="Tu nombre"></label>
-      <label><span id="departmentLabel">Departamento</span><input id="customerDepartment" required placeholder="Ej. Santa Ana"></label>
-      <label><span id="municipalityLabel">Municipio</span><input id="customerMunicipality" required placeholder="Ej. Santa Ana"></label>
+      <div class="quote-location-row">
+        <label><span id="departmentLabel">Departamento</span><input id="customerDepartment" required placeholder="Ej. Santa Ana"></label>
+        <label><span id="municipalityLabel">Municipio</span><input id="customerMunicipality" required placeholder="Ej. Santa Ana"></label>
+      </div>
       <div class="quote-actions">
         <button class="solid whatsapp" type="submit">SOLICITAR POR WHATSAPP ↗</button>
         <button class="outline" id="instagramQuote" type="button">SOLICITAR POR INSTAGRAM ↗</button>
@@ -168,30 +174,25 @@
   </dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script defer src="image-manifest.js?v=1"></script>
-  <script defer src="storefront-config.js?v=4"></script>
-  <script defer src="experience-config.js?v=5"></script>
-  <script defer src="productos.js"></script>
-  <script defer src="catalog-loader.js?v=5"></script>
-  <script defer src="ios-safari-fix.js?v=12"></script>
-  <script defer src="app.js?v=14"></script>
-  <script defer src="safari-internal-detail.js?v=12"></script>
-  <script defer src="enhancements.js?v=5"></script>
-  <script defer src="personalization.js?v=4"></script>
-  <script defer src="gymrat-test.js?v=2"></script>
+  <script defer src="image-manifest.js"></script>
+  <script defer src="storefront-config.js"></script>
+  <script defer src="experience-config.js"></script>
+  <script defer src="../productos.js"></script>
+  <script defer src="catalog-loader.js"></script>
+  <script defer src="doufu-runtime.js?v=1"></script>
+  <script defer src="ios-safari-fix.js"></script>
+  <script defer src="app.js"></script>
+  <script defer src="safari-internal-detail.js"></script>
+  <script defer src="enhancements.js"></script>
+  <script defer src="personalization.js"></script>
+  <script defer src="gymrat-test.js"></script>
   <script>
-    (()=>{
-      let hideDotsTimer;
-      document.addEventListener('pointerdown',event=>{
-        const gallery=event.target.closest?.('#detailGallery');
-        if(!gallery)return;
-        const media=gallery.closest('.detail-media');
-        if(!media)return;
-        media.classList.add('show-gallery-dots');
-        clearTimeout(hideDotsTimer);
-        hideDotsTimer=setTimeout(()=>media.classList.remove('show-gallery-dots'),2200);
-      },{passive:true});
-    })();
+    (()=>{let hideDotsTimer;document.addEventListener('pointerdown',event=>{const gallery=event.target.closest?.('#detailGallery');if(!gallery)return;const media=gallery.closest('.detail-media');if(!media)return;media.classList.add('show-gallery-dots');clearTimeout(hideDotsTimer);hideDotsTimer=setTimeout(()=>media.classList.remove('show-gallery-dots'),2200);},{passive:true});})();
   </script>
+  <script defer src="app-motion.js"></script>
+  <script defer src="cover-v15.js"></script>
+  <script defer src="cover-v16-fix.js"></script>
+  <script defer src="native-android-cover-fix.js?v=22"></script>
+<script defer src="pwa-status.js"></script>
 </body>
 </html>

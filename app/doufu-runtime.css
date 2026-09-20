@@ -1,0 +1,7 @@
+
+html.doufu-app{background:var(--page,#fff)}
+@supports (padding-top: env(safe-area-inset-top)){
+  html.doufu-app body{padding-top:env(safe-area-inset-top)}
+  html.doufu-app .category-menu{padding-top:calc(24px + env(safe-area-inset-top))}
+  html.doufu-app .cart-drawer{padding-top:calc(20px + env(safe-area-inset-top))}
+}

@@ -1,0 +1,20 @@
+/* App-only motion: preserve the HAKI layout and opaque navigation surfaces. */
+:root{--app-ease:cubic-bezier(.22,1,.36,1)}
+html.doufu-app .header{top:env(safe-area-inset-top,0px)}
+html.doufu-app .cart-drawer{transition:transform 300ms var(--app-ease)}
+html.doufu-app :is(.solid,.outline,.header-icon,.size-option,.gymrat-option){transition:background-color 160ms ease,color 160ms ease,border-color 160ms ease,opacity 120ms ease}
+html.doufu-app :is(button,a):active{opacity:.72}
+html.doufu-app :is(.product-image,.collection-image) img{transform:none!important}
+html.doufu-app .category-menu[open]{animation:app-menu-in 260ms var(--app-ease)}
+html.doufu-app .size-guide-dialog[open],html.doufu-app .gymrat-dialog[open]{animation:app-sheet-in 280ms var(--app-ease)}
+html.doufu-app dialog[open]::backdrop{animation:app-backdrop-in 180ms ease}
+html.doufu-app .search-panel:not([hidden]){animation:app-sheet-in 180ms var(--app-ease)}
+html.doufu-app .gymrat-question-view{animation:app-question-in 220ms var(--app-ease)}
+html.doufu-app .gymrat-progress-fill{transition:width 240ms var(--app-ease)}
+html.doufu-app .toast{border-radius:12px;transition:transform 240ms var(--app-ease),opacity 180ms ease}
+html.doufu-app .cart-drawer,html.doufu-app .gymrat-dialog{overscroll-behavior-y:contain}
+@keyframes app-menu-in{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+@keyframes app-sheet-in{from{transform:translateY(16px)}to{transform:translateY(0)}}
+@keyframes app-question-in{from{transform:translateY(10px);opacity:.5}to{transform:translateY(0);opacity:1}}
+@keyframes app-backdrop-in{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){html.doufu-app *,html.doufu-app *::before,html.doufu-app *::after,html.doufu-app dialog::backdrop{animation:none!important;transition:none!important;scroll-behavior:auto!important}}

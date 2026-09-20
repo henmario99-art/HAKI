@@ -1,0 +1,249 @@
+/* v9: opaque safe-area and photo-first product detail. App only. */
+html.doufu-app .product-count,html.doufu-app .card-size-label{display:none!important}
+html.doufu-app body #collectionsSection #collectionsGrid .collection-tile:after{display:none!important;content:none!important}
+html.doufu-app body #collectionsSection #collectionsGrid .collection-tile h3{right:13px}
+/* The sticky header begins below the iPhone status bar. Cover that strip so
+   scrolling photos cannot show through it. No blur or alpha on the logo. */
+html.doufu-app body::before{content:'';position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--surface,#fff);z-index:59;pointer-events:none}
+html.doufu-app .header{background:var(--surface,#fff)!important;opacity:1!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;isolation:isolate;z-index:50}
+html.doufu-app .header .brand,html.doufu-app .header .brand-logo{opacity:1!important;filter:none!important;mask-image:none!important;-webkit-mask-image:none!important;animation:none!important;transition:none!important}
+html.doufu-app .header::before{content:'';position:absolute;left:0;right:0;bottom:100%;height:env(safe-area-inset-top,0px);background:var(--surface,#fff);pointer-events:none}
+html.doufu-app body:is(.haki-ios-product-open,.detail-view) .header{visibility:hidden;pointer-events:none}
+html.doufu-app body:is(.haki-ios-product-open,.detail-view)::before{display:none}
+html.doufu-app.haki-ios-webkit body.haki-ios-product-open #productDetail,
+html.doufu-app body.detail-view #productDetail{position:fixed!important;inset:0!important;z-index:55!important;margin:0!important;width:100%!important;max-width:none!important;overflow-y:auto!important;overflow-x:hidden!important;background:var(--surface);padding:0 0 max(24px,env(safe-area-inset-bottom))!important;overscroll-behavior:contain}
+html.doufu-app body.detail-view{overflow:hidden}
+html.doufu-app #productDetail .app-detail-toolbar{position:sticky;top:0;height:0;overflow:visible;z-index:65;display:flex;justify-content:space-between;align-items:flex-start;padding:0 12px;pointer-events:none}
+html.doufu-app.haki-ios-webkit body.haki-ios-product-open #productDetail .detail-back,
+html.doufu-app #productDetail .app-detail-toolbar .detail-back,
+html.doufu-app #productDetail .app-detail-cart{position:relative!important;top:auto!important;display:flex!important;align-items:center;justify-content:center;flex:0 0 44px;width:44px!important;height:44px!important;min-height:44px!important;padding:10px!important;margin:calc(env(safe-area-inset-top,0px) + 12px) 0 0!important;border:0!important;border-radius:50%;background:#fff!important;color:#111!important;box-shadow:0 2px 12px #0000000a;pointer-events:auto;text-decoration:none}
+html.doufu-app .app-detail-toolbar svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+html.doufu-app #productDetail .detail-layout{display:block;padding:0;gap:0}
+html.doufu-app #productDetail .detail-media{width:100%;margin:0;border-radius:0}
+html.doufu-app #productDetail .detail-gallery{aspect-ratio:7/10;max-height:none;border-radius:0;margin:0;gap:0}
+html.doufu-app #productDetail .detail-gallery img{object-fit:cover;width:100%;height:100%;max-height:none;flex:0 0 100%}
+html.doufu-app #productDetail .detail-availability,html.doufu-app #productDetail .gallery-zoom{display:none!important}
+html.doufu-app #productDetail .detail-content{padding:0;background:var(--surface)}
+html.doufu-app #productDetail .detail-summary{position:static!important;padding:22px 18px 0;box-shadow:none;border:0}
+html.doufu-app .app-detail-heading{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:start}
+html.doufu-app #productDetail .detail-code{font-size:10px;letter-spacing:.22em;line-height:1.5;margin:0 0 8px;color:var(--ink);font-weight:700!important}
+html.doufu-app #productDetail .detail-summary h1{font-size:28px;line-height:1.05;margin:0;max-width:12ch;overflow-wrap:normal}
+html.doufu-app #productDetail .detail-price{font-size:23px;line-height:1.3;white-space:nowrap;margin:0}
+html.doufu-app .app-detail-bestseller{display:inline-block;border:1px solid var(--ink);border-radius:999px;padding:5px 10px;font-size:10px;font-weight:700;margin-top:18px}
+html.doufu-app #productDetail .detail-options{padding:28px 18px 22px}
+html.doufu-app #productDetail .detail-size-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 18px}
+html.doufu-app #productDetail .detail-size-heading h2{font-family:var(--font-body)!important;font-size:11px!important;line-height:1.4;text-transform:uppercase;margin:0}
+html.doufu-app #productDetail .size-guide-link{font-size:10px;text-transform:uppercase;font-weight:700;text-decoration:underline;white-space:nowrap}
+html.doufu-app #productDetail .detail-sizes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0}
+html.doufu-app #productDetail .detail-size{height:48px;min-width:0;border:1px solid var(--line);border-radius:12px;font-size:16px}
+html.doufu-app #productDetail .detail-size-status{font-size:12px;color:var(--muted);min-height:18px;margin:10px 0 12px}
+html.doufu-app #productDetail .detail-add{width:100%;min-height:52px;border-radius:999px;font-size:12px}
+html.doufu-app #productDetail .haki-complements{margin-top:12px;padding:24px 18px}
+@media(min-width:801px){html.doufu-app #productDetail .detail-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);max-width:1200px;margin:auto}html.doufu-app #productDetail .detail-content{padding-top:70px}html.doufu-app #productDetail .haki-complements{max-width:1200px;margin:0 auto}}
+
+
+/* HAKI Doufu v23 — correcciones visuales del catálogo (2026-09-16)
+   - Evita que el buscador/cabecera se superponga al entrar a categorías.
+   - Elimina restos visuales de la marca bajo la flecha de regreso.
+   - Aumenta el aire entre tallas y “Añadir al carrito”.
+   - Oculta por completo las flechas antiguas del carrusel de detalle. */
+
+/* Las flechas antiguas del carrusel no deben reaparecer por reglas inyectadas. */
+html.doufu-app #productDetail #galleryPrev,
+html.doufu-app #productDetail #galleryNext,
+html.doufu-app #productDetail .gallery-controls > .header-icon{
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+html.doufu-app #productDetail .gallery-controls{
+  justify-content:center!important;
+}
+
+/* Más separación en las tarjetas del catálogo. */
+html.doufu-app .product-actions{
+  row-gap:13px!important;
+}
+html.doufu-app .product-actions .sizes{
+  margin-bottom:2px!important;
+}
+
+/* Más separación en la vista individual de la prenda. */
+html.doufu-app #productDetail .detail-add{
+  margin-top:18px!important;
+}
+
+@media (max-width:800px){
+  /*
+    En portada la cabecera flota sobre la foto. Al entrar a una categoría esa
+    misma geometría no puede seguir flotando sobre el catálogo: le damos una
+    superficie propia y reservamos exactamente su espacio antes del contenido.
+  */
+  html.doufu-app body.category-view .header{
+    position:absolute!important;
+    inset:0 0 auto 0!important;
+    height:148px!important;
+    padding:0!important;
+    background:var(--surface,#fff)!important;
+    color:var(--ink,#111)!important;
+    border:0!important;
+    border-bottom:1px solid var(--line,#dedede)!important;
+    box-shadow:none!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+    opacity:1!important;
+    z-index:50!important;
+  }
+
+  /* En categorías la palabra HAKI de portada quedaba debajo de la flecha y se
+     veía recortada (p. ej. “K I”). No se necesita aquí. */
+  html.doufu-app body.category-view .header > .brand{
+    display:none!important;
+  }
+
+  /* Segunda fila estable: tema + búsqueda + carrito. */
+  html.doufu-app body.category-view .header > .header-side:not(.header-right){
+    left:12px!important;
+    top:max(72px,calc(env(safe-area-inset-top) + 38px))!important;
+    width:44px!important;
+    height:48px!important;
+  }
+  html.doufu-app body.category-view .header-right{
+    left:64px!important;
+    right:12px!important;
+    top:max(72px,calc(env(safe-area-inset-top) + 38px))!important;
+    height:48px!important;
+    gap:8px!important;
+  }
+  html.doufu-app body.category-view #themeToggle,
+  html.doufu-app body.category-view #openCart{
+    color:var(--ink,#111)!important;
+  }
+  html.doufu-app body.category-view #themeToggle svg,
+  html.doufu-app body.category-view #openCart svg{
+    color:var(--ink,#111)!important;
+    stroke:var(--ink,#111)!important;
+  }
+  html.doufu-app body.category-view #themeToggle .theme-icon-moon path{
+    fill:var(--ink,#111)!important;
+    stroke:none!important;
+  }
+  html.doufu-app body.category-view .desktop-search{
+    height:46px!important;
+    border:1px solid var(--line,#aaa)!important;
+    background:var(--surface,#fff)!important;
+    color:var(--ink,#111)!important;
+  }
+  html.doufu-app body.category-view .desktop-search svg{
+    stroke:var(--ink,#111)!important;
+  }
+  html.doufu-app body.category-view .desktop-search input{
+    color:var(--ink,#111)!important;
+  }
+  html.doufu-app body.category-view .desktop-search input::placeholder{
+    color:var(--muted,#777)!important;
+    opacity:1!important;
+  }
+  html.doufu-app body.category-view #openCart b{
+    background:var(--ink,#111)!important;
+    color:var(--inverse,#fff)!important;
+    border-color:var(--surface,#fff)!important;
+  }
+
+  /* Android/Chromium: el catálogo normal necesita empezar debajo de la cabecera. */
+  html.doufu-app:not(.haki-ios-webkit) body.category-view #catalogo.catalog{
+    padding-top:158px!important;
+  }
+  html.doufu-app:not(.haki-ios-webkit) body.category-view #catalogo .catalog-heading{
+    min-height:0!important;
+    height:0!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+  }
+  html.doufu-app:not(.haki-ios-webkit) body.category-view #catalogo .back-home.haki-chevron-back{
+    position:absolute!important;
+    top:max(14px,calc(env(safe-area-inset-top) + 8px))!important;
+    left:16px!important;
+    z-index:60!important;
+    margin:0!important;
+  }
+
+  /* iOS usa una hoja fija separada; no debe heredar el padding de Android. */
+  html.doufu-app.haki-ios-webkit body.category-view .haki-ios-category-sheet{
+    padding-top:24px!important;
+  }
+
+  /* Aire adicional en móvil, donde las filas estaban visualmente pegadas. */
+  html.doufu-app .product-actions{
+    row-gap:14px!important;
+  }
+  html.doufu-app #productDetail .detail-add{
+    margin-top:20px!important;
+  }
+}
+
+
+/* HAKI Android v24 — remove only the controls crossed out in the reference.
+   Category/collection view keeps the large back button and FILTROS / ENVÍOS labels. */
+@media (max-width:800px){
+  /* Remove crossed-out top controls in category screens. */
+  html.doufu-app body.category-view #themeToggle,
+  html.doufu-app body.category-view .desktop-search,
+  html.doufu-app body.category-view #openSearch,
+  html.doufu-app body.category-view #openCart,
+  html.doufu-app body.collection-view #themeToggle,
+  html.doufu-app body.collection-view .desktop-search,
+  html.doufu-app body.collection-view #openSearch,
+  html.doufu-app body.collection-view #openCart{
+    display:none!important;
+    visibility:hidden!important;
+    pointer-events:none!important;
+  }
+
+  /* No empty header rows after those controls are removed. */
+  html.doufu-app body.category-view .header,
+  html.doufu-app body.collection-view .header{
+    height:0!important;
+    min-height:0!important;
+    padding:0!important;
+    margin:0!important;
+    border:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+    pointer-events:none!important;
+  }
+  html.doufu-app body.category-view .header > .brand,
+  html.doufu-app body.collection-view .header > .brand,
+  html.doufu-app body.category-view .header > .header-side,
+  html.doufu-app body.collection-view .header > .header-side{
+    display:none!important;
+  }
+
+  /* Keep room only for the large back button and the filter row. */
+  html.doufu-app:not(.haki-ios-webkit) body.category-view #catalogo.catalog,
+  html.doufu-app:not(.haki-ios-webkit) body.collection-view #catalogo.catalog{
+    padding-top:max(78px,calc(env(safe-area-inset-top) + 58px))!important;
+  }
+  html.doufu-app:not(.haki-ios-webkit) body.category-view #catalogo .back-home.haki-chevron-back,
+  html.doufu-app:not(.haki-ios-webkit) body.collection-view #catalogo .back-home.haki-chevron-back{
+    position:absolute!important;
+    top:max(12px,calc(env(safe-area-inset-top) + 7px))!important;
+    left:16px!important;
+    z-index:70!important;
+    margin:0!important;
+    pointer-events:auto!important;
+  }
+
+  /* Remove the two crossed-out chevrons beside FILTROS / ENVÍOS, not the labels. */
+  html.doufu-app body.category-view .catalog-filter-chevron,
+  html.doufu-app body.collection-view .catalog-filter-chevron{
+    display:none!important;
+  }
+  html.doufu-app body.category-view .catalog-filter summary,
+  html.doufu-app body.collection-view .catalog-filter summary{
+    justify-content:flex-start!important;
+    gap:0!important;
+  }
+}

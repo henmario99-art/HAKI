@@ -1,0 +1,60 @@
+/* HAKI Doufu v8 — compact editorial cards inspired by the supplied video. */
+html.doufu-app{--app-canvas:#f6f6f2;--app-radius:15px}
+html.doufu-app[data-theme=oscuro]{--app-canvas:#181818}
+html.doufu-app body{background:var(--app-canvas)}
+html.doufu-app .header{height:68px;background:var(--surface);border-bottom:1px solid var(--line)}
+html.doufu-app .header-side{gap:4px}
+html.doufu-app .hero-copy{padding:30px 18px}
+html.doufu-app .hero h1{max-width:540px;font-size:clamp(38px,8vw,70px);line-height:1.03;letter-spacing:-.04em!important}
+html.doufu-app .hero-buttons{gap:8px}
+html.doufu-app .hero-buttons .hero-button{border-radius:999px;min-height:46px;font-size:10px;padding:13px 17px}
+html.doufu-app .hero-description{font-size:14px;margin:14px 0 22px}
+html.doufu-app .new-arrivals,html.doufu-app .collections,html.doufu-app .catalog{padding-left:16px;padding-right:16px}
+html.doufu-app .section-heading{margin-bottom:18px}
+html.doufu-app .app-eyebrow{font-size:9px;font-weight:700;letter-spacing:.18em;margin:0 0 8px;color:var(--muted);line-height:1.4}
+html.doufu-app :is(.section-heading h2,.catalog-heading h2){font-family:var(--font-body)!important;font-weight:900!important;font-size:clamp(21px,4.8vw,32px);letter-spacing:-.035em!important;line-height:1.1}
+html.doufu-app .new-arrivals{padding-top:30px;padding-bottom:30px}
+html.doufu-app .collections{padding-top:24px;padding-bottom:32px}
+html.doufu-app .catalog-heading{padding-bottom:18px;border:0}
+html.doufu-app .product-count{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:10px;white-space:nowrap}
+html.doufu-app .notice:empty{display:none}
+/* Override the old image + separate label layout, including its mobile rules. */
+html.doufu-app body #collectionsSection #collectionsGrid.collections-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;border:0}
+html.doufu-app body #collectionsSection #collectionsGrid .collection-tile{position:relative!important;display:block!important;aspect-ratio:1/1!important;border-radius:var(--app-radius)!important;overflow:hidden!important;background:var(--soft)!important;isolation:isolate}
+html.doufu-app body #collectionsSection #collectionsGrid .collection-tile .collection-image{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;aspect-ratio:auto!important;margin:0!important}
+html.doufu-app body #collectionsSection #collectionsGrid .collection-tile:before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,transparent 30%,rgba(0,0,0,.72) 100%)}
+html.doufu-app body #collectionsSection #collectionsGrid .collection-tile h3{position:absolute!important;left:13px;bottom:14px;right:32px;color:#fff!important;padding:0!important;font-size:13px!important;font-weight:800!important;line-height:1.15!important;text-transform:uppercase;z-index:2}
+html.doufu-app body #collectionsSection #collectionsGrid .collection-tile:after{content:'→'!important;display:block!important;position:absolute;right:12px;bottom:13px;color:white;font-size:18px;z-index:2}
+html.doufu-app .products{gap:24px 10px}
+html.doufu-app .product-image{display:block;border-radius:var(--app-radius);overflow:hidden;aspect-ratio:3/4;background:var(--soft)}
+html.doufu-app .product-info.product-detail-link{grid-template-columns:minmax(0,1fr) auto;min-height:58px;gap:4px;align-items:start;padding:10px 0 6px}
+html.doufu-app .product-info>div{display:flex;flex-direction:column}
+html.doufu-app .product-info h3{order:-1;font-size:10px!important;line-height:1.4;height:1.4em;margin:0 0 4px;font-weight:700}
+html.doufu-app .product-info .product-code{font-size:8px;line-height:1.4;letter-spacing:.05em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html.doufu-app .product-info strong{font-size:10px!important;line-height:1.4;margin:0}
+html.doufu-app .product-number,html.doufu-app .best-seller-badge{border-radius:999px;font-size:8px;padding:5px 7px;max-width:calc(100% - 16px)}
+html.doufu-app .product-actions{display:grid!important;grid-template-columns:minmax(0,1fr);gap:7px;padding-top:0}
+html.doufu-app .card-size-label{font-size:8px;letter-spacing:.08em;font-weight:600;color:var(--muted)}
+html.doufu-app .product-actions .sizes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+html.doufu-app .product-actions .size-option{width:100%;height:40px;min-width:0;border-radius:9px;font-size:11px;border:1px solid var(--line)}
+html.doufu-app .product-actions .size-option.selected{border-color:var(--ink);background:var(--ink);color:var(--inverse)}
+html.doufu-app .product-actions .size-option:disabled{opacity:.35;text-decoration:line-through}
+html.doufu-app .product-actions .add{width:100%;min-width:0;height:42px;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:5px;font-size:9px!important;letter-spacing:.01em;line-height:1.2;background:var(--ink);color:var(--inverse);border:1px solid var(--ink);transform:none}
+html.doufu-app .product-actions .add span{font-size:17px;font-weight:400}
+html.doufu-app .product-actions .add:disabled{opacity:.38}
+html.doufu-app .product-rail>.product{flex-basis:calc((100% - 12px)/2)}
+html.doufu-app .product-rail{gap:12px;scrollbar-width:none;padding-bottom:10px}
+html.doufu-app .product-rail::-webkit-scrollbar{display:none}
+html.doufu-app .detail-summary h1{font-family:var(--font-body)!important;font-weight:900!important;letter-spacing:-.03em!important}
+html.doufu-app .detail-add{border-radius:999px!important}
+html.doufu-app .detail-size{border-radius:10px;min-height:44px}
+html.doufu-app .category-menu,html.doufu-app .cart-drawer{border-radius:20px 0 0 20px}
+html.doufu-app .category-menu{border-radius:0 20px 20px 0}
+html.doufu-app .gymrat-option{border-radius:12px}
+@media(min-width:801px){html.doufu-app body #collectionsSection #collectionsGrid.collections-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}html.doufu-app .product-rail>.product{flex-basis:calc((100% - 36px)/4)}html.doufu-app .product-info h3,html.doufu-app .product-info strong{font-size:13px!important}html.doufu-app .product-actions .add{font-size:11px!important}}
+@media(max-width:360px){html.doufu-app .product-info.product-detail-link{grid-template-columns:1fr;min-height:74px}html.doufu-app .product-actions .add{font-size:8px!important}}
+
+
+/* v20 — category header cleanup: one back arrow, no category title */
+html.doufu-app body.category-view #catalogTitle{display:none!important}
+html.doufu-app .haki-chevron-back::before{content:none!important;display:none!important}
