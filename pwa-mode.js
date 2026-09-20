@@ -8,7 +8,7 @@
   const installed = () => navigator.standalone === true || modes.some(mode => mode.matches);
   const inApp = location.pathname.startsWith(app.pathname);
   const file = location.pathname.slice((inApp ? app : base).pathname.length);
-  const pages = ['', 'index.html', 'product', 'product.html', 'encomiendas.html', 'domicilios.html', 'cambios-devoluciones.html'];
+  const pages = ['', 'index.html', 'product', 'product.html', 'encomiendas', 'encomiendas.html', 'domicilios', 'domicilios.html', 'cambios-devoluciones', 'cambios-devoluciones.html'];
   function route() {
     if (!pages.includes(file) || installed() === inApp) return;
     const target = new URL(file === 'index.html' || /^product(?:\.html)?$/.test(file) ? './' : file, installed() ? app : base);
