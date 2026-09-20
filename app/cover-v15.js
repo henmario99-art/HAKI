@@ -2,7 +2,9 @@
   const getConfig=()=>window.HAKI_CONFIG||{};
   const imageUrl=url=>{
     if(!url) return '';
-    return typeof window.hakiImage==='function' ? window.hakiImage(url,1920) : url;
+    return typeof window.hakiImage==='function'
+      ? window.hakiImage(url, matchMedia('(max-width:800px)').matches ? 1280 : 1920)
+      : url;
   };
   const applyCover=()=>{
     const config=getConfig();
