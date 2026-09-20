@@ -47,7 +47,11 @@ async function api(path, options={}) {
 async function checkAuth() {
   try {
     const data = await api('auth', { method: 'GET' });
-    if (data.authenticated) return showAdmin();
+    if (data.authenticated) {
+      if (new URLSearchParams(location.search).get('panel') === '1') return showAdmin();
+      location.replace('/admin/sales.html');
+      return;
+    }
   } catch {}
   $('#loginView').hidden = false;
   $('#adminView').hidden = true;
@@ -61,7 +65,8 @@ $('#loginForm').addEventListener('submit', async (e) => {
     await api('auth', { method: 'POST', body: JSON.stringify({ password: $('#password').value }) });
     $('#password').value = '';
     status.textContent = '';
-    await showAdmin();
+    if (new URLSearchParams(location.search).get('panel') === '1') await showAdmin();
+    else location.href = '/admin/sales.html';
   } catch (err) {
     status.textContent = err.message;
   }

@@ -1,0 +1,61 @@
+/* Solicitudes del 20-09: navegación horizontal, métricas compactas y etapas. */
+.sales-tabs.haki-primary-tabs{
+  display:flex!important;
+  gap:6px;
+  overflow-x:auto!important;
+  overscroll-behavior-x:contain;
+  scrollbar-width:none;
+  padding:0 0 9px!important;
+  margin-bottom:14px!important;
+  border:0!important;
+  -webkit-overflow-scrolling:touch;
+}
+.sales-tabs.haki-primary-tabs::-webkit-scrollbar{display:none}
+.sales-tabs.haki-primary-tabs .tab{
+  display:inline-flex!important;
+  flex:0 0 auto;
+  align-items:center;
+  justify-content:center;
+  min-height:40px!important;
+  padding:8px 14px!important;
+  border:1px solid var(--line)!important;
+  border-radius:999px!important;
+  font-size:13px!important;
+  background:#fff!important;
+}
+.sales-tabs.haki-primary-tabs .tab.is-active{background:#111!important;color:#fff!important;border-color:#111!important}
+.sales-tabs.haki-primary-tabs .tab.is-active::after{display:none!important}
+.haki-sales-menu-toggle .chevron,.haki-admin-menu,.haki-admin-menu-backdrop,.suite-back-sales,.inventory-back-sales{display:none!important}
+
+.metrics.haki-bottom-metrics{
+  grid-template-columns:repeat(5,minmax(74px,1fr))!important;
+  gap:7px!important;
+  overflow-x:auto;
+  padding-bottom:3px;
+}
+.metrics.haki-bottom-metrics article{
+  min-width:74px;
+  min-height:70px!important;
+  border-radius:13px!important;
+  padding:9px 7px!important;
+}
+.metrics.haki-bottom-metrics span{font-size:9px!important;line-height:1.15}
+.metrics.haki-bottom-metrics strong{font-size:15px!important;margin-top:5px!important;white-space:nowrap}
+.metrics.haki-bottom-metrics article:nth-child(2){order:3}
+.metrics.haki-bottom-metrics article:nth-child(3){order:2}
+.metrics.haki-bottom-metrics article:nth-child(4){order:4}
+.metrics.haki-bottom-metrics article:nth-child(5){order:5}
+
+.haki-sale-mini[data-shipping-stage="Pedido tomado"]{background:#dff3ff!important;border-color:#a9daf6!important}
+.haki-sale-mini[data-shipping-stage="Empacado"]{background:#fff2b8!important;border-color:#ead274!important}
+.haki-sale-mini[data-shipping-stage="Enviado"]{background:#fff!important}
+
+#weekTitle.haki-editable-period-label,#weekRange.haki-editable-period-label,
+.week-toolbar.haki-period-toolbar .week-nav span#weekRange{font-size:16px!important;cursor:text;touch-action:manipulation}
+.suite-header>div:first-child>p{display:none!important}
+
+@media(max-width:700px){
+  .sales-tabs.haki-primary-tabs{margin-left:-10px!important;margin-right:-10px!important;padding-left:10px!important;padding-right:10px!important}
+  .suite-header{padding-top:0!important}
+  .metrics.haki-bottom-metrics{margin-top:13px!important}
+}

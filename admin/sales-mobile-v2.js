@@ -13,6 +13,7 @@
   const months = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   const asDate = iso => new Date(`${iso}T12:00:00`);
   const saleNet = sale => Math.max(0, Number(((Number(sale?.total) || 0) - (Number(sale?.comisionC807) || 0)).toFixed(2)));
+  const merchandiseTotal = sale => Number(sale?.subtotal ?? ((Number(sale?.total) || 0) - (Number(sale?.envio) || 0))) || 0;
   const activeSale = sale => !['Cancelado', 'No retirado'].includes(sale?.estado);
   const statePill = value => value === 'Retirado' ? 'done' : (value === 'Cancelado' || value === 'No retirado' ? 'cancelled' : 'pending');
 
@@ -166,19 +167,22 @@
 
   function renderMetrics() {
     const active = state.sales.filter(activeSale);
-    const sold = active.reduce((sum, sale) => sum + saleNet(sale), 0);
+    const sold = active.reduce((sum, sale) => sum + merchandiseTotal(sale), 0);
     const pendingOrders = active.filter(sale => sale.estado === 'Pendiente').length;
-    const toCollect = active.filter(sale => sale.dinero === 'Pendiente').reduce((sum, sale) => sum + saleNet(sale), 0);
+    const toCollect = active.filter(sale => sale.dinero === 'Pendiente').reduce((sum, sale) => sum + (Number(sale.total) || 0), 0);
     const orders = active.length;
     if (metricCards[0]) metricCards[0].querySelector('strong').textContent = money(sold);
     if (metricCards[1]) metricCards[1].querySelector('strong').textContent = String(pendingOrders);
     if (metricCards[2]) metricCards[2].querySelector('strong').textContent = money(toCollect);
     if (metricCards[3]) metricCards[3].querySelector('strong').textContent = String(orders);
+    const unclaimed = document.querySelector('#metricUnclaimed');
+    if (unclaimed) unclaimed.textContent = String(state.sales.filter(sale => sale.estado === 'No retirado').length);
   }
 
   function saleMiniCard(sale) {
     const card = document.createElement('article');
     card.className = 'haki-sale-mini';
+    card.dataset.shippingStage = sale.etapaEnvio || 'Pedido tomado';
     const itemText = (sale.items || []).map(item => `${item.codigo} ${item.talla}${Number(item.cantidad) > 1 ? ` ×${item.cantidad}` : ''}`).join(' · ') || 'Pedido';
     const destination = sale.lugarHorario || 'Sin destino';
     card.innerHTML = `

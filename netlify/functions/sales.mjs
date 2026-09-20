@@ -137,6 +137,7 @@ function normalizeSale(input = {}, id = null, previous = null) {
     costoGuiaC807: usesC807 ? C807_GUIDE_COST : 0,
     comisionC807: Number(comisionC807.toFixed(2)),
     estado,
+    etapaEnvio: ['Pedido tomado', 'Empacado', 'Enviado'].includes(input.etapaEnvio) ? input.etapaEnvio : (previous?.etapaEnvio || 'Pedido tomado'),
     dinero,
     cobroSolicitadoAt: validTimestamp(input.cobroSolicitadoAt) || validTimestamp(previous?.cobroSolicitadoAt),
     cobroCanceladoAt: validTimestamp(input.cobroCanceladoAt) || validTimestamp(previous?.cobroCanceladoAt),
