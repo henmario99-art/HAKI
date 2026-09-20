@@ -291,3 +291,46 @@ html.doufu-app .footer{background:#101010!important;color:#f5f5f5!important}
     letter-spacing:.08em!important;
   }
 }
+
+
+/* v33: stable installed search. Keep iOS input at 16px to prevent focus zoom,
+   while rendering the visible placeholder smaller. */
+@media (max-width:800px){
+  html.doufu-app body.search-view .header{
+    background:var(--surface,#fff)!important;
+    color:var(--ink,#111)!important;
+    border-bottom:1px solid var(--line,#dedede)!important;
+    opacity:1!important;
+    visibility:visible!important;
+    pointer-events:auto!important;
+  }
+  html.doufu-app body.search-view .header .header-icon,
+  html.doufu-app body.search-view .header .desktop-search,
+  html.doufu-app body.search-view .header .desktop-search svg{
+    color:var(--ink,#111)!important;
+    stroke:var(--ink,#111)!important;
+  }
+  html.doufu-app body.search-view .desktop-search{
+    border-color:var(--line,#aaa)!important;
+    background:var(--surface,#fff)!important;
+  }
+  html.doufu-app body.search-view #catalogo.catalog{
+    padding-top:28px!important;
+  }
+  html.doufu-app body.search-view #catalogo .back-home{
+    display:none!important;
+  }
+  #desktopSearch,
+  #searchInput,
+  .desktop-search input,
+  .search-wrap input{
+    font-size:16px!important;
+  }
+  .desktop-search input::placeholder{
+    font-size:10.5px!important;
+    letter-spacing:.12em!important;
+  }
+  .search-wrap input::placeholder{
+    font-size:12px!important;
+  }
+}
