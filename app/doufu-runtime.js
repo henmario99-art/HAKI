@@ -7,7 +7,6 @@
     if (!url) return CDN + 'images/producto.svg';
     if (REMOTE.test(url)) return url;
     const local = clean(url);
-    if (local === 'assets/portada-haki-v15.webp') return local;
     return CDN + local;
   };
 
