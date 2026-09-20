@@ -897,15 +897,33 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     );
   }
 
-  let searchTimer = 0;
+  let searchFrame = 0;
   let pendingSearch = '';
-  let lastSearchRender = 0;
-  let searchWasEmpty = true;
+  let searchGridReady = false;
+
+  function setSearchView(active) {
+    if (iosCategory) leaveIOSCategory();
+    ['homeHero', 'novedades', 'collectionsSection'].forEach(id => {
+      const section = document.getElementById(id);
+      if (section) section.hidden = active;
+    });
+    document.body.classList.toggle('search-view', active);
+    // Search is its own mode. Never inherit category/collection header rules.
+    if (active) document.body.classList.remove('collection-view', 'category-view');
+  }
+
+  function ensureSearchGrid() {
+    if (searchGridReady && els.products.querySelectorAll('article.product').length === ALL_PRODUCTS.length) return;
+    state.category = 'Todos';
+    state.collection = null;
+    renderProductList(els.products, ALL_PRODUCTS);
+    searchGridReady = true;
+  }
 
   function applyLiveSearch(value) {
     const next = String(value || '');
-    const active = !!next.trim();
-    const firstActiveSearch = searchWasEmpty && active;
+    const query = normalize(next.trim());
+    const active = !!query;
 
     if (detailCode) {
       leaveIOSDetail();
@@ -918,57 +936,72 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       routedEntry = navigationEntry().key;
     }
 
-    leaveIOSCategory();
     state.query = next;
     els.search.value = next;
     $('#desktopSearch').value = next;
     state.category = 'Todos';
     state.collection = null;
-    setHomeVisible(!active);
-    $('#catalogTitle').textContent = active ? 'RESULTADOS' : 'TODAS LAS PRENDAS';
-    renderProducts();
 
-    // Move to results only once when a search begins. Further keystrokes never
-    // fight iOS' keyboard/visual viewport or reset the user's scroll position.
-    if (firstActiveSearch) {
-      document.getElementById('catalogo')?.scrollIntoView({
-        behavior: 'instant',
-        block: 'start'
-      });
+    if (!active) {
+      setSearchView(false);
+      if (searchGridReady) {
+        $$('article.product', els.products).forEach(card => { card.hidden = false; });
+      }
+      els.count.textContent = `${ALL_PRODUCTS.length} productos`;
+      els.notice.textContent = '';
+      $('#catalogTitle').textContent = 'TODAS LAS PRENDAS';
+      return;
     }
 
-    searchWasEmpty = !active;
-    lastSearchRender = performance.now();
+    ensureSearchGrid();
+    setSearchView(true);
+    $('#catalogo').hidden = false;
+    $('#catalogTitle').textContent = 'RESULTADOS';
+
+    let visible = 0;
+    $$('article.product', els.products).forEach(card => {
+      const product = productByCode(card.dataset.code);
+      const match = !!product && normalize(
+        `${product.codigo || ''} ${product.nombre || ''} ${product.categoria || ''}`
+      ).includes(query);
+      card.hidden = !match;
+      if (match) visible += 1;
+    });
+
+    els.count.textContent = `${visible} producto${visible === 1 ? '' : 's'}`;
+    els.notice.textContent = visible
+      ? `${visible} producto${visible === 1 ? '' : 's'} encontrado${visible === 1 ? '' : 's'}.`
+      : 'No hay prendas disponibles en esta búsqueda.';
   }
 
   function scheduleLiveSearch(value) {
     pendingSearch = String(value || '');
-    clearTimeout(searchTimer);
-
-    // Clearing the field should feel immediate.
-    if (!pendingSearch.trim()) {
-      applyLiveSearch('');
-      return;
-    }
-
-    // While typing, update at a controlled rate instead of rebuilding the grid
-    // on every key. A trailing pass guarantees the final query after the user pauses.
-    const elapsed = performance.now() - lastSearchRender;
-    if (elapsed >= 170) applyLiveSearch(pendingSearch);
-
-    searchTimer = setTimeout(() => {
-      if (state.query !== pendingSearch) applyLiveSearch(pendingSearch);
-    }, 190);
+    if (searchFrame) cancelAnimationFrame(searchFrame);
+    searchFrame = requestAnimationFrame(() => {
+      searchFrame = 0;
+      applyLiveSearch(pendingSearch);
+    });
   }
 
-  $('#desktopSearch').addEventListener('input', e => {
-    els.search.value = e.target.value;
-    scheduleLiveSearch(e.target.value);
+  $('#desktopSearch').addEventListener('input', event => {
+    els.search.value = event.target.value;
+    scheduleLiveSearch(event.target.value);
   });
 
-  els.search.addEventListener('input', e => {
-    $('#desktopSearch').value = e.target.value;
-    scheduleLiveSearch(e.target.value);
+  els.search.addEventListener('input', event => {
+    $('#desktopSearch').value = event.target.value;
+    scheduleLiveSearch(event.target.value);
+  });
+
+  [$('#desktopSearch'), els.search].forEach(input => {
+    input.addEventListener('search', event => scheduleLiveSearch(event.target.value));
+    input.addEventListener('keydown', event => {
+      if (event.key === 'Enter') {
+        if (searchFrame) cancelAnimationFrame(searchFrame);
+        searchFrame = 0;
+        applyLiveSearch(event.target.value);
+      }
+    });
   });
 
   els.openCart.addEventListener(
