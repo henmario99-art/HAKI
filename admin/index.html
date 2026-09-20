@@ -75,7 +75,13 @@
           <label>Enlace de TikTok<input data-config="tiktok" type="url" placeholder="https://www.tiktok.com/@tu-perfil"></label>
           <label>Moneda<input data-config="moneda"></label>
           <label>Tipo de portada<select data-config="tipoPortada"><option value="imagen">Foto</option><option value="video">Video</option></select></label>
-          <label class="wide">Foto de portada / respaldo del video<input data-config="portada"></label>
+          <input id="coverPath" data-config="portada" type="hidden">
+          <div class="wide media-row" id="coverUploadRow">
+            <img id="coverPreview" class="preview" alt="Vista previa de la portada">
+            <label class="upload-label">Subir / reemplazar foto de portada
+              <input id="coverFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+            </label>
+          </div>
           <label class="wide">Enlace del video de portada (MP4 o WebM)<input data-config="videoPortada" type="url"></label>
           <label class="wide">Anuncio<input data-config="anuncio"></label>
           <label>País<input data-config="pais"></label>
@@ -180,7 +186,7 @@
   <script src="../storefront-config.js?v=1"></script>
   <script src="../experience-config.js?v=3"></script>
   <script src="experience-settings.js?v=2"></script>
-  <script src="admin.js?v=7"></script>
+  <script src="admin.js?v=8"></script>
   <script src="info-settings.js?v=1"></script>
   <script src="personalization-settings.js?v=2"></script>
   <script src="admin-home-v2.js?v=1"></script>
