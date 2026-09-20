@@ -7,8 +7,12 @@
     if (REMOTE.test(url)) return url;
     return '/' + clean(url);
   };
+  const BROKEN_VARIANTS = new Set([
+    'images/optimized/2e82ffe16ce2-800.webp',
+    'images/optimized/06de4e28143e-800.webp'
+  ]);
   const itemsFor = url => ((window.HAKI_IMAGES || {})[url] || [])
-    .filter(item => item && item.src && Number(item.width) > 0);
+    .filter(item => item && item.src && Number(item.width) > 0 && !BROKEN_VARIANTS.has(item.src));
   const pickItem = (items, size) =>
     items.find(item => item.width >= size) || items.at(-1);
   const netlifyImage = (url, size = 800) => {
