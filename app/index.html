@@ -4,7 +4,7 @@
   <meta charset="utf-8"><script src="../pwa-mode.js"></script><link rel="manifest" href="../manifest.webmanifest">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#111111">
-  <meta name="haki-release" content="pwa-v36-splash-fixed">
+  <meta name="haki-release" content="pwa-v37-no-splash">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="HAKI">
@@ -12,15 +12,6 @@
   <title>HAKI — Ropa deportiva</title>
   <link rel="icon" href="https://cdn.jsdelivr.net/gh/henmario99-art/HAKI@main/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.jsdelivr.net/gh/henmario99-art/HAKI@main/apple-touch-icon.png">
-  <link rel="apple-touch-startup-image" href="splash-haki-v2.webp">
-  <link rel="preload" as="image" href="splash-haki-v2.webp" type="image/webp">
-  <style id="haki-app-splash-style">
-    html.haki-splash-active,html.haki-splash-active body{background:#000!important}
-    .haki-app-splash{position:fixed;inset:0;z-index:2147483647;width:100vw;height:100vh;height:100dvh;display:block;overflow:hidden;background:#000 url('splash-haki-v2.webp') center center/contain no-repeat;opacity:1;visibility:visible;transition:opacity .24s ease,visibility .24s ease}
-    .haki-app-splash.is-hiding{opacity:0;visibility:hidden;pointer-events:none}
-    @media(prefers-reduced-motion:reduce){.haki-app-splash{transition:none}}
-  </style>
-  <script>document.documentElement.classList.add('haki-splash-active');</script>
   <link rel="preload" as="script" href="image-manifest.js">
   <link rel="preload" as="script" href="../productos.js?v=31">
   <link rel="stylesheet" href="styles.css">
@@ -60,31 +51,6 @@
   <link rel="stylesheet" href="android-cover-v27.css?v=30">
 </head>
 <body>
-  <div id="hakiAppSplash" class="haki-app-splash" aria-hidden="true"></div>
-  <script id="haki-app-splash-runtime">
-    (() => {
-      const started = performance.now();
-      let finished = false;
-      const hideSplash = () => {
-        if (finished) return;
-        finished = true;
-        const splash = document.getElementById('hakiAppSplash');
-        const elapsed = performance.now() - started;
-        const wait = Math.max(0, 650 - elapsed);
-        setTimeout(() => {
-          if (!splash) {
-            document.documentElement.classList.remove('haki-splash-active');
-            return;
-          }
-          splash.classList.add('is-hiding');
-          document.documentElement.classList.remove('haki-splash-active');
-          setTimeout(() => splash.remove(), 280);
-        }, wait);
-      };
-      addEventListener('load', () => setTimeout(hideSplash, 120), { once: true });
-      setTimeout(hideSplash, 7000);
-    })();
-  </script>
   <div class="announcement"><span id="announcementText">HECHO PARA TU SIGUIENTE NIVEL</span><span id="countryText" hidden>HAKI · EL SALVADOR</span><button id="pauseAnnouncement" type="button" aria-label="Pausar anuncios">Ⅱ</button></div>
 
   <header class="header">
