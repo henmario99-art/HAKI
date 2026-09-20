@@ -1121,7 +1121,11 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       state.category = restored.category; state.collection = restored.collection;
     }
     const filtered = state.category !== 'Todos' || !!state.collection || !!state.query;
-    setHomeVisible(!filtered);
+    if (state.query) setSearchView(true);
+    else {
+      document.body.classList.remove('search-view');
+      setHomeVisible(!filtered);
+    }
     $('#catalogTitle').textContent = state.query ? 'RESULTADOS' : state.collection?.nombre || (filtered ? state.category : 'TODAS LAS PRENDAS');
     if (returningFromIOSDetail && restored && els.products.childNodes.length) {
       syncCardSelections(els.products);
@@ -1356,7 +1360,10 @@ ${settings().totalTexto}: ${money(totals.total)}`;
   window.addEventListener('haki:catalog-updated',()=>{
     Object.keys(CONFIG).forEach(k=>delete CONFIG[k]);Object.assign(CONFIG,window.HAKI_CONFIG);
     ALL_PRODUCTS.splice(0,ALL_PRODUCTS.length,...window.HAKI_PRODUCTOS);COLLECTIONS.splice(0,COLLECTIONS.length,...window.hakiCollections(CONFIG));
-    reconcileCart();applyConfig();renderCollections();renderProducts();if(detailCode)renderProductDetail(productByCode(detailCode));renderCart();
+    searchGridReady=false;
+    reconcileCart();applyConfig();renderCollections();renderProducts();
+    if(state.query) applyLiveSearch(state.query);
+    if(detailCode)renderProductDetail(productByCode(detailCode));renderCart();
   });
   reconcileCart();
   applyConfig();
