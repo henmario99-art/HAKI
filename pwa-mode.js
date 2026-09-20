@@ -22,7 +22,14 @@
   // Never install a new worker over the normal website. App worker is /app/ only.
   if (inApp && installed() && 'serviceWorker' in navigator) {
     addEventListener('load', () => {
-      navigator.serviceWorker.register(new URL('sw.js', app), {scope: app.pathname, updateViaCache: 'none'})
+      if ('caches' in window) {
+        caches.keys().then(keys => Promise.all(
+          keys.filter(key => key.startsWith('haki-installed-shell-') && key !== 'haki-installed-shell-v30')
+            .map(key => caches.delete(key))
+        )).catch(() => {});
+      }
+      navigator.serviceWorker.register(new URL('sw.js?v=30', app), {scope: app.pathname, updateViaCache: 'none'})
+        .then(registration => registration.update())
         .catch(() => {}); // Online catalogue still works when storage is unavailable.
     }, {once: true});
   }
