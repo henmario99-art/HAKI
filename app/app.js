@@ -256,7 +256,7 @@
     }
     renderedLists.set(container, signature);
     container.innerHTML = list
-      .map(p => {
+      .map((p, index) => {
         const selected = state.selected[p.codigo] || '';
 
         const sizes = ['S', 'M', 'L', 'XL']
