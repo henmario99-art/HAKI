@@ -82,9 +82,8 @@
     let appTheme = '';
     try { appTheme = localStorage.getItem('haki_app_theme_v1'); } catch {}
     data.config.tema = appTheme === 'claro' ? 'claro' : 'oscuro';
-    // DOUFU v15: keep the locally packaged cover while product/catalog data can refresh.
-    data.config.portada='assets/portada-haki-v15.webp';
-    data.config.portadaRespaldo='assets/portada-haki-v15.webp';
+    // Installed mode uses the exact same cover configured in /admin/ as the normal website.
+    // Do not override portada/portadaRespaldo here.
     data.config.frase='HAKI';
     data.config.subfrase='Haki | Anime & Sports | El Salvador';
     data.config.buscarTexto='BUSCAR PRENDA...';

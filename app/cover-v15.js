@@ -1,19 +1,40 @@
 (()=>{
-  const COVER='assets/portada-haki-v15.webp';
+  const getConfig=()=>window.HAKI_CONFIG||{};
+  const imageUrl=url=>{
+    if(!url) return '';
+    return typeof window.hakiImage==='function' ? window.hakiImage(url,1920) : url;
+  };
   const applyCover=()=>{
+    const config=getConfig();
     const hero=document.getElementById('heroImage');
     const title=document.getElementById('heroTitle');
     const desc=document.getElementById('heroDescription');
     const search=document.getElementById('desktopSearch');
     const b1=document.getElementById('heroButton1');
     const b2=document.getElementById('heroButton2');
+
     if(hero){
-      hero.removeAttribute('srcset');
-      hero.removeAttribute('sizes');
-      if(hero.getAttribute('src')!==COVER) hero.setAttribute('src',COVER);
+      const primary=config.portada||config.portadaRespaldo||'assets/portada-haki-v15.webp';
+      const fallback=config.portadaRespaldo||'assets/portada-haki-v15.webp';
+      const target=imageUrl(primary);
+      if(target && hero.getAttribute('src')!==target) hero.setAttribute('src',target);
+      const srcset=typeof window.hakiSrcset==='function' ? window.hakiSrcset(primary) : '';
+      if(srcset){
+        hero.setAttribute('srcset',srcset);
+        hero.setAttribute('sizes','100vw');
+      }else{
+        hero.removeAttribute('srcset');
+        hero.removeAttribute('sizes');
+      }
+      hero.onerror=()=>{
+        hero.onerror=null;
+        const backup=imageUrl(fallback);
+        if(backup) hero.src=backup;
+      };
       hero.setAttribute('fetchpriority','high');
       hero.setAttribute('decoding','async');
     }
+
     if(title){title.textContent='HAKI';title.setAttribute('aria-label','HAKI');}
     if(desc) desc.textContent='Haki | Anime & Sports | El Salvador';
     if(search){search.placeholder='BUSCAR PRENDA...';search.setAttribute('aria-label','Buscar prenda');}
