@@ -897,29 +897,79 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     );
   }
 
-  $('#desktopSearch').addEventListener('input', e=>{els.search.value=e.target.value;els.search.dispatchEvent(new Event('input'));});
-  els.search.addEventListener(
-    'input',
-    e => {
-      if (detailCode) {
-        leaveIOSDetail();
-        detailCode = null;
-        $('#productDetail').hidden = true; $('#catalogo').hidden = false;
-        document.body.classList.remove('detail-view');
-        history.replaceState(null, '', '#catalogo');
-        routedHash = '#catalogo';
-        routedEntry = navigationEntry().key;
-        window.scrollTo({ top: 0, behavior: 'instant' });
-      }
-      leaveIOSCategory();
-      state.query = e.target.value; $('#desktopSearch').value=state.query;
-      state.category = 'Todos'; state.collection = null;
-      setHomeVisible(!state.query);
-      if (state.query) window.scrollTo({ top: 0, behavior: 'instant' });
-      $('#catalogTitle').textContent = state.query ? 'RESULTADOS' : 'TODAS LAS PRENDAS';
-      renderProducts();
+  let searchTimer = 0;
+  let pendingSearch = '';
+  let lastSearchRender = 0;
+  let searchWasEmpty = true;
+
+  function applyLiveSearch(value) {
+    const next = String(value || '');
+    const active = !!next.trim();
+    const firstActiveSearch = searchWasEmpty && active;
+
+    if (detailCode) {
+      leaveIOSDetail();
+      detailCode = null;
+      $('#productDetail').hidden = true;
+      $('#catalogo').hidden = false;
+      document.body.classList.remove('detail-view');
+      history.replaceState(null, '', '#catalogo');
+      routedHash = '#catalogo';
+      routedEntry = navigationEntry().key;
     }
-  );
+
+    leaveIOSCategory();
+    state.query = next;
+    els.search.value = next;
+    $('#desktopSearch').value = next;
+    state.category = 'Todos';
+    state.collection = null;
+    setHomeVisible(!active);
+    $('#catalogTitle').textContent = active ? 'RESULTADOS' : 'TODAS LAS PRENDAS';
+    renderProducts();
+
+    // Move to results only once when a search begins. Further keystrokes never
+    // fight iOS' keyboard/visual viewport or reset the user's scroll position.
+    if (firstActiveSearch) {
+      document.getElementById('catalogo')?.scrollIntoView({
+        behavior: 'instant',
+        block: 'start'
+      });
+    }
+
+    searchWasEmpty = !active;
+    lastSearchRender = performance.now();
+  }
+
+  function scheduleLiveSearch(value) {
+    pendingSearch = String(value || '');
+    clearTimeout(searchTimer);
+
+    // Clearing the field should feel immediate.
+    if (!pendingSearch.trim()) {
+      applyLiveSearch('');
+      return;
+    }
+
+    // While typing, update at a controlled rate instead of rebuilding the grid
+    // on every key. A trailing pass guarantees the final query after the user pauses.
+    const elapsed = performance.now() - lastSearchRender;
+    if (elapsed >= 170) applyLiveSearch(pendingSearch);
+
+    searchTimer = setTimeout(() => {
+      if (state.query !== pendingSearch) applyLiveSearch(pendingSearch);
+    }, 190);
+  }
+
+  $('#desktopSearch').addEventListener('input', e => {
+    els.search.value = e.target.value;
+    scheduleLiveSearch(e.target.value);
+  });
+
+  els.search.addEventListener('input', e => {
+    $('#desktopSearch').value = e.target.value;
+    scheduleLiveSearch(e.target.value);
+  });
 
   els.openCart.addEventListener(
     'click',
@@ -1111,7 +1161,6 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     $$('img[data-fallback]', detail).forEach(img => img.addEventListener('error', () => { img.src = img.dataset.fallback; }, { once: true }));
     let photo = 0;
     const gallery = $('#detailGallery');
-    setupZoom(gallery);
     function updateDots() { $$('[data-photo]', detail).forEach(btn => btn.setAttribute('aria-pressed', String(Number(btn.dataset.photo) === photo))); }
     function goPhoto(index) { photo = Math.max(0, Math.min(images.length - 1, index)); gallery.scrollTo({ left: photo * gallery.clientWidth, behavior: 'smooth' }); updateDots(); }
     $('#galleryPrev').addEventListener('click', () => goPhoto(photo - 1));
