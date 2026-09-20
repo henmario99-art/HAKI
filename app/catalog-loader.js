@@ -135,6 +135,20 @@
       if(changed){apply(data);window.dispatchEvent(new Event('haki:catalog-updated'));}
     }catch{/* Keep the usable local catalog when the network is slow/offline. */}finally{busy=false;}
   }
-  window.addEventListener('DOMContentLoaded',()=>{refresh();setInterval(refresh,60000);});
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});
+  let lastRefresh=0;
+  const refreshLater=()=>{
+    const run=()=>setTimeout(()=>{lastRefresh=Date.now();refresh();},4500);
+    if('requestIdleCallback' in window) requestIdleCallback(run,{timeout:6000});
+    else run();
+  };
+  window.addEventListener('load',()=>{
+    refreshLater();
+    setInterval(()=>{lastRefresh=Date.now();refresh();},300000);
+  },{once:true});
+  document.addEventListener('visibilitychange',()=>{
+    if(!document.hidden && Date.now()-lastRefresh>120000){
+      lastRefresh=Date.now();
+      refresh();
+    }
+  });
 })();
