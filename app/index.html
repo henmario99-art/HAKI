@@ -4,7 +4,7 @@
   <meta charset="utf-8"><script src="../pwa-mode.js"></script><link rel="manifest" href="../manifest.webmanifest">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#111111">
-  <meta name="haki-release" content="pwa-v35-splash">
+  <meta name="haki-release" content="pwa-v36-splash-fixed">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="HAKI">
@@ -12,12 +12,11 @@
   <title>HAKI — Ropa deportiva</title>
   <link rel="icon" href="https://cdn.jsdelivr.net/gh/henmario99-art/HAKI@main/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.jsdelivr.net/gh/henmario99-art/HAKI@main/apple-touch-icon.png">
-  <link rel="apple-touch-startup-image" href="splash-haki.webp">
-  <link rel="preload" as="image" href="splash-haki.webp" type="image/webp">
+  <link rel="apple-touch-startup-image" href="splash-haki-v2.webp">
+  <link rel="preload" as="image" href="splash-haki-v2.webp" type="image/webp">
   <style id="haki-app-splash-style">
     html.haki-splash-active,html.haki-splash-active body{background:#000!important}
-    .haki-app-splash{position:fixed;inset:0;z-index:2147483647;width:100vw;height:100vh;height:100dvh;display:grid;place-items:center;overflow:hidden;background:#000;opacity:1;visibility:visible;transition:opacity .24s ease,visibility .24s ease}
-    .haki-app-splash img{display:block;width:100%;height:100%;object-fit:contain;object-position:center;background:#000}
+    .haki-app-splash{position:fixed;inset:0;z-index:2147483647;width:100vw;height:100vh;height:100dvh;display:block;overflow:hidden;background:#000 url('splash-haki-v2.webp') center center/contain no-repeat;opacity:1;visibility:visible;transition:opacity .24s ease,visibility .24s ease}
     .haki-app-splash.is-hiding{opacity:0;visibility:hidden;pointer-events:none}
     @media(prefers-reduced-motion:reduce){.haki-app-splash{transition:none}}
   </style>
@@ -61,9 +60,7 @@
   <link rel="stylesheet" href="android-cover-v27.css?v=30">
 </head>
 <body>
-  <div id="hakiAppSplash" class="haki-app-splash" aria-hidden="true">
-    <img src="splash-haki.webp" alt="" width="1080" height="1920" fetchpriority="high" decoding="sync">
-  </div>
+  <div id="hakiAppSplash" class="haki-app-splash" aria-hidden="true"></div>
   <script id="haki-app-splash-runtime">
     (() => {
       const started = performance.now();
