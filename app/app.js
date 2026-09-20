@@ -138,7 +138,8 @@
     const hero = $('#heroImage');
 
     hero.src = freshImage(
-      CONFIG.portada || CONFIG.portadaRespaldo, 1920
+      CONFIG.portada || CONFIG.portadaRespaldo,
+      matchMedia('(max-width:800px)').matches ? 1280 : 1920
     );
     hero.srcset = window.hakiSrcset(CONFIG.portada); hero.sizes="100vw";
 
@@ -291,7 +292,7 @@
             <a class="product-image product-detail-link" href="#producto/${encodeURIComponent(p.codigo)}" aria-label="Ver ${esc(p.nombre)}">
 
               <img
-                src="${esc(freshImage(p.imagen))}"
+                src="${esc(freshImage(p.imagen, 560))}"
                 data-fallback="${esc(
                   freshImage(fallbackFor(p))
                 )}"
@@ -966,7 +967,7 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     $('#collectionsGrid').innerHTML = COLLECTIONS.map(c => {
       const first = ALL_PRODUCTS.find(p => inCollection(p, c));
       const picture = c.imagen || first?.imagen || 'images/producto.svg';
-      return `<a class="collection-tile" href="#coleccion/${encodeURIComponent(c.id)}"><div class="collection-image"><img src="${esc(freshImage(picture))}" alt="${esc(c.nombre)}" loading="lazy"></div><h3>${esc(c.nombre)}</h3></a>`;
+      return `<a class="collection-tile" href="#coleccion/${encodeURIComponent(c.id)}"><div class="collection-image"><img src="${esc(freshImage(picture, 560))}" srcset="${esc(window.hakiSrcset(picture))}" sizes="(max-width:800px) 46vw, 25vw" alt="${esc(c.nombre)}" loading="eager" fetchpriority="low" decoding="async"></div><h3>${esc(c.nombre)}</h3></a>`;
     }).join('');
     $$('#collectionsGrid img').forEach(img => img.addEventListener('error', () => { img.src = freshImage('images/producto.svg'); }, { once: true }));
     const fresh = ALL_PRODUCTS.filter(p => p.novedad === true);
