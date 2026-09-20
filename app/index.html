@@ -4,7 +4,7 @@
   <meta charset="utf-8"><script src="../pwa-mode.js"></script><link rel="manifest" href="../manifest.webmanifest">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#111111">
-  <meta name="haki-release" content="pwa-v28-video-interface">
+  <meta name="haki-release" content="pwa-v29-fast-return">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="HAKI">
@@ -46,7 +46,7 @@
   <link rel="stylesheet" href="app-visual.css">
   <link rel="stylesheet" href="app-detail.css">
   <link rel="stylesheet" href="cover-v15.css">
-  <link rel="stylesheet" href="android-cover-v27.css?v=27">
+  <link rel="stylesheet" href="android-cover-v27.css?v=29">
 </head>
 <body>
   <div class="announcement"><span id="announcementText">HECHO PARA TU SIGUIENTE NIVEL</span><span id="countryText" hidden>HAKI · EL SALVADOR</span><button id="pauseAnnouncement" type="button" aria-label="Pausar anuncios">Ⅱ</button></div>
@@ -81,7 +81,7 @@
   <main id="top">
     <section class="hero" id="homeHero">
       <div class="hero-photo">
-        <img id="heroImage" src="assets/portada-haki-v15.webp" alt="HAKI ropa deportiva" fetchpriority="high">
+        <img id="heroImage" alt="HAKI ropa deportiva" fetchpriority="high" decoding="async">
         <video id="heroVideo" muted playsinline loop autoplay hidden aria-label="Portada HAKI"></video>
       </div>
       <div class="hero-copy">
@@ -177,7 +177,7 @@
   <script defer src="image-manifest.js"></script>
   <script defer src="storefront-config.js"></script>
   <script defer src="experience-config.js"></script>
-  <script defer src="../productos.js"></script>
+  <script defer src="../productos.js?v=29"></script>\n  <script defer src="cover-bootstrap.js?v=29"></script>
   <script defer src="catalog-loader.js"></script>
   <script defer src="doufu-runtime.js?v=1"></script>
   <script defer src="ios-safari-fix.js"></script>
@@ -192,7 +192,7 @@
   <script defer src="app-motion.js"></script>
   <script defer src="cover-v15.js"></script>
   <script defer src="cover-v16-fix.js"></script>
-  <script defer src="native-android-cover-fix.js?v=22"></script>
+  <script defer src="native-android-cover-fix.js?v=29"></script>
 <script defer src="pwa-status.js"></script>
 </body>
 </html>

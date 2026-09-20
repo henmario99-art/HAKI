@@ -247,3 +247,14 @@ html.doufu-app #productDetail .detail-add{
     gap:0!important;
   }
 }
+
+
+/* v29: larger instant back target on installed product sheets. */
+html.doufu-app #productDetail .app-detail-toolbar .detail-back,
+html.doufu-app.haki-ios-webkit body.haki-ios-product-open #productDetail .detail-back{
+  width:52px!important;
+  height:52px!important;
+  min-height:52px!important;
+  flex-basis:52px!important;
+  touch-action:manipulation;
+}

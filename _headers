@@ -22,3 +22,11 @@
   Cache-Control: no-cache, must-revalidate
 /app/sw.js
   Cache-Control: no-store
+
+
+/productos.js
+  Cache-Control: no-cache, no-store, must-revalidate
+/app/
+  Cache-Control: no-cache, no-store, must-revalidate
+/app/index.html
+  Cache-Control: no-cache, no-store, must-revalidate

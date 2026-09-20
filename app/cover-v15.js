@@ -14,8 +14,8 @@
     const b2=document.getElementById('heroButton2');
 
     if(hero){
-      const primary=config.portada||config.portadaRespaldo||'assets/portada-haki-v15.webp';
-      const fallback=config.portadaRespaldo||'assets/portada-haki-v15.webp';
+      const primary=config.portada||config.portadaRespaldo||'';
+      const fallback=config.portadaRespaldo||'';
       const target=imageUrl(primary);
       if(target && hero.getAttribute('src')!==target) hero.setAttribute('src',target);
       const srcset=typeof window.hakiSrcset==='function' ? window.hakiSrcset(primary) : '';

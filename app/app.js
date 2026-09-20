@@ -296,7 +296,7 @@
                   freshImage(fallbackFor(p))
                 )}"
                 alt="${esc(p.nombre)}"
-                loading="lazy" decoding="async" width="400" height="500" srcset="${esc(window.hakiSrcset(p.imagen))}" sizes="(max-width:800px) 50vw, 25vw"
+                loading="${index < 4 ? 'eager' : 'lazy'}" fetchpriority="${index < 2 ? 'high' : 'auto'}" decoding="async" width="400" height="500" srcset="${esc(window.hakiSrcset(p.imagen))}" sizes="(max-width:800px) 50vw, 25vw"
               >
 
               <span class="product-number">
@@ -986,6 +986,7 @@ ${settings().totalTexto}: ${money(totals.total)}`;
   }
 
   function routeCore(event) {
+    const previousHash = routedHash;
     const currentHash = location.hash || '#top';
     document.body.classList.toggle('category-view', isCategoryHash(currentHash));
     const entry = navigationEntry();
@@ -1000,7 +1001,9 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     try { hash = decodeURIComponent(location.hash.slice(1)); } catch { hash = ''; }
     closeMenu(); closeSearch(); $('#sizeGuideDialog').close();
     detailCode = hash.startsWith('producto/') ? hash.slice(9) : null;
-    $('#productDetail').hidden = !detailCode;
+    const returningFromIOSDetail = isIOS && !!iosListing && !detailCode &&
+      previousHash?.startsWith('#producto/');
+    $('#productDetail').hidden = !detailCode && !returningFromIOSDetail;
     document.body.classList.toggle('detail-view', !!detailCode && !isIOS);
     if (isIOS && detailCode) {
       // Keep the listing in layout at its original scroll position, with the
@@ -1011,7 +1014,7 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       $('#productDetail').scrollTop = 0;
       return;
     }
-    leaveIOSDetail();
+    if (!returningFromIOSDetail) leaveIOSDetail();
     if (isIOS) {
       if (isCategoryHash(currentHash)) enterIOSCategory(entry.key);
       else leaveIOSCategory();
@@ -1036,17 +1039,29 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     const filtered = state.category !== 'Todos' || !!state.collection || !!state.query;
     setHomeVisible(!filtered);
     $('#catalogTitle').textContent = state.query ? 'RESULTADOS' : state.collection?.nombre || (filtered ? state.category : 'TODAS LAS PRENDAS');
-    renderProducts();
+    if (returningFromIOSDetail && restored && els.products.childNodes.length) {
+      syncCardSelections(els.products);
+    } else {
+      renderProducts();
+    }
     syncCardSelections($('#newProducts'));
     if (iosCategory) {
       iosCategory.scrollTop = restored?.y || 0;
+      if (returningFromIOSDetail) leaveIOSDetail();
       return;
     }
     if (restored) {
-      if (Math.abs(window.scrollY - restored.y) > 1) window.scrollTo({ top: restored.y, behavior: 'instant' });
+      if (Math.abs(window.scrollY - restored.y) > 1) {
+        if (isIOS) window.scrollTo(0, restored.y);
+        else window.scrollTo({ top: restored.y, behavior: 'instant' });
+      }
     }
-    else if (filtered || hash === 'top' || !hash) window.scrollTo({ top: 0, behavior: 'instant' });
+    else if (filtered || hash === 'top' || !hash) {
+      if (isIOS) window.scrollTo(0, 0);
+      else window.scrollTo({ top: 0, behavior: 'instant' });
+    }
     else document.getElementById(hash)?.scrollIntoView({ behavior: 'instant', block: 'start' });
+    if (returningFromIOSDetail) leaveIOSDetail();
   }
 
   function renderProductDetail(p) {
