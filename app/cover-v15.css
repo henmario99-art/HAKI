@@ -276,3 +276,18 @@ html.doufu-app .footer{background:#101010!important;color:#f5f5f5!important}
     top:max(60px,calc(env(safe-area-inset-top) + 13px))!important;
   }
 }
+
+
+/* v32: prevent iOS search focus zoom without disabling user pinch zoom. */
+@media (max-width:800px){
+  #desktopSearch,
+  .desktop-search input,
+  #searchInput,
+  .search-wrap input{
+    font-size:16px!important;
+    touch-action:manipulation;
+  }
+  .desktop-search input{
+    letter-spacing:.08em!important;
+  }
+}
