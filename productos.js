@@ -1232,7 +1232,7 @@ window.HAKI_PRODUCTOS = [
     "imagen": "images/1789334909788-e06abe21-IMG_5032.jpeg",
     "imagenRespaldo": "images/leggings.svg",
     "tallas": {
-      "S": true,
+      "S": false,
       "M": true,
       "L": true,
       "XL": true
@@ -1419,7 +1419,7 @@ window.HAKI_PRODUCTOS = [
     "imagen": "images/1789335902578-1ac4eac4-IMG_5041.webp",
     "imagenRespaldo": "images/tee-gray.svg",
     "tallas": {
-      "S": true,
+      "S": false,
       "M": true,
       "L": true,
       "XL": true
