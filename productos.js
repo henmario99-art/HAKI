@@ -635,7 +635,7 @@ window.HAKI_PRODUCTOS = [
       "S": true,
       "M": true,
       "L": true,
-      "XL": true
+      "XL": false
     },
     "colecciones": [
       "collection-1"
@@ -659,7 +659,7 @@ window.HAKI_PRODUCTOS = [
       "S": true,
       "M": true,
       "L": true,
-      "XL": true
+      "XL": false
     },
     "colecciones": [
       "collection-1"
@@ -1184,7 +1184,7 @@ window.HAKI_PRODUCTOS = [
     "imagen": "images/1789334709291-6b8efe22-IMG_5030.jpeg",
     "imagenRespaldo": "images/tee-gray.svg",
     "tallas": {
-      "S": true,
+      "S": false,
       "M": true,
       "L": true,
       "XL": true
