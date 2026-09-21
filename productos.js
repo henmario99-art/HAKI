@@ -541,7 +541,7 @@ window.HAKI_PRODUCTOS = [
       "S": true,
       "M": true,
       "L": true,
-      "XL": false
+      "XL": true
     },
     "colecciones": [
       "collection-1"
