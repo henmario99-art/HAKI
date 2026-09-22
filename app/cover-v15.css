@@ -375,3 +375,8 @@ html.doufu-app .footer{background:#101010!important;color:#f5f5f5!important}
     padding-top:182px!important;
   }
 }
+
+
+/* HAKI · icono de marca cargado desde el administrador */
+html.haki-custom-brand-icon .header>.brand .brand-logo{display:block!important;width:auto!important;max-width:118px!important;height:31px!important;object-fit:contain!important}
+html.haki-custom-brand-icon .header>.brand::after{display:none!important}
