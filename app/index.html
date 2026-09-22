@@ -15,7 +15,7 @@
   <link rel="preload" as="script" href="image-manifest.js">
   <link rel="preload" as="script" href="../productos.js?v=31">
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="enhancements.css">
+  <link rel="stylesheet" href="enhancements.css?v=2">
   <link rel="stylesheet" href="experience.css">
   <link rel="stylesheet" href="gymrat-test.css">
   <link rel="stylesheet" href="doufu-runtime.css?v=1">
@@ -47,7 +47,7 @@
   <link rel="stylesheet" href="app-motion.css">
   <link rel="stylesheet" href="app-visual.css">
   <link rel="stylesheet" href="app-detail.css">
-  <link rel="stylesheet" href="cover-v15.css?v=34">
+  <link rel="stylesheet" href="cover-v15.css?v=35">
   <link rel="stylesheet" href="android-cover-v27.css?v=30">
 </head>
 <body>
@@ -161,18 +161,14 @@
 
   <dialog id="sizeGuideDialog" class="size-guide-dialog" aria-labelledby="sizeGuideTitle">
     <div class="drawer-head"><h2 id="sizeGuideTitle">Guía de tallas</h2><button id="closeSizeGuide" class="header-icon" type="button" aria-label="Cerrar guía de tallas">×</button></div>
-    <p class="size-guide-description">Medidas para camisetas y centros.</p>
-    <div class="menu-size-guide-scroll">
-      <table class="menu-size-guide-table">
-        <thead><tr><th scope="col">Talla USA</th><th scope="col">Pecho (cm)</th><th scope="col">Hombro (cm)</th><th scope="col">Largo (cm)</th></tr></thead>
-        <tbody>
-          <tr><th scope="row">S</th><td>84–88</td><td>39</td><td>60</td></tr>
-          <tr><th scope="row">M</th><td>88–92</td><td>40</td><td>61</td></tr>
-          <tr><th scope="row">L</th><td>89–105</td><td>41</td><td>62</td></tr>
-          <tr><th scope="row">XL</th><td>93–112</td><td>43</td><td>64</td></tr>
-        </tbody>
-      </table>
+    <p id="sizeGuideDescription" class="size-guide-description">Selecciona el tipo de prenda para consultar sus medidas.</p>
+    <div id="sizeGuideTabs" class="size-guide-tabs" role="tablist" aria-label="Tipos de guía de tallas">
+      <button type="button" class="size-guide-tab" data-size-guide="compression">Compresión</button>
+      <button type="button" class="size-guide-tab" data-size-guide="oversized">Oversized</button>
+      <button type="button" class="size-guide-tab" data-size-guide="pants">Pants</button>
+      <button type="button" class="size-guide-tab" data-size-guide="shorts">Shorts</button>
     </div>
+    <div id="sizeGuideContent"></div>
   </dialog>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -184,7 +180,7 @@
   <script defer src="catalog-loader.js?v=20260922-31"></script>
   <script defer src="doufu-runtime.js?v=31"></script>
   <script defer src="ios-safari-fix.js"></script>
-  <script defer src="app.js?v=33"></script>
+  <script defer src="app.js?v=34"></script>
   <script defer src="safari-internal-detail.js"></script>
   <script defer src="enhancements.js"></script>
   <script defer src="personalization.js"></script>
@@ -194,7 +190,7 @@
   </script>
   <script defer src="app-motion.js"></script>
   <script defer src="cover-v15.js"></script>
-  <script defer src="cover-v16-fix.js"></script>
+  <script defer src="cover-v16-fix.js?v=2"></script>
   <script defer src="native-android-cover-fix.js?v=30"></script>
 <script defer src="pwa-status.js"></script>
 </body>
