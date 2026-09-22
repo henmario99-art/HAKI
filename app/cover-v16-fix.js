@@ -69,7 +69,9 @@
       const guideButton = event.target.closest('#openGlobalSizeGuide');
       if (guideButton) {
         event.preventDefault();
-        document.getElementById('sizeGuideDialog')?.showModal?.();
+        document.getElementById('categoryMenu')?.close?.();
+        if (typeof window.HAKI_OPEN_SIZE_GUIDE === 'function') window.HAKI_OPEN_SIZE_GUIDE('compression');
+        else document.getElementById('sizeGuideDialog')?.showModal?.();
       }
       const menuLink = event.target.closest('#categoryMenu a');
       if (menuLink) {
