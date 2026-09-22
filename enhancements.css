@@ -99,3 +99,23 @@ html body #collectionsSection #collectionsGrid .collection-tile h3{display:block
 .size-guide-dialog .menu-size-guide-table{min-width:620px}
 .size-guide-note{margin:14px 0 0;color:var(--muted,#666);font-size:11px;line-height:1.5}
 @media(max-width:600px){.size-guide-dialog{width:calc(100vw - 20px);padding:18px}.size-guide-tab{min-height:36px;padding:0 12px;font-size:10px}}
+
+
+/* 2026-09-22: Android/Instagram keyboard viewport guard */
+@media(max-width:800px){
+  #cartDrawer.keyboard-active{
+    height:var(--haki-vvh,100dvh)!important;
+    max-height:var(--haki-vvh,100dvh)!important;
+    overflow-y:auto!important;
+    overscroll-behavior:contain;
+    scroll-padding-top:24px;
+    scroll-padding-bottom:34px;
+    padding-bottom:max(28px,env(safe-area-inset-bottom))!important;
+  }
+  #cartDrawer.keyboard-active .quote-form{
+    padding-bottom:28px!important;
+  }
+  #cartDrawer.keyboard-active .quote-form input{
+    scroll-margin-block:90px;
+  }
+}

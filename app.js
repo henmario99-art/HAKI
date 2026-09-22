@@ -1037,26 +1037,30 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     return copied;
   }
 
-  function openInstagramOutsideBrowser(url) {
+  function openInstagramChat(handle) {
+    const username = String(handle || '').replace(/^@/, '').trim();
+    const webTarget = `https://ig.me/m/${encodeURIComponent(username)}`;
     const ua = navigator.userAgent || '';
-    const inInstagram = /Instagram/i.test(ua);
     const isiOS = /iPad|iPhone|iPod/i.test(ua) ||
       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     const isAndroid = /Android/i.test(ua);
 
-    if (inInstagram && isAndroid) {
-      const target = url.replace(/^https?:\/\//, '');
-      location.href = `intent://${target}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(url)};end`;
-      return 'Chrome';
+    // Android: target Instagram itself, never Chrome. If Instagram cannot
+    // handle the intent, fall back to Meta's DM link.
+    if (isAndroid) {
+      location.href = `intent://ig.me/m/${encodeURIComponent(username)}#Intent;scheme=https;package=com.instagram.android;S.browser_fallback_url=${encodeURIComponent(webTarget)};end`;
+      return true;
     }
 
-    if (inInstagram && isiOS) {
-      location.href = `x-safari-${url}`;
-      return 'Safari';
+    // iOS: ig.me is Instagram's DM universal link. Navigating in the same
+    // context gives iOS/Instagram the chance to hand the user back to the app.
+    if (isiOS) {
+      location.href = webTarget;
+      return true;
     }
 
-    window.open(url, '_blank', 'noopener');
-    return '';
+    window.open(webTarget, '_blank', 'noopener');
+    return false;
   }
 
   function submitInstagram() {
@@ -1064,25 +1068,73 @@ ${settings().totalTexto}: ${money(totals.total)}`;
 
     const text = quoteText();
     const handle = String(CONFIG.instagram || '').replace(/^@/, '').trim();
-    const target = `https://ig.me/m/${encodeURIComponent(handle)}`;
     const legacyCopied = legacyCopyQuoteText(text);
     const modernCopy = (navigator.clipboard?.writeText && window.isSecureContext)
       ? navigator.clipboard.writeText(text).then(() => true).catch(() => legacyCopied)
       : Promise.resolve(legacyCopied);
 
-    const externalBrowser = openInstagramOutsideBrowser(target);
+    openInstagramChat(handle);
     modernCopy.then(copied => {
-      if (externalBrowser) {
-        showToast(copied
-          ? `Cotización copiada. Abriendo ${externalBrowser}…`
-          : `Abriendo ${externalBrowser}… Copia la cotización manualmente.`);
-      } else {
-        showToast(copied
-          ? 'Cotización copiada. Pégala en Instagram.'
-          : 'Instagram abierto. Copia la cotización manualmente.');
-      }
+      showToast(copied
+        ? 'Cotización copiada. Abriendo Instagram…'
+        : 'Abriendo Instagram… Copia la cotización manualmente.');
     });
   }
+
+  function installQuoteKeyboardGuard() {
+    const drawer = els.drawer;
+    const viewport = window.visualViewport;
+    if (!drawer || !/Android/i.test(navigator.userAgent || '')) return;
+
+    let settleTimer = 0;
+
+    const activeQuoteInput = () => {
+      const active = document.activeElement;
+      return active?.matches?.('#quoteForm input') ? active : null;
+    };
+
+    const syncViewport = () => {
+      if (!drawer.classList.contains('keyboard-active')) return;
+      const height = Math.max(280, Math.round(viewport?.height || window.innerHeight));
+      drawer.style.setProperty('--haki-vvh', `${height}px`);
+
+      const active = activeQuoteInput();
+      if (!active) return;
+      clearTimeout(settleTimer);
+      settleTimer = setTimeout(() => {
+        active.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'smooth' });
+      }, 70);
+    };
+
+    document.addEventListener('focusin', event => {
+      if (!event.target.matches?.('#quoteForm input')) return;
+      drawer.classList.add('keyboard-active');
+      syncViewport();
+
+      requestAnimationFrame(() => {
+        event.target.scrollIntoView({ block: 'center', inline: 'nearest' });
+      });
+
+      clearTimeout(settleTimer);
+      settleTimer = setTimeout(() => {
+        syncViewport();
+        event.target.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'smooth' });
+      }, 180);
+    });
+
+    document.addEventListener('focusout', () => {
+      setTimeout(() => {
+        if (activeQuoteInput()) return;
+        drawer.classList.remove('keyboard-active');
+        drawer.style.removeProperty('--haki-vvh');
+      }, 220);
+    });
+
+    viewport?.addEventListener('resize', syncViewport);
+    viewport?.addEventListener('scroll', syncViewport);
+  }
+
+  installQuoteKeyboardGuard();
 
   let toastTimer;
 

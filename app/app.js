@@ -1016,26 +1016,26 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     link.remove();
   }
 
-  function openInstagramOutsideBrowser(url) {
+  function openInstagramChat(handle) {
+    const username = String(handle || '').replace(/^@/, '').trim();
+    const webTarget = `https://ig.me/m/${encodeURIComponent(username)}`;
     const ua = navigator.userAgent || '';
-    const inInstagram = /Instagram/i.test(ua);
     const isiOS = /iPad|iPhone|iPod/i.test(ua) ||
       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     const isAndroid = /Android/i.test(ua);
 
-    if (inInstagram && isAndroid) {
-      const target = url.replace(/^https?:\/\//, '');
-      location.href = `intent://${target}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(url)};end`;
-      return 'Chrome';
+    if (isAndroid) {
+      location.href = `intent://ig.me/m/${encodeURIComponent(username)}#Intent;scheme=https;package=com.instagram.android;S.browser_fallback_url=${encodeURIComponent(webTarget)};end`;
+      return true;
     }
 
-    if (inInstagram && isiOS) {
-      location.href = `x-safari-${url}`;
-      return 'Safari';
+    if (isiOS) {
+      location.href = webTarget;
+      return true;
     }
 
-    openQuoteLink(url);
-    return '';
+    openQuoteLink(webTarget);
+    return false;
   }
 
   function submitWhatsApp(e) {
@@ -1091,18 +1091,69 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       ? navigator.clipboard.writeText(text).then(() => true).catch(() => legacyCopied)
       : Promise.resolve(legacyCopied);
 
-    const externalBrowser = openInstagramOutsideBrowser(`https://ig.me/m/${encodeURIComponent(handle)}`);
+    openInstagramChat(handle);
 
     modernCopy.then(copied => {
-      showToast(externalBrowser
-        ? (copied
-          ? `Cotización copiada. Abriendo ${externalBrowser}…`
-          : `Abriendo ${externalBrowser}… Copia la cotización manualmente.`)
-        : (copied
-          ? 'Cotización copiada. Pégala en Instagram.'
-          : 'Instagram abierto. Mantén pulsado y pega la cotización.'));
+      showToast(copied
+        ? 'Cotización copiada. Abriendo Instagram…'
+        : 'Abriendo Instagram… Mantén pulsado y pega la cotización.');
     });
   }
+
+  function installQuoteKeyboardGuard() {
+    const drawer = els.drawer;
+    const viewport = window.visualViewport;
+    if (!drawer || !/Android/i.test(navigator.userAgent || '')) return;
+
+    let settleTimer = 0;
+
+    const activeQuoteInput = () => {
+      const active = document.activeElement;
+      return active?.matches?.('#quoteForm input') ? active : null;
+    };
+
+    const syncViewport = () => {
+      if (!drawer.classList.contains('keyboard-active')) return;
+      const height = Math.max(280, Math.round(viewport?.height || window.innerHeight));
+      drawer.style.setProperty('--haki-vvh', `${height}px`);
+
+      const active = activeQuoteInput();
+      if (!active) return;
+      clearTimeout(settleTimer);
+      settleTimer = setTimeout(() => {
+        active.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'smooth' });
+      }, 70);
+    };
+
+    document.addEventListener('focusin', event => {
+      if (!event.target.matches?.('#quoteForm input')) return;
+      drawer.classList.add('keyboard-active');
+      syncViewport();
+
+      requestAnimationFrame(() => {
+        event.target.scrollIntoView({ block: 'center', inline: 'nearest' });
+      });
+
+      clearTimeout(settleTimer);
+      settleTimer = setTimeout(() => {
+        syncViewport();
+        event.target.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'smooth' });
+      }, 180);
+    });
+
+    document.addEventListener('focusout', () => {
+      setTimeout(() => {
+        if (activeQuoteInput()) return;
+        drawer.classList.remove('keyboard-active');
+        drawer.style.removeProperty('--haki-vvh');
+      }, 220);
+    });
+
+    viewport?.addEventListener('resize', syncViewport);
+    viewport?.addEventListener('scroll', syncViewport);
+  }
+
+  installQuoteKeyboardGuard();
 
   let toastTimer;
 
