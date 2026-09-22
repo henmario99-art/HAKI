@@ -439,7 +439,7 @@ window.HAKI_PRODUCTOS = [
     "imagen": "images/WhatsApp-Image-2026-09-11-at-2.58.56-PM.jpeg",
     "imagenRespaldo": "images/tee-black.svg",
     "tallas": {
-      "S": true,
+      "S": false,
       "M": true,
       "L": true,
       "XL": false
@@ -804,7 +804,7 @@ window.HAKI_PRODUCTOS = [
     "imagenRespaldo": "images/leggings.svg",
     "tallas": {
       "S": false,
-      "M": true,
+      "M": false,
       "L": false,
       "XL": false
     },
@@ -851,7 +851,7 @@ window.HAKI_PRODUCTOS = [
     "imagenRespaldo": "images/leggings.svg",
     "tallas": {
       "S": false,
-      "M": true,
+      "M": false,
       "L": true,
       "XL": false
     },
@@ -1184,7 +1184,7 @@ window.HAKI_PRODUCTOS = [
     "imagen": "images/1789334709291-6b8efe22-IMG_5030.jpeg",
     "imagenRespaldo": "images/tee-gray.svg",
     "tallas": {
-      "S": false,
+      "S": true,
       "M": true,
       "L": true,
       "XL": true
@@ -1305,7 +1305,7 @@ window.HAKI_PRODUCTOS = [
     "imagen": "images/1789335366719-d0e45c8c-IMG_5036.jpeg",
     "imagenRespaldo": "images/tee-black.svg",
     "tallas": {
-      "S": true,
+      "S": false,
       "M": false,
       "L": false,
       "XL": true
@@ -1352,7 +1352,7 @@ window.HAKI_PRODUCTOS = [
     "imagenRespaldo": "images/shorts.svg",
     "tallas": {
       "S": true,
-      "M": false,
+      "M": true,
       "L": false,
       "XL": false
     },
@@ -1375,10 +1375,10 @@ window.HAKI_PRODUCTOS = [
     "imagen": "images/1789335516494-993de3a1-IMG_5038.jpeg",
     "imagenRespaldo": "images/leggings.svg",
     "tallas": {
-      "S": true,
-      "M": true,
+      "S": false,
+      "M": false,
       "L": true,
-      "XL": true
+      "XL": false
     },
     "colecciones": [
       "collection-4"
