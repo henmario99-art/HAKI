@@ -214,3 +214,12 @@ html body #collectionsSection #collectionsGrid .collection-tile h3{display:block
     max-width:39vw!important;
   }
 }
+
+
+/* HAKI · guías de tallas por categoría */
+.size-guide-tabs{display:flex;gap:8px;margin:0 0 18px;padding:0 0 4px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.size-guide-tab{flex:0 0 auto;min-height:38px;padding:0 14px;border:1px solid var(--line,#ddd);border-radius:999px;background:transparent;color:var(--ink,#111);font:inherit;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;cursor:pointer}
+.size-guide-tab.is-active{background:var(--ink,#111);color:var(--surface,#fff);border-color:var(--ink,#111)}
+.size-guide-dialog .menu-size-guide-table{min-width:620px}
+.size-guide-note{margin:14px 0 0;color:var(--muted,#666);font-size:11px;line-height:1.5}
+@media(max-width:600px){.size-guide-dialog{width:calc(100vw - 20px);padding:18px}.size-guide-tab{min-height:36px;padding:0 12px;font-size:10px}}
