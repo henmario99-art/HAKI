@@ -1,4 +1,4 @@
-import { readInventory, applyAvailability } from './_inventory.mjs';
+import { readInventory, applyAvailability, filterPublicStock } from './_inventory.mjs';
 import { json, github, repoParts, BRANCH } from './_shared.mjs';
 
 function parseCatalog(source) {
@@ -18,7 +18,8 @@ export default async (request) => {
     const file = await github(`/repos/${owner}/${repo}/contents/productos.js?ref=${encodeURIComponent(BRANCH)}`, { method: 'GET' });
     const source = Buffer.from(file.content, 'base64').toString('utf8');
     const parsed = parseCatalog(source);
-      parsed.products = applyAvailability(parsed.products, await readInventory());
+    const inventory = await readInventory();
+    parsed.products = filterPublicStock(applyAvailability(parsed.products, inventory), inventory);
 
     return json(
       { ...parsed, version: file.sha },
