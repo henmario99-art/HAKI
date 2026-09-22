@@ -1,21 +1,13 @@
-import { getStore } from '@netlify/blobs';
+import { readJSON, mutateJSON, storageBackend } from './_private-store.mjs';
 import { randomUUID } from 'node:crypto';
 import { json, bodyJson, verifyAdmin } from './_shared.mjs';
 
-const STORE_NAME = 'haki-private-sales';
 const INVENTORY_KEY = 'inventory';
 const SIZES = ['S', 'M', 'L', 'XL'];
 const SALE_STATES = new Set(['Pendiente', 'Retirado', 'Cancelado', 'No retirado']);
 const MONEY_STATES = new Set(['Pendiente', 'En caja', 'No retiró']);
 const C807_GUIDE_COST = 4.15;
 
-function store() {
-  return getStore({ name: STORE_NAME, consistency: 'strong' });
-}
-
-function clone(value) {
-  return JSON.parse(JSON.stringify(value));
-}
 
 function text(value, max = 200) {
   return String(value ?? '').trim().slice(0, max);
@@ -186,20 +178,8 @@ function adjustmentFrom(oldSale, newSale) {
   return delta;
 }
 
-async function mutateJSON(key, fallback, mutator) {
-  const blobs = store();
-  for (let attempt = 0; attempt < 5; attempt += 1) {
-    const entry = await blobs.getWithMetadata(key, { type: 'json', consistency: 'strong' });
-    const current = entry?.data ?? clone(fallback);
-    const next = await mutator(clone(current));
-    const result = await blobs.setJSON(key, next, entry ? { onlyIfMatch: entry.etag } : { onlyIfNew: true });
-    if (result.modified) return next;
-  }
-  throw new Error('Los datos cambiaron al mismo tiempo. Intenta de nuevo.');
-}
-
 async function getInventory() {
-  return (await store().get(INVENTORY_KEY, { type: 'json', consistency: 'strong' })) || {};
+  return await readJSON(INVENTORY_KEY, {});
 }
 
 async function applyInventoryDelta(delta, allowNegative = false) {
@@ -231,7 +211,7 @@ async function setInventory(productId, stock) {
 }
 
 async function getWeek(start) {
-  const value = await store().get(weekKey(start), { type: 'json', consistency: 'strong' });
+  const value = await readJSON(weekKey(start), []);
   return Array.isArray(value) ? value : [];
 }
 
@@ -243,7 +223,7 @@ async function mutateWeek(start, mutator) {
 }
 
 async function getExpenses(start) {
-  const value = await store().get(expenseKey(start), { type: 'json', consistency: 'strong' });
+  const value = await readJSON(expenseKey(start), []);
   return Array.isArray(value) ? value : [];
 }
 
@@ -280,7 +260,7 @@ export default async (request) => {
 
   try {
     if (request.method === 'GET' && mode === 'inventory') {
-      return json({ inventory: await getInventory() });
+      return json({ inventory: await getInventory(), storage: storageBackend() });
     }
 
     if (request.method === 'PUT' && mode === 'inventory') {
@@ -292,7 +272,7 @@ export default async (request) => {
     if (request.method === 'GET' && mode === 'expenses') {
       const requested = url.searchParams.get('weekStart') || weekStartFor(new Date().toISOString().slice(0, 10));
       const start = weekStartFor(requested);
-      return json({ weekStart: start, expenses: await getExpenses(start) });
+      return json({ weekStart: start, expenses: await getExpenses(start), storage: storageBackend() });
     }
 
     if (request.method === 'POST' && mode === 'expenses') {
@@ -344,7 +324,7 @@ export default async (request) => {
       const requested = url.searchParams.get('weekStart') || weekStartFor(new Date().toISOString().slice(0, 10));
       const start = weekStartFor(requested);
       const [sales, inventory] = await Promise.all([getWeek(start), getInventory()]);
-      return json({ weekStart: start, weekEnd: addDays(start, 6), sales, inventory });
+      return json({ weekStart: start, weekEnd: addDays(start, 6), sales, inventory, storage: storageBackend() });
     }
 
     if (request.method === 'POST') {
