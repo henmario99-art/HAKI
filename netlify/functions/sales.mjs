@@ -367,16 +367,24 @@ export default async (request) => {
       return json({ ok: true, sale, weekStart: start }, 201);
     }
 
-    if (request.method === 'PUT') {
+    if (request.method === 'PUT' || request.method === 'PATCH') {
       const body = await bodyJson(request);
-      const saleInput = body?.sale || body;
+      const partial = request.method === 'PATCH';
+      let saleInput = body?.sale || body;
+      if (partial && !['estado', 'etapaEnvio'].includes(body.field)) throw new Error('Campo no permitido.');
+      if (partial && body.field === 'estado' && !SALE_STATES.has(body.value)) throw new Error('Estado inválido.');
+      if (partial && body.field === 'etapaEnvio' && !['Pedido tomado', 'Empacado', 'Enviado'].includes(body.value)) throw new Error('Etapa inválida.');
       const id = text(saleInput?.id, 80);
       if (!id) throw new Error('Falta el identificador de la venta.');
-      const previousStart = weekStartFor(body?.previousWeekStart || saleInput?.fecha);
+      const previousStart = weekStartFor(body?.previousWeekStart || (partial ? body.weekStart : saleInput?.fecha));
       const previousSales = await getWeek(previousStart);
       const previous = findSale(previousSales, id);
       if (!previous) throw new Error('No se encontró la venta que intentas editar.');
-      const sale = normalizeSale(saleInput, id, previous);
+      if (partial) {
+        if ((body.updatedAt || '') !== (previous.updatedAt || '')) throw new Error('Esta venta cambió. Actualiza la semana antes de editarla.');
+        saleInput = { ...previous, [body.field]: body.value };
+      }
+      const sale = partial ? { ...previous, [body.field]: body.value } : { ...previous, ...normalizeSale(saleInput, id, previous) };
       sale.createdAt = previous.createdAt || new Date().toISOString();
       sale.updatedAt = new Date().toISOString();
       const nextStart = weekStartFor(sale.fecha);
@@ -385,7 +393,11 @@ export default async (request) => {
 
       try {
         if (nextStart === previousStart) {
-          await mutateWeek(previousStart, sales => sales.map(entry => entry.id === id ? sale : entry));
+          await mutateWeek(previousStart, sales => {
+            const latest = findSale(sales, id);
+            if (partial && (!latest || (latest.updatedAt || '') !== (previous.updatedAt || ''))) throw new Error('La venta cambió. Actualiza la semana.');
+            return sales.map(entry => entry.id === id ? sale : entry);
+          });
         } else {
           await mutateWeek(previousStart, sales => sales.filter(entry => entry.id !== id));
           try {
@@ -405,7 +417,7 @@ export default async (request) => {
         await applyInventoryDelta(new Map([...delta].map(([key, value]) => [key, -value])), true).catch(() => {});
         throw error;
       }
-      return json({ ok: true, sale, weekStart: nextStart });
+      return json({ ok: true, sale, weekStart: nextStart, ...(partial ? { inventory: await getInventory() } : {}) });
     }
 
     if (request.method === 'DELETE') {

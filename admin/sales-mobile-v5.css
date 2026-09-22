@@ -59,3 +59,5 @@
   .suite-header{padding-top:0!important}
   .metrics.haki-bottom-metrics{margin-top:13px!important}
 }
+
+.sale-quick-controls{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;cursor:default}.sale-quick-controls label{display:grid;gap:4px;font-size:11px;font-weight:600;color:#555}.sale-quick-controls select{width:100%;min-width:0;min-height:40px;font:inherit;font-size:16px;color:#111;border:1px solid #ccc;border-radius:8px;padding:6px;background:#fff}.sale-quick-controls select:disabled{opacity:.6}

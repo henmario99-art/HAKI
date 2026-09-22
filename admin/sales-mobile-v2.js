@@ -193,6 +193,35 @@
         <span class="pill ${sale.dinero === 'En caja' ? 'done' : 'pending'}">${escapeHtml(sale.dinero || 'Pendiente')}</span>
         <span class="pill">${escapeHtml(destination)}</span>
       </div>`;
+    const controls = document.createElement('div');
+    controls.className = 'sale-quick-controls';
+    controls.addEventListener('click', event => event.stopPropagation());
+    for (const [field, title, options] of [
+      ['etapaEnvio', 'Etapa', ['Pedido tomado', 'Empacado', 'Enviado']],
+      ['estado', 'Estado', ['Pendiente', 'Retirado', 'No retirado', 'Cancelado']]
+    ]) {
+      const label = document.createElement('label'); label.textContent = title;
+      const select = document.createElement('select');
+      select.setAttribute('aria-label', `${title} de ${sale.cliente || 'este pedido'}`);
+      for (const value of options) { const option = document.createElement('option'); option.value = value; option.textContent = value; select.append(option); }
+      select.value = sale[field] || options[0];
+      select.addEventListener('change', async () => {
+        controls.querySelectorAll('select').forEach(node => node.disabled = true);
+        const previousValue = sale[field] || options[0];
+        try {
+          const data = await api('sales', { method: 'PATCH', body: JSON.stringify({ id: sale.id, weekStart: mondayOf(sale.fecha), field, value: select.value, updatedAt: sale.updatedAt || '' }) });
+          Object.assign(sale, data.sale);
+          card.dataset.shippingStage = sale.etapaEnvio || 'Pedido tomado';
+          const pill = card.querySelector('.meta .pill');
+          pill.textContent = sale.estado; pill.className = `pill ${statePill(sale.estado)}`;
+          if (data.inventory) state.inventory = data.inventory;
+          renderMetrics(); renderInventory(); toast('Pedido actualizado');
+        } catch (error) { select.value = previousValue; toast(error.message, true); }
+        finally { controls.querySelectorAll('select').forEach(node => node.disabled = false); }
+      });
+      label.append(select); controls.append(label);
+    }
+    card.append(controls);
     card.addEventListener('click', () => openEditSale(sale));
     return card;
   }

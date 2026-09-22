@@ -87,6 +87,7 @@ async function loadCatalog() {
   $('#saveBtn').disabled = true;
   try {
     const data = await api('catalog', { method: 'GET' });
+    state.catalogSha = data.sha;
     state.config = window.hakiSettings(data.config || {});
     state.products = data.products || [];
     fillConfig();
@@ -294,6 +295,13 @@ function renderProducts() {
     const card = $('.product-card', tpl);
     $('.product-index', tpl).textContent = String(state.products.indexOf(p) + 1).padStart(2,'0');
     $('.product-title', tpl).textContent = p.nombre;
+    const publishLabel = document.createElement('label');
+    publishLabel.className = 'check-label';
+    const publish = document.createElement('input');
+    publish.type = 'checkbox'; publish.checked = p.borrador !== true;
+    publish.addEventListener('change', () => { p.borrador = !publish.checked; });
+    publishLabel.append(publish, document.createTextNode('Mostrar en el catálogo'));
+    card.append(publishLabel);
 
     $$('[data-field]', tpl).forEach(input => {
       const key = input.dataset.field;
@@ -466,6 +474,7 @@ $('#addBtn').addEventListener('click', () => {
 });
 
 async function saveCatalog() {
+  if (document.querySelector('.private-inventory[data-dirty="true"]')) { toast('Guarda primero las cantidades con «Guardar inventario».'); return false; }
   for (const input of document.querySelectorAll('#experienceSettings input')) { if (!input.reportValidity()) return; }
   if (!confirm('¿Guardar estos cambios en el catálogo?')) return false;
   const buttons = [$('#saveBtn'), $('#saveOrderBtn')];
@@ -473,7 +482,7 @@ async function saveCatalog() {
   try {
     await api('catalog', {
       method: 'PUT',
-      body: JSON.stringify({ config: state.config, products: state.products })
+      body: JSON.stringify({ config: state.config, products: state.products, sha: state.catalogSha })
     });
     toast('Cambios guardados en GitHub. El catálogo los leerá sin un deploy de producción.', true);
     setTimeout(loadCatalog, 1200);

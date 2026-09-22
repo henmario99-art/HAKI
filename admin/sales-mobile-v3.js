@@ -254,6 +254,7 @@
       });
       state.inventory = data.inventory || state.inventory;
       row.classList.remove('is-dirty');
+      updateStockNotice(row, product);
       const total = row.querySelector('.inventory-total');
       if (total) total.textContent = String(Object.values(next).reduce((sum, value) => sum + value, 0));
       if (typeof toast === 'function') toast(`${product.nombre} actualizado`);
@@ -265,8 +266,19 @@
     }
   }
 
+  function updateStockNotice(row, product) {
+    if (!product) return;
+    let note = row.querySelector('.inventory-stock-notice');
+    if (!note) { note = document.createElement('small'); note.className='inventory-stock-notice'; row.querySelector('.inventory-product')?.append(note); }
+    const stock = state.inventory?.[String(product.id)];
+    if (!stock) { if (note.textContent !== 'Inventario sin registrar') note.textContent = 'Inventario sin registrar'; return; }
+    const zeros = ['S','M','L','XL'].filter(size => Number(stock[size]) === 0);
+    const text = zeros.length === 4 ? 'Sin existencias' : zeros.length ? `Tallas en 0: ${zeros.join(', ')}` : 'Todas las tallas con existencias';
+    if (note.textContent !== text) note.textContent = text;
+  }
   function decorateInventoryRows() {
     inventoryList.querySelectorAll('.inventory-row').forEach(row => {
+      updateStockNotice(row, productForRow(row));
       if (row.querySelector('.inventory-item-update')) return;
       const button = document.createElement('button');
       button.type = 'button';

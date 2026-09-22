@@ -1,3 +1,4 @@
+import { readInventory, applyAvailability } from './_inventory.mjs';
 import { json, bodyJson, verifyAdmin, github, repoParts, BRANCH } from './_shared.mjs';
 
 function parseCatalog(source) {
@@ -51,6 +52,7 @@ export default async (request) => {
       const file = await github(path, { method: 'GET' });
       const source = Buffer.from(file.content, 'base64').toString('utf8');
       const parsed = parseCatalog(source);
+      parsed.products = applyAvailability(parsed.products, await readInventory());
       return json({ ...parsed, sha: file.sha, branch: BRANCH });
     }
 
@@ -59,6 +61,8 @@ export default async (request) => {
       validatePayload(body);
 
       const current = await github(path, { method: 'GET' });
+      if (body.sha && body.sha !== current.sha) return json({ error: 'El catálogo cambió desde que lo abriste. Recarga antes de guardar para conservar los cambios recientes.' }, 409);
+      body.products = applyAvailability(body.products, await readInventory());
       const content = serializeCatalog(body.config, body.products);
       const result = await github(`/repos/${owner}/${repo}/contents/productos.js`, {
         method: 'PUT',

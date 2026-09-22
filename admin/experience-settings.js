@@ -19,11 +19,74 @@
   addStyles();replacePinkAndAddGreen(document.querySelector('#productTemplate')?.content);const apply=()=>{groupProductOptions(document.querySelector('#productTemplate')?.content);document.querySelectorAll('#products .product-card').forEach(groupProductOptions);migrateLegacyPink()};setTimeout(apply,0);setInterval(apply,400);
 })();
 (() => {
-  const STYLE_ID='haki-private-inventory-style';let inventory=null;let loading=false;
-  function addStyles(){if(document.getElementById(STYLE_ID))return;const style=document.createElement('style');style.id=STYLE_ID;style.textContent=`.private-inventory{margin-top:16px;padding:15px;border:1px solid #dcdcd7;border-radius:14px;background:#fafaf8}.private-inventory-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:11px}.private-inventory-head strong{font-size:13px}.private-inventory-head span{font-size:11px;color:#777}.private-stock-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.private-stock-grid label{font-size:11px;font-weight:800;color:#666}.private-stock-grid input{margin-top:4px;text-align:center}.private-inventory-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:10px}.private-stock-total{font-size:12px;color:#666}.private-inventory .private-save-stock{min-height:40px}html[data-theme=oscuro] .private-inventory{background:#222;border-color:#444}.admin-sales-link{white-space:nowrap}@media(max-width:700px){.private-stock-grid{gap:6px}.private-inventory{padding:12px}.private-inventory-footer{align-items:stretch;flex-direction:column}.private-inventory .private-save-stock{width:100%}}`;document.head.append(style)}
-  function addSalesLink(){const actions=document.querySelector('.top-actions');if(!actions||actions.querySelector('.admin-sales-link'))return;const link=document.createElement('a');link.className='ghost admin-sales-link';link.href='/admin/sales.html';link.textContent='Ventas';actions.prepend(link)}
-  async function loadInventory(){if(loading||inventory)return;loading=true;try{const data=await api('sales?mode=inventory',{method:'GET'});inventory=data.inventory||{};enhanceCards()}catch(error){console.warn('No se pudo cargar inventario privado',error)}finally{loading=false}}
-  function stockFor(id){return inventory?.[String(id)]||{S:0,M:0,L:0,XL:0}}function productForCard(card){const code=card.querySelector('[data-field="codigo"]')?.value||'';return Array.isArray(state?.products)?state.products.find(product=>String(product.codigo)===String(code)):null}
-  function enhanceCard(card){if(card.querySelector('.private-inventory'))return;const product=productForCard(card);if(!product)return;const stock=stockFor(product.id);const section=document.createElement('section');section.className='private-inventory';section.dataset.productId=product.id;section.innerHTML=`<div class="private-inventory-head"><strong>Inventario privado</strong><span>Solo administrador</span></div><div class="private-stock-grid">${['S','M','L','XL'].map(size=>`<label>${size}<input type="number" min="0" step="1" value="${Number(stock[size])||0}" data-private-size="${size}"></label>`).join('')}</div><div class="private-inventory-footer"><span class="private-stock-total">Total: <b>0</b> unidades</span><button class="ghost private-save-stock" type="button">Guardar inventario</button></div>`;const updateTotal=()=>{section.querySelector('.private-stock-total b').textContent=String([...section.querySelectorAll('[data-private-size]')].reduce((sum,input)=>sum+Math.max(0,Math.trunc(Number(input.value)||0)),0))};section.querySelectorAll('[data-private-size]').forEach(input=>input.addEventListener('input',updateTotal));updateTotal();section.querySelector('.private-save-stock').addEventListener('click',async event=>{const button=event.currentTarget;button.disabled=true;try{const next={};section.querySelectorAll('[data-private-size]').forEach(input=>next[input.dataset.privateSize]=Math.max(0,Math.trunc(Number(input.value)||0)));const data=await api('sales?mode=inventory',{method:'PUT',body:JSON.stringify({productId:product.id,stock:next})});inventory=data.inventory||inventory;toast('Inventario guardado',true)}catch(error){toast(error.message)}finally{button.disabled=false}});const sizes=card.querySelector('.sizes');if(sizes)sizes.after(section);else card.append(section)}
-  function enhanceCards(){document.querySelectorAll('#products .product-card').forEach(enhanceCard)}addStyles();addSalesLink();setInterval(()=>{addSalesLink();const admin=document.querySelector('#adminView');if(!admin||admin.hidden)return;if(!inventory)loadInventory();else enhanceCards()},400);
+  let inventory = null;
+  let loading = false;
+  let reportSignature = '';
+  const sizes = ['S', 'M', 'L', 'XL'];
+  const count = value => Math.max(0, Math.trunc(Number(value) || 0));
+  const style = document.createElement('style');
+  style.textContent = `.private-inventory{margin-top:16px;padding:14px;border:1px solid #ddd;border-radius:14px;background:#fafaf8}.private-inventory-head{display:flex;justify-content:space-between;gap:10px;font-size:13px;margin-bottom:10px}.private-inventory-head span{font-size:11px;color:#666}.private-stock-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.private-stock-grid label{font-size:12px}.private-stock-grid input{text-align:center;min-width:0;font-size:16px}.private-inventory-footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;margin-top:10px;font-size:12px}.inventory-zero-notice{border:1px solid #e5bc6b;background:#fff6df;color:#573800;border-radius:12px;padding:12px;margin:12px 0;font-size:13px}.private-stock-note{font-size:11px;color:#666;margin:8px 0 0}`;
+  document.head.append(style);
+
+  function syncSizes(product, stock, card) {
+    product.tallas ||= {};
+    for (const size of sizes) {
+      if (!Object.hasOwn(stock, size)) continue;
+      product.tallas[size] = count(stock[size]) > 0;
+      const checkbox = card?.querySelector(`[data-size="${size}"]`);
+      if (checkbox) { checkbox.checked = product.tallas[size]; checkbox.disabled = true; checkbox.title = 'La disponibilidad se actualiza con el inventario'; }
+    }
+  }
+  function zeroReport() {
+    let note = document.getElementById('inventoryZeroNotice');
+    if (!note) { note = document.createElement('div'); note.id = 'inventoryZeroNotice'; note.className = 'inventory-zero-notice'; document.querySelector('#products')?.before(note); }
+    const tracked = (state.products || []).filter(p => Object.hasOwn(inventory || {}, String(p.id)));
+    const zeros = tracked.filter(p => sizes.every(size => count(inventory[String(p.id)][size]) === 0));
+    const partial = tracked.filter(p => sizes.some(size => count(inventory[String(p.id)][size]) === 0) && !zeros.includes(p));
+    const signature = JSON.stringify([zeros.map(p=>[p.codigo,p.nombre]),partial.map(p=>[p.codigo,p.nombre,inventory[String(p.id)]])]);
+    if (signature === reportSignature) return;
+    reportSignature = signature;
+    note.hidden = !zeros.length && !partial.length;
+    note.replaceChildren();
+    if (zeros.length) { const line = document.createElement('p'); line.textContent = `Sin existencias: ${zeros.map(p => `${p.nombre} (${p.codigo})`).join(' · ')}`; note.append(line); }
+    if (partial.length) { const detail = document.createElement('details'); const title = document.createElement('summary'); title.textContent = `${partial.length} prendas actualizadas tienen alguna talla en 0`; detail.append(title); for (const p of partial) { const line = document.createElement('p'); line.textContent = `${p.nombre} (${p.codigo}): ${sizes.filter(size => count(inventory[String(p.id)][size]) === 0).join(', ')}`; detail.append(line); } note.append(detail); }
+  }
+  function enhanceCards() {
+    if (!inventory) return;
+    document.querySelectorAll('#products .product-card').forEach(card => {
+      if (card.querySelector('.private-inventory')) return;
+      const code = card.querySelector('[data-field="codigo"]')?.value;
+      const product = state.products.find(p => p.codigo === code);
+      if (!product) return;
+      const stock = inventory[String(product.id)];
+      if (stock) syncSizes(product, stock, card);
+      const section = document.createElement('section'); section.className = 'private-inventory'; section.dataset.productId = product.id;
+      section.innerHTML = `<div class="private-inventory-head"><strong>Inventario privado</strong><span>Solo administrador</span></div><div class="private-stock-grid">${sizes.map(size => `<label>${size}<input type="number" min="0" step="1" value="${count(stock?.[size])}" data-private-size="${size}"></label>`).join('')}</div><div class="private-inventory-footer"><span class="private-stock-total"></span><button type="button" class="ghost private-save-stock">Guardar inventario</button></div><p class="private-stock-note">La disponibilidad de cada talla sigue las cantidades guardadas.</p>`;
+      const values = () => Object.fromEntries([...section.querySelectorAll('[data-private-size]')].map(input => [input.dataset.privateSize, count(input.value)]));
+      const total = () => { section.querySelector('.private-stock-total').textContent = `Total: ${Object.values(values()).reduce((a,b) => a+b,0)} unidades`; };
+      section.addEventListener('input', () => { total(); section.dataset.dirty = 'true'; syncSizes(product, values(), card); }); total();
+      section.querySelector('button').addEventListener('click', async event => {
+        const button = event.currentTarget; button.disabled = true;
+        try { const data = await api('sales?mode=inventory', { method:'PUT', body:JSON.stringify({productId:product.id,stock:values()}) }); inventory = data.inventory; delete section.dataset.dirty; syncSizes(product, inventory[String(product.id)], card); zeroReport(); toast('Inventario y disponibilidad guardados', true); }
+        catch(error) { toast(error.message); }
+        finally { button.disabled = false; }
+      });
+      const sizesNode = card.querySelector('.sizes'); if (sizesNode) sizesNode.after(section); else card.append(section);
+    });
+    zeroReport();
+  }
+  // Never initialize persisted inventory from missing, delayed, or failed reads.
+  async function loadInventory() {
+    if (loading || inventory) return;
+    loading = true;
+    try { const data = await api('sales?mode=inventory', {method:'GET'}); inventory = data.inventory || {}; enhanceCards(); }
+    catch(error) { console.warn('No se pudo cargar inventario privado', error); }
+    finally { loading = false; }
+  }
+  setInterval(() => {
+    const admin = document.querySelector('#adminView'); if (!admin || admin.hidden) return;
+    const actions = document.querySelector('.top-actions');
+    if (actions && !actions.querySelector('.admin-sales-link')) { const link = document.createElement('a'); link.className='ghost admin-sales-link'; link.href='/admin/sales.html'; link.textContent='Ventas'; actions.prepend(link); }
+    if (!inventory) loadInventory(); else enhanceCards();
+  }, 400);
 })();
