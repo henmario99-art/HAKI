@@ -349,7 +349,8 @@ window.HAKI_PRODUCTOS = [
       "Negro"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 2,
@@ -375,7 +376,8 @@ window.HAKI_PRODUCTOS = [
       "Gris"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 3,
@@ -402,7 +404,8 @@ window.HAKI_PRODUCTOS = [
       "Rojo"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 4,
@@ -428,7 +431,8 @@ window.HAKI_PRODUCTOS = [
       "Negro"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 5,
@@ -453,7 +457,8 @@ window.HAKI_PRODUCTOS = [
       "Blanco"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 6,
@@ -477,7 +482,8 @@ window.HAKI_PRODUCTOS = [
       "Gris"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 7,
@@ -502,7 +508,8 @@ window.HAKI_PRODUCTOS = [
       "Negro"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 8,
@@ -527,7 +534,8 @@ window.HAKI_PRODUCTOS = [
       "Rojo"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 9,
@@ -551,7 +559,8 @@ window.HAKI_PRODUCTOS = [
       "Negro"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 10,
@@ -576,7 +585,8 @@ window.HAKI_PRODUCTOS = [
       "Blanco"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 19,
@@ -600,7 +610,8 @@ window.HAKI_PRODUCTOS = [
       "Negro"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 13,
@@ -621,7 +632,8 @@ window.HAKI_PRODUCTOS = [
     ],
     "colores": [],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 11,
@@ -645,7 +657,8 @@ window.HAKI_PRODUCTOS = [
       "Negro"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 12,
@@ -670,7 +683,8 @@ window.HAKI_PRODUCTOS = [
       "Blanco"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 14,
@@ -696,7 +710,8 @@ window.HAKI_PRODUCTOS = [
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
     "novedad": true,
-    "imagen2": ""
+    "imagen2": "",
+    "borrador": false
   },
   {
     "id": 15,
@@ -720,7 +735,8 @@ window.HAKI_PRODUCTOS = [
     ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "imagen2": "images/1789324304093-e7f0337d-images-StormMuscleFitSeamlessT_ShirtGSBlackGSPitchGreyA3B5N_BB3J_0731_V1_1920x.webp"
+    "imagen2": "images/1789324304093-e7f0337d-images-StormMuscleFitSeamlessT_ShirtGSBlackGSPitchGreyA3B5N_BB3J_0731_V1_1920x.webp",
+    "borrador": false
   },
   {
     "id": 16,
@@ -745,7 +761,8 @@ window.HAKI_PRODUCTOS = [
     ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "imagen2": ""
+    "imagen2": "",
+    "borrador": false
   },
   {
     "id": 20,
@@ -769,7 +786,8 @@ window.HAKI_PRODUCTOS = [
       "Rojo"
     ],
     "masVendido": true,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 23,
@@ -792,7 +810,8 @@ window.HAKI_PRODUCTOS = [
       "Negro"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 24,
@@ -815,7 +834,8 @@ window.HAKI_PRODUCTOS = [
       "Negro"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 17,
@@ -839,7 +859,8 @@ window.HAKI_PRODUCTOS = [
     ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "imagen2": ""
+    "imagen2": "",
+    "borrador": false
   },
   {
     "id": 18,
@@ -862,7 +883,8 @@ window.HAKI_PRODUCTOS = [
       "Negro"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 21,
@@ -885,7 +907,8 @@ window.HAKI_PRODUCTOS = [
       "Negro"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 22,
@@ -909,7 +932,8 @@ window.HAKI_PRODUCTOS = [
       "Rojo"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 25,
@@ -933,7 +957,8 @@ window.HAKI_PRODUCTOS = [
     ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "imagen2": "images/1789326760143-0feee96c-espalda.webp"
+    "imagen2": "images/1789326760143-0feee96c-espalda.webp",
+    "borrador": false
   },
   {
     "id": 26,
@@ -956,7 +981,8 @@ window.HAKI_PRODUCTOS = [
       "Rojo"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 27,
@@ -980,7 +1006,8 @@ window.HAKI_PRODUCTOS = [
       "Negro"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 28,
@@ -1003,7 +1030,8 @@ window.HAKI_PRODUCTOS = [
       "Negro"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 29,
@@ -1027,7 +1055,8 @@ window.HAKI_PRODUCTOS = [
     ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "imagen2": "images/1789333575155-f8aaa80c-IMG_9899.jpeg"
+    "imagen2": "images/1789333575155-f8aaa80c-IMG_9899.jpeg",
+    "borrador": false
   },
   {
     "id": 30,
@@ -1051,7 +1080,8 @@ window.HAKI_PRODUCTOS = [
     ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "imagen2": "images/1789333870425-25e8b747-IMG_1809.jpeg"
+    "imagen2": "images/1789333870425-25e8b747-IMG_1809.jpeg",
+    "borrador": false
   },
   {
     "id": 31,
@@ -1075,7 +1105,8 @@ window.HAKI_PRODUCTOS = [
     ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "imagen2": "images/1789335742577-c0929b25-IMG_2443.jpeg"
+    "imagen2": "images/1789335742577-c0929b25-IMG_2443.jpeg",
+    "borrador": false
   },
   {
     "id": 32,
@@ -1100,7 +1131,8 @@ window.HAKI_PRODUCTOS = [
     ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "imagen2": "images/1789334036579-225605c0-IMG_2455.jpeg"
+    "imagen2": "images/1789334036579-225605c0-IMG_2455.jpeg",
+    "borrador": false
   },
   {
     "id": 33,
@@ -1124,7 +1156,8 @@ window.HAKI_PRODUCTOS = [
     ],
     "masVendido": true,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "novedad": true
+    "novedad": true,
+    "borrador": false
   },
   {
     "id": 35,
@@ -1148,7 +1181,8 @@ window.HAKI_PRODUCTOS = [
     ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "novedad": true
+    "novedad": true,
+    "borrador": false
   },
   {
     "id": 34,
@@ -1173,7 +1207,8 @@ window.HAKI_PRODUCTOS = [
     "masVendido": true,
     "etiquetaMasVendido": "MÁS VENDIDO",
     "imagen2": "images/1789334437869-4e51e8e7-64c7ae95-a57e-4798-99bb-b578c8d51c80.jpeg",
-    "novedad": true
+    "novedad": true,
+    "borrador": false
   },
   {
     "id": 36,
@@ -1197,7 +1232,8 @@ window.HAKI_PRODUCTOS = [
     ],
     "masVendido": true,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "novedad": true
+    "novedad": true,
+    "borrador": false
   },
   {
     "id": 37,
@@ -1221,7 +1257,8 @@ window.HAKI_PRODUCTOS = [
     ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "novedad": true
+    "novedad": true,
+    "borrador": false
   },
   {
     "id": 38,
@@ -1247,7 +1284,8 @@ window.HAKI_PRODUCTOS = [
     ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "novedad": true
+    "novedad": true,
+    "borrador": false
   },
   {
     "id": 39,
@@ -1271,7 +1309,8 @@ window.HAKI_PRODUCTOS = [
     ],
     "masVendido": true,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "novedad": true
+    "novedad": true,
+    "borrador": false
   },
   {
     "id": 40,
@@ -1294,7 +1333,8 @@ window.HAKI_PRODUCTOS = [
     "colores": [],
     "masVendido": true,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "novedad": true
+    "novedad": true,
+    "borrador": false
   },
   {
     "id": 41,
@@ -1317,7 +1357,8 @@ window.HAKI_PRODUCTOS = [
       "Blanco"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 42,
@@ -1340,7 +1381,8 @@ window.HAKI_PRODUCTOS = [
       "Negro"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 43,
@@ -1364,7 +1406,8 @@ window.HAKI_PRODUCTOS = [
       "Rojo"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 44,
@@ -1385,7 +1428,8 @@ window.HAKI_PRODUCTOS = [
     ],
     "colores": [],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 45,
@@ -1408,7 +1452,8 @@ window.HAKI_PRODUCTOS = [
       "Negro"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 46,
@@ -1431,7 +1476,8 @@ window.HAKI_PRODUCTOS = [
       "Negro"
     ],
     "masVendido": true,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 47,
@@ -1455,7 +1501,8 @@ window.HAKI_PRODUCTOS = [
     ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "imagen2": "images/1789336027972-549aaf15-IMG_5043.webp"
+    "imagen2": "images/1789336027972-549aaf15-IMG_5043.webp",
+    "borrador": false
   },
   {
     "id": 48,
@@ -1477,7 +1524,8 @@ window.HAKI_PRODUCTOS = [
     "colores": [],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "novedad": true
+    "novedad": true,
+    "borrador": false
   },
   {
     "id": 49,
@@ -1500,7 +1548,8 @@ window.HAKI_PRODUCTOS = [
       "Negro"
     ],
     "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO"
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
   },
   {
     "id": 50,
@@ -1524,7 +1573,8 @@ window.HAKI_PRODUCTOS = [
     ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "novedad": true
+    "novedad": true,
+    "borrador": false
   },
   {
     "id": 51,
@@ -1547,7 +1597,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 52,
@@ -1570,7 +1620,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 53,
@@ -1593,7 +1643,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 54,
@@ -1616,7 +1666,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 55,
@@ -1639,7 +1689,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 56,
@@ -1662,7 +1712,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 57,
@@ -1685,7 +1735,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 58,
@@ -1708,7 +1758,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 59,
@@ -1731,7 +1781,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 60,
@@ -1754,7 +1804,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 61,
@@ -1777,7 +1827,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 62,
@@ -1800,7 +1850,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 63,
@@ -1823,7 +1873,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 64,
@@ -1846,7 +1896,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 65,
@@ -1869,6 +1919,351 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
+  },
+  {
+    "id": 66,
+    "codigo": "HAKI-066",
+    "nombre": "NUEVO PRODUCTO",
+    "precio": 0,
+    "categoria": "Camisetas",
+    "novedad": false,
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "colecciones": [],
+    "colores": [],
+    "imagen": "images/producto.svg",
+    "imagenRespaldo": "images/producto.svg",
+    "imagen2": "",
+    "guiaTallas": "",
+    "tallas": {
+      "S": false,
+      "M": false,
+      "L": false,
+      "XL": false
+    },
+    "borrador": false
+  },
+  {
+    "id": 67,
+    "codigo": "HAKI-067",
+    "nombre": "NUEVO PRODUCTO",
+    "precio": 0,
+    "categoria": "Camisetas",
+    "novedad": false,
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "colecciones": [],
+    "colores": [],
+    "imagen": "images/producto.svg",
+    "imagenRespaldo": "images/producto.svg",
+    "imagen2": "",
+    "guiaTallas": "",
+    "tallas": {
+      "S": false,
+      "M": false,
+      "L": false,
+      "XL": false
+    },
+    "borrador": false
+  },
+  {
+    "id": 68,
+    "codigo": "HAKI-068",
+    "nombre": "NUEVO PRODUCTO",
+    "precio": 0,
+    "categoria": "Camisetas",
+    "novedad": false,
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "colecciones": [],
+    "colores": [],
+    "imagen": "images/producto.svg",
+    "imagenRespaldo": "images/producto.svg",
+    "imagen2": "",
+    "guiaTallas": "",
+    "tallas": {
+      "S": false,
+      "M": false,
+      "L": false,
+      "XL": false
+    },
+    "borrador": false
+  },
+  {
+    "id": 69,
+    "codigo": "HAKI-069",
+    "nombre": "NUEVO PRODUCTO",
+    "precio": 0,
+    "categoria": "Camisetas",
+    "novedad": false,
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "colecciones": [],
+    "colores": [],
+    "imagen": "images/producto.svg",
+    "imagenRespaldo": "images/producto.svg",
+    "imagen2": "",
+    "guiaTallas": "",
+    "tallas": {
+      "S": false,
+      "M": false,
+      "L": false,
+      "XL": false
+    },
+    "borrador": false
+  },
+  {
+    "id": 70,
+    "codigo": "HAKI-070",
+    "nombre": "NUEVO PRODUCTO",
+    "precio": 0,
+    "categoria": "Camisetas",
+    "novedad": false,
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "colecciones": [],
+    "colores": [],
+    "imagen": "images/producto.svg",
+    "imagenRespaldo": "images/producto.svg",
+    "imagen2": "",
+    "guiaTallas": "",
+    "tallas": {
+      "S": false,
+      "M": false,
+      "L": false,
+      "XL": false
+    },
+    "borrador": false
+  },
+  {
+    "id": 71,
+    "codigo": "HAKI-071",
+    "nombre": "NUEVO PRODUCTO",
+    "precio": 0,
+    "categoria": "Camisetas",
+    "novedad": false,
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "colecciones": [],
+    "colores": [],
+    "imagen": "images/producto.svg",
+    "imagenRespaldo": "images/producto.svg",
+    "imagen2": "",
+    "guiaTallas": "",
+    "tallas": {
+      "S": false,
+      "M": false,
+      "L": false,
+      "XL": false
+    },
+    "borrador": false
+  },
+  {
+    "id": 72,
+    "codigo": "HAKI-072",
+    "nombre": "NUEVO PRODUCTO",
+    "precio": 0,
+    "categoria": "Camisetas",
+    "novedad": false,
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "colecciones": [],
+    "colores": [],
+    "imagen": "images/producto.svg",
+    "imagenRespaldo": "images/producto.svg",
+    "imagen2": "",
+    "guiaTallas": "",
+    "tallas": {
+      "S": false,
+      "M": false,
+      "L": false,
+      "XL": false
+    },
+    "borrador": false
+  },
+  {
+    "id": 73,
+    "codigo": "HAKI-073",
+    "nombre": "NUEVO PRODUCTO",
+    "precio": 0,
+    "categoria": "Camisetas",
+    "novedad": false,
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "colecciones": [],
+    "colores": [],
+    "imagen": "images/producto.svg",
+    "imagenRespaldo": "images/producto.svg",
+    "imagen2": "",
+    "guiaTallas": "",
+    "tallas": {
+      "S": false,
+      "M": false,
+      "L": false,
+      "XL": false
+    },
+    "borrador": false
+  },
+  {
+    "id": 74,
+    "codigo": "HAKI-074",
+    "nombre": "NUEVO PRODUCTO",
+    "precio": 0,
+    "categoria": "Camisetas",
+    "novedad": false,
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "colecciones": [],
+    "colores": [],
+    "imagen": "images/producto.svg",
+    "imagenRespaldo": "images/producto.svg",
+    "imagen2": "",
+    "guiaTallas": "",
+    "tallas": {
+      "S": false,
+      "M": false,
+      "L": false,
+      "XL": false
+    },
+    "borrador": false
+  },
+  {
+    "id": 75,
+    "codigo": "HAKI-075",
+    "nombre": "NUEVO PRODUCTO",
+    "precio": 0,
+    "categoria": "Camisetas",
+    "novedad": false,
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "colecciones": [],
+    "colores": [],
+    "imagen": "images/producto.svg",
+    "imagenRespaldo": "images/producto.svg",
+    "imagen2": "",
+    "guiaTallas": "",
+    "tallas": {
+      "S": false,
+      "M": false,
+      "L": false,
+      "XL": false
+    },
+    "borrador": false
+  },
+  {
+    "id": 76,
+    "codigo": "HAKI-076",
+    "nombre": "NUEVO PRODUCTO",
+    "precio": 0,
+    "categoria": "Camisetas",
+    "novedad": false,
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "colecciones": [],
+    "colores": [],
+    "imagen": "images/producto.svg",
+    "imagenRespaldo": "images/producto.svg",
+    "imagen2": "",
+    "guiaTallas": "",
+    "tallas": {
+      "S": false,
+      "M": false,
+      "L": false,
+      "XL": false
+    },
+    "borrador": false
+  },
+  {
+    "id": 77,
+    "codigo": "HAKI-077",
+    "nombre": "NUEVO PRODUCTO",
+    "precio": 0,
+    "categoria": "Camisetas",
+    "novedad": false,
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "colecciones": [],
+    "colores": [],
+    "imagen": "images/producto.svg",
+    "imagenRespaldo": "images/producto.svg",
+    "imagen2": "",
+    "guiaTallas": "",
+    "tallas": {
+      "S": false,
+      "M": false,
+      "L": false,
+      "XL": false
+    },
+    "borrador": false
+  },
+  {
+    "id": 78,
+    "codigo": "HAKI-078",
+    "nombre": "NUEVO PRODUCTO",
+    "precio": 0,
+    "categoria": "Camisetas",
+    "novedad": false,
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "colecciones": [],
+    "colores": [],
+    "imagen": "images/producto.svg",
+    "imagenRespaldo": "images/producto.svg",
+    "imagen2": "",
+    "guiaTallas": "",
+    "tallas": {
+      "S": false,
+      "M": false,
+      "L": false,
+      "XL": false
+    },
+    "borrador": false
+  },
+  {
+    "id": 79,
+    "codigo": "HAKI-079",
+    "nombre": "NUEVO PRODUCTO",
+    "precio": 0,
+    "categoria": "Camisetas",
+    "novedad": false,
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "colecciones": [],
+    "colores": [],
+    "imagen": "images/producto.svg",
+    "imagenRespaldo": "images/producto.svg",
+    "imagen2": "",
+    "guiaTallas": "",
+    "tallas": {
+      "S": false,
+      "M": false,
+      "L": false,
+      "XL": false
+    },
+    "borrador": false
+  },
+  {
+    "id": 80,
+    "codigo": "HAKI-080",
+    "nombre": "NUEVO PRODUCTO",
+    "precio": 0,
+    "categoria": "Camisetas",
+    "novedad": false,
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "colecciones": [],
+    "colores": [],
+    "imagen": "images/producto.svg",
+    "imagenRespaldo": "images/producto.svg",
+    "imagen2": "",
+    "guiaTallas": "",
+    "tallas": {
+      "S": false,
+      "M": false,
+      "L": false,
+      "XL": false
+    },
+    "borrador": false
   }
 ];
