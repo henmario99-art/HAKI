@@ -166,9 +166,10 @@ async function inventoryMap() {
   const rows = await db('haki_inventory?select=product_id,product_code,size,quantity');
   const out: Record<string, any> = {};
   for (const row of rows || []) {
-    const key = String(row.product_id || row.product_code);
-    out[key] ||= { S:0,M:0,L:0,XL:0 };
-    out[key][row.size] = Number(row.quantity) || 0;
+    const stock = out[row.product_code] || out[String(row.product_id)] || { S:0,M:0,L:0,XL:0 };
+    stock[row.size] = Number(row.quantity) || 0;
+    if (row.product_code) out[row.product_code] = stock;
+    if (row.product_id) out[String(row.product_id)] = stock;
   }
   return out;
 }
