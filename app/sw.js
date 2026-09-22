@@ -28,6 +28,8 @@ self.addEventListener('activate', event => {
       }
     }
     await self.clients.claim();
+    const windows = await self.clients.matchAll({ type:'window', includeUncontrolled:true });
+    await Promise.all(windows.map(client => client.navigate(client.url).catch(() => null)));
   })());
 });
 
