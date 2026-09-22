@@ -1080,6 +1080,7 @@ ${settings().totalTexto}: ${money(totals.total)}`;
   }
 
   const isInstagramInAppBrowser = /Instagram/i.test(navigator.userAgent || '');
+  const isAndroidInstagramBrowser = isInstagramInAppBrowser && /Android/i.test(navigator.userAgent || '');
 
   function instagramReturnOverlay() {
     let overlay = document.getElementById('instagramReturnOverlay');
@@ -1128,7 +1129,22 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     if (isInstagramInAppBrowser) {
       modernCopy.then(copied => {
         closeCart();
-        showInstagramReturnOverlay(copied);
+
+        // Android's Instagram in-app browser allows the same window.close()
+        // action that previously worked from our large X button. Trigger it
+        // directly from "Cotizar por Instagram" so the customer returns to DM.
+        if (isAndroidInstagramBrowser) {
+          try { window.close(); } catch {}
+
+          // If a specific Instagram/Android build blocks the close, keep the
+          // same safe fallback used on iPhone: point to Instagram's native X.
+          window.setTimeout(() => {
+            if (document.visibilityState !== 'hidden') showInstagramReturnOverlay();
+          }, 320);
+          return;
+        }
+
+        showInstagramReturnOverlay();
         showToast(copied ? 'Cotización copiada.' : 'Pedido listo.');
       });
       return;
