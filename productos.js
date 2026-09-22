@@ -321,7 +321,8 @@ window.HAKI_CONFIG = {
       }
     },
     "maxProductos": 8
-  }
+  },
+  "iconoHaki": "images/1790047535761-44e2b288-HAKI-Post-de-Instagram-45-Photoroom.webp"
 };
 
 window.HAKI_PRODUCTOS = [
