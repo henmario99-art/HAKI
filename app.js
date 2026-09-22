@@ -140,39 +140,48 @@
     }
 
     const hero = $('#heroImage');
-    const coverBase = CONFIG.portada || CONFIG.portadaRespaldo || '';
-    const coverVariants = [
-      [CONFIG.portadaMobile, 1080],
-      [CONFIG.portadaTablet, 1600],
-      [CONFIG.portadaDesktop, 2560],
-      [CONFIG.portada, 3200],
-    ].filter(([url]) => String(url || '').trim());
-    const uniqueCoverVariants = coverVariants.filter(([url], index, list) =>
-      list.findIndex(([candidate]) => candidate === url) === index
-    );
-    const responsiveCoverSrcset = uniqueCoverVariants.length > 1
-      ? uniqueCoverVariants.map(([url, width]) => `${url} ${width}w`).join(', ')
-      : '';
-    const desktopCover = CONFIG.portadaDesktop || coverBase;
-
-    hero.src = desktopCover
-      ? (CONFIG.portadaDesktop
-          ? desktopCover
-          : freshImage(desktopCover, matchMedia('(max-width:800px)').matches ? 1280 : 2560))
-      : freshImage(CONFIG.portadaRespaldo || 'images/hero-fallback.svg', 1920);
-    hero.srcset = responsiveCoverSrcset || window.hakiSrcset(coverBase);
-    hero.sizes = '100vw';
-    hero.fetchPriority = 'high';
-    hero.decoding = 'async';
-
-    hero.onerror = () => {
-      hero.onerror = null;
+    if (window.HAKI_COVER_WAITING_LIVE) {
+      hero.removeAttribute('src');
       hero.removeAttribute('srcset');
-      hero.src = freshImage(
-        CONFIG.portadaRespaldo || 'images/hero-fallback.svg',
-        1920
+      hero.style.visibility = 'hidden';
+    } else {
+      const coverVersion = String(CONFIG.portadaRevision || CONFIG.catalogVersion || '');
+      const versioned = url => {
+        const value = String(url || '').trim();
+        if (!value || !coverVersion || /^(?:data:|blob:)/i.test(value)) return value;
+        return `${value}${value.includes('?') ? '&' : '?'}v=${encodeURIComponent(coverVersion)}`;
+      };
+      const coverBase = CONFIG.portadaOriginal || CONFIG.portadaDesktop || CONFIG.portada || CONFIG.portadaRespaldo || '';
+      const desktopCover = CONFIG.portadaOriginal || CONFIG.portadaDesktop || CONFIG.portada || CONFIG.portadaRespaldo || '';
+      const coverVariants = [
+        [CONFIG.portadaMobile, Number(CONFIG.portadaMobileWidth) || 1440],
+        [CONFIG.portadaTablet, Number(CONFIG.portadaTabletWidth) || 2200],
+        [CONFIG.portadaDesktop, Number(CONFIG.portadaDesktopWidth) || 3200],
+        [CONFIG.portadaOriginal || CONFIG.portada, Number(CONFIG.portadaOriginalWidth || CONFIG.portadaDesktopWidth) || 4096],
+      ].filter(([url,width]) => String(url || '').trim() && Number(width) > 0);
+      const uniqueCoverVariants = coverVariants.filter(([url], index, list) =>
+        list.findIndex(([candidate]) => candidate === url) === index
       );
-    };
+      const responsiveCoverSrcset = uniqueCoverVariants.length > 1
+        ? uniqueCoverVariants.map(([url, width]) => `${versioned(url)} ${width}w`).join(', ')
+        : '';
+
+      hero.src = desktopCover
+        ? versioned(desktopCover)
+        : versioned(freshImage(CONFIG.portadaRespaldo || 'images/hero-fallback.svg', 2560));
+      if (responsiveCoverSrcset) hero.srcset = responsiveCoverSrcset;
+      else hero.removeAttribute('srcset');
+      hero.sizes = '100vw';
+      hero.fetchPriority = 'high';
+      hero.decoding = 'async';
+      hero.style.visibility = '';
+
+      hero.onerror = () => {
+        hero.onerror = null;
+        hero.removeAttribute('srcset');
+        hero.src = versioned(freshImage(CONFIG.portadaRespaldo || 'images/hero-fallback.svg', 2560));
+      };
+    }
 
     const ig = `https://www.instagram.com/${
       CONFIG.instagram || 'haki__sv'
