@@ -69,6 +69,14 @@
         <h2>Configuración general</h2>
         <div class="grid config-grid">
           <label>Marca<input data-config="marca"></label>
+          <input id="brandIconPath" data-config="iconoHaki" type="hidden">
+          <div class="wide media-row" id="brandIconUploadRow">
+            <img id="brandIconPreview" class="preview" alt="Vista previa del icono de HAKI">
+            <label class="upload-label">Subir / reemplazar icono de HAKI
+              <input id="brandIconFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml">
+            </label>
+            <button id="clearBrandIcon" class="ghost" type="button">Usar logo predeterminado</button>
+          </div>
           <label>Instagram<input data-config="instagram"></label>
           <label>WhatsApp<input data-config="whatsapp"></label>
           <label>Enlace de Facebook<input data-config="facebook" type="url" placeholder="https://www.facebook.com/tu-pagina"></label>
@@ -186,7 +194,7 @@
   <script src="../storefront-config.js?v=1"></script>
   <script src="../experience-config.js?v=3"></script>
   <script src="experience-settings.js?v=3"></script>
-  <script src="admin.js?v=9"></script>
+  <script src="admin.js?v=10"></script>
   <script src="info-settings.js?v=1"></script>
   <script src="personalization-settings.js?v=2"></script>
   <script src="admin-home-v2.js?v=1"></script>
