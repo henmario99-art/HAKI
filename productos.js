@@ -1980,7 +1980,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 68,
@@ -2003,7 +2003,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 69,
@@ -2026,7 +2026,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 70,
@@ -2049,7 +2049,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 71,
@@ -2072,7 +2072,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 72,
@@ -2095,7 +2095,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 73,
@@ -2118,7 +2118,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 74,
@@ -2141,7 +2141,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 75,
@@ -2164,7 +2164,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 76,
@@ -2187,7 +2187,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 77,
@@ -2210,7 +2210,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 78,
@@ -2233,7 +2233,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 79,
@@ -2256,7 +2256,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 80,
@@ -2279,6 +2279,6 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   }
 ];
