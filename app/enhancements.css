@@ -225,31 +225,70 @@ html body #collectionsSection #collectionsGrid .collection-tile h3{display:block
 @media(max-width:600px){.size-guide-dialog{width:calc(100vw - 20px);padding:18px}.size-guide-tab{min-height:36px;padding:0 12px;font-size:10px}}
 
 
-/* 2026-09-22: mobile keyboard viewport guard */
+/* 2026-09-22: platform-specific mobile keyboard handling */
 @media(max-width:800px){
-  #cartDrawer.keyboard-active{
+  #cartDrawer.keyboard-active.keyboard-android{
+    position:fixed!important;
+    left:0!important;
+    right:0!important;
     top:var(--haki-vv-top,0px)!important;
     bottom:auto!important;
+    width:100%!important;
     height:var(--haki-vvh,100dvh)!important;
     max-height:var(--haki-vvh,100dvh)!important;
+    box-sizing:border-box!important;
     overflow-y:auto!important;
     overflow-x:hidden!important;
     overscroll-behavior-y:contain;
     -webkit-overflow-scrolling:touch;
-    scroll-padding-top:24px;
-    scroll-padding-bottom:calc(120px + env(safe-area-inset-bottom));
-    padding-bottom:max(34px,env(safe-area-inset-bottom))!important;
+    scroll-padding-top:20px;
+    scroll-padding-bottom:96px;
+    padding-bottom:max(10px,env(safe-area-inset-bottom))!important;
     touch-action:pan-y;
+    contain:layout paint;
   }
-  #cartDrawer.keyboard-active .quote-form{
-    padding-bottom:max(120px,28vh)!important;
+  #cartDrawer.keyboard-android .quote-form{
+    padding-bottom:max(72px,16vh)!important;
   }
-  #cartDrawer.keyboard-active .quote-form input{
-    scroll-margin-top:72px;
-    scroll-margin-bottom:160px;
+  #cartDrawer.keyboard-android .quote-form input{
+    scroll-margin-top:36px;
+    scroll-margin-bottom:100px;
+  }
+  #cartDrawer.keyboard-android .quote-actions{
+    position:sticky;
+    bottom:0;
+    z-index:12;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:6px!important;
+    margin-top:8px!important;
+    padding:8px 0 max(8px,env(safe-area-inset-bottom));
+    background:#fff;
+  }
+  #cartDrawer.keyboard-android .quote-actions button{
+    min-width:0!important;
+    min-height:48px!important;
+    padding:0 7px!important;
+    font-size:10px!important;
+    line-height:1.2!important;
+    white-space:normal!important;
+  }
+
+  #cartDrawer.keyboard-active.keyboard-ios{
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    -webkit-overflow-scrolling:touch;
+    scroll-behavior:auto!important;
+    scroll-padding-top:12px;
+    scroll-padding-bottom:24px;
+  }
+  #cartDrawer.keyboard-ios .quote-form{
+    padding-bottom:max(24px,env(safe-area-inset-bottom))!important;
+  }
+  #cartDrawer.keyboard-ios .quote-form input{
+    scroll-margin-top:12px;
+    scroll-margin-bottom:20px;
   }
 }
-
 
 /* Instagram in-app browser: direct instruction to use Instagram's native X. */
 .instagram-return-overlay[hidden]{display:none!important}
@@ -294,6 +333,15 @@ html body #collectionsSection #collectionsGrid .collection-tile h3{display:block
   letter-spacing:-.045em;
   font-weight:900;
   color:#111;
+}
+.instagram-return-copy{
+  max-width:330px;
+  margin:18px 0 0;
+  color:#111;
+  font-size:15px;
+  line-height:1.45;
+  font-weight:600;
+  letter-spacing:0;
 }
 body.instagram-return-open{overflow:hidden!important}
 

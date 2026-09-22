@@ -1096,6 +1096,7 @@ ${settings().totalTexto}: ${money(totals.total)}`;
           <path d="M194 113 L34 22 M34 22 L51 61 M34 22 L77 18"></path>
         </svg>
         <h2 id="instagramReturnTitle">TOCA LA X DE INSTAGRAM</h2>
+        <p class="instagram-return-copy">Tu cotización quedó copiada. Cierra el catálogo y pégala en el chat.</p>
       </div>
     `;
 
@@ -1165,6 +1166,11 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     const mobileQuery = window.matchMedia('(max-width: 800px)');
     if (!drawer || !form || !mobileQuery.matches) return;
 
+    const ua = navigator.userAgent || '';
+    const isAndroidKeyboard = /Android/i.test(ua);
+    const isiOSKeyboard = /iPad|iPhone|iPod/i.test(ua)
+      || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
     let settleTimer = 0;
     let lateTimer = 0;
     let frame = 0;
@@ -1174,6 +1180,65 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       return active?.matches?.('#quoteForm input') ? active : null;
     };
 
+    const resetKeyboardState = () => {
+      drawer.classList.remove('keyboard-active', 'keyboard-android', 'keyboard-ios');
+      drawer.style.removeProperty('--haki-vvh');
+      drawer.style.removeProperty('--haki-vv-top');
+    };
+
+    // iOS already moves its visual viewport while the keyboard animates.
+    // Rewriting the drawer height/top on every VisualViewport event causes
+    // the repeated jumps seen while typing, so iPhone uses one native scroll
+    // correction per focus and otherwise lets WebKit keep the viewport stable.
+    if (isiOSKeyboard && !isAndroidKeyboard) {
+      const settleIOSField = input => {
+        drawer.classList.add('keyboard-active', 'keyboard-ios');
+        drawer.classList.remove('keyboard-android');
+
+        clearTimeout(settleTimer);
+        settleTimer = window.setTimeout(() => {
+          if (document.activeElement !== input) return;
+
+          const rect = input.getBoundingClientRect();
+          const visibleTop = Math.max(0, viewport?.offsetTop || 0);
+          const visibleHeight = Math.max(260, viewport?.height || window.innerHeight);
+          const safeTop = visibleTop + 12;
+          const safeBottom = visibleTop + visibleHeight - 18;
+
+          if (rect.top < safeTop || rect.bottom > safeBottom) {
+            input.scrollIntoView({
+              block: 'nearest',
+              inline: 'nearest',
+              behavior: 'auto'
+            });
+          }
+        }, 180);
+      };
+
+      document.addEventListener('focusin', event => {
+        if (!event.target.matches?.('#quoteForm input')) return;
+        settleIOSField(event.target);
+      });
+
+      document.addEventListener('focusout', () => {
+        window.setTimeout(() => {
+          if (!activeQuoteInput()) resetKeyboardState();
+        }, 220);
+      });
+
+      window.addEventListener('orientationchange', () => {
+        window.setTimeout(() => {
+          const input = activeQuoteInput();
+          if (input) settleIOSField(input);
+        }, 220);
+      }, { passive: true });
+
+      return;
+    }
+
+    // Android WebViews commonly keep a layout viewport larger than the visible
+    // keyboard viewport, so size the drawer to VisualViewport and keep the two
+    // quote buttons pinned together above the keyboard.
     const viewportMetrics = () => ({
       height: Math.max(280, Math.round(viewport?.height || window.innerHeight)),
       top: Math.max(0, Math.round(viewport?.offsetTop || 0))
@@ -1185,22 +1250,23 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       drawer.style.setProperty('--haki-vv-top', `${top}px`);
     };
 
-    const keepFieldVisible = (input = activeQuoteInput(), behavior = 'auto') => {
+    const keepFieldVisible = (input = activeQuoteInput()) => {
       if (!input) return;
+
       const { height, top } = viewportMetrics();
       const rect = input.getBoundingClientRect();
-      const safeTop = top + Math.max(18, Math.min(72, height * .14));
-      const safeBottom = top + height - Math.max(28, Math.min(110, height * .20));
+      const safeTop = top + Math.max(12, Math.min(42, height * .09));
+      const safeBottom = top + height - Math.max(76, Math.min(110, height * .20));
 
       if (rect.top >= safeTop && rect.bottom <= safeBottom) return;
 
-      const desiredTop = top + Math.max(18, (height - rect.height) * .36);
+      const desiredTop = top + Math.max(12, (height - rect.height) * .25);
       const nextTop = Math.max(0, drawer.scrollTop + rect.top - desiredTop);
-      drawer.scrollTo({ top: nextTop, behavior });
+      drawer.scrollTo({ top: nextTop, behavior: 'auto' });
     };
 
     const syncViewport = () => {
-      if (!drawer.classList.contains('keyboard-active')) return;
+      if (!drawer.classList.contains('keyboard-android')) return;
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
         applyViewport();
@@ -1208,43 +1274,41 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       });
     };
 
-    const activateFor = input => {
-      drawer.classList.add('keyboard-active');
+    const activateAndroidField = input => {
+      drawer.classList.add('keyboard-active', 'keyboard-android');
+      drawer.classList.remove('keyboard-ios');
       applyViewport();
 
       requestAnimationFrame(() => keepFieldVisible(input));
 
       clearTimeout(settleTimer);
-      settleTimer = setTimeout(() => {
-        applyViewport();
-        keepFieldVisible(input, 'smooth');
-      }, 120);
-
-      clearTimeout(lateTimer);
-      lateTimer = setTimeout(() => {
+      settleTimer = window.setTimeout(() => {
         applyViewport();
         keepFieldVisible(input);
-      }, 320);
+      }, 130);
+
+      clearTimeout(lateTimer);
+      lateTimer = window.setTimeout(() => {
+        applyViewport();
+        keepFieldVisible(input);
+      }, 360);
     };
 
     document.addEventListener('focusin', event => {
       if (!event.target.matches?.('#quoteForm input')) return;
-      activateFor(event.target);
+      activateAndroidField(event.target);
     });
 
     document.addEventListener('focusout', () => {
-      setTimeout(() => {
-        if (activeQuoteInput()) return;
-        drawer.classList.remove('keyboard-active');
-        drawer.style.removeProperty('--haki-vvh');
-        drawer.style.removeProperty('--haki-vv-top');
-      }, 240);
+      window.setTimeout(() => {
+        if (!activeQuoteInput()) resetKeyboardState();
+      }, 220);
     });
 
     viewport?.addEventListener('resize', syncViewport);
     viewport?.addEventListener('scroll', syncViewport);
     window.addEventListener('resize', syncViewport, { passive: true });
-    window.addEventListener('orientationchange', () => setTimeout(syncViewport, 120), { passive: true });
+    window.addEventListener('orientationchange', () => window.setTimeout(syncViewport, 140), { passive: true });
   }
 
   installQuoteKeyboardGuard();
