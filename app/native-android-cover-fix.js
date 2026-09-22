@@ -4,7 +4,13 @@
     const config = window.HAKI_CONFIG || {};
     const hero = document.getElementById('heroImage');
     if (!hero) return;
-    const source = config.portada || config.portadaRespaldo;
+    if (window.HAKI_COVER_WAITING_LIVE) {
+      hero.removeAttribute('src');
+      hero.removeAttribute('srcset');
+      hero.style.visibility = 'hidden';
+      return;
+    }
+    const source = config.portadaOriginal || config.portadaDesktop || config.portada || config.portadaRespaldo;
     if (!source) return;
 
     const variants = [
@@ -16,7 +22,7 @@
     const unique = variants.filter(([url],index,list) =>
       list.findIndex(([candidate]) => candidate === url) === index
     );
-    const target = config.portadaDesktop || (
+    const target = config.portadaOriginal || config.portadaDesktop || (
       typeof window.hakiImage === 'function'
         ? window.hakiImage(source, matchMedia('(max-width:800px)').matches ? 1280 : 2560)
         : source
@@ -42,6 +48,7 @@
 
     hero.fetchPriority = 'high';
     hero.decoding = 'async';
+    hero.style.visibility = '';
   }
 
   applyCover();
