@@ -1,3 +1,4 @@
+window.HAKI_COVER_WAITING_LIVE = true;
 // Optimize every local raster image through Netlify Image CDN, including uploads not present in the legacy manifest.
 (() => {
   const legacyItems = url => ((window.HAKI_IMAGES || {})[url] || []).filter(v => v && v.src && v.width);
@@ -63,7 +64,7 @@
 
 // Render the bundled/cached catalog immediately, refresh current data in the background.
 (() => {
-  const key='haki_app_catalog_cache_v2';
+  const key='haki_app_catalog_cache_v3';
   const valid=d=>d&&d.config&&typeof d.config==='object'&&Array.isArray(d.products)&&d.products.every(p=>p&&typeof p.codigo==='string'&&typeof p.nombre==='string');
   const norm=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
   const upper=value=>String(value||'').toLocaleUpperCase('es-SV');
@@ -124,13 +125,22 @@
   async function refresh(){
     if(busy||document.hidden)return;busy=true;
     try{
-      const response=await fetch('https://uysfqzlihiosebqzvfrl.supabase.co/functions/v1/haki-operations?mode=public-catalog',{cache:'no-store',signal:AbortSignal.timeout(12000)});
+      const endpoint='https://uysfqzlihiosebqzvfrl.supabase.co/functions/v1/haki-operations?mode=public-catalog&_=' + Date.now();
+      const response=await fetch(endpoint,{cache:'no-store',signal:AbortSignal.timeout(12000)});
       if(!response.ok)throw new Error('Catalog unavailable');
       const data=polish(await response.json());if(!valid(data))return;
+      data.config ||= {};
+      data.config.catalogVersion = data.version || data.config.portadaRevision || '';
       const changed=JSON.stringify(data)!==JSON.stringify({config:window.HAKI_CONFIG,products:window.HAKI_PRODUCTOS});
+      apply(data);
+      window.HAKI_COVER_WAITING_LIVE=false;
       try{localStorage.setItem(key,JSON.stringify(data));}catch{}
-      if(changed){apply(data);window.dispatchEvent(new Event('haki:catalog-updated'));}
-    }catch{/* Keep the usable local catalog when the network is slow/offline. */}finally{busy=false;}
+      window.dispatchEvent(new CustomEvent('haki:catalog-updated',{detail:{live:true,changed,version:data.version||''}}));
+    }catch{
+      // If the network is unavailable, allow the last usable cached/bundled cover.
+      window.HAKI_COVER_WAITING_LIVE=false;
+      window.dispatchEvent(new CustomEvent('haki:catalog-updated',{detail:{live:false}}));
+    }finally{busy=false;}
   }
   window.addEventListener('DOMContentLoaded',()=>{refresh();setInterval(refresh,300000);});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});
