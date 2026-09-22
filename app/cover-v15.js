@@ -15,8 +15,17 @@
     const b1=document.getElementById('heroButton1');
     const b2=document.getElementById('heroButton2');
 
+    if(window.HAKI_COVER_WAITING_LIVE){
+      if(hero){
+        hero.removeAttribute('src');
+        hero.removeAttribute('srcset');
+        hero.style.visibility='hidden';
+      }
+      return;
+    }
+
     if(hero){
-      const primary=config.portada||config.portadaRespaldo||'';
+      const primary=config.portadaOriginal||config.portadaDesktop||config.portada||config.portadaRespaldo||'';
       const fallback=config.portadaRespaldo||'';
       const variants=[
         [config.portadaMobile,1080],
@@ -25,7 +34,7 @@
         [config.portada,3200],
       ].filter(([url])=>String(url||'').trim());
       const unique=variants.filter(([url],index,list)=>list.findIndex(([candidate])=>candidate===url)===index);
-      const target=config.portadaDesktop||imageUrl(primary);
+      const target=config.portadaOriginal||config.portadaDesktop||imageUrl(primary);
       if(target&&hero.getAttribute('src')!==target) hero.setAttribute('src',target);
       const responsive=unique.length>1?unique.map(([url,width])=>`${url} ${width}w`).join(', '):'';
       const srcset=responsive||(typeof window.hakiSrcset==='function'?window.hakiSrcset(primary):'');
@@ -44,6 +53,7 @@
       };
       hero.setAttribute('fetchpriority','high');
       hero.setAttribute('decoding','async');
+      hero.style.visibility='';
     }
 
     if(title){
