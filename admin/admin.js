@@ -473,22 +473,16 @@ async function decodeCoverImage(file) {
   }
 }
 
-async function makeCoverVariant(image, originalName, label, maxDimension, quality) {
-  const sourceWidth = image.naturalWidth || image.width;
-  const sourceHeight = image.naturalHeight || image.height;
-  if (!sourceWidth || !sourceHeight) throw new Error('La portada no tiene dimensiones válidas.');
-  const ratio = Math.min(1, maxDimension / Math.max(sourceWidth, sourceHeight));
-  const width = Math.max(1, Math.round(sourceWidth * ratio));
-  const height = Math.max(1, Math.round(sourceHeight * ratio));
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d', { alpha:true });
-  ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = 'high';
-  ctx.drawImage(image, 0, 0, width, height);
-  const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', quality));
-  if (!blob) throw new Error('No se pudo optimizar la portada.');
+async function canvasToCoverPayload(canvas, originalName, label, quality=.96, maxBytes=7.5*1024*1024) {
+  let q = quality;
+  let blob = null;
+  while (q >= .86) {
+    blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', q));
+    if (!blob) throw new Error('No se pudo optimizar la portada.');
+    if (blob.size <= maxBytes) break;
+    q -= .03;
+  }
+  if (!blob || blob.size > maxBytes) throw new Error('La portada sigue siendo demasiado pesada incluso optimizada.');
   const stem = String(originalName || 'portada').replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9_-]+/g, '-');
   return {
     name: `${stem}-${label}.webp`,
@@ -498,11 +492,41 @@ async function makeCoverVariant(image, originalName, label, maxDimension, qualit
   };
 }
 
+async function makeCoverVariant(image, originalName, label, targetWidth, quality=.96) {
+  const sourceWidth = image.naturalWidth || image.width;
+  const sourceHeight = image.naturalHeight || image.height;
+  if (!sourceWidth || !sourceHeight) throw new Error('La portada no tiene dimensiones válidas.');
+  const width = Math.max(1, Math.min(sourceWidth, Math.round(targetWidth)));
+  const height = Math.max(1, Math.round(sourceHeight * (width / sourceWidth)));
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d', { alpha:true });
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(image, 0, 0, width, height);
+  return {
+    payload: await canvasToCoverPayload(canvas, originalName, label, quality),
+    width,
+    height,
+  };
+}
+
 async function uploadCoverPayload(payload) {
   return api('upload', {
     method: 'POST',
     body: JSON.stringify(payload),
   });
+}
+
+async function persistCoverConfig(configPatch) {
+  const data = await api('catalog', {
+    method: 'PATCH',
+    body: JSON.stringify({ config: configPatch }),
+  });
+  state.catalogSha = data.sha || state.catalogSha;
+  Object.assign(state.config, configPatch);
+  return data;
 }
 
 $('#brandIconFile')?.addEventListener('change', async (e) => {
@@ -541,68 +565,88 @@ $('#coverFile')?.addEventListener('change', async (e) => {
   if (!file) return;
   try {
     e.target.disabled = true;
-    toast('Preparando portada en alta calidad…');
-
     if (!['image/jpeg','image/png','image/webp'].includes(file.type)) {
-      const data = await uploadCoverPayload({
-        name: file.name,
-        mime: file.type,
-        base64: await fileToBase64(file),
-        preserveQuality: true,
-      });
-      state.config.portada = data.path;
-      state.config.portadaRespaldo = data.path;
-      state.config.portadaOriginal = data.path;
-      state.config.portadaMobile = data.path;
-      state.config.portadaTablet = data.path;
-      state.config.portadaDesktop = data.path;
-    } else {
-      const decoded = await decodeCoverImage(file);
-      try {
-        const specs = [
-          { key:'portadaMobile', label:'mobile-1080', max:1080, quality:.90 },
-          { key:'portadaTablet', label:'tablet-1600', max:1600, quality:.91 },
-          { key:'portadaDesktop', label:'desktop-2560', max:2560, quality:.92 },
-          { key:'portada', label:'master-3200', max:3200, quality:.94 },
-        ];
-        const uploaded = {};
-        for (let i = 0; i < specs.length; i += 1) {
-          const spec = specs[i];
-          toast(`Optimizando portada ${i + 1}/${specs.length}…`);
-          const payload = await makeCoverVariant(decoded.image, file.name, spec.label, spec.max, spec.quality);
-          const data = await uploadCoverPayload(payload);
-          uploaded[spec.key] = data.path;
-        }
-
-        state.config.portadaMobile = uploaded.portadaMobile;
-        state.config.portadaTablet = uploaded.portadaTablet;
-        state.config.portadaDesktop = uploaded.portadaDesktop;
-        state.config.portada = uploaded.portada;
-        state.config.portadaRespaldo = uploaded.portada;
-
-        state.config.portadaOriginal = uploaded.portada;
-        if (file.size <= 7.5 * 1024 * 1024) {
-          try {
-            const original = await uploadCoverPayload({
-              name: file.name,
-              mime: file.type,
-              base64: await fileToBase64(file),
-              preserveQuality: true,
-            });
-            state.config.portadaOriginal = original.path;
-          } catch (_) {
-            // El master de 3200 px queda como respaldo si el original bruto no cabe.
-          }
-        }
-      } finally {
-        URL.revokeObjectURL(decoded.objectUrl);
-      }
+      throw new Error('Para máxima calidad usa JPG, PNG o WebP.');
     }
 
-    const pathInput = $('#coverPath');
-    if (pathInput) pathInput.value = state.config.portada;
-    refreshCoverPreview();
-    toast('Portada lista en alta calidad y versiones responsivas. Pulsa “Guardar y publicar” para aplicarla.', true);
+    toast('Subiendo portada original sin reducir calidad…');
+    const decoded = await decodeCoverImage(file);
+    try {
+      const sourceWidth = decoded.image.naturalWidth || decoded.image.width;
+      const sourceHeight = decoded.image.naturalHeight || decoded.image.height;
+      const MAX_ORIGINAL_BYTES = 7.5 * 1024 * 1024;
+
+      let masterUpload;
+      let masterWidth = sourceWidth;
+      let masterHeight = sourceHeight;
+
+      if (file.size <= MAX_ORIGINAL_BYTES) {
+        masterUpload = await uploadCoverPayload({
+          name: file.name,
+          mime: file.type,
+          base64: await fileToBase64(file),
+          preserveQuality: true,
+        });
+      } else {
+        toast('El original es muy pesado; creando master 4K de alta calidad…');
+        const master = await makeCoverVariant(decoded.image, file.name, 'master-4k', 4096, .98);
+        masterUpload = await uploadCoverPayload(master.payload);
+        masterWidth = master.width;
+        masterHeight = master.height;
+      }
+
+      let mobileUpload = masterUpload;
+      let mobileWidth = masterWidth;
+      let mobileHeight = masterHeight;
+      if (sourceWidth > 1440) {
+        toast('Creando versión móvil nítida…');
+        const mobile = await makeCoverVariant(decoded.image, file.name, 'mobile-1440', 1440, .96);
+        mobileUpload = await uploadCoverPayload(mobile.payload);
+        mobileWidth = mobile.width;
+        mobileHeight = mobile.height;
+      }
+
+      let tabletUpload = masterUpload;
+      let tabletWidth = masterWidth;
+      let tabletHeight = masterHeight;
+      if (sourceWidth > 2200) {
+        toast('Creando versión tablet de alta calidad…');
+        const tablet = await makeCoverVariant(decoded.image, file.name, 'tablet-2200', 2200, .97);
+        tabletUpload = await uploadCoverPayload(tablet.payload);
+        tabletWidth = tablet.width;
+        tabletHeight = tablet.height;
+      }
+
+      const revision = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
+      const patch = {
+        portada: masterUpload.path,
+        portadaRespaldo: masterUpload.path,
+        portadaOriginal: masterUpload.path,
+        portadaDesktop: masterUpload.path,
+        portadaTablet: tabletUpload.path,
+        portadaMobile: mobileUpload.path,
+        portadaOriginalWidth: masterWidth,
+        portadaOriginalHeight: masterHeight,
+        portadaDesktopWidth: masterWidth,
+        portadaDesktopHeight: masterHeight,
+        portadaTabletWidth: tabletWidth,
+        portadaTabletHeight: tabletHeight,
+        portadaMobileWidth: mobileWidth,
+        portadaMobileHeight: mobileHeight,
+        portadaRevision: revision,
+        tipoPortada: 'imagen',
+      };
+
+      toast('Publicando portada nueva…');
+      await persistCoverConfig(patch);
+
+      const pathInput = $('#coverPath');
+      if (pathInput) pathInput.value = masterUpload.path;
+      refreshCoverPreview();
+      toast('Portada publicada en máxima calidad. Ya no necesitas pulsar “Guardar y publicar”.', true);
+    } finally {
+      URL.revokeObjectURL(decoded.objectUrl);
+    }
   } catch (err) {
     toast(err.message);
   } finally {
