@@ -13,7 +13,7 @@
 
   let warmed = false;
   function warmNextImages() {
-    if (warmed || window.HAKI_COVER_WAITING_LIVE) return;
+    if (warmed || window.HAKI_COVER_WAITING_LIVE || !hero?.complete || !hero.naturalWidth) return;
     warmed = true;
     const config = window.HAKI_CONFIG || {};
     const products = window.HAKI_PRODUCTOS || [];
@@ -32,6 +32,11 @@
       img.src = typeof window.hakiImage === 'function' ? window.hakiImage(source, 560) : source;
     }
   }
+
+  hero?.addEventListener('load', () => {
+    if ('requestIdleCallback' in window) requestIdleCallback(warmNextImages);
+    else setTimeout(warmNextImages, 250);
+  });
 
   window.addEventListener('haki:catalog-updated', event => {
     if (event?.detail?.live === false) return;

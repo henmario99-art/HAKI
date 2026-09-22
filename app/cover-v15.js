@@ -24,7 +24,9 @@
       return;
     }
 
-    if(hero){
+    if(window.HAKI_COVER){
+      window.HAKI_COVER.paint(hero,config);
+    }else if(hero){
       const primary=config.portadaOriginal||config.portadaDesktop||config.portada||config.portadaRespaldo||'';
       const fallback=config.portadaRespaldo||'';
       const variants=[

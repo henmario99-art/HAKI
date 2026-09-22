@@ -4,6 +4,10 @@
     const config = window.HAKI_CONFIG || {};
     const hero = document.getElementById('heroImage');
     if (!hero) return;
+    if (window.HAKI_COVER) {
+      window.HAKI_COVER.paint(hero, config);
+      return;
+    }
     if (window.HAKI_COVER_WAITING_LIVE) {
       hero.removeAttribute('src');
       hero.removeAttribute('srcset');

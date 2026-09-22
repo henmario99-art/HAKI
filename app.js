@@ -144,6 +144,8 @@
       hero.removeAttribute('src');
       hero.removeAttribute('srcset');
       hero.style.visibility = 'hidden';
+    } else if (window.HAKI_COVER) {
+      window.HAKI_COVER.paint(hero, CONFIG);
     } else {
       const coverVersion = String(CONFIG.portadaRevision || CONFIG.catalogVersion || '');
       const versioned = url => {

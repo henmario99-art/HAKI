@@ -115,10 +115,19 @@ window.HAKI_COVER_WAITING_LIVE = true;
   async function refresh(){
     if(busy||document.hidden)return;busy=true;
     try{
+      let data;
+      if(window.HAKI_FETCH_CATALOG){
+        const request=window.HAKI_INITIAL_CATALOG || window.HAKI_FETCH_CATALOG();
+        window.HAKI_INITIAL_CATALOG=null;
+        data=await request;
+        if(!valid(data))throw new Error('Catalog unavailable');
+        polish(data);
+      }else{
       const endpoint='https://uysfqzlihiosebqzvfrl.supabase.co/functions/v1/haki-operations?mode=public-catalog&_=' + Date.now();
       const response=await fetch(endpoint,{cache:'no-store',signal:AbortSignal.timeout(12000)});
       if(!response.ok)throw new Error('Catalog unavailable');
-      const data=polish(await response.json());if(!valid(data))return;
+      data=polish(await response.json());if(!valid(data))throw new Error('Catalog unavailable');
+      }
       data.config ||= {};
       data.config.catalogVersion = data.version || data.config.portadaRevision || '';
       const changed=JSON.stringify(data)!==JSON.stringify({config:window.HAKI_CONFIG,products:window.HAKI_PRODUCTOS});
@@ -180,7 +189,8 @@ window.HAKI_COVER_WAITING_LIVE = true;
   }
 
   window.addEventListener('DOMContentLoaded',()=>{
-    refreshAvailability();
+    // The initial public catalog already includes current stock.
+    // Avoid competing with the cover by fetching the same inventory twice.
     setInterval(refreshAvailability,45000);
   });
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshAvailability();});
