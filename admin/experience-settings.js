@@ -67,7 +67,7 @@
       section.addEventListener('input', () => { total(); section.dataset.dirty = 'true'; syncSizes(product, values(), card); }); total();
       section.querySelector('button').addEventListener('click', async event => {
         const button = event.currentTarget; button.disabled = true;
-        try { const data = await api('sales?mode=inventory', { method:'PUT', body:JSON.stringify({productId:product.id,stock:values()}) }); inventory = data.inventory; delete section.dataset.dirty; syncSizes(product, inventory[String(product.id)], card); zeroReport(); toast('Inventario y disponibilidad guardados', true); }
+        try { const data = await api('sales?mode=inventory', { method:'PUT', body:JSON.stringify({productId:product.id,productCode:product.codigo,stock:values()}) }); inventory = data.inventory; delete section.dataset.dirty; syncSizes(product, inventory[String(product.id)] || inventory[String(product.codigo || '').toUpperCase()], card); zeroReport(); toast('Inventario y disponibilidad guardados', true); }
         catch(error) { toast(error.message); }
         finally { button.disabled = false; }
       });

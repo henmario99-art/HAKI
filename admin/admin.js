@@ -517,7 +517,7 @@ $('#addBtn').addEventListener('click', () => {
 });
 
 async function saveCatalog() {
-  if (document.querySelector('.private-inventory[data-dirty="true"]')) { toast('Guarda primero las cantidades con «Guardar inventario».'); return false; }
+  if (document.querySelector('.private-inventory[data-dirty="true"]')) { toast('Hay cantidades de inventario sin guardar. Pulsa «Guardar inventario» en la prenda nueva y luego vuelve a «Guardar y publicar».'); return false; }
   for (const input of document.querySelectorAll('#experienceSettings input')) { if (!input.reportValidity()) return; }
   if (!confirm('¿Guardar estos cambios en el catálogo?')) return false;
   const buttons = [$('#saveBtn'), $('#saveOrderBtn')];
