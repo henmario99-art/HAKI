@@ -58,6 +58,28 @@ export default async request => {
       const data = await edge('catalog', { method:'GET' });
       return json({ config:data.config || {}, products:data.products || [], sha:data.version || '', branch:'supabase', storage:'supabase' });
     }
+    if (request.method === 'PATCH') {
+      const body = await bodyJson(request);
+      const partial = body?.config && typeof body.config === 'object' ? body.config : {};
+      const current = await edge('catalog', { method:'GET' });
+      const mergedConfig = { ...(current.config || {}), ...partial };
+      const data = await edge('catalog', {
+        method:'PUT',
+        body:JSON.stringify({
+          config:mergedConfig,
+          products:Array.isArray(current.products) ? current.products : [],
+          expectedVersion:String(current.version || ''),
+        }),
+      });
+      return json({
+        ok:true,
+        config:data.config || mergedConfig,
+        products:data.products || current.products || [],
+        sha:data.version || '',
+        commit:null,
+        storage:'supabase',
+      });
+    }
     if (request.method === 'PUT') {
       const body = await bodyJson(request);
       validatePayload(body);
