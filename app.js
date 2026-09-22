@@ -1039,21 +1039,36 @@ ${settings().totalTexto}: ${money(totals.total)}`;
 
   function openInstagramChat(handle) {
     const username = String(handle || '').replace(/^@/, '').trim();
-    const webTarget = `https://ig.me/m/${encodeURIComponent(username)}`;
+    const encodedUsername = encodeURIComponent(username);
+    const webTarget = `https://ig.me/m/${encodedUsername}`;
     const ua = navigator.userAgent || '';
     const isiOS = /iPad|iPhone|iPod/i.test(ua) ||
       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     const isAndroid = /Android/i.test(ua);
+    const isInstagramBrowser = /Instagram/i.test(ua);
 
-    // Android: target Instagram itself, never Chrome. If Instagram cannot
-    // handle the intent, fall back to Meta's DM link.
+    // Android: ask the OS for the Instagram app first and keep ig.me as fallback.
     if (isAndroid) {
-      location.href = `intent://ig.me/m/${encodeURIComponent(username)}#Intent;scheme=https;package=com.instagram.android;S.browser_fallback_url=${encodeURIComponent(webTarget)};end`;
+      location.href = `intent://ig.me/m/${encodedUsername}#Intent;scheme=https;package=com.instagram.android;S.browser_fallback_url=${encodeURIComponent(webTarget)};end`;
       return true;
     }
 
-    // iOS: ig.me is Instagram's DM universal link. Navigating in the same
-    // context gives iOS/Instagram the chance to hand the user back to the app.
+    // iPhone/iPad opened from Instagram itself: leave Instagram's in-app browser
+    // and return to the native Direct area, which feels like closing the catalog.
+    // If Instagram/iOS blocks its private app scheme, fall back to the official
+    // ig.me conversation link after a short delay.
+    if (isiOS && isInstagramBrowser) {
+      location.href = 'instagram://direct-inbox';
+      window.setTimeout(() => {
+        if (document.visibilityState === 'visible') {
+          location.href = webTarget;
+        }
+      }, 850);
+      return true;
+    }
+
+    // Outside Instagram's own browser, ig.me is the most reliable way to open
+    // the specific HAKI conversation in the installed Instagram app.
     if (isiOS) {
       location.href = webTarget;
       return true;
