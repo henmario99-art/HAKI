@@ -484,6 +484,18 @@ Deno.serve(async (req: Request) => {
       return json({ ok:true, sale:saved, weekStart:mondayOf(saved.fecha), inventory:await inventoryMap() });
     }
 
+    if (req.method === 'DELETE' && mode === 'permanent-delete') {
+      const body = await req.json();
+      const id = txt(body?.id,80);
+      if (!id || body?.confirmDelete !== true || !body?.archivedAt) {
+        return json({ error:'Confirma el borrado definitivo desde Ventas archivadas.' },400);
+      }
+      const result = await rpc('haki_permanently_delete_archived_sale', {
+        p_id:id, p_expected_archived_at:body.archivedAt,
+      });
+      return json({ ok:true, deleted:true, id, result });
+    }
+
     if (req.method === 'DELETE') {
       const body = await req.json();
       const id = txt(body?.id,80);

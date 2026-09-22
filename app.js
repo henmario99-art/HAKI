@@ -1018,30 +1018,70 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     );
   }
 
-  async function submitInstagram() {
+  function legacyCopyQuoteText(text) {
+    const area = document.createElement('textarea');
+    area.value = text;
+    area.setAttribute('readonly', '');
+    area.setAttribute('aria-hidden', 'true');
+    area.style.position = 'fixed';
+    area.style.left = '-9999px';
+    area.style.top = '0';
+    area.style.opacity = '0';
+    document.body.appendChild(area);
+    area.focus({ preventScroll: true });
+    area.select();
+    area.setSelectionRange(0, area.value.length);
+    let copied = false;
+    try { copied = document.execCommand('copy'); } catch {}
+    area.remove();
+    return copied;
+  }
+
+  function openInstagramOutsideBrowser(url) {
+    const ua = navigator.userAgent || '';
+    const inInstagram = /Instagram/i.test(ua);
+    const isiOS = /iPad|iPhone|iPod/i.test(ua) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isAndroid = /Android/i.test(ua);
+
+    if (inInstagram && isAndroid) {
+      const target = url.replace(/^https?:\/\//, '');
+      location.href = `intent://${target}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(url)};end`;
+      return 'Chrome';
+    }
+
+    if (inInstagram && isiOS) {
+      location.href = `x-safari-${url}`;
+      return 'Safari';
+    }
+
+    window.open(url, '_blank', 'noopener');
+    return '';
+  }
+
+  function submitInstagram() {
     if (!validateQuote()) return;
 
     const text = quoteText();
+    const handle = String(CONFIG.instagram || '').replace(/^@/, '').trim();
+    const target = `https://ig.me/m/${encodeURIComponent(handle)}`;
+    const legacyCopied = legacyCopyQuoteText(text);
+    const modernCopy = (navigator.clipboard?.writeText && window.isSecureContext)
+      ? navigator.clipboard.writeText(text).then(() => true).catch(() => legacyCopied)
+      : Promise.resolve(legacyCopied);
 
-    try {
-      await navigator.clipboard.writeText(
-        text
-      );
-
-      showToast(
-        'Cotización copiada. Pégala en Instagram.'
-      );
-    } catch {
-      showToast(
-        'Abriendo Instagram. Copia la cotización manualmente.'
-      );
-    }
-
-    window.open(
-      `https://ig.me/m/${encodeURIComponent(String(CONFIG.instagram || '').replace(/^@/,''))}`,
-      '_blank',
-      'noopener'
-    );
+    const externalBrowser = openInstagramOutsideBrowser(target);
+    modernCopy.then(copied => {
+      if (externalBrowser) {
+        showToast(copied
+          ? `Cotización copiada. Abriendo ${externalBrowser}…`
+          : `Abriendo ${externalBrowser}… Copia la cotización manualmente.`);
+      } else {
+        showToast(copied
+          ? 'Cotización copiada. Pégala en Instagram.'
+          : 'Instagram abierto. Copia la cotización manualmente.');
+      }
+    });
   }
 
   let toastTimer;

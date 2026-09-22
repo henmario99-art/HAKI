@@ -1016,6 +1016,28 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     link.remove();
   }
 
+  function openInstagramOutsideBrowser(url) {
+    const ua = navigator.userAgent || '';
+    const inInstagram = /Instagram/i.test(ua);
+    const isiOS = /iPad|iPhone|iPod/i.test(ua) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isAndroid = /Android/i.test(ua);
+
+    if (inInstagram && isAndroid) {
+      const target = url.replace(/^https?:\/\//, '');
+      location.href = `intent://${target}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(url)};end`;
+      return 'Chrome';
+    }
+
+    if (inInstagram && isiOS) {
+      location.href = `x-safari-${url}`;
+      return 'Safari';
+    }
+
+    openQuoteLink(url);
+    return '';
+  }
+
   function submitWhatsApp(e) {
     e.preventDefault();
 
@@ -1069,12 +1091,16 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       ? navigator.clipboard.writeText(text).then(() => true).catch(() => legacyCopied)
       : Promise.resolve(legacyCopied);
 
-    openQuoteLink(`https://ig.me/m/${encodeURIComponent(handle)}`);
+    const externalBrowser = openInstagramOutsideBrowser(`https://ig.me/m/${encodeURIComponent(handle)}`);
 
     modernCopy.then(copied => {
-      showToast(copied
-        ? 'Cotización copiada. Pégala en Instagram.'
-        : 'Instagram abierto. Mantén pulsado y pega la cotización.');
+      showToast(externalBrowser
+        ? (copied
+          ? `Cotización copiada. Abriendo ${externalBrowser}…`
+          : `Abriendo ${externalBrowser}… Copia la cotización manualmente.`)
+        : (copied
+          ? 'Cotización copiada. Pégala en Instagram.'
+          : 'Instagram abierto. Mantén pulsado y pega la cotización.'));
     });
   }
 
