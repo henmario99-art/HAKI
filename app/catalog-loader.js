@@ -134,4 +134,5 @@
   }
   window.addEventListener('DOMContentLoaded',()=>{refresh();setInterval(refresh,300000);});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});
+  window.addEventListener('storage',event=>{if(event.key==='haki_stock_version')refresh();});
 })();
