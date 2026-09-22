@@ -523,7 +523,7 @@ window.HAKI_PRODUCTOS = [
       "S": true,
       "M": true,
       "L": true,
-      "XL": false
+      "XL": true
     },
     "colecciones": [
       "collection-1"
@@ -825,7 +825,7 @@ window.HAKI_PRODUCTOS = [
       "S": true,
       "M": true,
       "L": true,
-      "XL": false
+      "XL": true
     },
     "colecciones": [
       "collection-1"
@@ -1018,7 +1018,7 @@ window.HAKI_PRODUCTOS = [
     "imagen": "images/1789333438996-e8d8c5e8-7a277e3c-449c-45c2-9bb2-98c237612a43_Original.jpeg",
     "imagenRespaldo": "images/leggings.svg",
     "tallas": {
-      "S": true,
+      "S": false,
       "M": false,
       "L": false,
       "XL": false
@@ -1045,7 +1045,7 @@ window.HAKI_PRODUCTOS = [
       "S": false,
       "M": false,
       "L": true,
-      "XL": true
+      "XL": false
     },
     "colecciones": [
       "collection-2"
@@ -1560,10 +1560,10 @@ window.HAKI_PRODUCTOS = [
     "imagen": "images/1789336258515-ed6db935-IMG_5046.webp",
     "imagenRespaldo": "images/tee-gray.svg",
     "tallas": {
-      "S": false,
+      "S": true,
       "M": true,
       "L": true,
-      "XL": true
+      "XL": false
     },
     "colecciones": [
       "collection-3"
@@ -1578,9 +1578,9 @@ window.HAKI_PRODUCTOS = [
   },
   {
     "id": 51,
-    "codigo": "HAKI-051",
-    "nombre": "PRODUCTO RECUPERADO 01",
-    "precio": 0,
+    "codigo": "YLAP01-01",
+    "nombre": "YLA PANTS FLOR",
+    "precio": 35,
     "categoria": "Camisetas",
     "novedad": false,
     "masVendido": false,
@@ -1593,18 +1593,18 @@ window.HAKI_PRODUCTOS = [
     "guiaTallas": "",
     "tallas": {
       "S": false,
-      "M": false,
-      "L": false,
-      "XL": false
+      "M": true,
+      "L": true,
+      "XL": true
     },
     "borrador": false,
     "recuperado": true
   },
   {
     "id": 52,
-    "codigo": "HAKI-052",
-    "nombre": "PRODUCTO RECUPERADO 02",
-    "precio": 0,
+    "codigo": "SUPC01-01",
+    "nombre": "SUP BÁSICA NEGRO",
+    "precio": 18,
     "categoria": "Camisetas",
     "novedad": false,
     "masVendido": false,
@@ -1616,18 +1616,18 @@ window.HAKI_PRODUCTOS = [
     "imagen2": "",
     "guiaTallas": "",
     "tallas": {
-      "S": false,
+      "S": true,
       "M": false,
       "L": false,
-      "XL": false
+      "XL": true
     },
     "borrador": false,
     "recuperado": true
   },
   {
     "id": 53,
-    "codigo": "HAKI-053",
-    "nombre": "PRODUCTO RECUPERADO 03",
+    "codigo": "SUPC01-10",
+    "nombre": "SUP BÁSICA AZUL",
     "precio": 0,
     "categoria": "Camisetas",
     "novedad": false,
@@ -1637,12 +1637,12 @@ window.HAKI_PRODUCTOS = [
     "colores": [],
     "imagen": "images/1790039416838-11251033-ChatGPT-Image-21-sept-2026-07_10_06-p.m..webp",
     "imagenRespaldo": "images/producto.svg",
-    "imagen2": "images/1790039482415-15160791-worth-it-red-blue-onyx-l-fit-check-v0-b3z5k93wh5xf1.webp",
+    "imagen2": "",
     "guiaTallas": "",
     "tallas": {
       "S": false,
       "M": false,
-      "L": false,
+      "L": true,
       "XL": false
     },
     "borrador": false,
@@ -1650,8 +1650,8 @@ window.HAKI_PRODUCTOS = [
   },
   {
     "id": 54,
-    "codigo": "HAKI-054",
-    "nombre": "PRODUCTO RECUPERADO 04",
+    "codigo": "GSCH-06",
+    "nombre": "ONYX CENTRO GRIS",
     "precio": 0,
     "categoria": "Camisetas",
     "novedad": false,
@@ -1664,7 +1664,7 @@ window.HAKI_PRODUCTOS = [
     "imagen2": "",
     "guiaTallas": "",
     "tallas": {
-      "S": false,
+      "S": true,
       "M": false,
       "L": false,
       "XL": false
@@ -1674,9 +1674,9 @@ window.HAKI_PRODUCTOS = [
   },
   {
     "id": 55,
-    "codigo": "HAKI-055",
-    "nombre": "PRODUCTO RECUPERADO 05",
-    "precio": 0,
+    "codigo": "SUPH0-01",
+    "nombre": "SUP CENTRO OVERSIZED",
+    "precio": 26,
     "categoria": "Camisetas",
     "novedad": false,
     "masVendido": false,
@@ -1688,19 +1688,19 @@ window.HAKI_PRODUCTOS = [
     "imagen2": "",
     "guiaTallas": "",
     "tallas": {
-      "S": false,
+      "S": true,
       "M": false,
-      "L": false,
-      "XL": false
+      "L": true,
+      "XL": true
     },
     "borrador": false,
     "recuperado": true
   },
   {
     "id": 56,
-    "codigo": "HAKI-056",
-    "nombre": "PRODUCTO RECUPERADO 06",
-    "precio": 0,
+    "codigo": "WOLV-06",
+    "nombre": "WOLVES GRIS",
+    "precio": 22,
     "categoria": "Camisetas",
     "novedad": false,
     "masVendido": false,
@@ -1715,15 +1715,15 @@ window.HAKI_PRODUCTOS = [
       "S": false,
       "M": false,
       "L": false,
-      "XL": false
+      "XL": true
     },
     "borrador": false,
     "recuperado": true
   },
   {
     "id": 57,
-    "codigo": "HAKI-057",
-    "nombre": "PRODUCTO RECUPERADO 07",
+    "codigo": "BSK-01",
+    "nombre": "BERSERK OVERSIZED",
     "precio": 0,
     "categoria": "Camisetas",
     "novedad": false,
@@ -1737,7 +1737,7 @@ window.HAKI_PRODUCTOS = [
     "guiaTallas": "",
     "tallas": {
       "S": false,
-      "M": false,
+      "M": true,
       "L": false,
       "XL": false
     },
@@ -1746,8 +1746,8 @@ window.HAKI_PRODUCTOS = [
   },
   {
     "id": 58,
-    "codigo": "HAKI-058",
-    "nombre": "PRODUCTO RECUPERADO 08",
+    "codigo": "YLAP-08",
+    "nombre": "YLA PANTS VERDE",
     "precio": 0,
     "categoria": "Camisetas",
     "novedad": false,
@@ -1760,7 +1760,7 @@ window.HAKI_PRODUCTOS = [
     "imagen2": "",
     "guiaTallas": "",
     "tallas": {
-      "S": false,
+      "S": true,
       "M": false,
       "L": false,
       "XL": false
@@ -1770,9 +1770,9 @@ window.HAKI_PRODUCTOS = [
   },
   {
     "id": 59,
-    "codigo": "HAKI-059",
-    "nombre": "PRODUCTO RECUPERADO 09",
-    "precio": 0,
+    "codigo": "SPDL-02",
+    "nombre": "SPIDERWOMAN BLANCO",
+    "precio": 20,
     "categoria": "Camisetas",
     "novedad": false,
     "masVendido": false,
@@ -1784,9 +1784,9 @@ window.HAKI_PRODUCTOS = [
     "imagen2": "",
     "guiaTallas": "",
     "tallas": {
-      "S": false,
-      "M": false,
-      "L": false,
+      "S": true,
+      "M": true,
+      "L": true,
       "XL": false
     },
     "borrador": false,
@@ -1794,9 +1794,9 @@ window.HAKI_PRODUCTOS = [
   },
   {
     "id": 60,
-    "codigo": "HAKI-060",
-    "nombre": "PRODUCTO RECUPERADO 10",
-    "precio": 0,
+    "codigo": "SPDC-01",
+    "nombre": "SPIDERWOMAN NEGRO",
+    "precio": 18,
     "categoria": "Camisetas",
     "novedad": false,
     "masVendido": false,
@@ -1810,7 +1810,7 @@ window.HAKI_PRODUCTOS = [
     "tallas": {
       "S": false,
       "M": false,
-      "L": false,
+      "L": true,
       "XL": false
     },
     "borrador": false,
@@ -1818,8 +1818,8 @@ window.HAKI_PRODUCTOS = [
   },
   {
     "id": 61,
-    "codigo": "HAKI-061",
-    "nombre": "PRODUCTO RECUPERADO 11",
+    "codigo": "BSKC-01",
+    "nombre": "BERSERK MANGA CORTA",
     "precio": 0,
     "categoria": "Camisetas",
     "novedad": false,
@@ -1835,16 +1835,16 @@ window.HAKI_PRODUCTOS = [
       "S": false,
       "M": false,
       "L": false,
-      "XL": false
+      "XL": true
     },
     "borrador": false,
     "recuperado": true
   },
   {
     "id": 62,
-    "codigo": "HAKI-062",
-    "nombre": "PRODUCTO RECUPERADO 12",
-    "precio": 0,
+    "codigo": "BSKL-01",
+    "nombre": "BERSERK MANGA LARGA",
+    "precio": 20,
     "categoria": "Camisetas",
     "novedad": false,
     "masVendido": false,
@@ -1859,16 +1859,16 @@ window.HAKI_PRODUCTOS = [
       "S": false,
       "M": false,
       "L": false,
-      "XL": false
+      "XL": true
     },
     "borrador": false,
     "recuperado": true
   },
   {
     "id": 63,
-    "codigo": "HAKI-063",
-    "nombre": "PRODUCTO RECUPERADO 13",
-    "precio": 0,
+    "codigo": "BSK-02",
+    "nombre": "BERSERK MANGA CORTA",
+    "precio": 18,
     "categoria": "Camisetas",
     "novedad": false,
     "masVendido": false,
@@ -1883,16 +1883,16 @@ window.HAKI_PRODUCTOS = [
       "S": false,
       "M": false,
       "L": false,
-      "XL": false
+      "XL": true
     },
     "borrador": false,
     "recuperado": true
   },
   {
     "id": 64,
-    "codigo": "HAKI-064",
-    "nombre": "PRODUCTO RECUPERADO 14",
-    "precio": 0,
+    "codigo": "DBJ-01",
+    "nombre": "BREATHE JACKET",
+    "precio": 22,
     "categoria": "Camisetas",
     "novedad": false,
     "masVendido": false,
@@ -1905,7 +1905,7 @@ window.HAKI_PRODUCTOS = [
     "guiaTallas": "",
     "tallas": {
       "S": false,
-      "M": false,
+      "M": true,
       "L": false,
       "XL": false
     },
@@ -1914,9 +1914,9 @@ window.HAKI_PRODUCTOS = [
   },
   {
     "id": 65,
-    "codigo": "HAKI-065",
-    "nombre": "PRODUCTO RECUPERADO 15",
-    "precio": 0,
+    "codigo": "SPDL-01",
+    "nombre": "SPIDERMAN MANGA LARGA",
+    "precio": 20,
     "categoria": "Camisetas",
     "novedad": false,
     "masVendido": false,
@@ -1929,7 +1929,7 @@ window.HAKI_PRODUCTOS = [
     "guiaTallas": "",
     "tallas": {
       "S": false,
-      "M": false,
+      "M": true,
       "L": false,
       "XL": false
     },
