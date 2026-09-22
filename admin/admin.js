@@ -595,27 +595,15 @@ $('#coverFile')?.addEventListener('change', async (e) => {
         masterHeight = master.height;
       }
 
-      let mobileUpload = masterUpload;
-      let mobileWidth = masterWidth;
-      let mobileHeight = masterHeight;
-      if (sourceWidth > 1440) {
-        toast('Creando versión móvil nítida…');
-        const mobile = await makeCoverVariant(decoded.image, file.name, 'mobile-1440', 1440, .96);
-        mobileUpload = await uploadCoverPayload(mobile.payload);
-        mobileWidth = mobile.width;
-        mobileHeight = mobile.height;
-      }
-
-      let tabletUpload = masterUpload;
-      let tabletWidth = masterWidth;
-      let tabletHeight = masterHeight;
-      if (sourceWidth > 2200) {
-        toast('Creando versión tablet de alta calidad…');
-        const tablet = await makeCoverVariant(decoded.image, file.name, 'tablet-2200', 2200, .97);
-        tabletUpload = await uploadCoverPayload(tablet.payload);
-        tabletWidth = tablet.width;
-        tabletHeight = tablet.height;
-      }
+      // The tall mobile hero crops a wide image with object-fit: cover.
+      // A 1440px-wide panorama loses most of its pixels in that crop.
+      // Reuse the preserved original at every breakpoint, including Retina.
+      const mobileUpload = masterUpload;
+      const mobileWidth = masterWidth;
+      const mobileHeight = masterHeight;
+      const tabletUpload = masterUpload;
+      const tabletWidth = masterWidth;
+      const tabletHeight = masterHeight;
 
       const revision = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
       const patch = {
