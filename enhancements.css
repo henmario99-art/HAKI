@@ -220,3 +220,48 @@ body.instagram-return-open{overflow:hidden!important}
 @media(prefers-reduced-motion:reduce){
   .instagram-return-overlay.needs-native-close .instagram-return-x{animation:none}
 }
+
+
+/* If Instagram blocks window.close(), strip the page down to a plain white instruction screen. */
+.instagram-return-overlay.needs-native-close{
+  background:#fff!important;
+  padding:0 20px!important;
+  place-items:start center!important;
+}
+.instagram-return-overlay.needs-native-close .instagram-return-card{
+  width:100%!important;
+  min-height:100dvh;
+  justify-content:flex-start;
+  padding-top:max(110px,calc(env(safe-area-inset-top) + 72px));
+}
+.instagram-return-overlay.needs-native-close .instagram-return-x{
+  display:none!important;
+}
+.instagram-return-overlay.needs-native-close .instagram-return-card::before{
+  content:'↖';
+  display:block;
+  margin:0 0 18px;
+  color:#111;
+  font:300 clamp(74px,24vw,118px)/.8 Arial,sans-serif;
+}
+.instagram-return-overlay.needs-native-close .instagram-return-card h2{
+  margin:0 0 14px!important;
+  max-width:340px;
+  font-size:clamp(30px,9vw,44px)!important;
+  line-height:.95!important;
+}
+.instagram-return-overlay.needs-native-close .instagram-return-card p{
+  max-width:300px!important;
+  margin:0!important;
+  color:#111!important;
+  font-size:15px!important;
+  line-height:1.45!important;
+  font-weight:600!important;
+}
+.instagram-return-overlay.needs-native-close .instagram-return-hint{
+  display:block!important;
+  margin-top:16px!important;
+  color:#111!important;
+  font-size:10px!important;
+  letter-spacing:.12em!important;
+}

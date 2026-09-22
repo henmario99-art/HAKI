@@ -1135,7 +1135,11 @@ ${settings().totalTexto}: ${money(totals.total)}`;
         if (document.visibilityState === 'hidden') return;
         overlay.classList.add('needs-native-close');
         closeButton.classList.remove('is-closing');
-        message.textContent = 'Instagram bloqueó el cierre automático. Toca la X original de arriba para volver al chat.';
+        const title = overlay.querySelector('#instagramReturnTitle');
+        const hint = overlay.querySelector('.instagram-return-hint');
+        if (title) title.textContent = 'TOCA LA X DE INSTAGRAM';
+        if (hint) hint.textContent = 'ARRIBA A LA IZQUIERDA';
+        message.textContent = 'Instagram bloqueó el cierre automático. Toca la X de Instagram para volver al chat.';
       }, 320);
     });
 
@@ -1148,6 +1152,10 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     const overlay = instagramReturnOverlay();
     const message = overlay.querySelector('#instagramReturnMessage');
     overlay.classList.remove('needs-native-close');
+    const title = overlay.querySelector('#instagramReturnTitle');
+    const hint = overlay.querySelector('.instagram-return-hint');
+    if (title) title.textContent = 'VOLVER AL CHAT';
+    if (hint) hint.textContent = 'SOLO VISIBLE DENTRO DE INSTAGRAM';
     message.textContent = copied
       ? 'Tu cotización ya está copiada. Toca la X para cerrar el catálogo y regresar a Instagram.'
       : 'Toca la X para cerrar el catálogo y regresar a Instagram. Luego pega tu pedido en el chat.';
