@@ -23,13 +23,13 @@ body.sale-editor-mode .sale-editor{display:block!important;margin:0 auto;backgro
 
 .product-picker-overlay{position:fixed;inset:0;background:#0007;z-index:1000;display:flex;align-items:flex-end;justify-content:center;padding-top:40px}
 .product-picker-overlay[hidden]{display:none!important}
-.product-picker-sheet{width:min(720px,100%);max-height:88dvh;background:#fff;border-radius:22px 22px 0 0;display:flex;flex-direction:column;box-shadow:0 -15px 45px #0002;padding-bottom:env(safe-area-inset-bottom)}
+.product-picker-sheet{width:min(720px,100%);height:min(760px,88dvh);max-height:88dvh;background:#fff;border-radius:22px 22px 0 0;display:flex;flex-direction:column;box-shadow:0 -15px 45px #0002;padding-bottom:env(safe-area-inset-bottom);overflow:hidden}
 .product-picker-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid #ecece8}
 .product-picker-head h2{margin:0;font-size:22px}
 .product-picker-close{border:0;background:#efefec;border-radius:50%;width:42px;height:42px;font-size:25px;cursor:pointer}
 .product-picker-search{margin:14px 16px 8px;width:calc(100% - 32px);border:1px solid #cacac5;border-radius:12px;padding:12px 13px;font-size:16px;outline:none}
 .product-picker-search:focus{border-color:#111;box-shadow:0 0 0 2px #11111110}
-.product-picker-list{overflow:auto;padding:8px 12px 16px;display:grid;gap:8px;-webkit-overflow-scrolling:touch}
+.product-picker-list{flex:1 1 auto;min-height:0;overflow:auto;padding:8px 12px 16px;display:grid;align-content:start;gap:8px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .product-picker-option{border:1px solid #e0e0db;border-radius:13px;background:#fff;padding:8px;display:grid;grid-template-columns:64px minmax(0,1fr) auto;align-items:center;gap:11px;text-align:left;cursor:pointer}
 .product-picker-option:active{background:#f6f6f3}
 .product-picker-option img{width:64px;height:64px;object-fit:cover;border-radius:10px;background:#f0f0ed}
@@ -51,7 +51,7 @@ body.sale-editor-mode .sale-editor{display:block!important;margin:0 auto;backgro
 
 @media(min-width:701px){
   .product-picker-overlay{align-items:center;padding:24px}
-  .product-picker-sheet{border-radius:22px;max-height:min(760px,88dvh)}
+  .product-picker-sheet{border-radius:22px;height:min(760px,88dvh);max-height:min(760px,88dvh)}
 }
 
 @media(max-width:700px){
@@ -62,3 +62,9 @@ body.sale-editor-mode .sale-editor{display:block!important;margin:0 auto;backgro
 
 /* Keep stock status below the code instead of sharing its grid cell. */
 .inventory-product .inventory-stock-notice{grid-column:2;grid-row:3;white-space:normal;overflow-wrap:anywhere;line-height:1.4;margin-top:3px}
+
+
+@media(max-width:700px){
+  .product-picker-overlay{height:100dvh;min-height:100dvh}
+  .product-picker-sheet{height:88dvh;min-height:88dvh;max-height:88dvh}
+}

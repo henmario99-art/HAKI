@@ -24,11 +24,25 @@
   const totalUnits = sale => (sale?.items || []).reduce((sum, item) => sum + (Number(item.cantidad) || 0), 0);
 
   function setPanel(name) {
+    const archived = name === 'archived';
     Object.entries(panelViews).forEach(([key, view]) => {
-      if (view) view.hidden = key !== name;
+      if (!view) return;
+      if (key === 'sales') view.hidden = !['sales','archived'].includes(name);
+      else view.hidden = key !== name;
     });
     document.querySelectorAll('.sales-tabs .tab').forEach(tab => tab.classList.toggle('is-active', tab.dataset.tab === name));
     document.body.classList.remove('sale-editor-mode');
+
+    const archivedView = document.querySelector('#archivedSalesView');
+    const days = document.querySelector('#days');
+    const metrics = document.querySelector('.metrics');
+    const toolbar = document.querySelector('.week-toolbar');
+    if (archivedView) archivedView.hidden = !archived;
+    if (days) days.hidden = archived;
+    if (metrics) metrics.hidden = archived;
+    if (toolbar) toolbar.hidden = archived;
+    if (archived && typeof loadArchivedSales === 'function') loadArchivedSales().catch(error => toast(error.message, true));
+
     if (name === 'collections') loadReceivables();
     if (name === 'expenses') {
       suiteWeekStart = state.weekStart || suiteWeekStart;

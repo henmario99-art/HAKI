@@ -60,4 +60,25 @@
   .metrics.haki-bottom-metrics{margin-top:13px!important}
 }
 
-.sale-quick-controls{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;cursor:default}.sale-quick-controls label{display:grid;gap:4px;font-size:11px;font-weight:600;color:#555}.sale-quick-controls select{width:100%;min-width:0;min-height:40px;font:inherit;font-size:16px;color:#111;border:1px solid #ccc;border-radius:8px;padding:6px;background:#fff}.sale-quick-controls select:disabled{opacity:.6}
+.sale-quick-controls{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px;cursor:default}
+.sale-quick-controls label{display:grid;gap:4px;min-width:0;font-size:11px;font-weight:600;color:#555}
+.sale-quick-controls select{width:100%;min-width:0;min-height:40px;font:inherit;font-size:16px;font-weight:700;color:#111;border:1px solid #ccc;border-radius:8px;padding:6px 28px 6px 7px;background:#fff}
+.sale-quick-controls select.quick-good{background:#dcf5e5!important;border-color:#9fd9b6!important;color:#126b39!important}
+.sale-quick-controls select.quick-bad{background:#fde2df!important;border-color:#edb7b0!important;color:#9d2a1e!important}
+.sale-quick-controls select.quick-pending{background:#fff1c7!important;border-color:#efd982!important;color:#7b5b00!important}
+.sale-quick-controls select:disabled{opacity:.6}
+.sale-main-copy{min-width:0}
+.sale-client-line{display:flex;align-items:baseline;gap:0;min-width:0;white-space:nowrap;overflow:hidden}
+.sale-client-line strong{flex:0 0 auto;max-width:52%;overflow:hidden;text-overflow:ellipsis}
+.sale-client-line span{min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:12px;font-weight:700;color:#555}
+.sale-destination{display:block!important;margin-top:3px!important;color:#666!important}
+.archived-sale-actions{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px}
+#archivedSalesView{width:100%}
+#archivedSalesList{display:grid;gap:10px}
+
+@media(max-width:700px){
+  .sale-quick-controls{gap:6px}
+  .sale-quick-controls label{font-size:10px}
+  .sale-quick-controls select{padding-left:6px;padding-right:24px}
+  .sale-client-line strong{max-width:48%}
+}

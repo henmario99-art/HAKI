@@ -16,6 +16,17 @@
   const merchandiseTotal = sale => Number(sale?.subtotal ?? ((Number(sale?.total) || 0) - (Number(sale?.envio) || 0))) || 0;
   const activeSale = sale => !['Cancelado', 'No retirado'].includes(sale?.estado);
   const statePill = value => value === 'Retirado' ? 'done' : (value === 'Cancelado' || value === 'No retirado' ? 'cancelled' : 'pending');
+  const quickTone = (field,value) => {
+    if ((field === 'estado' && value === 'Retirado') || (field === 'dinero' && value === 'En caja')) return 'quick-good';
+    if ((field === 'estado' && ['Cancelado','No retirado'].includes(value)) || (field === 'dinero' && value === 'No retiró')) return 'quick-bad';
+    if ((field === 'estado' || field === 'dinero') && value === 'Pendiente') return 'quick-pending';
+    return '';
+  };
+  const paintQuickSelect = (select,field,value) => {
+    select.classList.remove('quick-good','quick-bad','quick-pending');
+    const tone = quickTone(field,value);
+    if (tone) select.classList.add(tone);
+  };
   const moneyPill = value => value === 'En caja' ? 'done' : (value === 'No retiró' ? 'cancelled' : 'pending');
 
   function weekFromDate(value) {
@@ -187,13 +198,11 @@
     const itemText = (sale.items || []).map(item => `${item.codigo} ${item.talla}${Number(item.cantidad) > 1 ? ` ×${item.cantidad}` : ''}`).join(' · ') || 'Pedido';
     const destination = sale.lugarHorario || 'Sin destino';
     card.innerHTML = `
-      <div><strong>${escapeHtml(sale.cliente || 'Cliente')}</strong><small>${escapeHtml(itemText)}</small></div>
-      <div class="amount">${money(saleNet(sale))}</div>
-      <div class="meta">
-        <span class="pill ${statePill(sale.estado)}">${escapeHtml(sale.estado || 'Pendiente')}</span>
-        <span class="pill ${sale.dinero === 'En caja' ? 'done' : 'pending'}">${escapeHtml(sale.dinero || 'Pendiente')}</span>
-        <span class="pill">${escapeHtml(destination)}</span>
-      </div>`;
+      <div class="sale-main-copy">
+        <div class="sale-client-line"><strong>${escapeHtml(sale.cliente || 'Cliente')}</strong><span> - ${escapeHtml(itemText)}</span></div>
+        <small class="sale-destination">${escapeHtml(destination)}</small>
+      </div>
+      <div class="amount">${money(saleNet(sale))}</div>`;
     const controls = document.createElement('div');
     controls.className = 'sale-quick-controls';
     controls.addEventListener('click', event => event.stopPropagation());
@@ -204,9 +213,11 @@
     ]) {
       const label = document.createElement('label'); label.textContent = title;
       const select = document.createElement('select');
+      select.dataset.quickField = field;
       select.setAttribute('aria-label', `${title} de ${sale.cliente || 'este pedido'}`);
       for (const value of options) { const option = document.createElement('option'); option.value = value; option.textContent = value; select.append(option); }
       select.value = sale[field] || options[0];
+      paintQuickSelect(select,field,select.value);
       select.addEventListener('change', async () => {
         controls.querySelectorAll('select').forEach(node => node.disabled = true);
         const previousValue = sale[field] || options[0];
@@ -214,17 +225,11 @@
           const data = await api('sales', { method: 'PATCH', body: JSON.stringify({ id: sale.id, weekStart: mondayOf(sale.fecha), field, value: select.value, updatedAt: sale.updatedAt || '' }) });
           Object.assign(sale, data.sale);
           card.dataset.shippingStage = sale.etapaEnvio || 'Pedido tomado';
-          if (field === 'estado') {
-            const pill = card.querySelectorAll('.meta .pill')[0];
-            if (pill) { pill.textContent = sale.estado; pill.className = `pill ${statePill(sale.estado)}`; }
-          }
-          if (field === 'dinero') {
-            const pill = card.querySelectorAll('.meta .pill')[1];
-            if (pill) { pill.textContent = sale.dinero; pill.className = `pill ${moneyPill(sale.dinero)}`; }
-          }
+          paintQuickSelect(select,field,sale[field]);
+          if (field === 'etapaEnvio') card.dataset.shippingStage = sale.etapaEnvio || 'Pedido tomado';
           if (data.inventory) state.inventory = data.inventory;
           renderMetrics(); renderInventory(); toast(field === 'dinero' ? 'Estado del dinero actualizado' : 'Pedido actualizado');
-        } catch (error) { select.value = previousValue; toast(error.message, true); }
+        } catch (error) { select.value = previousValue; paintQuickSelect(select,field,previousValue); toast(error.message, true); }
         finally { controls.querySelectorAll('select').forEach(node => node.disabled = false); }
       });
       label.append(select); controls.append(label);
