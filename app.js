@@ -1,6 +1,6 @@
 (() => {
   const CONFIG = window.HAKI_CONFIG || {};
-  const ALL_PRODUCTS = (window.HAKI_PRODUCTOS || []).filter(p => p.borrador !== true);
+  const ALL_PRODUCTS = [...(window.HAKI_PRODUCTOS || [])];
   const COLLECTIONS = window.hakiCollections(CONFIG);
 
   const $ = (s, el = document) => el.querySelector(s);
@@ -1212,7 +1212,7 @@ ${settings().totalTexto}: ${money(totals.total)}`;
   function reconcileCart(){state.cart=state.cart.filter(i=>{const p=productByCode(i.codigo);return p&&p.tallas?.[i.talla]&&Number.isInteger(i.cantidad)&&i.cantidad>0;});saveCart();}
   window.addEventListener('haki:catalog-updated',()=>{
     Object.keys(CONFIG).forEach(k=>delete CONFIG[k]);Object.assign(CONFIG,window.HAKI_CONFIG);
-    ALL_PRODUCTS.splice(0,ALL_PRODUCTS.length,...window.HAKI_PRODUCTOS.filter(p => p.borrador !== true));COLLECTIONS.splice(0,COLLECTIONS.length,...window.hakiCollections(CONFIG));
+    ALL_PRODUCTS.splice(0, ALL_PRODUCTS.length, ...(window.HAKI_PRODUCTOS || []));COLLECTIONS.splice(0,COLLECTIONS.length,...window.hakiCollections(CONFIG));
     reconcileCart();applyConfig();renderCollections();renderProducts();if(detailCode)renderProductDetail(productByCode(detailCode));renderCart();
   });
   reconcileCart();
