@@ -415,7 +415,7 @@ Deno.serve(async (req: Request) => {
       const anchor = validDate(url.searchParams.get('anchor')) || new Date().toISOString().slice(0,10);
       const weeks = Math.min(52,Math.max(1,integer(url.searchParams.get('weeks') || 26,1)));
       const from = addDays(mondayOf(anchor), -(weeks-1)*7);
-      const rows = await db(`haki_sales?sale_date=gte.${from}&sale_date=lte.${anchor}&select=payload&order=sale_date.desc`);
+      const rows = await db(`haki_sales?archived_at=is.null&sale_date=gte.${from}&sale_date=lte.${anchor}&select=payload&order=sale_date.desc`);
       const receivables = (rows||[]).map((r:any)=>r.payload).filter((sale:any)=>
         sale?.dinero === 'Pendiente' &&
         !['Cancelado','No retirado'].includes(sale?.estado) &&
@@ -424,12 +424,33 @@ Deno.serve(async (req: Request) => {
       return json({ receivables });
     }
 
+    if (req.method === 'GET' && mode === 'archived') {
+      const rows = await db('haki_sales?archived_at=not.is.null&select=id,sale_date,payload,archived_at,archived_reason&order=archived_at.desc&limit=250');
+      return json({ archived:(rows||[]).map((r:any)=>({ ...(r.payload||{}), id:r.id, archivedAt:r.archived_at, archivedReason:r.archived_reason || '' })) });
+    }
+
+    if (req.method === 'GET' && mode === 'history') {
+      const id = txt(url.searchParams.get('id'),80);
+      if (!id) throw new Error('Falta el identificador de la venta.');
+      const rows = await db(`haki_sales_history?sale_id=eq.${encodeURIComponent(id)}&select=action,before_payload,after_payload,before_sale_date,after_sale_date,before_archived_at,after_archived_at,changed_at&order=changed_at.desc&limit=100`);
+      return json({ history:rows || [] });
+    }
+
     if (req.method === 'GET') {
       const requested = validDate(url.searchParams.get('weekStart')) || mondayOf(new Date().toISOString().slice(0,10));
       const start = mondayOf(requested);
       const end = addDays(start,6);
-      const rows = await db(`haki_sales?sale_date=gte.${start}&sale_date=lte.${end}&select=payload&order=sale_date.asc`);
+      const rows = await db(`haki_sales?archived_at=is.null&sale_date=gte.${start}&sale_date=lte.${end}&select=payload&order=sale_date.asc`);
       return json({ weekStart:start, weekEnd:end, sales:(rows||[]).map((r:any)=>r.payload), inventory:await inventoryMap() });
+    }
+
+    if (req.method === 'POST' && mode === 'restore') {
+      const body = await req.json();
+      const id = txt(body?.id,80);
+      if (!id) throw new Error('Falta el identificador de la venta.');
+      const result = await rpc('haki_restore_sale',{p_id:id});
+      const sale = Array.isArray(result) ? result[0] : result;
+      return json({ ok:true, sale, inventory:await inventoryMap() });
     }
 
     if (req.method === 'POST') {
@@ -445,12 +466,15 @@ Deno.serve(async (req: Request) => {
       const input = body?.sale || body;
       const id = txt(input?.id,80);
       if (!id) throw new Error('Falta el identificador de la venta.');
-      const rows = await db(`haki_sales?id=eq.${encodeURIComponent(id)}&select=payload`);
+      const rows = await db(`haki_sales?id=eq.${encodeURIComponent(id)}&archived_at=is.null&select=payload`);
       const previous = rows?.[0]?.payload;
       if (!previous) throw new Error('No se encontró la venta.');
       let candidate = input;
       if (req.method === 'PATCH') {
-        if (!['estado','etapaEnvio'].includes(body?.field)) throw new Error('Campo no permitido.');
+        if (!['estado','etapaEnvio','dinero'].includes(body?.field)) throw new Error('Campo no permitido.');
+        if (body?.field === 'estado' && !SALE_STATES.has(body?.value)) throw new Error('Estado inválido.');
+        if (body?.field === 'etapaEnvio' && !['Pedido tomado','Empacado','Enviado'].includes(body?.value)) throw new Error('Etapa inválida.');
+        if (body?.field === 'dinero' && !MONEY_STATES.has(body?.value)) throw new Error('Estado de dinero inválido.');
         candidate = { ...previous, [body.field]:body.value };
       }
       const sale = normalizeSale(candidate, previous);
@@ -464,8 +488,9 @@ Deno.serve(async (req: Request) => {
       const body = await req.json();
       const id = txt(body?.id,80);
       if (!id) throw new Error('Falta el identificador de la venta.');
-      await rpc('haki_delete_sale',{p_id:id});
-      return json({ ok:true });
+      const result = await rpc('haki_delete_sale',{p_id:id});
+      const sale = Array.isArray(result) ? result[0] : result;
+      return json({ ok:true, archived:true, sale, inventory:await inventoryMap() });
     }
 
     return json({ error:'Método no permitido.' },405);

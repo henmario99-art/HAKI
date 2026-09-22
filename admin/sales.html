@@ -39,6 +39,7 @@
         </div>
         <div class="week-actions">
           <button id="todayWeek" class="button secondary" type="button">Esta semana</button>
+          <button id="archivedSales" class="button secondary" type="button">Archivadas</button>
           <button id="newSale" class="button primary" type="button">+ Nueva venta</button>
         </div>
       </div>
@@ -81,12 +82,20 @@
           <div class="sale-total"><span>Subtotal <strong id="saleSubtotal">$0.00</strong></span><span>Envío <strong id="saleShippingTotal">$0.00</strong></span><span id="saleC807GuideWrap" hidden>Costo guía C807 <strong id="saleC807Guide">$4.15</strong></span><span id="saleC807CommissionWrap" hidden>Comisión C807 <strong id="saleC807Commission">$0.00</strong></span><span class="grand-total">Total a cobrar <strong id="saleTotal">$0.00</strong></span></div>
 
           <footer class="editor-actions">
-            <button id="deleteSale" class="button danger" type="button" hidden>Eliminar venta</button>
+            <button id="deleteSale" class="button danger" type="button" hidden>Archivar venta</button>
             <div class="dialog-spacer"></div>
             <button class="button secondary" id="cancelDialog" type="button">Cancelar</button>
             <button class="button primary" id="saveSale" type="submit">Guardar venta</button>
           </footer>
         </form>
+      </section>
+
+      <section id="archivedSalesView" hidden>
+        <div class="inventory-head">
+          <div><h1>Ventas archivadas</h1><p>Estas ventas siguen guardadas y pueden restaurarse.</p></div>
+          <button id="backFromArchived" class="button secondary" type="button">Volver a ventas</button>
+        </div>
+        <div id="archivedSalesList" class="inventory-list"></div>
       </section>
 
       <div id="days" class="days"></div>
@@ -168,7 +177,7 @@
   </template>
 
   <script src="supabase-sales.js?v=1"></script>
-  <script src="sales.js?v=7"></script>
+  <script src="sales.js?v=8"></script>
   <script src="sales-product-picker.js?v=1"></script>
   <script src="sales-rules.js?v=1"></script>
   <script src="sales-destinations.js?v=3"></script>
@@ -176,7 +185,7 @@
   <script src="sales-agency-search-fix.js?v=1"></script>
   <script src="sales-receivables-filter.js?v=1"></script>
   <script src="sales-flow.js?v=3"></script>
-  <script src="sales-mobile-v2.js?v=3"></script>
+  <script src="sales-mobile-v2.js?v=4"></script>
   <script src="sales-mobile-v3.js?v=3"></script>
   <script src="sales-mobile-v5.js?v=1"></script>
 </body>

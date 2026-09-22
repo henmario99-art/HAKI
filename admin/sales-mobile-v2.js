@@ -16,6 +16,7 @@
   const merchandiseTotal = sale => Number(sale?.subtotal ?? ((Number(sale?.total) || 0) - (Number(sale?.envio) || 0))) || 0;
   const activeSale = sale => !['Cancelado', 'No retirado'].includes(sale?.estado);
   const statePill = value => value === 'Retirado' ? 'done' : (value === 'Cancelado' || value === 'No retirado' ? 'cancelled' : 'pending');
+  const moneyPill = value => value === 'En caja' ? 'done' : (value === 'No retiró' ? 'cancelled' : 'pending');
 
   function weekFromDate(value) {
     const iso = value instanceof Date ? isoDate(value) : value;
@@ -198,7 +199,8 @@
     controls.addEventListener('click', event => event.stopPropagation());
     for (const [field, title, options] of [
       ['etapaEnvio', 'Etapa', ['Pedido tomado', 'Empacado', 'Enviado']],
-      ['estado', 'Estado', ['Pendiente', 'Retirado', 'No retirado', 'Cancelado']]
+      ['estado', 'Estado', ['Pendiente', 'Retirado', 'No retirado', 'Cancelado']],
+      ['dinero', 'Dinero', ['Pendiente', 'En caja', 'No retiró']]
     ]) {
       const label = document.createElement('label'); label.textContent = title;
       const select = document.createElement('select');
@@ -212,10 +214,16 @@
           const data = await api('sales', { method: 'PATCH', body: JSON.stringify({ id: sale.id, weekStart: mondayOf(sale.fecha), field, value: select.value, updatedAt: sale.updatedAt || '' }) });
           Object.assign(sale, data.sale);
           card.dataset.shippingStage = sale.etapaEnvio || 'Pedido tomado';
-          const pill = card.querySelector('.meta .pill');
-          pill.textContent = sale.estado; pill.className = `pill ${statePill(sale.estado)}`;
+          if (field === 'estado') {
+            const pill = card.querySelectorAll('.meta .pill')[0];
+            if (pill) { pill.textContent = sale.estado; pill.className = `pill ${statePill(sale.estado)}`; }
+          }
+          if (field === 'dinero') {
+            const pill = card.querySelectorAll('.meta .pill')[1];
+            if (pill) { pill.textContent = sale.dinero; pill.className = `pill ${moneyPill(sale.dinero)}`; }
+          }
           if (data.inventory) state.inventory = data.inventory;
-          renderMetrics(); renderInventory(); toast('Pedido actualizado');
+          renderMetrics(); renderInventory(); toast(field === 'dinero' ? 'Estado del dinero actualizado' : 'Pedido actualizado');
         } catch (error) { select.value = previousValue; toast(error.message, true); }
         finally { controls.querySelectorAll('select').forEach(node => node.disabled = false); }
       });
