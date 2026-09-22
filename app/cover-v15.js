@@ -18,9 +18,17 @@
     if(hero){
       const primary=config.portada||config.portadaRespaldo||'';
       const fallback=config.portadaRespaldo||'';
-      const target=imageUrl(primary);
-      if(target && hero.getAttribute('src')!==target) hero.setAttribute('src',target);
-      const srcset=typeof window.hakiSrcset==='function' ? window.hakiSrcset(primary) : '';
+      const variants=[
+        [config.portadaMobile,1080],
+        [config.portadaTablet,1600],
+        [config.portadaDesktop,2560],
+        [config.portada,3200],
+      ].filter(([url])=>String(url||'').trim());
+      const unique=variants.filter(([url],index,list)=>list.findIndex(([candidate])=>candidate===url)===index);
+      const target=config.portadaDesktop||imageUrl(primary);
+      if(target&&hero.getAttribute('src')!==target) hero.setAttribute('src',target);
+      const responsive=unique.length>1?unique.map(([url,width])=>`${url} ${width}w`).join(', '):'';
+      const srcset=responsive||(typeof window.hakiSrcset==='function'?window.hakiSrcset(primary):'');
       if(srcset){
         hero.setAttribute('srcset',srcset);
         hero.setAttribute('sizes','100vw');
@@ -30,6 +38,7 @@
       }
       hero.onerror=()=>{
         hero.onerror=null;
+        hero.removeAttribute('srcset');
         const backup=imageUrl(fallback);
         if(backup) hero.src=backup;
       };
@@ -37,8 +46,16 @@
       hero.setAttribute('decoding','async');
     }
 
-    if(title && !title.querySelector('.hero-brand-icon')){title.textContent='HAKI';title.setAttribute('aria-label','HAKI');}
-    if(desc) desc.textContent='Haki | Anime & Sports | El Salvador';
+    if(title){
+      title.replaceChildren();
+      title.hidden=true;
+      title.setAttribute('aria-hidden','true');
+    }
+    if(desc){
+      desc.textContent='';
+      desc.hidden=true;
+      desc.setAttribute('aria-hidden','true');
+    }
     if(search){search.placeholder='BUSCAR PRENDA...';search.setAttribute('aria-label','Buscar prenda');}
     if(b1){b1.classList.add('solid');b1.classList.remove('outline');b1.dataset.heroStyle='blanco';}
     if(b2){b2.classList.add('outline');b2.classList.remove('solid');b2.dataset.heroStyle='transparente';}
