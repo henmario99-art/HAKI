@@ -1,6 +1,6 @@
 import { getStore } from '@netlify/blobs';
 import { randomUUID } from 'node:crypto';
-import { json, bodyJson, verifyAdmin } from './_shared.mjs';
+import { json, bodyJson, verifyAdmin, makeOperationsToken, github, repoParts, BRANCH } from './_shared.mjs';
 
 const STORE_NAME = 'haki-private-sales';
 const INVENTORY_KEY = 'inventory';
@@ -299,6 +299,114 @@ async function exportSnapshot() {
   return { inventory, weeks, expenses };
 }
 
+
+const SUPABASE_EDGE = 'https://uysfqzlihiosebqzvfrl.supabase.co/functions/v1/haki-operations';
+const MIGRATION_FLAG_KEY = 'supabase-migration-v1';
+let supabaseReadyMemory = false;
+
+function operationsToken() {
+  const secret = process.env.ADMIN_SESSION_SECRET || '';
+  if (!secret) throw new Error('Falta ADMIN_SESSION_SECRET.');
+  return makeOperationsToken(secret);
+}
+
+async function edgeRequest(query = '', options = {}) {
+  const response = await fetch(`${SUPABASE_EDGE}${query ? `?${query}` : ''}`, {
+    ...options,
+    headers: {
+      'content-type': 'application/json',
+      'x-haki-operations-token': operationsToken(),
+      ...(options.headers || {}),
+    },
+  });
+  const raw = await response.text();
+  let data = {};
+  try { data = raw ? JSON.parse(raw) : {}; } catch { data = { error: raw || `Error ${response.status}` }; }
+  if (!response.ok) {
+    const error = new Error(data?.error || `Supabase respondió ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
+  return data;
+}
+
+async function migrationProducts() {
+  const { owner, repo } = repoParts();
+  const path = `/repos/${owner}/${repo}/contents/productos.js?ref=${encodeURIComponent(BRANCH)}`;
+  const file = await github(path, { method: 'GET' });
+  const source = Buffer.from(file.content, 'base64').toString('utf8');
+  const match = source.match(/window\.HAKI_PRODUCTOS\s*=\s*(\[[\s\S]*\]);\s*$/);
+  if (!match) throw new Error('No se pudo leer productos.js para migrar inventario.');
+  const products = JSON.parse(match[1]);
+  return Array.isArray(products) ? products : [];
+}
+
+async function markSupabaseReady(details = {}) {
+  supabaseReadyMemory = true;
+  await store().setJSON(MIGRATION_FLAG_KEY, {
+    completed: true,
+    completedAt: new Date().toISOString(),
+    ...details,
+  });
+}
+
+async function ensureSupabaseReady() {
+  if (supabaseReadyMemory) return true;
+
+  const flag = await store().get(MIGRATION_FLAG_KEY, { type: 'json', consistency: 'strong' });
+  if (flag?.completed) {
+    supabaseReadyMemory = true;
+    return true;
+  }
+
+  try {
+    const status = await edgeRequest('mode=status', { method: 'GET' });
+    if (status?.migrated) {
+      await markSupabaseReady({ recoveredFromSupabase: true, migration: status.migration || null });
+      return true;
+    }
+
+    const [snapshot, products] = await Promise.all([
+      exportSnapshot(),
+      migrationProducts(),
+    ]);
+
+    const imported = await edgeRequest('mode=import', {
+      method: 'POST',
+      body: JSON.stringify({ snapshot, products }),
+    });
+
+    const verify = await edgeRequest('mode=status', { method: 'GET' });
+    if (!verify?.migrated) throw new Error('Supabase no confirmó la migración.');
+
+    await markSupabaseReady({
+      salesCount: imported?.salesCount ?? verify?.migration?.salesCount ?? null,
+      expensesCount: imported?.expensesCount ?? verify?.migration?.expensesCount ?? null,
+      inventoryRows: imported?.inventoryRows ?? verify?.migration?.inventoryRows ?? null,
+    });
+    return true;
+  } catch (error) {
+    console.error('Migración Supabase aplazada:', error);
+    return false;
+  }
+}
+
+async function proxySalesToSupabase(request, url) {
+  const body = ['GET', 'HEAD'].includes(request.method) ? undefined : await request.clone().text();
+  const response = await fetch(`${SUPABASE_EDGE}${url.search}`, {
+    method: request.method,
+    headers: {
+      'content-type': 'application/json',
+      'x-haki-operations-token': operationsToken(),
+    },
+    body,
+  });
+  const raw = await response.text();
+  let data = {};
+  try { data = raw ? JSON.parse(raw) : {}; } catch { data = { error: raw || `Error ${response.status}` }; }
+  return json(data, response.status);
+}
+
 export default async (request) => {
   if (!verifyAdmin(request)) return json({ error: 'No autorizado.' }, 401);
 
@@ -306,6 +414,11 @@ export default async (request) => {
   const mode = url.searchParams.get('mode') || 'week';
 
   try {
+    if (mode !== 'export') {
+      const ready = await ensureSupabaseReady();
+      if (ready) return await proxySalesToSupabase(request, url);
+    }
+
     if (request.method === 'GET' && mode === 'export') {
       return json(await exportSnapshot());
     }

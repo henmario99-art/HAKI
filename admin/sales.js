@@ -7,7 +7,7 @@ const months=['enero','febrero','marzo','abril','mayo','junio','julio','agosto',
 const state={products:[],inventory:{},sales:[],weekStart:'',editing:null,previousWeekStart:''};
 const C807_GUIDE_COST=4.15;
 
-async function api(path,options={}){if(String(path).startsWith('sales')&&window.HAKI_SUPABASE_READY&&window.hakiSupabaseSalesApi)return window.hakiSupabaseSalesApi(path,options);const res=await fetch(`${API}/${path}`,{credentials:'same-origin',headers:{'content-type':'application/json',...(options.headers||{})},...options});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.error||`Error ${res.status}`);return data}
+async function api(path,options={}){const res=await fetch(`${API}/${path}`,{credentials:'same-origin',headers:{'content-type':'application/json',...(options.headers||{})},...options});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.error||`Error ${res.status}`);return data}
 function toast(message,error=false){const el=$('#status');el.textContent=message;el.classList.toggle('error',error);el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),2800)}
 function isoDate(date){const y=date.getFullYear();const m=String(date.getMonth()+1).padStart(2,'0');const d=String(date.getDate()).padStart(2,'0');return `${y}-${m}-${d}`}
 function parseDate(iso){return new Date(`${iso}T12:00:00`)}
@@ -41,7 +41,7 @@ function editorC807Commission(total,delivery,moneyState){
 }
 function c807GuideCost(delivery){return isC807Delivery(delivery)?C807_GUIDE_COST:0}
 
-async function ensureAuth(){try{const auth=await api('auth',{method:'GET'});if(!auth.authenticated){location.href='/admin/';return}window.hakiSetOperationsToken?.(auth.operationsToken||'')}catch{location.href='/admin/'}}
+async function ensureAuth(){try{const auth=await api('auth',{method:'GET'});if(!auth.authenticated)location.href='/admin/'}catch{location.href='/admin/'}}
 async function loadProducts(){const data=await api('catalog',{method:'GET'});state.products=data.products||[]}
 async function loadWeek(){const data=await api(`sales?weekStart=${encodeURIComponent(state.weekStart)}`,{method:'GET'});state.weekStart=data.weekStart;state.sales=data.sales||[];state.inventory=data.inventory||{};renderWeek();renderInventory()}
 
@@ -119,4 +119,4 @@ $('#cancelDialog').addEventListener('click',hideEditor);
 $('#deleteSale').addEventListener('click',deleteSale);
 $('#saleForm').addEventListener('submit',event=>{event.preventDefault();saveSale()});
 
-(async()=>{await ensureAuth();state.weekStart=mondayOf(new Date());try{await loadProducts();window.HAKI_SUPABASE_READY=await window.hakiEnsureOperationalStore?.(state.products)||false;await loadWeek();if(window.HAKI_SUPABASE_READY)toast('Ventas conectadas a Supabase')}catch(err){toast(err.message,true)}})();
+(async()=>{await ensureAuth();state.weekStart=mondayOf(new Date());try{await loadProducts();await loadWeek()}catch(err){toast(err.message,true)}})();
