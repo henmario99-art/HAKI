@@ -1039,6 +1039,8 @@ ${settings().totalTexto}: ${money(totals.total)}`;
 
   function openInstagramChat(handle) {
     const username = String(handle || '').replace(/^@/, '').trim();
+    if (!username) return false;
+
     const encodedUsername = encodeURIComponent(username);
     const webTarget = `https://ig.me/m/${encodedUsername}`;
     const ua = navigator.userAgent || '';
@@ -1047,15 +1049,48 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     const isAndroid = /Android/i.test(ua);
     const isInstagramBrowser = /Instagram/i.test(ua);
 
-    // Android: ask the OS for the Instagram app first and keep ig.me as fallback.
-    if (isAndroid) {
+    const openAndroidInstagram = () => {
       location.href = `intent://ig.me/m/${encodedUsername}#Intent;scheme=https;package=com.instagram.android;S.browser_fallback_url=${encodeURIComponent(webTarget)};end`;
+    };
+
+    // If the catalog was opened from an Instagram DM, first try to dismiss
+    // Instagram's own in-app browser. When the host allows window.close(),
+    // this returns to the exact conversation that launched the catalog.
+    // If it refuses to close, keep the navigation on the same user gesture
+    // and hand control to the native Instagram app instead of instagram.com.
+    if (isInstagramBrowser) {
+      if (isAndroid) {
+        openAndroidInstagram();
+        return true;
+      }
+
+      if (isiOS) {
+        try { window.close(); } catch {}
+
+        if (document.visibilityState !== 'hidden') {
+          const appTarget = `instagram://direct?username=${encodedUsername}`;
+          location.href = appTarget;
+
+          // The username scheme is app-only and can be rejected by some
+          // Instagram builds. Fall back to Meta's ig.me DM link only when the
+          // page is still visible, so a successful app handoff is not replaced.
+          window.setTimeout(() => {
+            if (document.visibilityState !== 'hidden') location.href = webTarget;
+          }, 700);
+        }
+        return true;
+      }
+    }
+
+    // Android browsers: explicitly target the Instagram package so the DM
+    // opens in the installed app, with ig.me as the browser fallback.
+    if (isAndroid) {
+      openAndroidInstagram();
       return true;
     }
 
-    // iPhone/iPad: open the exact HAKI DM thread. When the catalog is inside
-    // Instagram's in-app browser, ig.me hands control back to the native app
-    // and lands directly in this conversation.
+    // Safari/iOS: ig.me is the supported universal DM link and opens the
+    // conversation in Instagram when the app accepts the universal link.
     if (isiOS) {
       location.href = webTarget;
       return true;
@@ -1085,43 +1120,76 @@ ${settings().totalTexto}: ${money(totals.total)}`;
 
   function installQuoteKeyboardGuard() {
     const drawer = els.drawer;
+    const form = els.form;
     const viewport = window.visualViewport;
-    if (!drawer || !/Android/i.test(navigator.userAgent || '')) return;
+    const mobileQuery = window.matchMedia('(max-width: 800px)');
+    if (!drawer || !form || !mobileQuery.matches) return;
 
     let settleTimer = 0;
+    let lateTimer = 0;
+    let frame = 0;
 
     const activeQuoteInput = () => {
       const active = document.activeElement;
       return active?.matches?.('#quoteForm input') ? active : null;
     };
 
+    const viewportMetrics = () => ({
+      height: Math.max(280, Math.round(viewport?.height || window.innerHeight)),
+      top: Math.max(0, Math.round(viewport?.offsetTop || 0))
+    });
+
+    const applyViewport = () => {
+      const { height, top } = viewportMetrics();
+      drawer.style.setProperty('--haki-vvh', `${height}px`);
+      drawer.style.setProperty('--haki-vv-top', `${top}px`);
+    };
+
+    const keepFieldVisible = (input = activeQuoteInput(), behavior = 'auto') => {
+      if (!input) return;
+      const { height, top } = viewportMetrics();
+      const rect = input.getBoundingClientRect();
+      const safeTop = top + Math.max(18, Math.min(72, height * .14));
+      const safeBottom = top + height - Math.max(28, Math.min(110, height * .20));
+
+      if (rect.top >= safeTop && rect.bottom <= safeBottom) return;
+
+      const desiredTop = top + Math.max(18, (height - rect.height) * .36);
+      const nextTop = Math.max(0, drawer.scrollTop + rect.top - desiredTop);
+      drawer.scrollTo({ top: nextTop, behavior });
+    };
+
     const syncViewport = () => {
       if (!drawer.classList.contains('keyboard-active')) return;
-      const height = Math.max(280, Math.round(viewport?.height || window.innerHeight));
-      drawer.style.setProperty('--haki-vvh', `${height}px`);
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        applyViewport();
+        keepFieldVisible();
+      });
+    };
 
-      const active = activeQuoteInput();
-      if (!active) return;
+    const activateFor = input => {
+      drawer.classList.add('keyboard-active');
+      applyViewport();
+
+      requestAnimationFrame(() => keepFieldVisible(input));
+
       clearTimeout(settleTimer);
       settleTimer = setTimeout(() => {
-        active.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'smooth' });
-      }, 70);
+        applyViewport();
+        keepFieldVisible(input, 'smooth');
+      }, 120);
+
+      clearTimeout(lateTimer);
+      lateTimer = setTimeout(() => {
+        applyViewport();
+        keepFieldVisible(input);
+      }, 320);
     };
 
     document.addEventListener('focusin', event => {
       if (!event.target.matches?.('#quoteForm input')) return;
-      drawer.classList.add('keyboard-active');
-      syncViewport();
-
-      requestAnimationFrame(() => {
-        event.target.scrollIntoView({ block: 'center', inline: 'nearest' });
-      });
-
-      clearTimeout(settleTimer);
-      settleTimer = setTimeout(() => {
-        syncViewport();
-        event.target.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'smooth' });
-      }, 180);
+      activateFor(event.target);
     });
 
     document.addEventListener('focusout', () => {
@@ -1129,11 +1197,14 @@ ${settings().totalTexto}: ${money(totals.total)}`;
         if (activeQuoteInput()) return;
         drawer.classList.remove('keyboard-active');
         drawer.style.removeProperty('--haki-vvh');
-      }, 220);
+        drawer.style.removeProperty('--haki-vv-top');
+      }, 240);
     });
 
     viewport?.addEventListener('resize', syncViewport);
     viewport?.addEventListener('scroll', syncViewport);
+    window.addEventListener('resize', syncViewport, { passive: true });
+    window.addEventListener('orientationchange', () => setTimeout(syncViewport, 120), { passive: true });
   }
 
   installQuoteKeyboardGuard();
