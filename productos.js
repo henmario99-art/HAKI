@@ -52,7 +52,7 @@ window.HAKI_CONFIG = {
   "saludoCotizacion": "Hola HAKI 👋\nQuiero solicitar una cotización.",
   "marca": "HAKI",
   "instagram": "hakisv1",
-  "whatsapp": "50360228002",
+  "whatsapp": "50375727369",
   "moneda": "$",
   "portada": "images/1789889171001-65832ad9-BE0489CD-E7A6-4BA2-9D87-612F0E61EFB2.jpeg",
   "portadaRespaldo": "images/1789889171001-65832ad9-BE0489CD-E7A6-4BA2-9D87-612F0E61EFB2.jpeg",
