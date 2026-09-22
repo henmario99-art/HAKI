@@ -1,15 +1,29 @@
-import { json, bodyJson, makeSession, sessionCookie, clearSessionCookie, safeEqualText, verifyAdmin } from './_shared.mjs';
+import { json, bodyJson, makeSession, makeOperationsToken, verifySignedToken, sessionCookie, clearSessionCookie, safeEqualText, verifyAdmin } from './_shared.mjs';
 
 export default async (request) => {
   if (request.method === 'GET') {
-    return json({ authenticated: verifyAdmin(request) });
+    const authenticated = verifyAdmin(request);
+    const secret = process.env.ADMIN_SESSION_SECRET || '';
+    return json({
+      authenticated,
+      operationsToken: authenticated && secret ? makeOperationsToken(secret) : '',
+    });
   }
 
   if (request.method === 'POST') {
     const body = await bodyJson(request);
+    const secret = process.env.ADMIN_SESSION_SECRET || '';
+
+    if (body?.action === 'verifyOperations') {
+      const payload = verifySignedToken(body?.token || '', secret, 'operations');
+      return json({
+        valid: !!payload,
+        expiresAt: payload ? new Date(Number(payload.exp)).toISOString() : null,
+      }, payload ? 200 : 401);
+    }
+
     const password = body?.password || '';
     const expected = process.env.ADMIN_PASSWORD || '';
-    const secret = process.env.ADMIN_SESSION_SECRET || '';
 
     if (!expected || !secret) {
       return json({ error: 'El panel aún no está configurado en Netlify.' }, 503);
