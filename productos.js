@@ -424,7 +424,7 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-1"
     ],
-    "novedad": true,
+    "novedad": false,
     "imagen2": "images/WhatsApp-Image-2026-09-11-at-2.56.24-PM.jpeg",
     "guiaTallas": "",
     "colores": [
@@ -451,7 +451,7 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-1"
     ],
-    "novedad": true,
+    "novedad": false,
     "imagen2": "images/WhatsApp-Image-2026-09-11-at-2.58.56-PMd.jpeg",
     "colores": [
       "Blanco"
@@ -502,7 +502,7 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-1"
     ],
-    "novedad": true,
+    "novedad": false,
     "imagen2": "images/WhatsApp-Image-2026-09-11-at-3.01.22-PMy.jpeg",
     "colores": [
       "Negro"
@@ -528,7 +528,7 @@ window.HAKI_PRODUCTOS = [
     "colecciones": [
       "collection-1"
     ],
-    "novedad": true,
+    "novedad": false,
     "colores": [
       "Negro",
       "Rojo"
