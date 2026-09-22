@@ -25,14 +25,28 @@ function toast(message, ok=false) {
 async function api(path, options={}) {
   if(path==='upload'&&options.body){
     const body=JSON.parse(options.body);
-    if(['image/jpeg','image/png','image/webp'].includes(body.mime)){
-      const image=new Image();image.src=`data:${body.mime};base64,${body.base64}`;await image.decode();
+    const preserveQuality = body.preserveQuality === true;
+    delete body.preserveQuality;
+    if(!preserveQuality && ['image/jpeg','image/png','image/webp'].includes(body.mime)){
+      const image=new Image();
+      image.src=`data:${body.mime};base64,${body.base64}`;
+      await image.decode();
       const ratio=Math.min(1,1600/Math.max(image.width,image.height));
-      const canvas=document.createElement('canvas');canvas.width=Math.round(image.width*ratio);canvas.height=Math.round(image.height*ratio);canvas.getContext('2d').drawImage(image,0,0,canvas.width,canvas.height);
+      const canvas=document.createElement('canvas');
+      canvas.width=Math.round(image.width*ratio);
+      canvas.height=Math.round(image.height*ratio);
+      const ctx=canvas.getContext('2d');
+      ctx.imageSmoothingEnabled=true;
+      ctx.imageSmoothingQuality='high';
+      ctx.drawImage(image,0,0,canvas.width,canvas.height);
       const data=canvas.toDataURL('image/webp',.84);
-      if(data.startsWith('data:image/webp')&&data.length<body.base64.length*1.05){body.base64=data.split(',')[1];body.mime='image/webp';body.name=body.name.replace(/\.[^.]+$/,'')+'.webp';}
-      options={...options,body:JSON.stringify(body)};
+      if(data.startsWith('data:image/webp')&&data.length<body.base64.length*1.05){
+        body.base64=data.split(',')[1];
+        body.mime='image/webp';
+        body.name=body.name.replace(/\.[^.]+$/,'')+'.webp';
+      }
     }
+    options={...options,body:JSON.stringify(body)};
   }
   const res = await fetch(`${API}/${path}`, {
     credentials: 'same-origin',
@@ -440,6 +454,57 @@ function fileToBase64(file) {
   });
 }
 
+
+async function decodeCoverImage(file) {
+  const objectUrl = URL.createObjectURL(file);
+  const image = new Image();
+  image.decoding = 'async';
+  try {
+    await new Promise((resolve, reject) => {
+      image.onload = resolve;
+      image.onerror = () => reject(new Error('No se pudo leer la foto de portada.'));
+      image.src = objectUrl;
+    });
+    if (typeof image.decode === 'function') await image.decode().catch(() => {});
+    return { image, objectUrl };
+  } catch (error) {
+    URL.revokeObjectURL(objectUrl);
+    throw error;
+  }
+}
+
+async function makeCoverVariant(image, originalName, label, maxDimension, quality) {
+  const sourceWidth = image.naturalWidth || image.width;
+  const sourceHeight = image.naturalHeight || image.height;
+  if (!sourceWidth || !sourceHeight) throw new Error('La portada no tiene dimensiones válidas.');
+  const ratio = Math.min(1, maxDimension / Math.max(sourceWidth, sourceHeight));
+  const width = Math.max(1, Math.round(sourceWidth * ratio));
+  const height = Math.max(1, Math.round(sourceHeight * ratio));
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d', { alpha:true });
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(image, 0, 0, width, height);
+  const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/webp', quality));
+  if (!blob) throw new Error('No se pudo optimizar la portada.');
+  const stem = String(originalName || 'portada').replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9_-]+/g, '-');
+  return {
+    name: `${stem}-${label}.webp`,
+    mime: 'image/webp',
+    base64: await fileToBase64(blob),
+    preserveQuality: true,
+  };
+}
+
+async function uploadCoverPayload(payload) {
+  return api('upload', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
 $('#brandIconFile')?.addEventListener('change', async (e) => {
   const file = e.target.files?.[0];
   if (!file) return;
@@ -476,17 +541,68 @@ $('#coverFile')?.addEventListener('change', async (e) => {
   if (!file) return;
   try {
     e.target.disabled = true;
-    toast('Subiendo foto de portada…');
-    const data = await api('upload', {
-      method: 'POST',
-      body: JSON.stringify({ name: file.name, mime: file.type, base64: await fileToBase64(file) })
-    });
-    state.config.portada = data.path;
-    state.config.portadaRespaldo = data.path;
+    toast('Preparando portada en alta calidad…');
+
+    if (!['image/jpeg','image/png','image/webp'].includes(file.type)) {
+      const data = await uploadCoverPayload({
+        name: file.name,
+        mime: file.type,
+        base64: await fileToBase64(file),
+        preserveQuality: true,
+      });
+      state.config.portada = data.path;
+      state.config.portadaRespaldo = data.path;
+      state.config.portadaOriginal = data.path;
+      state.config.portadaMobile = data.path;
+      state.config.portadaTablet = data.path;
+      state.config.portadaDesktop = data.path;
+    } else {
+      const decoded = await decodeCoverImage(file);
+      try {
+        const specs = [
+          { key:'portadaMobile', label:'mobile-1080', max:1080, quality:.90 },
+          { key:'portadaTablet', label:'tablet-1600', max:1600, quality:.91 },
+          { key:'portadaDesktop', label:'desktop-2560', max:2560, quality:.92 },
+          { key:'portada', label:'master-3200', max:3200, quality:.94 },
+        ];
+        const uploaded = {};
+        for (let i = 0; i < specs.length; i += 1) {
+          const spec = specs[i];
+          toast(`Optimizando portada ${i + 1}/${specs.length}…`);
+          const payload = await makeCoverVariant(decoded.image, file.name, spec.label, spec.max, spec.quality);
+          const data = await uploadCoverPayload(payload);
+          uploaded[spec.key] = data.path;
+        }
+
+        state.config.portadaMobile = uploaded.portadaMobile;
+        state.config.portadaTablet = uploaded.portadaTablet;
+        state.config.portadaDesktop = uploaded.portadaDesktop;
+        state.config.portada = uploaded.portada;
+        state.config.portadaRespaldo = uploaded.portada;
+
+        state.config.portadaOriginal = uploaded.portada;
+        if (file.size <= 7.5 * 1024 * 1024) {
+          try {
+            const original = await uploadCoverPayload({
+              name: file.name,
+              mime: file.type,
+              base64: await fileToBase64(file),
+              preserveQuality: true,
+            });
+            state.config.portadaOriginal = original.path;
+          } catch (_) {
+            // El master de 3200 px queda como respaldo si el original bruto no cabe.
+          }
+        }
+      } finally {
+        URL.revokeObjectURL(decoded.objectUrl);
+      }
+    }
+
     const pathInput = $('#coverPath');
-    if (pathInput) pathInput.value = data.path;
+    if (pathInput) pathInput.value = state.config.portada;
     refreshCoverPreview();
-    toast('Foto de portada subida. Pulsa “Guardar y publicar” para aplicarla.', true);
+    toast('Portada lista en alta calidad y versiones responsivas. Pulsa “Guardar y publicar” para aplicarla.', true);
   } catch (err) {
     toast(err.message);
   } finally {
