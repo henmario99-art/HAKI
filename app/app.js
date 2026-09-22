@@ -169,7 +169,7 @@
     const customBrandIcon = String(CONFIG.iconoHaki || '').trim();
     document.documentElement.classList.toggle('haki-custom-brand-icon', !!customBrandIcon);
     if (customBrandIcon) {
-      $('.brand-logo').forEach(img => {
+      $$('.brand-logo').forEach(img => {
         img.src = freshImage(customBrandIcon, 320);
         img.removeAttribute('srcset');
         img.onerror = () => {
@@ -312,7 +312,7 @@
     if (description) description.textContent = guide.description;
 
     if (tabs) {
-      $('[data-size-guide]', tabs).forEach(button => {
+      $$('[data-size-guide]', tabs).forEach(button => {
         const active = button.dataset.sizeGuide === type;
         button.classList.toggle('is-active', active);
         button.setAttribute('aria-selected', String(active));
