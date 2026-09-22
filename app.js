@@ -1053,22 +1053,9 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       return true;
     }
 
-    // iPhone/iPad opened from Instagram itself: leave Instagram's in-app browser
-    // and return to the native Direct area, which feels like closing the catalog.
-    // If Instagram/iOS blocks its private app scheme, fall back to the official
-    // ig.me conversation link after a short delay.
-    if (isiOS && isInstagramBrowser) {
-      location.href = 'instagram://direct-inbox';
-      window.setTimeout(() => {
-        if (document.visibilityState === 'visible') {
-          location.href = webTarget;
-        }
-      }, 850);
-      return true;
-    }
-
-    // Outside Instagram's own browser, ig.me is the most reliable way to open
-    // the specific HAKI conversation in the installed Instagram app.
+    // iPhone/iPad: open the exact HAKI DM thread. When the catalog is inside
+    // Instagram's in-app browser, ig.me hands control back to the native app
+    // and lands directly in this conversation.
     if (isiOS) {
       location.href = webTarget;
       return true;
