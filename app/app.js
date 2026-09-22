@@ -1079,6 +1079,59 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     return false;
   }
 
+  const isInstagramInAppBrowser = /Instagram/i.test(navigator.userAgent || '');
+
+  function instagramReturnOverlay() {
+    let overlay = document.getElementById('instagramReturnOverlay');
+    if (overlay) return overlay;
+
+    overlay = document.createElement('div');
+    overlay.id = 'instagramReturnOverlay';
+    overlay.className = 'instagram-return-overlay';
+    overlay.hidden = true;
+    overlay.innerHTML = `
+      <div class="instagram-return-card" role="dialog" aria-modal="true" aria-labelledby="instagramReturnTitle">
+        <button type="button" class="instagram-return-x" id="instagramReturnClose" aria-label="Volver al chat de Instagram">×</button>
+        <h2 id="instagramReturnTitle">VOLVER AL CHAT</h2>
+        <p id="instagramReturnMessage">Tu cotización ya está copiada. Toca la X para cerrar el catálogo y regresar a Instagram.</p>
+        <span class="instagram-return-hint">SOLO VISIBLE DENTRO DE INSTAGRAM</span>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const closeButton = overlay.querySelector('#instagramReturnClose');
+    const message = overlay.querySelector('#instagramReturnMessage');
+
+    closeButton.addEventListener('click', () => {
+      closeButton.classList.add('is-closing');
+
+      try { window.close(); } catch {}
+
+      window.setTimeout(() => {
+        if (document.visibilityState === 'hidden') return;
+        overlay.classList.add('needs-native-close');
+        closeButton.classList.remove('is-closing');
+        message.textContent = 'Instagram bloqueó el cierre automático. Toca la X original de arriba para volver al chat.';
+      }, 320);
+    });
+
+    return overlay;
+  }
+
+  function showInstagramReturnOverlay(copied) {
+    if (!isInstagramInAppBrowser) return;
+
+    const overlay = instagramReturnOverlay();
+    const message = overlay.querySelector('#instagramReturnMessage');
+    overlay.classList.remove('needs-native-close');
+    message.textContent = copied
+      ? 'Tu cotización ya está copiada. Toca la X para cerrar el catálogo y regresar a Instagram.'
+      : 'Toca la X para cerrar el catálogo y regresar a Instagram. Luego pega tu pedido en el chat.';
+    overlay.hidden = false;
+    document.body.classList.add('instagram-return-open');
+  }
+
   function submitInstagram() {
     if (!validateQuote()) return;
 
@@ -1089,20 +1142,25 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       return;
     }
 
-    // Copy synchronously first so iPhone/Safari and Doufu WebViews keep the
-    // operation inside the user's tap. Then also use the modern Clipboard API
-    // when available. Instagram is opened immediately to avoid popup blocking.
     const legacyCopied = legacyCopyText(text);
     const modernCopy = (navigator.clipboard?.writeText && window.isSecureContext)
       ? navigator.clipboard.writeText(text).then(() => true).catch(() => legacyCopied)
       : Promise.resolve(legacyCopied);
 
-    openInstagramChat(handle);
+    if (isInstagramInAppBrowser) {
+      modernCopy.then(copied => {
+        closeCart();
+        showInstagramReturnOverlay(copied);
+        showToast(copied ? 'Cotización copiada.' : 'Pedido listo.');
+      });
+      return;
+    }
 
+    openInstagramChat(handle);
     modernCopy.then(copied => {
       showToast(copied
         ? 'Cotización copiada. Abriendo Instagram…'
-        : 'Abriendo Instagram… Mantén pulsado y pega la cotización.');
+        : 'Abriendo Instagram… Copia la cotización manualmente.');
     });
   }
 

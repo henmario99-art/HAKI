@@ -146,3 +146,77 @@ html body #collectionsSection #collectionsGrid .collection-tile h3{display:block
     scroll-margin-bottom:96px;
   }
 }
+
+
+/* 2026-09-22: obvious return control only inside Instagram's in-app browser */
+.instagram-return-overlay[hidden]{display:none!important}
+.instagram-return-overlay{
+  position:fixed;
+  inset:0;
+  z-index:2147483000;
+  display:grid;
+  place-items:center;
+  padding:28px 20px calc(28px + env(safe-area-inset-bottom));
+  background:rgba(255,255,255,.98);
+  color:#111;
+  text-align:center;
+}
+.instagram-return-card{
+  width:min(420px,100%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+.instagram-return-x{
+  width:122px;
+  height:122px;
+  border:0;
+  border-radius:50%;
+  background:#111;
+  color:#fff;
+  display:grid;
+  place-items:center;
+  padding:0 0 10px;
+  font:300 94px/1 Arial,sans-serif;
+  cursor:pointer;
+  box-shadow:0 18px 48px rgba(0,0,0,.18);
+  transition:transform .18s ease,opacity .18s ease;
+}
+.instagram-return-x:active{transform:scale(.94)}
+.instagram-return-x.is-closing{opacity:.55;transform:scale(.96)}
+.instagram-return-card h2{
+  margin:28px 0 10px;
+  font-size:clamp(28px,8vw,40px);
+  line-height:1;
+  letter-spacing:-.04em;
+}
+.instagram-return-card p{
+  max-width:330px;
+  margin:0;
+  color:#555;
+  font-size:15px;
+  line-height:1.5;
+}
+.instagram-return-hint{
+  margin-top:24px;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.15em;
+  color:#888;
+}
+.instagram-return-overlay.needs-native-close .instagram-return-x{
+  animation:haki-instagram-close-pulse 1.1s ease-in-out infinite;
+}
+.instagram-return-overlay.needs-native-close .instagram-return-card p{
+  max-width:350px;
+  color:#111;
+  font-weight:800;
+}
+body.instagram-return-open{overflow:hidden!important}
+@keyframes haki-instagram-close-pulse{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.08)}
+}
+@media(prefers-reduced-motion:reduce){
+  .instagram-return-overlay.needs-native-close .instagram-return-x{animation:none}
+}
