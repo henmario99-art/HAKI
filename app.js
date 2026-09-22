@@ -272,26 +272,27 @@
 
   function productSizeGuideType(p) {
     const ownCategory = normalize(p?.categoria || '');
-    if (/oversized|oversize/.test(ownCategory)) return 'oversized';
-    if (/short|calzoneta|bermuda/.test(ownCategory)) return 'shorts';
-    if (/pants|pant|jogger|pantalon/.test(ownCategory)) return 'pants';
-    if (/compresion|camiseta|centro|camisa|top/.test(ownCategory)) return 'compression';
-
     const linkedCollections = (p?.colecciones || [])
       .map(id => COLLECTIONS.find(collection => collection.id === id))
       .filter(Boolean);
     const collectionNames = normalize(linkedCollections.map(collection => collection.nombre || '').join(' '));
+    const collectionCategories = normalize(linkedCollections.map(collection => collection.categoria || '').join(' '));
 
+    // La categoría visual manda para Oversized; Pants y Shorts se separan por
+    // la categoría propia de cada producto cuando comparten la misma colección.
     if (/oversized|oversize/.test(collectionNames)) return 'oversized';
-    if (/compresion|camiseta|centro|camisa/.test(collectionNames)) return 'compression';
+    if (/oversized|oversize/.test(ownCategory)) return 'oversized';
+    if (/short|calzoneta|bermuda/.test(ownCategory)) return 'shorts';
+    if (/pants|pant|jogger|pantalon/.test(ownCategory)) return 'pants';
 
     const hasShorts = /short|calzoneta|bermuda/.test(collectionNames);
     const hasPants = /pants|pant|jogger|pantalon/.test(collectionNames);
     if (hasShorts && !hasPants) return 'shorts';
     if (hasPants && !hasShorts) return 'pants';
 
-    const collectionCategories = normalize(linkedCollections.map(collection => collection.categoria || '').join(' '));
-    if (/oversized|oversize/.test(collectionCategories)) return 'oversized';
+    if (/compresion|camiseta|centro|camisa/.test(collectionNames)) return 'compression';
+    if (/compresion|camiseta|centro|camisa|top/.test(ownCategory)) return 'compression';
+
     if (/short|calzoneta|bermuda/.test(collectionCategories)) return 'shorts';
     if (/pants|pant|jogger|pantalon/.test(collectionCategories)) return 'pants';
     if (/compresion|camiseta|centro|camisa|top/.test(collectionCategories)) return 'compression';
