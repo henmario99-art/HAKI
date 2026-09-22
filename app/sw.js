@@ -1,6 +1,6 @@
-/* HAKI PWA v46: Supabase catalog + cache-first shell. */
-const SHELL_CACHE = 'haki-installed-shell-v46';
-const IMAGE_CACHE = 'haki-installed-images-v1';
+/* HAKI PWA v47: live catalog + network-first shell. */
+const SHELL_CACHE = 'haki-installed-shell-v47';
+const IMAGE_CACHE = 'haki-installed-images-v2';
 const SHELL = ["./android-cover-v27.css","./app-detail.css","./app-motion.css","./app-motion.js","./app-visual.css","./app.js","./cambios-devoluciones.html","./catalog-loader.js","./cover-bootstrap.js","./cover-v15.css","./cover-v15.js","./cover-v16-fix.js","./domicilios.html","./doufu-runtime.css","./doufu-runtime.js","./encomiendas.html","./enhancements.css","./enhancements.js","./experience-config.js","./experience.css","./gymrat-test.css","./gymrat-test.js","./image-manifest.js","./index.html","./info.css","./info.js","./ios-safari-fix.js","./native-android-cover-fix.js","./personalization.js","./pwa-status.js","./safari-internal-detail.js","./storefront-config.js","./styles.css","./","./icons/icon-192.png","./icons/icon-512.png","./icons/icon-512-maskable.png","../pwa-mode.js","../productos.js"];
 const shellPaths = new Set(SHELL.map(file => new URL(file, self.location.href).pathname));
 
@@ -22,7 +22,8 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     for (const key of await caches.keys()) {
-      if (key.startsWith('haki-installed-shell-') && key !== SHELL_CACHE) {
+      if ((key.startsWith('haki-installed-shell-') && key !== SHELL_CACHE) ||
+          (key.startsWith('haki-installed-images-') && key !== IMAGE_CACHE)) {
         await caches.delete(key);
       }
     }
@@ -56,18 +57,15 @@ self.addEventListener('fetch', event => {
   event.respondWith((async () => {
     const cache = await caches.open(SHELL_CACHE);
     const key = new Request(new URL(url.pathname, url.origin).href, {credentials:'same-origin'});
-    const cached = await cache.match(key);
-    const update = fetch(event.request).then(response => {
+    try {
+      const networkRequest = new Request(event.request, { cache:'no-store' });
+      const response = await fetch(networkRequest);
       if (response.ok && response.type === 'basic') {
         cache.put(key, response.clone()).catch(() => {});
       }
       return response;
-    }).catch(() => null);
-
-    if (cached) {
-      event.waitUntil(update);
-      return cached;
+    } catch {
+      return (await cache.match(key)) || Response.error();
     }
-    return (await update) || Response.error();
   })());
 });
