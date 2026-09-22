@@ -341,7 +341,11 @@
     if (!content) return;
 
     if (title) title.textContent = `Guía de tallas · ${guide.label}`;
-    if (description) description.textContent = guide.description;
+    if (description) {
+      description.textContent = '';
+      description.hidden = true;
+      description.style.display = 'none';
+    }
 
     if (tabs) {
       $$('[data-size-guide]', tabs).forEach(button => {
