@@ -126,28 +126,51 @@
     $('#countryText').textContent =
       CONFIG.pais || 'HAKI · EL SALVADOR';
 
-    const title = (CONFIG.frase || 'NO HAY LÍMITES.').replace(' ', '<br>');
-
-    $('#heroTitle').innerHTML = title.includes('LÍMITES')
-      ? 'NO HAY<br>LÍMITES.'
-      : esc(CONFIG.frase || 'NO HAY LÍMITES.');
-
-    $('#heroDescription').textContent =
-      CONFIG.subfrase ||
-      'Tu esfuerzo. Tu ritmo. Tu Haki. Ropa deportiva para darlo todo.';
+    const coverTitle = $('#heroTitle');
+    if (coverTitle) {
+      coverTitle.replaceChildren();
+      coverTitle.hidden = true;
+      coverTitle.setAttribute('aria-hidden', 'true');
+    }
+    const coverDescription = $('#heroDescription');
+    if (coverDescription) {
+      coverDescription.textContent = '';
+      coverDescription.hidden = true;
+      coverDescription.setAttribute('aria-hidden', 'true');
+    }
 
     const hero = $('#heroImage');
-
-    hero.src = freshImage(
-      CONFIG.portada || CONFIG.portadaRespaldo, 1920
+    const coverBase = CONFIG.portada || CONFIG.portadaRespaldo || '';
+    const coverVariants = [
+      [CONFIG.portadaMobile, 1080],
+      [CONFIG.portadaTablet, 1600],
+      [CONFIG.portadaDesktop, 2560],
+      [CONFIG.portada, 3200],
+    ].filter(([url]) => String(url || '').trim());
+    const uniqueCoverVariants = coverVariants.filter(([url], index, list) =>
+      list.findIndex(([candidate]) => candidate === url) === index
     );
-    hero.srcset = window.hakiSrcset(CONFIG.portada); hero.sizes="100vw";
+    const responsiveCoverSrcset = uniqueCoverVariants.length > 1
+      ? uniqueCoverVariants.map(([url, width]) => `${url} ${width}w`).join(', ')
+      : '';
+    const desktopCover = CONFIG.portadaDesktop || coverBase;
+
+    hero.src = desktopCover
+      ? (CONFIG.portadaDesktop
+          ? desktopCover
+          : freshImage(desktopCover, matchMedia('(max-width:800px)').matches ? 1280 : 2560))
+      : freshImage(CONFIG.portadaRespaldo || 'images/hero-fallback.svg', 1920);
+    hero.srcset = responsiveCoverSrcset || window.hakiSrcset(coverBase);
+    hero.sizes = '100vw';
+    hero.fetchPriority = 'high';
+    hero.decoding = 'async';
 
     hero.onerror = () => {
       hero.onerror = null;
-
+      hero.removeAttribute('srcset');
       hero.src = freshImage(
-        CONFIG.portadaRespaldo || 'images/hero-fallback.svg'
+        CONFIG.portadaRespaldo || 'images/hero-fallback.svg',
+        1920
       );
     };
 
