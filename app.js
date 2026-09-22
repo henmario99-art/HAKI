@@ -1,6 +1,7 @@
 (() => {
   const CONFIG = window.HAKI_CONFIG || {};
   const ALL_PRODUCTS = (window.HAKI_PRODUCTOS || []).filter(p => p.borrador !== true);
+  const hasStock = p => ['S','M','L','XL'].some(size => !!p?.tallas?.[size]);
   const COLLECTIONS = window.hakiCollections(CONFIG);
 
   const $ = (s, el = document) => el.querySelector(s);
@@ -235,6 +236,7 @@
 
     return ALL_PRODUCTS.filter(
       p =>
+        hasStock(p) &&
         (state.category === 'Todos' ||
           normalize(p.categoria || '') === normalize(state.category)) &&
         (!state.collection || inCollection(p, state.collection)) &&
@@ -1095,7 +1097,7 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       return `<a class="collection-tile" href="#coleccion/${encodeURIComponent(c.id)}"><div class="collection-image"><img src="${esc(freshImage(picture))}" alt="${esc(c.nombre)}" loading="lazy"></div><h3>${esc(c.nombre)}</h3></a>`;
     }).join('');
     $$('#collectionsGrid img').forEach(img => img.addEventListener('error', () => { img.src = freshImage('images/producto.svg'); }, { once: true }));
-    const fresh = ALL_PRODUCTS.filter(p => p.novedad === true);
+    const fresh = ALL_PRODUCTS.filter(p => p.novedad === true && hasStock(p));
     renderProductList($('#newProducts'), fresh);
     $('#newEmpty').hidden = fresh.length > 0;
     $('.rail-actions').hidden = !fresh.length;
