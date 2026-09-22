@@ -18,8 +18,7 @@ export default async (request) => {
     const file = await github(`/repos/${owner}/${repo}/contents/productos.js?ref=${encodeURIComponent(BRANCH)}`, { method: 'GET' });
     const source = Buffer.from(file.content, 'base64').toString('utf8');
     const parsed = parseCatalog(source);
-    parsed.products = applyAvailability(parsed.products, await readInventory())
-      .filter(product => Object.values(product.tallas || {}).some(Boolean));
+    parsed.products = applyAvailability(parsed.products, await readInventory());
 
     return json(
       { ...parsed, version: file.sha },
