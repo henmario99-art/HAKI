@@ -59,7 +59,7 @@
     const heroTitle = document.getElementById('heroTitle');
     const heroDesc = document.getElementById('heroDescription');
     const search = document.getElementById('desktopSearch');
-    if (heroTitle) heroTitle.textContent = 'HAKI';
+    if (heroTitle && !heroTitle.querySelector('.hero-brand-icon')) heroTitle.textContent = 'HAKI';
     if (heroDesc) heroDesc.textContent = 'Haki | Anime & Sports | El Salvador';
     if (search) search.placeholder = 'BUSCAR PRENDA...';
   }
@@ -70,7 +70,7 @@
       if (guideButton) {
         event.preventDefault();
         document.getElementById('categoryMenu')?.close?.();
-        if (typeof window.HAKI_OPEN_SIZE_GUIDE === 'function') window.HAKI_OPEN_SIZE_GUIDE('compression');
+        if (typeof window.HAKI_OPEN_SIZE_GUIDE === 'function') window.HAKI_OPEN_SIZE_GUIDE('compression', true);
         else document.getElementById('sizeGuideDialog')?.showModal?.();
       }
       const menuLink = event.target.closest('#categoryMenu a');

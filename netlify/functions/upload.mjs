@@ -35,7 +35,7 @@ export default async (request) => {
     }
 
     const payload = {
-      message: `Subir imagen ${name} desde panel HAKI`,
+      message: `Subir imagen ${name} desde panel HAKI [skip netlify]`,
       content: base64,
       branch: BRANCH,
       ...(sha ? { sha } : {}),

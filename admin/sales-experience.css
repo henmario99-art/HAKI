@@ -40,8 +40,8 @@ body.sale-editor-mode .sale-editor{display:block!important;margin:0 auto;backgro
 .product-picker-empty{padding:26px 12px;text-align:center;color:#74746f}
 
 /* Miniaturas dentro del inventario privado */
-.inventory-product{display:grid;grid-template-columns:62px minmax(0,1fr);grid-template-rows:auto auto;column-gap:12px;align-items:center}
-.inventory-product-image{grid-column:1;grid-row:1/3;width:62px;height:62px;object-fit:cover;border-radius:11px;background:#f0f0ed;border:1px solid #e2e2de}
+.inventory-product{display:grid;grid-template-columns:62px minmax(0,1fr);grid-template-rows:auto auto auto;column-gap:12px;align-items:center}
+.inventory-product-image{grid-column:1;grid-row:1/4;width:62px;height:62px;object-fit:cover;border-radius:11px;background:#f0f0ed;border:1px solid #e2e2de}
 .inventory-product strong{grid-column:2;grid-row:1;align-self:end;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .inventory-product small{grid-column:2;grid-row:2;align-self:start;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
@@ -59,3 +59,6 @@ body.sale-editor-mode .sale-editor{display:block!important;margin:0 auto;backgro
   .inventory-product-image{width:58px;height:58px}
   .sale-table td[data-label="Destino"]{max-width:none}
 }
+
+/* Keep stock status below the code instead of sharing its grid cell. */
+.inventory-product .inventory-stock-notice{grid-column:2;grid-row:3;white-space:normal;overflow-wrap:anywhere;line-height:1.4;margin-top:3px}

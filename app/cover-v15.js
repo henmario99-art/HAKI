@@ -37,7 +37,7 @@
       hero.setAttribute('decoding','async');
     }
 
-    if(title){title.textContent='HAKI';title.setAttribute('aria-label','HAKI');}
+    if(title && !title.querySelector('.hero-brand-icon')){title.textContent='HAKI';title.setAttribute('aria-label','HAKI');}
     if(desc) desc.textContent='Haki | Anime & Sports | El Salvador';
     if(search){search.placeholder='BUSCAR PRENDA...';search.setAttribute('aria-label','Buscar prenda');}
     if(b1){b1.classList.add('solid');b1.classList.remove('outline');b1.dataset.heroStyle='blanco';}

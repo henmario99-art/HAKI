@@ -64,10 +64,13 @@ export default async (request) => {
       if (body.sha && body.sha !== current.sha) return json({ error: 'El catálogo cambió desde que lo abriste. Recarga antes de guardar para conservar los cambios recientes.' }, 409);
       body.products = applyAvailability(body.products, await readInventory());
       const content = serializeCatalog(body.config, body.products);
+      if (content === Buffer.from(current.content, 'base64').toString('utf8')) {
+        return json({ ok: true, unchanged: true, commit: null });
+      }
       const result = await github(`/repos/${owner}/${repo}/contents/productos.js`, {
         method: 'PUT',
         body: JSON.stringify({
-          message: body.message || 'Actualizar catálogo desde panel HAKI',
+          message: `${body.message || 'Actualizar catálogo desde panel HAKI'} [skip netlify]`,
           content: Buffer.from(content, 'utf8').toString('base64'),
           sha: current.sha,
           branch: BRANCH,

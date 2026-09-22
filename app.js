@@ -165,17 +165,17 @@
     $('#year').textContent = new Date().getFullYear();
     $('#collectionsTitle').textContent = CONFIG.tituloColecciones || 'EXPLORA POR CATEGORÍA';
 
+    // The editable mark belongs to the cover, not the header or footer.
     const customBrandIcon = String(CONFIG.iconoHaki || '').trim();
-    document.documentElement.classList.toggle('haki-custom-brand-icon', !!customBrandIcon);
-    if (customBrandIcon) {
-      $$('.brand-logo').forEach(img => {
-        img.src = freshImage(customBrandIcon, 320);
-        img.removeAttribute('srcset');
-        img.onerror = () => {
-          img.onerror = null;
-          img.src = freshImage('images/haki-wordmark.svg', 320);
-        };
-      });
+    const heroTitle = $('#heroTitle');
+    if (customBrandIcon && heroTitle) {
+      const mark = document.createElement('img');
+      mark.className = 'hero-brand-icon';
+      mark.alt = CONFIG.marca || 'HAKI';
+      mark.src = freshImage(customBrandIcon, 640);
+      mark.style.cssText = 'display:block;width:auto;max-width:min(100%,320px);height:1.35em;object-fit:contain;object-position:left center';
+      mark.onerror = () => { heroTitle.textContent = CONFIG.frase || 'HAKI'; };
+      heroTitle.replaceChildren(mark);
     }
 
     const video = $('#heroVideo');
@@ -330,7 +330,12 @@
     `;
   }
 
-  function openSizeGuide(type = 'compression') {
+  function openSizeGuide(type = 'compression', allowCategories = false) {
+    const tabs = $('#sizeGuideTabs');
+    if (tabs) {
+      tabs.hidden = !allowCategories;
+      tabs.style.display = allowCategories ? '' : 'none';
+    }
     renderSizeGuide(type);
     const dialog = $('#sizeGuideDialog');
     if (dialog && !dialog.open) dialog.showModal();
@@ -1209,7 +1214,7 @@ ${settings().totalTexto}: ${money(totals.total)}`;
   $('#sizeGuideDialog').addEventListener('click', e => { if (e.target === $('#sizeGuideDialog')) $('#sizeGuideDialog').close(); });
   $('#openGlobalSizeGuide').addEventListener('click', () => {
     closeMenu();
-    openSizeGuide('compression');
+    openSizeGuide('compression', true);
   });
 
   function closeMenu() {

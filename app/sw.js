@@ -1,5 +1,5 @@
-/* HAKI PWA v40: nuevo icono + cache-first shell. */
-const SHELL_CACHE = 'haki-installed-shell-v40';
+/* HAKI PWA v41: nuevo icono + cache-first shell. */
+const SHELL_CACHE = 'haki-installed-shell-v41';
 const IMAGE_CACHE = 'haki-installed-images-v1';
 const SHELL = ["./android-cover-v27.css","./app-detail.css","./app-motion.css","./app-motion.js","./app-visual.css","./app.js","./cambios-devoluciones.html","./catalog-loader.js","./cover-bootstrap.js","./cover-v15.css","./cover-v15.js","./cover-v16-fix.js","./domicilios.html","./doufu-runtime.css","./doufu-runtime.js","./encomiendas.html","./enhancements.css","./enhancements.js","./experience-config.js","./experience.css","./gymrat-test.css","./gymrat-test.js","./image-manifest.js","./index.html","./info.css","./info.js","./ios-safari-fix.js","./native-android-cover-fix.js","./personalization.js","./pwa-status.js","./safari-internal-detail.js","./storefront-config.js","./styles.css","./","./icons/icon-192.png","./icons/icon-512.png","./icons/icon-512-maskable.png","../pwa-mode.js","../productos.js"];
 const shellPaths = new Set(SHELL.map(file => new URL(file, self.location.href).pathname));
