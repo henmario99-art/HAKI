@@ -172,7 +172,7 @@
     if (customBrandIcon && heroTitle) {
       const frame = document.createElement('span');
       frame.className = 'hero-brand-icon';
-      frame.style.cssText = 'display:block;position:relative;overflow:hidden;height:clamp(150px,20svh,190px);width:130px;max-width:100%';
+      frame.style.cssText = 'display:block;position:relative;overflow:hidden;height:clamp(112px,15svh,142px);width:97px;max-width:100%';
       const mark = document.createElement('img');
       mark.alt = CONFIG.marca || 'HAKI';
       mark.crossOrigin = 'anonymous';
@@ -197,7 +197,7 @@
           }
           if (right < left || bottom < top) return;
           const width = right - left + 1, height = bottom - top + 1;
-          frame.style.width = `calc(clamp(150px,20svh,190px) * ${width / height})`;
+          frame.style.width = `calc(clamp(112px,15svh,142px) * ${width / height})`;
           mark.style.cssText = `position:absolute;display:block;max-width:none;width:${canvas.width / width * 100}%;height:${canvas.height / height * 100}%;left:${-left / width * 100}%;top:${-top / height * 100}%`;
         } catch {
           // Cross-origin providers without CORS still display within the larger frame.
