@@ -1114,51 +1114,21 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     overlay.hidden = true;
     overlay.innerHTML = `
       <div class="instagram-return-card" role="dialog" aria-modal="true" aria-labelledby="instagramReturnTitle">
-        <button type="button" class="instagram-return-x" id="instagramReturnClose" aria-label="Volver al chat de Instagram">×</button>
-        <h2 id="instagramReturnTitle">VOLVER AL CHAT</h2>
-        <p id="instagramReturnMessage">Tu cotización ya está copiada. Toca la X para cerrar el catálogo y regresar a Instagram.</p>
-        <span class="instagram-return-hint">SOLO VISIBLE DENTRO DE INSTAGRAM</span>
+        <svg class="instagram-native-arrow" viewBox="0 0 220 130" aria-hidden="true" focusable="false">
+          <path d="M194 113 L34 22 M34 22 L51 61 M34 22 L77 18"></path>
+        </svg>
+        <h2 id="instagramReturnTitle">TOCA LA X DE INSTAGRAM</h2>
       </div>
     `;
 
     document.body.appendChild(overlay);
-
-    const closeButton = overlay.querySelector('#instagramReturnClose');
-    const message = overlay.querySelector('#instagramReturnMessage');
-
-    closeButton.addEventListener('click', () => {
-      closeButton.classList.add('is-closing');
-
-      try { window.close(); } catch {}
-
-      window.setTimeout(() => {
-        if (document.visibilityState === 'hidden') return;
-        overlay.classList.add('needs-native-close');
-        closeButton.classList.remove('is-closing');
-        const title = overlay.querySelector('#instagramReturnTitle');
-        const hint = overlay.querySelector('.instagram-return-hint');
-        if (title) title.textContent = 'TOCA LA X DE INSTAGRAM';
-        if (hint) hint.textContent = 'ARRIBA A LA IZQUIERDA';
-        message.textContent = 'Instagram bloqueó el cierre automático. Toca la X de Instagram para volver al chat.';
-      }, 320);
-    });
-
     return overlay;
   }
 
-  function showInstagramReturnOverlay(copied) {
+  function showInstagramReturnOverlay() {
     if (!isInstagramInAppBrowser) return;
 
     const overlay = instagramReturnOverlay();
-    const message = overlay.querySelector('#instagramReturnMessage');
-    overlay.classList.remove('needs-native-close');
-    const title = overlay.querySelector('#instagramReturnTitle');
-    const hint = overlay.querySelector('.instagram-return-hint');
-    if (title) title.textContent = 'VOLVER AL CHAT';
-    if (hint) hint.textContent = 'SOLO VISIBLE DENTRO DE INSTAGRAM';
-    message.textContent = copied
-      ? 'Tu cotización ya está copiada. Toca la X para cerrar el catálogo y regresar a Instagram.'
-      : 'Toca la X para cerrar el catálogo y regresar a Instagram. Luego pega tu pedido en el chat.';
     overlay.hidden = false;
     document.body.classList.add('instagram-return-open');
   }
