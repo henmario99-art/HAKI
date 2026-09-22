@@ -1597,7 +1597,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true,
+    "borrador": false,
     "recuperado": true
   },
   {
@@ -1621,7 +1621,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true,
+    "borrador": false,
     "recuperado": true
   },
   {
@@ -1645,7 +1645,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true,
+    "borrador": false,
     "recuperado": true
   },
   {
@@ -1669,7 +1669,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true,
+    "borrador": false,
     "recuperado": true
   },
   {
@@ -1693,7 +1693,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true,
+    "borrador": false,
     "recuperado": true
   },
   {
@@ -1717,7 +1717,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true,
+    "borrador": false,
     "recuperado": true
   },
   {
@@ -1741,7 +1741,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true,
+    "borrador": false,
     "recuperado": true
   },
   {
@@ -1765,7 +1765,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true,
+    "borrador": false,
     "recuperado": true
   },
   {
@@ -1789,7 +1789,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true,
+    "borrador": false,
     "recuperado": true
   },
   {
@@ -1813,7 +1813,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true,
+    "borrador": false,
     "recuperado": true
   },
   {
@@ -1837,7 +1837,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true,
+    "borrador": false,
     "recuperado": true
   },
   {
@@ -1861,7 +1861,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true,
+    "borrador": false,
     "recuperado": true
   },
   {
@@ -1885,7 +1885,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true,
+    "borrador": false,
     "recuperado": true
   },
   {
@@ -1909,7 +1909,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true,
+    "borrador": false,
     "recuperado": true
   },
   {
@@ -1933,7 +1933,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true,
+    "borrador": false,
     "recuperado": true
   },
   {
@@ -1957,7 +1957,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 67,
@@ -1980,7 +1980,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 68,
@@ -2003,7 +2003,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 69,
@@ -2026,7 +2026,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 70,
@@ -2049,7 +2049,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 71,
@@ -2072,7 +2072,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 72,
@@ -2095,7 +2095,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 73,
@@ -2118,7 +2118,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 74,
@@ -2141,7 +2141,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 75,
@@ -2164,7 +2164,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 76,
@@ -2187,7 +2187,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 77,
@@ -2210,7 +2210,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 78,
@@ -2233,7 +2233,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 79,
@@ -2256,7 +2256,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 80,
@@ -2279,6 +2279,6 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   }
 ];
