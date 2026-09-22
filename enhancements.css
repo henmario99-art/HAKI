@@ -125,3 +125,24 @@ html body #collectionsSection #collectionsGrid .collection-tile h3{display:block
     scroll-margin-bottom:160px;
   }
 }
+
+
+/* 2026-09-22: Android/iOS quote keyboard hardening */
+@media(max-width:800px){
+  #cartDrawer.keyboard-active{
+    position:fixed!important;
+    left:0!important;
+    right:0!important;
+    width:100%!important;
+    box-sizing:border-box!important;
+    contain:layout paint;
+  }
+  #cartDrawer.keyboard-active #quoteForm{
+    min-height:min-content;
+    scroll-margin-bottom:24px;
+  }
+  #cartDrawer.keyboard-active #quoteForm input:focus{
+    scroll-margin-top:56px;
+    scroll-margin-bottom:96px;
+  }
+}

@@ -1043,6 +1043,8 @@ ${settings().totalTexto}: ${money(totals.total)}`;
 
     const encodedUsername = encodeURIComponent(username);
     const webTarget = `https://ig.me/m/${encodedUsername}`;
+    const directTarget = `instagram://direct?username=${encodedUsername}`;
+    const inboxTarget = 'instagram://direct-inbox';
     const ua = navigator.userAgent || '';
     const isiOS = /iPad|iPhone|iPod/i.test(ua) ||
       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
@@ -1050,47 +1052,47 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     const isInstagramBrowser = /Instagram/i.test(ua);
 
     const openAndroidInstagram = () => {
-      location.href = `intent://ig.me/m/${encodedUsername}#Intent;scheme=https;package=com.instagram.android;S.browser_fallback_url=${encodeURIComponent(webTarget)};end`;
+      // Target the installed Instagram package directly. This avoids leaving the
+      // customer on instagram.com (and avoids a second login) when the app exists.
+      location.href = `intent://direct?username=${encodedUsername}#Intent;scheme=instagram;package=com.instagram.android;S.browser_fallback_url=${encodeURIComponent(webTarget)};end`;
     };
 
-    // If the catalog was opened from an Instagram DM, first try to dismiss
-    // Instagram's own in-app browser. When the host allows window.close(),
-    // this returns to the exact conversation that launched the catalog.
-    // If it refuses to close, keep the navigation on the same user gesture
-    // and hand control to the native Instagram app instead of instagram.com.
     if (isInstagramBrowser) {
+      // When the catalog was launched from a DM, closing the in-app browser is
+      // the only route that can restore the exact conversation that opened it.
+      // Instagram does not always allow window.close(), so we also use the native
+      // app deep link as a no-login fallback. Never fall back to instagram.com
+      // from inside Instagram's own browser.
+      try { window.close(); } catch {}
+
       if (isAndroid) {
-        openAndroidInstagram();
+        window.setTimeout(() => {
+          if (document.visibilityState !== 'hidden') openAndroidInstagram();
+        }, 80);
         return true;
       }
 
       if (isiOS) {
-        try { window.close(); } catch {}
+        window.setTimeout(() => {
+          if (document.visibilityState === 'hidden') return;
+          location.href = directTarget;
 
-        if (document.visibilityState !== 'hidden') {
-          const appTarget = `instagram://direct?username=${encodedUsername}`;
-          location.href = appTarget;
-
-          // The username scheme is app-only and can be rejected by some
-          // Instagram builds. Fall back to Meta's ig.me DM link only when the
-          // page is still visible, so a successful app handoff is not replaced.
           window.setTimeout(() => {
-            if (document.visibilityState !== 'hidden') location.href = webTarget;
-          }, 700);
-        }
+            if (document.visibilityState !== 'hidden') location.href = inboxTarget;
+          }, 650);
+        }, 80);
         return true;
       }
+
+      try { history.back(); } catch {}
+      return true;
     }
 
-    // Android browsers: explicitly target the Instagram package so the DM
-    // opens in the installed app, with ig.me as the browser fallback.
     if (isAndroid) {
       openAndroidInstagram();
       return true;
     }
 
-    // Safari/iOS: ig.me is the supported universal DM link and opens the
-    // conversation in Instagram when the app accepts the universal link.
     if (isiOS) {
       location.href = webTarget;
       return true;
@@ -1149,14 +1151,26 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       if (!input) return;
       const { height, top } = viewportMetrics();
       const rect = input.getBoundingClientRect();
-      const safeTop = top + Math.max(18, Math.min(72, height * .14));
-      const safeBottom = top + height - Math.max(28, Math.min(110, height * .20));
+      const safeTop = top + Math.max(14, Math.min(54, height * .10));
+      const safeBottom = top + height - Math.max(18, Math.min(72, height * .12));
 
       if (rect.top >= safeTop && rect.bottom <= safeBottom) return;
 
-      const desiredTop = top + Math.max(18, (height - rect.height) * .36);
+      // Center the active field inside the *visual* viewport, not the layout
+      // viewport. Android keyboards can shrink/offset VisualViewport without
+      // changing 100vh, which otherwise leaves the form hidden behind the IME.
+      const desiredTop = top + Math.max(12, (height - rect.height) * .30);
       const nextTop = Math.max(0, drawer.scrollTop + rect.top - desiredTop);
       drawer.scrollTo({ top: nextTop, behavior });
+
+      // A second native scroll hint helps Chrome/Android after its keyboard
+      // animation finishes and is harmless on iOS.
+      requestAnimationFrame(() => {
+        const latest = input.getBoundingClientRect();
+        if (latest.top < safeTop || latest.bottom > safeBottom) {
+          input.scrollIntoView({ block: 'center', inline: 'nearest', behavior });
+        }
+      });
     };
 
     const syncViewport = () => {
@@ -1178,13 +1192,21 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       settleTimer = setTimeout(() => {
         applyViewport();
         keepFieldVisible(input, 'smooth');
-      }, 120);
+      }, 140);
 
       clearTimeout(lateTimer);
       lateTimer = setTimeout(() => {
         applyViewport();
         keepFieldVisible(input);
-      }, 320);
+      }, 420);
+
+      // Some Android WebViews report the final keyboard viewport late.
+      window.setTimeout(() => {
+        if (document.activeElement === input) {
+          applyViewport();
+          keepFieldVisible(input);
+        }
+      }, 700);
     };
 
     document.addEventListener('focusin', event => {
