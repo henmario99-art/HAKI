@@ -1147,9 +1147,43 @@ ${settings().totalTexto}: ${money(totals.total)}`;
   function showInstagramReturnOverlay() {
     if (!isInstagramInAppBrowser) return;
 
+    // Instagram hides its native top bar after the page/WebView has been
+    // scrolled or panned by the keyboard. Remove focus and force every scroll
+    // surface back to the top before showing the close instruction.
+    try { document.activeElement?.blur?.(); } catch {}
+
+    const drawer = els.drawer;
+    if (drawer) {
+      drawer.classList.remove(
+        'keyboard-active',
+        'keyboard-android',
+        'keyboard-ios',
+        'instagram-android-keyboard'
+      );
+      drawer.style.removeProperty('--haki-vvh');
+      drawer.style.removeProperty('--haki-vv-top');
+      drawer.scrollTop = 0;
+    }
+
+    const revealNativeChrome = () => {
+      try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch { window.scrollTo(0, 0); }
+      if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    };
+
+    revealNativeChrome();
+
     const overlay = instagramReturnOverlay();
     overlay.hidden = false;
+    overlay.scrollTop = 0;
     document.body.classList.add('instagram-return-open');
+
+    // Instagram can finish its own keyboard/browser-bar animation after our
+    // first frame. Reassert top position a few times so its native X stays visible.
+    requestAnimationFrame(revealNativeChrome);
+    window.setTimeout(revealNativeChrome, 80);
+    window.setTimeout(revealNativeChrome, 220);
   }
 
   function submitInstagram() {
