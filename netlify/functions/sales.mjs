@@ -272,6 +272,33 @@ function findSale(sales, id) {
   return sales.find(sale => sale?.id === id) || null;
 }
 
+async function exportSnapshot() {
+  const blobs = store();
+  const [weekEntries, expenseEntries, inventory] = await Promise.all([
+    blobs.list({ prefix: 'week/' }),
+    blobs.list({ prefix: 'expenses/' }),
+    getInventory(),
+  ]);
+
+  const weeks = await Promise.all(
+    (weekEntries.blobs || []).map(async entry => ({
+      key: entry.key,
+      weekStart: entry.key.replace(/^week\//, ''),
+      sales: (await blobs.get(entry.key, { type: 'json', consistency: 'strong' })) || [],
+    }))
+  );
+
+  const expenses = await Promise.all(
+    (expenseEntries.blobs || []).map(async entry => ({
+      key: entry.key,
+      weekStart: entry.key.replace(/^expenses\//, ''),
+      expenses: (await blobs.get(entry.key, { type: 'json', consistency: 'strong' })) || [],
+    }))
+  );
+
+  return { inventory, weeks, expenses };
+}
+
 export default async (request) => {
   if (!verifyAdmin(request)) return json({ error: 'No autorizado.' }, 401);
 
@@ -279,6 +306,10 @@ export default async (request) => {
   const mode = url.searchParams.get('mode') || 'week';
 
   try {
+    if (request.method === 'GET' && mode === 'export') {
+      return json(await exportSnapshot());
+    }
+
     if (request.method === 'GET' && mode === 'inventory') {
       return json({ inventory: await getInventory() });
     }

@@ -23,14 +23,39 @@ function signPart(part, secret) {
   return crypto.createHmac('sha256', secret).update(part).digest('base64url');
 }
 
-export function makeSession(secret) {
+function makeSignedToken(secret, role, maxAgeMs = 7 * 24 * 60 * 60 * 1000) {
   const payload = {
-    role: 'admin',
-    exp: Date.now() + 7 * 24 * 60 * 60 * 1000,
-    nonce: crypto.randomBytes(8).toString('hex'),
+    role,
+    exp: Date.now() + maxAgeMs,
+    nonce: crypto.randomBytes(16).toString('hex'),
   };
   const body = b64url(JSON.stringify(payload));
   return `${body}.${signPart(body, secret)}`;
+}
+
+export function makeSession(secret) {
+  return makeSignedToken(secret, 'admin');
+}
+
+export function makeOperationsToken(secret) {
+  return makeSignedToken(secret, 'operations');
+}
+
+export function verifySignedToken(token = '', secret = '', expectedRole = '') {
+  if (!token || !secret || !token.includes('.')) return null;
+  const [body, signature] = String(token).split('.');
+  const expected = signPart(body, secret);
+  const a = Buffer.from(signature || '');
+  const b = Buffer.from(expected);
+  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
+  try {
+    const payload = JSON.parse(Buffer.from(body, 'base64url').toString('utf8'));
+    if (expectedRole && payload.role !== expectedRole) return null;
+    if (Number(payload.exp) <= Date.now()) return null;
+    return payload;
+  } catch {
+    return null;
+  }
 }
 
 function getCookie(request, name) {
