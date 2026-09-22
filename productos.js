@@ -1585,7 +1585,9 @@ window.HAKI_PRODUCTOS = [
     "novedad": false,
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "colecciones": [],
+    "colecciones": [
+      "collection-3"
+    ],
     "colores": [],
     "imagen": "images/1790039084712-2ffd305c-ChatGPT-Image-21-sept-2026-07_04_31-p.m..webp",
     "imagenRespaldo": "images/producto.svg",
@@ -1609,7 +1611,9 @@ window.HAKI_PRODUCTOS = [
     "novedad": false,
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "colecciones": [],
+    "colecciones": [
+      "collection-1"
+    ],
     "colores": [],
     "imagen": "images/1790039192375-afb42f55-WhatsApp-Image-2026-09-21-at-7.05.59-PM.webp",
     "imagenRespaldo": "images/producto.svg",
@@ -1633,7 +1637,9 @@ window.HAKI_PRODUCTOS = [
     "novedad": false,
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "colecciones": [],
+    "colecciones": [
+      "collection-1"
+    ],
     "colores": [],
     "imagen": "images/1790039416838-11251033-ChatGPT-Image-21-sept-2026-07_10_06-p.m..webp",
     "imagenRespaldo": "images/producto.svg",
@@ -1657,9 +1663,37 @@ window.HAKI_PRODUCTOS = [
     "novedad": false,
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "colecciones": [],
+    "colecciones": [
+      "collection-1"
+    ],
     "colores": [],
     "imagen": "images/1790039694282-78316065-658212146_18581339326032101_3737526298598322689_n.webp",
+    "imagenRespaldo": "images/producto.svg",
+    "imagen2": "",
+    "guiaTallas": "",
+    "tallas": {
+      "S": true,
+      "M": false,
+      "L": false,
+      "XL": false
+    },
+    "borrador": false,
+    "recuperado": true
+  },
+  {
+    "id": 58,
+    "codigo": "YLAP-08",
+    "nombre": "YLA PANTS VERDE",
+    "precio": 0,
+    "categoria": "Camisetas",
+    "novedad": false,
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "colecciones": [
+      "collection-3"
+    ],
+    "colores": [],
+    "imagen": "images/1790040864574-2701606e-ChatGPT-Image-21-sept-2026-07_34_10-p.m..webp",
     "imagenRespaldo": "images/producto.svg",
     "imagen2": "",
     "guiaTallas": "",
@@ -1681,7 +1715,9 @@ window.HAKI_PRODUCTOS = [
     "novedad": false,
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "colecciones": [],
+    "colecciones": [
+      "collection-1"
+    ],
     "colores": [],
     "imagen": "images/1790039913580-bf381706-ChatGPT-Image-21-sept-2026-07_18_22-p.m..webp",
     "imagenRespaldo": "images/producto.svg",
@@ -1705,7 +1741,9 @@ window.HAKI_PRODUCTOS = [
     "novedad": false,
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "colecciones": [],
+    "colecciones": [
+      "collection-4"
+    ],
     "colores": [],
     "imagen": "images/1790040029582-4e4ad440-805b9dba-ad98-4284-b0b0-3416d7d98279.4fa40bd70276c2b909509dd812582138.webp",
     "imagenRespaldo": "images/producto.svg",
@@ -1729,7 +1767,9 @@ window.HAKI_PRODUCTOS = [
     "novedad": false,
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "colecciones": [],
+    "colecciones": [
+      "collection-4"
+    ],
     "colores": [],
     "imagen": "images/1790040746513-4aa59e28-bef170c6-78d6-4bd6-b72a-9faec52a6048.webp",
     "imagenRespaldo": "images/producto.svg",
@@ -1745,30 +1785,6 @@ window.HAKI_PRODUCTOS = [
     "recuperado": true
   },
   {
-    "id": 58,
-    "codigo": "YLAP-08",
-    "nombre": "YLA PANTS VERDE",
-    "precio": 0,
-    "categoria": "Camisetas",
-    "novedad": false,
-    "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO",
-    "colecciones": [],
-    "colores": [],
-    "imagen": "images/1790040864574-2701606e-ChatGPT-Image-21-sept-2026-07_34_10-p.m..webp",
-    "imagenRespaldo": "images/producto.svg",
-    "imagen2": "",
-    "guiaTallas": "",
-    "tallas": {
-      "S": true,
-      "M": false,
-      "L": false,
-      "XL": false
-    },
-    "borrador": false,
-    "recuperado": true
-  },
-  {
     "id": 59,
     "codigo": "SPDL-02",
     "nombre": "SPIDERWOMAN BLANCO",
@@ -1777,7 +1793,9 @@ window.HAKI_PRODUCTOS = [
     "novedad": false,
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "colecciones": [],
+    "colecciones": [
+      "collection-2"
+    ],
     "colores": [],
     "imagen": "images/1790041134256-29783428-S871885b96e324538bcd884cf34266e4cw.jpg_960x960.webp",
     "imagenRespaldo": "images/producto.svg",
@@ -1801,7 +1819,9 @@ window.HAKI_PRODUCTOS = [
     "novedad": false,
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "colecciones": [],
+    "colecciones": [
+      "collection-1"
+    ],
     "colores": [],
     "imagen": "images/1790041425778-0f7a498c-ChatGPT-Image-21-sept-2026-07_43_21-p.m..webp",
     "imagenRespaldo": "images/producto.svg",
@@ -1825,7 +1845,9 @@ window.HAKI_PRODUCTOS = [
     "novedad": false,
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "colecciones": [],
+    "colecciones": [
+      "collection-1"
+    ],
     "colores": [],
     "imagen": "images/1790041491026-0374c5a6-D_NQ_NP_787071-MLM112116095874_062026-F.webp",
     "imagenRespaldo": "images/producto.svg",
@@ -1849,7 +1871,9 @@ window.HAKI_PRODUCTOS = [
     "novedad": false,
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "colecciones": [],
+    "colecciones": [
+      "collection-2"
+    ],
     "colores": [],
     "imagen": "images/1790041550216-d012e957-il_1588xN.7320993702_s2tm.webp",
     "imagenRespaldo": "images/producto.svg",
@@ -1873,7 +1897,9 @@ window.HAKI_PRODUCTOS = [
     "novedad": false,
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "colecciones": [],
+    "colecciones": [
+      "collection-1"
+    ],
     "colores": [],
     "imagen": "images/1790041590987-6a2cdb16-5.webp",
     "imagenRespaldo": "images/producto.svg",
@@ -1897,7 +1923,9 @@ window.HAKI_PRODUCTOS = [
     "novedad": false,
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "colecciones": [],
+    "colecciones": [
+      "collection-2"
+    ],
     "colores": [],
     "imagen": "images/1790041737624-2ba7f01e-images-7-.webp",
     "imagenRespaldo": "images/producto.svg",
@@ -1921,7 +1949,9 @@ window.HAKI_PRODUCTOS = [
     "novedad": false,
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "colecciones": [],
+    "colecciones": [
+      "collection-2"
+    ],
     "colores": [],
     "imagen": "images/1790041878419-d6d88194-s-l1200.webp",
     "imagenRespaldo": "images/producto.svg",
@@ -1945,7 +1975,9 @@ window.HAKI_PRODUCTOS = [
     "novedad": false,
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "colecciones": [],
+    "colecciones": [
+      "collection-2"
+    ],
     "colores": [],
     "imagen": "images/1790044896431-0609e781-9d906be2.webp",
     "imagenRespaldo": "images/producto.svg",
@@ -1968,7 +2000,9 @@ window.HAKI_PRODUCTOS = [
     "novedad": false,
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "colecciones": [],
+    "colecciones": [
+      "collection-1"
+    ],
     "colores": [],
     "imagen": "images/1790045196877-0030b82f-ChatGPT-Image-21-sept-2026-08_46_29-p.m..webp",
     "imagenRespaldo": "images/producto.svg",
@@ -1984,118 +2018,128 @@ window.HAKI_PRODUCTOS = [
   },
   {
     "id": 68,
-    "codigo": "HAKI-068",
-    "nombre": "NUEVO PRODUCTO",
-    "precio": 0,
+    "codigo": "BDBS-02",
+    "nombre": "BREATHE SHORT BLANCO",
+    "precio": 22,
     "categoria": "Camisetas",
     "novedad": false,
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "colecciones": [],
+    "colecciones": [
+      "collection-3"
+    ],
     "colores": [],
-    "imagen": "images/producto.svg",
+    "imagen": "images/1790045992117-95bbd519-399e3a99-1023-4dd1-aa09-83d33eef208d_1.webp",
     "imagenRespaldo": "images/producto.svg",
     "imagen2": "",
     "guiaTallas": "",
     "tallas": {
       "S": false,
-      "M": false,
-      "L": false,
+      "M": true,
+      "L": true,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 69,
-    "codigo": "HAKI-069",
-    "nombre": "NUEVO PRODUCTO",
-    "precio": 0,
+    "codigo": "BDBS-01",
+    "nombre": "BREATHE SHORT ROJO",
+    "precio": 22,
     "categoria": "Camisetas",
     "novedad": false,
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "colecciones": [],
+    "colecciones": [
+      "collection-3"
+    ],
     "colores": [],
-    "imagen": "images/producto.svg",
+    "imagen": "images/1790046173918-33191dd2-5c9fee02-ecc6-4f72-be85-91a363c69569.webp",
     "imagenRespaldo": "images/producto.svg",
     "imagen2": "",
     "guiaTallas": "",
     "tallas": {
-      "S": false,
+      "S": true,
       "M": false,
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 70,
-    "codigo": "HAKI-070",
-    "nombre": "NUEVO PRODUCTO",
-    "precio": 0,
+    "codigo": "GEAR 5",
+    "nombre": "GEAR 5",
+    "precio": 15,
     "categoria": "Camisetas",
     "novedad": false,
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "colecciones": [],
+    "colecciones": [
+      "collection-3"
+    ],
     "colores": [],
-    "imagen": "images/producto.svg",
+    "imagen": "images/1790046240687-003f2e1c-ChatGPT-Image-4-sept-2026-12_26_48-p.m..webp",
     "imagenRespaldo": "images/producto.svg",
     "imagen2": "",
     "guiaTallas": "",
     "tallas": {
-      "S": false,
+      "S": true,
       "M": false,
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 71,
-    "codigo": "HAKI-071",
-    "nombre": "NUEVO PRODUCTO",
-    "precio": 0,
+    "codigo": "BRSERKS-03",
+    "nombre": "BERSERK SHORT",
+    "precio": 15,
     "categoria": "Camisetas",
     "novedad": false,
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "colecciones": [],
+    "colecciones": [
+      "collection-3"
+    ],
     "colores": [],
-    "imagen": "images/producto.svg",
+    "imagen": "images/1790046267017-d5ddf7df-ChatGPT-Image-4-sept-2026-12_19_30-p.m..webp",
     "imagenRespaldo": "images/producto.svg",
     "imagen2": "",
     "guiaTallas": "",
     "tallas": {
-      "S": false,
+      "S": true,
       "M": false,
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 72,
-    "codigo": "HAKI-072",
-    "nombre": "NUEVO PRODUCTO",
-    "precio": 0,
+    "codigo": "BRSRK-01",
+    "nombre": "BERSERK SHORT BLANCO",
+    "precio": 15,
     "categoria": "Camisetas",
     "novedad": false,
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
-    "colecciones": [],
+    "colecciones": [
+      "collection-3"
+    ],
     "colores": [],
-    "imagen": "images/producto.svg",
+    "imagen": "images/1790046334067-bf89c657-ChatGPT-Image-4-sept-2026-12_24_27-p.m..webp",
     "imagenRespaldo": "images/producto.svg",
     "imagen2": "",
     "guiaTallas": "",
     "tallas": {
-      "S": false,
+      "S": true,
       "M": false,
       "L": false,
       "XL": false
     },
-    "borrador": true
+    "borrador": false
   },
   {
     "id": 73,
