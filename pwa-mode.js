@@ -23,11 +23,11 @@
   if (inApp && installed() && 'serviceWorker' in navigator) {
     if ('caches' in window) {
       caches.keys().then(keys => Promise.all(
-        keys.filter(key => key.startsWith('haki-installed-shell-') && key !== 'haki-installed-shell-v48')
+        keys.filter(key => key.startsWith('haki-installed-shell-') && key !== 'haki-installed-shell-v50')
           .map(key => caches.delete(key))
       )).catch(() => {});
     }
-    navigator.serviceWorker.register(new URL('sw.js?v=48', app), {scope: app.pathname, updateViaCache: 'none'})
+    navigator.serviceWorker.register(new URL('sw.js?v=50', app), {scope: app.pathname, updateViaCache: 'none'})
       .then(registration => registration.update())
       .catch(() => {}); // The catalogue remains usable if service-worker storage is unavailable.
   }

@@ -1080,6 +1080,7 @@ ${settings().totalTexto}: ${money(totals.total)}`;
   }
 
   const isInstagramInAppBrowser = /Instagram/i.test(navigator.userAgent || '');
+  const isAndroidInstagramBrowser = isInstagramInAppBrowser && /Android/i.test(navigator.userAgent || '');
 
   function instagramReturnOverlay() {
     let overlay = document.getElementById('instagramReturnOverlay');
@@ -1096,12 +1097,29 @@ ${settings().totalTexto}: ${money(totals.total)}`;
         </svg>
         <h2 id="instagramReturnTitle">TOCA LA X DE INSTAGRAM</h2>
         <p class="instagram-return-copy">Tu cotización quedó copiada. Cierra el catálogo y pégala en el chat.</p>
+        <button type="button" class="instagram-return-back" id="instagramReturnBack">← VOLVER AL CATÁLOGO</button>
       </div>
     `;
 
     document.body.appendChild(overlay);
+    overlay.querySelector('#instagramReturnBack')?.addEventListener('click', resetInstagramReturnOverlay);
     return overlay;
   }
+
+  function resetInstagramReturnOverlay() {
+    const overlay = document.getElementById('instagramReturnOverlay');
+    if (overlay) overlay.hidden = true;
+    document.body.classList.remove('instagram-return-open');
+  }
+
+  // Instagram can keep the same WebView alive after the native X is pressed.
+  // Clear the quote screen as soon as the view is left/restored so opening the
+  // catalog link again always starts on the catalog.
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) resetInstagramReturnOverlay();
+  });
+  window.addEventListener('pagehide', resetInstagramReturnOverlay);
+  window.addEventListener('pageshow', resetInstagramReturnOverlay);
 
   function showInstagramReturnOverlay() {
     if (!isInstagramInAppBrowser) return;
@@ -1161,23 +1179,72 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     if (!drawer || !form || !mobileQuery.matches) return;
 
     let settleTimer = 0;
+    let cleanupTimer = 0;
+    let viewportFrame = 0;
 
     const activeQuoteInput = () => {
       const active = document.activeElement;
       return active?.matches?.('#quoteForm input') ? active : null;
     };
 
-    const resetKeyboardState = () => {
-      drawer.classList.remove('keyboard-active', 'keyboard-android', 'keyboard-ios');
+    const clearViewportVars = () => {
       drawer.style.removeProperty('--haki-vvh');
       drawer.style.removeProperty('--haki-vv-top');
     };
 
-    // Android now uses the same stable handling as iPhone: one correction
-    // after focus, without continuously resizing or moving the drawer.
-    const settleField = input => {
+    const resetKeyboardState = () => {
+      drawer.classList.remove(
+        'keyboard-active',
+        'keyboard-android',
+        'keyboard-ios',
+        'instagram-android-keyboard'
+      );
+      clearViewportVars();
+    };
+
+    const syncInstagramAndroidViewport = () => {
+      if (!drawer.classList.contains('instagram-android-keyboard')) return;
+      cancelAnimationFrame(viewportFrame);
+      viewportFrame = requestAnimationFrame(() => {
+        const height = Math.max(250, Math.round(viewport?.height || window.innerHeight));
+        const top = Math.max(0, Math.round(viewport?.offsetTop || 0));
+        drawer.style.setProperty('--haki-vvh', `${height}px`);
+        drawer.style.setProperty('--haki-vv-top', `${top}px`);
+      });
+    };
+
+    const scrollInsideQuoteForm = input => {
+      if (!input || !drawer.classList.contains('instagram-android-keyboard')) return;
+      const formRect = form.getBoundingClientRect();
+      const inputRect = input.getBoundingClientRect();
+      const target = Math.max(0, form.scrollTop + inputRect.top - formRect.top - 70);
+      form.scrollTo({ top: target, behavior: 'auto' });
+    };
+
+    const activateInstagramAndroid = input => {
+      clearTimeout(cleanupTimer);
+      clearTimeout(settleTimer);
+      drawer.classList.add('keyboard-active', 'instagram-android-keyboard');
+      drawer.classList.remove('keyboard-android', 'keyboard-ios');
+      syncInstagramAndroidViewport();
+
+      settleTimer = window.setTimeout(() => {
+        syncInstagramAndroidViewport();
+        scrollInsideQuoteForm(input);
+      }, 120);
+
+      window.setTimeout(() => {
+        if (document.activeElement === input) {
+          syncInstagramAndroidViewport();
+          scrollInsideQuoteForm(input);
+        }
+      }, 320);
+    };
+
+    const settleStandardField = input => {
+      clearTimeout(cleanupTimer);
       drawer.classList.add('keyboard-active', 'keyboard-ios');
-      drawer.classList.remove('keyboard-android');
+      drawer.classList.remove('keyboard-android', 'instagram-android-keyboard');
 
       clearTimeout(settleTimer);
       settleTimer = window.setTimeout(() => {
@@ -1201,19 +1268,26 @@ ${settings().totalTexto}: ${money(totals.total)}`;
 
     document.addEventListener('focusin', event => {
       if (!event.target.matches?.('#quoteForm input')) return;
-      settleField(event.target);
+      if (isAndroidInstagramBrowser) activateInstagramAndroid(event.target);
+      else settleStandardField(event.target);
     });
 
     document.addEventListener('focusout', () => {
-      window.setTimeout(() => {
+      clearTimeout(cleanupTimer);
+      cleanupTimer = window.setTimeout(() => {
         if (!activeQuoteInput()) resetKeyboardState();
-      }, 220);
+      }, 260);
     });
+
+    viewport?.addEventListener('resize', syncInstagramAndroidViewport);
+    viewport?.addEventListener('scroll', syncInstagramAndroidViewport);
 
     window.addEventListener('orientationchange', () => {
       window.setTimeout(() => {
         const input = activeQuoteInput();
-        if (input) settleField(input);
+        if (!input) return;
+        if (isAndroidInstagramBrowser) activateInstagramAndroid(input);
+        else settleStandardField(input);
       }, 220);
     }, { passive: true });
   }
