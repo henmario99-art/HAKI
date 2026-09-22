@@ -1,4 +1,4 @@
-import { readJSON, mutateJSON, storageBackend } from './_private-store.mjs';
+import { readJSON, mutateJSON, storageBackend, migrateAllToSupabase } from './_private-store.mjs';
 import { randomUUID } from 'node:crypto';
 import { json, bodyJson, verifyAdmin } from './_shared.mjs';
 
@@ -259,6 +259,11 @@ export default async (request) => {
   const mode = url.searchParams.get('mode') || 'week';
 
   try {
+    if (request.method === 'POST' && mode === 'migrate-storage') {
+      const result = await migrateAllToSupabase();
+      return json({ ok: true, storage: storageBackend(), ...result });
+    }
+
     if (request.method === 'GET' && mode === 'inventory') {
       return json({ inventory: await getInventory(), storage: storageBackend() });
     }
