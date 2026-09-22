@@ -134,3 +134,32 @@ export async function mutateJSON(key, fallback, mutator) {
   }
   throw new Error('Los datos cambiaron al mismo tiempo. Intenta de nuevo.');
 }
+
+
+export async function migrateAllToSupabase() {
+  if (!config().enabled) throw new Error('Supabase no está configurado.');
+  const store = blobs();
+  const listed = await store.list();
+  const entries = Array.isArray(listed?.blobs) ? listed.blobs : [];
+  let migrated = 0;
+  let skipped = 0;
+
+  for (const entry of entries) {
+    const key = entry?.key;
+    if (!key) continue;
+    if (await readRemote(key)) {
+      skipped += 1;
+      continue;
+    }
+    const value = await store.get(key, { type: 'json', consistency: 'strong' });
+    if (value === null || value === undefined) {
+      skipped += 1;
+      continue;
+    }
+    const inserted = await insertRemote(key, value);
+    if (inserted) migrated += 1;
+    else skipped += 1;
+  }
+
+  return { total: entries.length, migrated, skipped };
+}
