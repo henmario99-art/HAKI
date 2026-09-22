@@ -1102,8 +1102,13 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     return false;
   }
 
-  const isInstagramInAppBrowser = /Instagram/i.test(navigator.userAgent || '');
-  const isAndroidInstagramBrowser = isInstagramInAppBrowser && /Android/i.test(navigator.userAgent || '');
+  const instagramUA = navigator.userAgent || '';
+  const isInstagramInAppBrowser = /Instagram/i.test(instagramUA);
+  const isAndroidInstagramBrowser = isInstagramInAppBrowser && /Android/i.test(instagramUA);
+  const isIOSInstagramBrowser = isInstagramInAppBrowser && (
+    /iPad|iPhone|iPod/i.test(instagramUA) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  );
 
   function instagramReturnOverlay() {
     let overlay = document.getElementById('instagramReturnOverlay');
@@ -1158,7 +1163,8 @@ ${settings().totalTexto}: ${money(totals.total)}`;
         'keyboard-active',
         'keyboard-android',
         'keyboard-ios',
-        'instagram-android-keyboard'
+        'instagram-android-keyboard',
+        'instagram-ios-keyboard'
       );
       drawer.style.removeProperty('--haki-vvh');
       drawer.style.removeProperty('--haki-vv-top');
@@ -1254,13 +1260,18 @@ ${settings().totalTexto}: ${money(totals.total)}`;
         'keyboard-active',
         'keyboard-android',
         'keyboard-ios',
-        'instagram-android-keyboard'
+        'instagram-android-keyboard',
+        'instagram-ios-keyboard'
       );
       clearViewportVars();
     };
 
-    const syncInstagramAndroidViewport = () => {
-      if (!drawer.classList.contains('instagram-android-keyboard')) return;
+    const isInstagramKeyboardSurface = () =>
+      drawer.classList.contains('instagram-android-keyboard') ||
+      drawer.classList.contains('instagram-ios-keyboard');
+
+    const syncInstagramViewport = () => {
+      if (!isInstagramKeyboardSurface()) return;
       cancelAnimationFrame(viewportFrame);
       viewportFrame = requestAnimationFrame(() => {
         const height = Math.max(250, Math.round(viewport?.height || window.innerHeight));
@@ -1271,37 +1282,53 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     };
 
     const scrollInsideQuoteForm = input => {
-      if (!input || !drawer.classList.contains('instagram-android-keyboard')) return;
+      if (!input || !isInstagramKeyboardSurface()) return;
       const formRect = form.getBoundingClientRect();
       const inputRect = input.getBoundingClientRect();
-      const target = Math.max(0, form.scrollTop + inputRect.top - formRect.top - 70);
+      const target = Math.max(0, form.scrollTop + inputRect.top - formRect.top - 62);
       form.scrollTo({ top: target, behavior: 'auto' });
     };
 
-    const activateInstagramAndroid = input => {
+    const stabilizeInstagramIOS = () => {
+      if (!isIOSInstagramBrowser) return;
+      try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch { window.scrollTo(0, 0); }
+      if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    };
+
+    const activateInstagramKeyboard = (input, platformClass) => {
       clearTimeout(cleanupTimer);
       clearTimeout(settleTimer);
-      drawer.classList.add('keyboard-active', 'instagram-android-keyboard');
-      drawer.classList.remove('keyboard-android', 'keyboard-ios');
-      syncInstagramAndroidViewport();
 
-      settleTimer = window.setTimeout(() => {
-        syncInstagramAndroidViewport();
+      drawer.classList.add('keyboard-active', platformClass);
+      drawer.classList.remove(
+        'keyboard-android',
+        'keyboard-ios',
+        platformClass === 'instagram-ios-keyboard'
+          ? 'instagram-android-keyboard'
+          : 'instagram-ios-keyboard'
+      );
+
+      syncInstagramViewport();
+      stabilizeInstagramIOS();
+
+      const settle = () => {
+        if (document.activeElement !== input) return;
+        syncInstagramViewport();
+        stabilizeInstagramIOS();
         scrollInsideQuoteForm(input);
-      }, 120);
+      };
 
-      window.setTimeout(() => {
-        if (document.activeElement === input) {
-          syncInstagramAndroidViewport();
-          scrollInsideQuoteForm(input);
-        }
-      }, 320);
+      settleTimer = window.setTimeout(settle, 100);
+      window.setTimeout(settle, 280);
+      window.setTimeout(settle, 520);
     };
 
     const settleStandardField = input => {
       clearTimeout(cleanupTimer);
       drawer.classList.add('keyboard-active', 'keyboard-ios');
-      drawer.classList.remove('keyboard-android', 'instagram-android-keyboard');
+      drawer.classList.remove('keyboard-android', 'instagram-android-keyboard', 'instagram-ios-keyboard');
 
       clearTimeout(settleTimer);
       settleTimer = window.setTimeout(() => {
@@ -1325,8 +1352,13 @@ ${settings().totalTexto}: ${money(totals.total)}`;
 
     document.addEventListener('focusin', event => {
       if (!event.target.matches?.('#quoteForm input')) return;
-      if (isAndroidInstagramBrowser) activateInstagramAndroid(event.target);
-      else settleStandardField(event.target);
+      if (isAndroidInstagramBrowser) {
+        activateInstagramKeyboard(event.target, 'instagram-android-keyboard');
+      } else if (isIOSInstagramBrowser) {
+        activateInstagramKeyboard(event.target, 'instagram-ios-keyboard');
+      } else {
+        settleStandardField(event.target);
+      }
     });
 
     document.addEventListener('focusout', () => {
@@ -1336,15 +1368,20 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       }, 260);
     });
 
-    viewport?.addEventListener('resize', syncInstagramAndroidViewport);
-    viewport?.addEventListener('scroll', syncInstagramAndroidViewport);
+    viewport?.addEventListener('resize', syncInstagramViewport);
+    viewport?.addEventListener('scroll', syncInstagramViewport);
 
     window.addEventListener('orientationchange', () => {
       window.setTimeout(() => {
         const input = activeQuoteInput();
         if (!input) return;
-        if (isAndroidInstagramBrowser) activateInstagramAndroid(input);
-        else settleStandardField(input);
+        if (isAndroidInstagramBrowser) {
+          activateInstagramKeyboard(input, 'instagram-android-keyboard');
+        } else if (isIOSInstagramBrowser) {
+          activateInstagramKeyboard(input, 'instagram-ios-keyboard');
+        } else {
+          settleStandardField(input);
+        }
       }, 220);
     }, { passive: true });
   }
