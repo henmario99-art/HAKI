@@ -170,13 +170,43 @@
     const customBrandIcon = String(CONFIG.iconoHaki || '').trim();
     const heroTitle = $('#heroTitle');
     if (customBrandIcon && heroTitle) {
+      const frame = document.createElement('span');
+      frame.className = 'hero-brand-icon';
+      frame.style.cssText = 'display:block;position:relative;overflow:hidden;height:clamp(150px,20svh,190px);width:130px;max-width:100%';
       const mark = document.createElement('img');
-      mark.className = 'hero-brand-icon';
       mark.alt = CONFIG.marca || 'HAKI';
-      mark.src = freshImage(customBrandIcon, 640);
-      mark.style.cssText = 'display:block;width:auto;max-width:min(100%,320px);height:1.35em;object-fit:contain;object-position:left center';
+      mark.crossOrigin = 'anonymous';
+      mark.style.cssText = 'display:block;width:100%;height:100%;object-fit:contain;object-position:left center;max-width:none';
+      // Measure alpha only to frame the visible symbol; keep the original file.
+      mark.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          const scale = Math.min(1, 512 / Math.max(mark.naturalWidth, mark.naturalHeight));
+          canvas.width = Math.max(1, Math.round(mark.naturalWidth * scale));
+          canvas.height = Math.max(1, Math.round(mark.naturalHeight * scale));
+          const ctx = canvas.getContext('2d', { willReadFrequently: true });
+          ctx.drawImage(mark, 0, 0, canvas.width, canvas.height);
+          const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+          let left = canvas.width, top = canvas.height, right = -1, bottom = -1;
+          for (let y = 0; y < canvas.height; y++) {
+            for (let x = 0; x < canvas.width; x++) {
+              if (pixels[(y * canvas.width + x) * 4 + 3] < 16) continue;
+              left = Math.min(left, x); right = Math.max(right, x);
+              top = Math.min(top, y); bottom = Math.max(bottom, y);
+            }
+          }
+          if (right < left || bottom < top) return;
+          const width = right - left + 1, height = bottom - top + 1;
+          frame.style.width = `calc(clamp(150px,20svh,190px) * ${width / height})`;
+          mark.style.cssText = `position:absolute;display:block;max-width:none;width:${canvas.width / width * 100}%;height:${canvas.height / height * 100}%;left:${-left / width * 100}%;top:${-top / height * 100}%`;
+        } catch {
+          // Cross-origin providers without CORS still display within the larger frame.
+        }
+      };
       mark.onerror = () => { heroTitle.textContent = CONFIG.frase || 'HAKI'; };
-      heroTitle.replaceChildren(mark);
+      mark.src = freshImage(customBrandIcon, 640);
+      frame.append(mark);
+      heroTitle.replaceChildren(frame);
     }
 
     const video = $('#heroVideo');
@@ -331,7 +361,7 @@
     `;
   }
 
-  function openSizeGuide(type = 'compression', allowCategories = false) {
+  function openSizeGuide(type = 'compression', allowCategories = true) {
     const tabs = $('#sizeGuideTabs');
     if (tabs) {
       tabs.hidden = !allowCategories;
