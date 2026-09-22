@@ -108,6 +108,7 @@ function fillConfig() {
     if(input.dataset.config==='tema')document.documentElement.dataset.theme=input.value;
   });
   refreshCoverPreview();
+  refreshBrandIconPreview();
 }
 
 function refreshCoverPreview() {
@@ -117,6 +118,17 @@ function refreshCoverPreview() {
   preview.onerror = () => {
     preview.onerror = null;
     preview.src = resolveImage('images/hero-fallback.svg');
+  };
+  preview.src = `${resolveImage(source)}?v=${Date.now()}`;
+}
+
+function refreshBrandIconPreview() {
+  const preview = $('#brandIconPreview');
+  if (!preview) return;
+  const source = state.config.iconoHaki || 'images/haki-wordmark.svg';
+  preview.onerror = () => {
+    preview.onerror = null;
+    preview.src = resolveImage('images/haki-wordmark.svg');
   };
   preview.src = `${resolveImage(source)}?v=${Date.now()}`;
 }
@@ -427,6 +439,37 @@ function fileToBase64(file) {
     reader.readAsDataURL(file);
   });
 }
+
+$('#brandIconFile')?.addEventListener('change', async (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  try {
+    e.target.disabled = true;
+    toast('Subiendo icono de HAKI…');
+    const data = await api('upload', {
+      method: 'POST',
+      body: JSON.stringify({ name: file.name, mime: file.type, base64: await fileToBase64(file) })
+    });
+    state.config.iconoHaki = data.path;
+    const pathInput = $('#brandIconPath');
+    if (pathInput) pathInput.value = data.path;
+    refreshBrandIconPreview();
+    toast('Icono de HAKI subido. Pulsa “Guardar y publicar” para aplicarlo.', true);
+  } catch (err) {
+    toast(err.message);
+  } finally {
+    e.target.disabled = false;
+    e.target.value = '';
+  }
+});
+
+$('#clearBrandIcon')?.addEventListener('click', () => {
+  state.config.iconoHaki = '';
+  const pathInput = $('#brandIconPath');
+  if (pathInput) pathInput.value = '';
+  refreshBrandIconPreview();
+  toast('Se usará el logo predeterminado al guardar.', true);
+});
 
 $('#coverFile')?.addEventListener('change', async (e) => {
   const file = e.target.files?.[0];
