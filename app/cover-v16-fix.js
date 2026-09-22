@@ -59,8 +59,16 @@
     const heroTitle = document.getElementById('heroTitle');
     const heroDesc = document.getElementById('heroDescription');
     const search = document.getElementById('desktopSearch');
-    if (heroTitle && !heroTitle.querySelector('.hero-brand-icon')) heroTitle.textContent = 'HAKI';
-    if (heroDesc) heroDesc.textContent = 'Haki | Anime & Sports | El Salvador';
+    if (heroTitle) {
+      heroTitle.replaceChildren();
+      heroTitle.hidden = true;
+      heroTitle.setAttribute('aria-hidden', 'true');
+    }
+    if (heroDesc) {
+      heroDesc.textContent = '';
+      heroDesc.hidden = true;
+      heroDesc.setAttribute('aria-hidden', 'true');
+    }
     if (search) search.placeholder = 'BUSCAR PRENDA...';
   }
 
