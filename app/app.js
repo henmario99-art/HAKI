@@ -1080,7 +1080,6 @@ ${settings().totalTexto}: ${money(totals.total)}`;
   }
 
   const isInstagramInAppBrowser = /Instagram/i.test(navigator.userAgent || '');
-  const isAndroidInstagramBrowser = isInstagramInAppBrowser && /Android/i.test(navigator.userAgent || '');
 
   function instagramReturnOverlay() {
     let overlay = document.getElementById('instagramReturnOverlay');
@@ -1131,22 +1130,17 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       modernCopy.then(copied => {
         closeCart();
 
-        // Android's Instagram in-app browser allows the same window.close()
-        // action that previously worked from our large X button. Trigger it
-        // directly from "Cotizar por Instagram" so the customer returns to DM.
-        if (isAndroidInstagramBrowser) {
-          try { window.close(); } catch {}
+        // Same action on Android and iPhone: try to close Instagram's in-app
+        // browser directly from the quote button. If iOS blocks the close,
+        // keep the native-X instruction as the fallback.
+        try { window.close(); } catch {}
 
-          // If a specific Instagram/Android build blocks the close, keep the
-          // same safe fallback used on iPhone: point to Instagram's native X.
-          window.setTimeout(() => {
-            if (document.visibilityState !== 'hidden') showInstagramReturnOverlay();
-          }, 320);
-          return;
-        }
-
-        showInstagramReturnOverlay();
-        showToast(copied ? 'Cotización copiada.' : 'Pedido listo.');
+        window.setTimeout(() => {
+          if (document.visibilityState !== 'hidden') {
+            showInstagramReturnOverlay();
+            showToast(copied ? 'Cotización copiada.' : 'Pedido listo.');
+          }
+        }, 320);
       });
       return;
     }
@@ -1166,14 +1160,7 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     const mobileQuery = window.matchMedia('(max-width: 800px)');
     if (!drawer || !form || !mobileQuery.matches) return;
 
-    const ua = navigator.userAgent || '';
-    const isAndroidKeyboard = /Android/i.test(ua);
-    const isiOSKeyboard = /iPad|iPhone|iPod/i.test(ua)
-      || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
     let settleTimer = 0;
-    let lateTimer = 0;
-    let frame = 0;
 
     const activeQuoteInput = () => {
       const active = document.activeElement;
@@ -1186,117 +1173,35 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       drawer.style.removeProperty('--haki-vv-top');
     };
 
-    // iOS already moves its visual viewport while the keyboard animates.
-    // Rewriting the drawer height/top on every VisualViewport event causes
-    // the repeated jumps seen while typing, so iPhone uses one native scroll
-    // correction per focus and otherwise lets WebKit keep the viewport stable.
-    if (isiOSKeyboard && !isAndroidKeyboard) {
-      const settleIOSField = input => {
-        drawer.classList.add('keyboard-active', 'keyboard-ios');
-        drawer.classList.remove('keyboard-android');
-
-        clearTimeout(settleTimer);
-        settleTimer = window.setTimeout(() => {
-          if (document.activeElement !== input) return;
-
-          const rect = input.getBoundingClientRect();
-          const visibleTop = Math.max(0, viewport?.offsetTop || 0);
-          const visibleHeight = Math.max(260, viewport?.height || window.innerHeight);
-          const safeTop = visibleTop + 12;
-          const safeBottom = visibleTop + visibleHeight - 18;
-
-          if (rect.top < safeTop || rect.bottom > safeBottom) {
-            input.scrollIntoView({
-              block: 'nearest',
-              inline: 'nearest',
-              behavior: 'auto'
-            });
-          }
-        }, 180);
-      };
-
-      document.addEventListener('focusin', event => {
-        if (!event.target.matches?.('#quoteForm input')) return;
-        settleIOSField(event.target);
-      });
-
-      document.addEventListener('focusout', () => {
-        window.setTimeout(() => {
-          if (!activeQuoteInput()) resetKeyboardState();
-        }, 220);
-      });
-
-      window.addEventListener('orientationchange', () => {
-        window.setTimeout(() => {
-          const input = activeQuoteInput();
-          if (input) settleIOSField(input);
-        }, 220);
-      }, { passive: true });
-
-      return;
-    }
-
-    // Android WebViews commonly keep a layout viewport larger than the visible
-    // keyboard viewport, so size the drawer to VisualViewport and keep the two
-    // quote buttons pinned together above the keyboard.
-    const viewportMetrics = () => ({
-      height: Math.max(280, Math.round(viewport?.height || window.innerHeight)),
-      top: Math.max(0, Math.round(viewport?.offsetTop || 0))
-    });
-
-    const applyViewport = () => {
-      const { height, top } = viewportMetrics();
-      drawer.style.setProperty('--haki-vvh', `${height}px`);
-      drawer.style.setProperty('--haki-vv-top', `${top}px`);
-    };
-
-    const keepFieldVisible = (input = activeQuoteInput()) => {
-      if (!input) return;
-
-      const { height, top } = viewportMetrics();
-      const rect = input.getBoundingClientRect();
-      const safeTop = top + Math.max(12, Math.min(42, height * .09));
-      const safeBottom = top + height - Math.max(76, Math.min(110, height * .20));
-
-      if (rect.top >= safeTop && rect.bottom <= safeBottom) return;
-
-      const desiredTop = top + Math.max(12, (height - rect.height) * .25);
-      const nextTop = Math.max(0, drawer.scrollTop + rect.top - desiredTop);
-      drawer.scrollTo({ top: nextTop, behavior: 'auto' });
-    };
-
-    const syncViewport = () => {
-      if (!drawer.classList.contains('keyboard-android')) return;
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        applyViewport();
-        keepFieldVisible();
-      });
-    };
-
-    const activateAndroidField = input => {
-      drawer.classList.add('keyboard-active', 'keyboard-android');
-      drawer.classList.remove('keyboard-ios');
-      applyViewport();
-
-      requestAnimationFrame(() => keepFieldVisible(input));
+    // Android now uses the same stable handling as iPhone: one correction
+    // after focus, without continuously resizing or moving the drawer.
+    const settleField = input => {
+      drawer.classList.add('keyboard-active', 'keyboard-ios');
+      drawer.classList.remove('keyboard-android');
 
       clearTimeout(settleTimer);
       settleTimer = window.setTimeout(() => {
-        applyViewport();
-        keepFieldVisible(input);
-      }, 130);
+        if (document.activeElement !== input) return;
 
-      clearTimeout(lateTimer);
-      lateTimer = window.setTimeout(() => {
-        applyViewport();
-        keepFieldVisible(input);
-      }, 360);
+        const top = Math.max(0, viewport?.offsetTop || 0);
+        const height = Math.max(260, viewport?.height || window.innerHeight);
+        const rect = input.getBoundingClientRect();
+        const safeTop = top + 12;
+        const safeBottom = top + height - 18;
+
+        if (rect.top < safeTop || rect.bottom > safeBottom) {
+          input.scrollIntoView({
+            block: 'nearest',
+            inline: 'nearest',
+            behavior: 'auto'
+          });
+        }
+      }, 180);
     };
 
     document.addEventListener('focusin', event => {
       if (!event.target.matches?.('#quoteForm input')) return;
-      activateAndroidField(event.target);
+      settleField(event.target);
     });
 
     document.addEventListener('focusout', () => {
@@ -1305,10 +1210,12 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       }, 220);
     });
 
-    viewport?.addEventListener('resize', syncViewport);
-    viewport?.addEventListener('scroll', syncViewport);
-    window.addEventListener('resize', syncViewport, { passive: true });
-    window.addEventListener('orientationchange', () => window.setTimeout(syncViewport, 140), { passive: true });
+    window.addEventListener('orientationchange', () => {
+      window.setTimeout(() => {
+        const input = activeQuoteInput();
+        if (input) settleField(input);
+      }, 220);
+    }, { passive: true });
   }
 
   installQuoteKeyboardGuard();
