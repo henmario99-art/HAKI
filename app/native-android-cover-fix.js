@@ -7,15 +7,31 @@
     const source = config.portada || config.portadaRespaldo;
     if (!source) return;
 
-    const target = typeof window.hakiImage === 'function'
-      ? window.hakiImage(source, matchMedia('(max-width:800px)').matches ? 1280 : 1920)
-      : source;
+    const variants = [
+      [config.portadaMobile,1080],
+      [config.portadaTablet,1600],
+      [config.portadaDesktop,2560],
+      [config.portada,3200],
+    ].filter(([url]) => String(url || '').trim());
+    const unique = variants.filter(([url],index,list) =>
+      list.findIndex(([candidate]) => candidate === url) === index
+    );
+    const target = config.portadaDesktop || (
+      typeof window.hakiImage === 'function'
+        ? window.hakiImage(source, matchMedia('(max-width:800px)').matches ? 1280 : 2560)
+        : source
+    );
 
     if (target && hero.getAttribute('src') !== target) hero.setAttribute('src', target);
 
-    const srcset = typeof window.hakiSrcset === 'function'
-      ? window.hakiSrcset(source)
+    const responsive = unique.length > 1
+      ? unique.map(([url,width]) => `${url} ${width}w`).join(', ')
       : '';
+    const srcset = responsive || (
+      typeof window.hakiSrcset === 'function'
+        ? window.hakiSrcset(source)
+        : ''
+    );
     if (srcset) {
       hero.setAttribute('srcset', srcset);
       hero.setAttribute('sizes', '100vw');
