@@ -1,5 +1,8 @@
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || '';
-const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+const LEGACY_SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+let MODERN_SECRET = '';
+try { MODERN_SECRET = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS') || '{}').default || ''; } catch {}
+const SERVICE_KEY = MODERN_SECRET || LEGACY_SERVICE_ROLE;
 const NETLIFY_AUTH = 'https://haki-sv.netlify.app/.netlify/functions/auth';
 const CORS = {
   'access-control-allow-origin': '*',
@@ -16,8 +19,8 @@ async function db(path: string, options: RequestInit = {}) {
   const response = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
     ...options,
     headers: {
-      apikey: SERVICE_ROLE,
-      authorization: `Bearer ${SERVICE_ROLE}`,
+      apikey: SERVICE_KEY,
+      ...(LEGACY_SERVICE_ROLE ? { authorization: `Bearer ${LEGACY_SERVICE_ROLE}` } : {}),
       'content-type': 'application/json',
       prefer: 'return=representation',
       ...(options.headers || {}),
