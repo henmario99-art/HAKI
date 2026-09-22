@@ -322,7 +322,7 @@ window.HAKI_CONFIG = {
     },
     "maxProductos": 8
   },
-  "iconoHaki": ""
+  "iconoHaki": "https://raw.githubusercontent.com/henmario99-art/HAKI/main/images/uploads/1790048891577-40dbc192-HAKI-Post-de-Instagram-45-Photoroom.webp"
 };
 
 window.HAKI_PRODUCTOS = [
