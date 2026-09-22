@@ -250,6 +250,81 @@ async function importSnapshot(body: any) {
   return { ok:true, salesCount, expensesCount, inventoryRows:inventoryRows.length };
 }
 
+
+async function catalogRecord() {
+  const rows = await db('haki_meta?key=eq.catalog_v1&select=value');
+  return rows?.[0]?.value || null;
+}
+
+function applyCatalogInventory(products: any[], inventory: Record<string, any>) {
+  return (Array.isArray(products) ? products : []).map(product => {
+    const stock = inventory[String(product?.codigo || '').toUpperCase()] || inventory[String(product?.id)];
+    if (!stock) return product;
+    const tallas = { ...(product?.tallas || {}) };
+    for (const size of SIZES) {
+      if (Object.hasOwn(stock, size)) tallas[size] = Number(stock[size]) > 0;
+    }
+    return { ...product, tallas };
+  });
+}
+
+async function catalogResponse(publicOnly = false) {
+  const record = await catalogRecord();
+  if (!record) return { exists:false, config:{}, products:[], version:'' };
+  const inventory = await inventoryMap();
+  let products = applyCatalogInventory(record.products || [], inventory);
+  if (publicOnly) products = products.filter((product:any) => product?.borrador !== true);
+  return { exists:true, config:record.config || {}, products, version:record.versionToken || record.savedAt || '' };
+}
+
+async function saveCatalog(body: any) {
+  const result = await rpc('haki_save_catalog', {
+    p_config: body?.config && typeof body.config === 'object' ? body.config : {},
+    p_products: Array.isArray(body?.products) ? body.products : [],
+    p_expected_version: txt(body?.expectedVersion, 120) || null,
+  });
+  return Array.isArray(result) ? result[0] : result;
+}
+
+function safeFileName(value: unknown) {
+  return txt(value || 'imagen.webp', 180)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9._-]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'imagen.webp';
+}
+
+async function uploadImage(body: any) {
+  const allowed = new Set(['image/jpeg','image/png','image/webp','image/gif']);
+  const mime = txt(body?.mime, 60);
+  const base64 = String(body?.base64 || '');
+  if (!allowed.has(mime)) throw new Error('Formato de imagen no permitido.');
+  if (!base64) throw new Error('No se recibió la imagen.');
+  if (Math.floor(base64.length * 0.75) > 8 * 1024 * 1024) throw new Error('La imagen supera 8 MB.');
+
+  let name = safeFileName(body?.name);
+  if (!/\.(jpg|jpeg|png|webp|gif)$/i.test(name)) {
+    name += mime === 'image/png' ? '.png' : mime === 'image/webp' ? '.webp' : mime === 'image/gif' ? '.gif' : '.jpg';
+  }
+  const objectName = `${Date.now()}-${crypto.randomUUID().slice(0,8)}-${name}`;
+  const path = `catalog/${objectName}`;
+  const encodedPath = path.split('/').map(encodeURIComponent).join('/');
+  const bytes = Uint8Array.from(atob(base64), char => char.charCodeAt(0));
+  const headers:any = { apikey:SERVICE_KEY, 'content-type':mime, 'x-upsert':'false' };
+  if (LEGACY_SERVICE_ROLE) headers.authorization = `Bearer ${LEGACY_SERVICE_ROLE}`;
+
+  const response = await fetch(`${SUPABASE_URL}/storage/v1/object/haki-public/${encodedPath}`, {
+    method:'POST', headers, body:bytes
+  });
+  const raw = await response.text();
+  if (!response.ok) {
+    let data:any = {};
+    try { data = raw ? JSON.parse(raw) : {}; } catch {}
+    throw new Error(data?.message || data?.error || `No se pudo subir la imagen (${response.status}).`);
+  }
+  return { ok:true, path:`${SUPABASE_URL}/storage/v1/object/public/haki-public/${encodedPath}`, storagePath:path };
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('', { status:204, headers:CORS });
   const url = new URL(req.url);
@@ -257,8 +332,19 @@ Deno.serve(async (req: Request) => {
 
   try {
     if (req.method === 'GET' && mode === 'availability') return json(await publicAvailability());
+    if (req.method === 'GET' && mode === 'public-catalog') return json(await catalogResponse(true));
 
     if (!(await authorize(req))) return json({ error:'No autorizado.' }, 401);
+
+    if (req.method === 'GET' && mode === 'catalog') return json(await catalogResponse(false));
+
+    if (req.method === 'PUT' && mode === 'catalog') {
+      const saved = await saveCatalog(await req.json());
+      const inventory = await inventoryMap();
+      return json({ ok:true, config:saved?.config || {}, products:applyCatalogInventory(saved?.products || [], inventory), version:saved?.versionToken || saved?.savedAt || '' });
+    }
+
+    if (req.method === 'POST' && mode === 'upload') return json(await uploadImage(await req.json()), 201);
 
     if (req.method === 'GET' && mode === 'status') {
       const rows = await db('haki_meta?key=eq.migration_v1&select=value');

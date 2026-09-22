@@ -1,55 +1,34 @@
-import { json, bodyJson, verifyAdmin, github, repoParts, BRANCH, sanitizeFileName } from './_shared.mjs';
+import { json, bodyJson, verifyAdmin, makeOperationsToken } from './_shared.mjs';
 
-const ALLOWED = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+const EDGE = 'https://uysfqzlihiosebqzvfrl.supabase.co/functions/v1/haki-operations';
+const ALLOWED = new Set(['image/jpeg','image/png','image/webp','image/gif']);
 
-export default async (request) => {
-  if (!verifyAdmin(request)) return json({ error: 'No autorizado.' }, 401);
-  if (request.method !== 'POST') return json({ error: 'Método no permitido.' }, 405);
-
+export default async request => {
+  if (!verifyAdmin(request)) return json({ error:'No autorizado.' },401);
+  if (request.method !== 'POST') return json({ error:'Método no permitido.' },405);
   try {
     const body = await bodyJson(request);
     const mime = String(body?.mime || '');
     const base64 = String(body?.base64 || '');
-    if (!ALLOWED.has(mime)) return json({ error: 'Formato de imagen no permitido.' }, 400);
-    if (!base64) return json({ error: 'No se recibió la imagen.' }, 400);
+    if (!ALLOWED.has(mime)) return json({ error:'Formato de imagen no permitido.' },400);
+    if (!base64) return json({ error:'No se recibió la imagen.' },400);
+    if (Math.floor(base64.length * 0.75) > 8 * 1024 * 1024) return json({ error:'La imagen supera 8 MB.' },413);
 
-    const approxBytes = Math.floor(base64.length * 0.75);
-    if (approxBytes > 8 * 1024 * 1024) return json({ error: 'La imagen supera 8 MB.' }, 413);
-
-    let name = sanitizeFileName(body?.name || `imagen-${Date.now()}.webp`);
-    if (!/\.(jpg|jpeg|png|webp|gif)$/i.test(name)) {
-      const ext = mime === 'image/png' ? '.png' : mime === 'image/webp' ? '.webp' : mime === 'image/gif' ? '.gif' : '.jpg';
-      name += ext;
-    }
-
-    // Unique names allow browser caching while replacements appear immediately.
-    name = `${Date.now()}-${crypto.randomUUID().slice(0,8)}-${name}`;
-    const path = `images/uploads/${name}`;
-    const { owner, repo } = repoParts();
-    let sha;
-    try {
-      const existing = await github(`/repos/${owner}/${repo}/contents/${encodeURIComponent(path).replace(/%2F/g, '/')}?ref=${encodeURIComponent(BRANCH)}`, { method: 'GET' });
-      sha = existing.sha;
-    } catch (error) {
-      if (error.status !== 404) throw error;
-    }
-
-    const payload = {
-      message: `Subir imagen ${name} desde panel HAKI [skip netlify]`,
-      content: base64,
-      branch: BRANCH,
-      ...(sha ? { sha } : {}),
-    };
-
-    const result = await github(`/repos/${owner}/${repo}/contents/${encodeURIComponent(path).replace(/%2F/g, '/')}`, {
-      method: 'PUT',
-      body: JSON.stringify(payload),
+    const secret = process.env.ADMIN_SESSION_SECRET || '';
+    if (!secret) throw new Error('El panel no tiene configurada la sesión administrativa.');
+    const response = await fetch(`${EDGE}?mode=upload`, {
+      method:'POST',
+      headers:{
+        'content-type':'application/json',
+        'x-haki-operations-token':makeOperationsToken(secret),
+      },
+      body:JSON.stringify(body),
     });
-
-    const publicPath = `https://raw.githubusercontent.com/${owner}/${repo}/${encodeURIComponent(BRANCH)}/${path.split('/').map(encodeURIComponent).join('/')}`;
-    return json({ ok: true, path: publicPath, repoPath: path, commit: result?.commit?.sha || null });
-  } catch (error) {
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) return json({ error:data.error || 'No se pudo subir la imagen.' },response.status);
+    return json({ ok:true, path:data.path, storagePath:data.storagePath, commit:null, storage:'supabase' });
+  } catch(error) {
     console.error(error);
-    return json({ error: error.message || 'No se pudo subir la imagen.' }, error.status || 500);
+    return json({ error:error.message || 'No se pudo subir la imagen.' },error.status || 500);
   }
 };

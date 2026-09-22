@@ -1,36 +1,24 @@
-import { readInventory, applyAvailability } from './_inventory.mjs';
-import { json, github, repoParts, BRANCH } from './_shared.mjs';
+import { json } from './_shared.mjs';
 
-function parseCatalog(source) {
-  const a = source.match(/window\.HAKI_CONFIG\s*=\s*(\{[\s\S]*?\});\s*window\.HAKI_PRODUCTOS/);
-  const b = source.match(/window\.HAKI_PRODUCTOS\s*=\s*(\[[\s\S]*\]);\s*$/);
-  if (!a || !b) throw new Error('No se reconoce el formato de productos.js');
-  const config = JSON.parse(a[1]);
-  const products = JSON.parse(b[1]);
-  return { config, products };
-}
+const EDGE='https://uysfqzlihiosebqzvfrl.supabase.co/functions/v1/haki-operations?mode=public-catalog';
 
-export default async (request) => {
-  if (request.method !== 'GET') return json({ error: 'Método no permitido.' }, 405);
-
+export default async request => {
+  if (request.method !== 'GET') return json({ error:'Método no permitido.' },405);
   try {
-    const { owner, repo } = repoParts();
-    const file = await github(`/repos/${owner}/${repo}/contents/productos.js?ref=${encodeURIComponent(BRANCH)}`, { method: 'GET' });
-    const source = Buffer.from(file.content, 'base64').toString('utf8');
-    const parsed = parseCatalog(source);
-    parsed.products = applyAvailability(parsed.products, await readInventory());
-
+    const response=await fetch(EDGE,{headers:{accept:'application/json'},cache:'no-store'});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok) return json({ error:data.error || 'Catálogo no disponible.' },response.status);
     return json(
-      { ...parsed, version: file.sha },
+      { config:data.config || {}, products:data.products || [], version:data.version || '' },
       200,
       {
-        'cache-control': 'no-store, max-age=0',
-        'netlify-cdn-cache-control': 'public, durable, max-age=30, stale-while-revalidate=30',
-        'x-haki-catalog-source': 'github-live'
+        'cache-control':'no-store, max-age=0',
+        'netlify-cdn-cache-control':'public, durable, max-age=15, stale-while-revalidate=30',
+        'x-haki-catalog-source':'supabase-live',
       }
     );
-  } catch (error) {
+  } catch(error) {
     console.error(error);
-    return json({ error: 'No se pudo cargar el catálogo.' }, 500);
+    return json({ error:'No se pudo cargar el catálogo.' },503);
   }
 };

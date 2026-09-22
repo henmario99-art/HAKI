@@ -114,7 +114,7 @@
   async function refresh(){
     if(busy||document.hidden)return;busy=true;
     try{
-      const response=await fetch('/.netlify/functions/public-catalog',{cache:'no-store',signal:AbortSignal.timeout(12000)});
+      const response=await fetch('https://uysfqzlihiosebqzvfrl.supabase.co/functions/v1/haki-operations?mode=public-catalog',{cache:'no-store',signal:AbortSignal.timeout(12000)});
       if(!response.ok)throw new Error('Catalog unavailable');
       const data=polish(await response.json());if(!valid(data))return;
       const changed=JSON.stringify(data)!==JSON.stringify({config:window.HAKI_CONFIG,products:window.HAKI_PRODUCTOS});

@@ -190,7 +190,7 @@ function newProduct() {
     colores: [],
     imagen: 'images/producto.svg',
     imagenRespaldo: 'images/producto.svg',
-    tallas: { S:true, M:true, L:true, XL:true }
+    tallas: { S:false, M:false, L:false, XL:false }
   };
 }
 
@@ -418,7 +418,7 @@ function renderProducts() {
         const imageInput = $('[data-field="imagen"]', card);
         imageInput.value = data.path;
         preview.src = `${resolveImage(data.path)}?v=${Date.now()}`;
-        toast('Imagen subida a GitHub. No requiere deploy. Guarda el catálogo cuando termines.', true);
+        toast('Imagen subida a Supabase. No genera deploy. Guarda el catálogo cuando termines.', true);
       } catch (err) {
         toast(err.message);
       } finally {
@@ -516,19 +516,39 @@ $('#addBtn').addEventListener('click', () => {
   window.scrollTo({ top: document.querySelector('.section-title').offsetTop - 80, behavior: 'smooth' });
 });
 
+async function saveDirtyInventory() {
+  const dirty = [...document.querySelectorAll('.private-inventory[data-dirty="true"]')];
+  for (const section of dirty) {
+    const product = state.products.find(p => String(p.id) === String(section.dataset.productId));
+    if (!product) throw new Error('No se pudo identificar una prenda con inventario pendiente.');
+    const stock = {};
+    section.querySelectorAll('[data-private-size]').forEach(input => {
+      stock[input.dataset.privateSize] = Math.max(0, Math.trunc(Number(input.value) || 0));
+    });
+    await api('sales?mode=inventory', {
+      method: 'PUT',
+      body: JSON.stringify({ productId: product.id, productCode: product.codigo, stock })
+    });
+    product.tallas ||= {};
+    ['S','M','L','XL'].forEach(size => { product.tallas[size] = Number(stock[size]) > 0; });
+    delete section.dataset.dirty;
+  }
+}
+
 async function saveCatalog() {
-  if (document.querySelector('.private-inventory[data-dirty="true"]')) { toast('Hay cantidades de inventario sin guardar. Pulsa «Guardar inventario» en la prenda nueva y luego vuelve a «Guardar y publicar».'); return false; }
   for (const input of document.querySelectorAll('#experienceSettings input')) { if (!input.reportValidity()) return; }
   if (!confirm('¿Guardar estos cambios en el catálogo?')) return false;
   const buttons = [$('#saveBtn'), $('#saveOrderBtn')];
   buttons.forEach(button => { button.disabled = true; button.dataset.label = button.textContent; button.textContent = 'Guardando…'; });
   try {
-    await api('catalog', {
+    await saveDirtyInventory();
+    const data = await api('catalog', {
       method: 'PUT',
       body: JSON.stringify({ config: state.config, products: state.products, sha: state.catalogSha })
     });
-    toast('Cambios guardados en GitHub. El catálogo los leerá sin un deploy de producción.', true);
-    setTimeout(loadCatalog, 1200);
+    state.catalogSha = data.sha || state.catalogSha;
+    if (Array.isArray(data.products)) state.products = data.products;
+    toast('Catálogo guardado en Supabase. No genera deploy.', true);
     return true;
   } catch (err) {
     toast(err.message);

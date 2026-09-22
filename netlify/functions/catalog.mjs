@@ -1,29 +1,16 @@
-import { readInventory, applyAvailability } from './_inventory.mjs';
-import { json, bodyJson, verifyAdmin, github, repoParts, BRANCH } from './_shared.mjs';
+import { json, bodyJson, verifyAdmin, makeOperationsToken } from './_shared.mjs';
 
-function parseCatalog(source) {
-  const a = source.match(/window\.HAKI_CONFIG\s*=\s*(\{[\s\S]*?\});\s*window\.HAKI_PRODUCTOS/);
-  const b = source.match(/window\.HAKI_PRODUCTOS\s*=\s*(\[[\s\S]*\]);\s*$/);
-  if (!a || !b) throw new Error('No se reconoce el formato de productos.js');
-  const config = JSON.parse(a[1]);
-  const products = JSON.parse(b[1]);
-  return { config, products };
-}
-
-function serializeCatalog(config, products) {
-  return `// ============================================================\n// HAKI — ARCHIVO PRINCIPAL PARA EDITAR EL CATÁLOGO\n// Gestionado desde /admin/\n// true = disponible | false = agotada\n// ============================================================\n\nwindow.HAKI_CONFIG = ${JSON.stringify(config, null, 2)};\n\nwindow.HAKI_PRODUCTOS = ${JSON.stringify(products, null, 2)};\n`;
-}
+const EDGE = 'https://uysfqzlihiosebqzvfrl.supabase.co/functions/v1/haki-operations';
 
 function validatePayload(body) {
   if (!body || typeof body !== 'object') throw new Error('Datos inválidos.');
   if (!body.config || typeof body.config !== 'object') throw new Error('Falta la configuración.');
   if (!Array.isArray(body.products)) throw new Error('Falta la lista de productos.');
-
   const seen = new Set();
   for (const [index, p] of body.products.entries()) {
     if (!p || typeof p !== 'object') throw new Error(`Producto ${index + 1} inválido.`);
     p.id = Number(p.id || index + 1);
-    p.codigo = String(p.codigo || '').trim();
+    p.codigo = String(p.codigo || '').trim().toUpperCase();
     p.nombre = String(p.nombre || '').trim();
     p.categoria = String(p.categoria || '').trim();
     p.precio = Number(p.precio || 0);
@@ -32,7 +19,6 @@ function validatePayload(body) {
     p.masVendido = p.masVendido === true;
     p.etiquetaMasVendido = String(p.etiquetaMasVendido || 'MÁS VENDIDO').trim().slice(0, 40) || 'MÁS VENDIDO';
     p.tallas = { S: !!p.tallas?.S, M: !!p.tallas?.M, L: !!p.tallas?.L, XL: !!p.tallas?.XL };
-
     if (!p.codigo) throw new Error(`El producto ${index + 1} no tiene código.`);
     if (!p.nombre) throw new Error(`El producto ${index + 1} no tiene nombre.`);
     if (!Number.isFinite(p.precio) || p.precio < 0) throw new Error(`Precio inválido en ${p.codigo}.`);
@@ -41,48 +27,51 @@ function validatePayload(body) {
   }
 }
 
-export default async (request) => {
-  if (!verifyAdmin(request)) return json({ error: 'No autorizado.' }, 401);
+function token() {
+  const secret = process.env.ADMIN_SESSION_SECRET || '';
+  if (!secret) throw new Error('El panel no tiene configurada la sesión administrativa.');
+  return makeOperationsToken(secret);
+}
 
-  const { owner, repo } = repoParts();
-  const path = `/repos/${owner}/${repo}/contents/productos.js?ref=${encodeURIComponent(BRANCH)}`;
+async function edge(mode, options = {}) {
+  const response = await fetch(`${EDGE}?mode=${encodeURIComponent(mode)}`, {
+    ...options,
+    headers: {
+      'content-type':'application/json',
+      'x-haki-operations-token':token(),
+      ...(options.headers || {}),
+    },
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error(data.error || `Error ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
+  return data;
+}
 
+export default async request => {
+  if (!verifyAdmin(request)) return json({ error:'No autorizado.' },401);
   try {
     if (request.method === 'GET') {
-      const file = await github(path, { method: 'GET' });
-      const source = Buffer.from(file.content, 'base64').toString('utf8');
-      const parsed = parseCatalog(source);
-      parsed.products = applyAvailability(parsed.products, await readInventory());
-      return json({ ...parsed, sha: file.sha, branch: BRANCH });
+      const data = await edge('catalog', { method:'GET' });
+      return json({ config:data.config || {}, products:data.products || [], sha:data.version || '', branch:'supabase', storage:'supabase' });
     }
-
     if (request.method === 'PUT') {
       const body = await bodyJson(request);
       validatePayload(body);
-
-      const current = await github(path, { method: 'GET' });
-      if (body.sha && body.sha !== current.sha) return json({ error: 'El catálogo cambió desde que lo abriste. Recarga antes de guardar para conservar los cambios recientes.' }, 409);
-      body.products = applyAvailability(body.products, await readInventory());
-      const content = serializeCatalog(body.config, body.products);
-      if (content === Buffer.from(current.content, 'base64').toString('utf8')) {
-        return json({ ok: true, unchanged: true, commit: null });
-      }
-      const result = await github(`/repos/${owner}/${repo}/contents/productos.js`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          message: `${body.message || 'Actualizar catálogo desde panel HAKI'} [skip netlify]`,
-          content: Buffer.from(content, 'utf8').toString('base64'),
-          sha: current.sha,
-          branch: BRANCH,
-        }),
+      const supplied = String(body.sha || '');
+      const expectedVersion = /^[0-9a-f]{40}$/i.test(supplied) ? '' : supplied;
+      const data = await edge('catalog', {
+        method:'PUT',
+        body:JSON.stringify({ config:body.config, products:body.products, expectedVersion }),
       });
-
-      return json({ ok: true, commit: result?.commit?.sha || null });
+      return json({ ok:true, config:data.config || body.config, products:data.products || body.products, sha:data.version || '', commit:null, storage:'supabase' });
     }
-
-    return json({ error: 'Método no permitido.' }, 405);
-  } catch (error) {
+    return json({ error:'Método no permitido.' },405);
+  } catch(error) {
     console.error(error);
-    return json({ error: error.message || 'Error del servidor.' }, error.status || 500);
+    return json({ error:error.message || 'Error del servidor.' }, error.status || 500);
   }
 };
