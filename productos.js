@@ -516,7 +516,7 @@ window.HAKI_PRODUCTOS = [
       "S": true,
       "M": true,
       "L": true,
-      "XL": true
+      "XL": false
     },
     "colecciones": [
       "collection-1"
@@ -731,10 +731,10 @@ window.HAKI_PRODUCTOS = [
     "imagen": "images/1789325270447-9b0b3c9d-ChatGPT-Image-13-sept-2026-12_47_37-p.m..webp",
     "imagenRespaldo": "images/tee-gray.svg",
     "tallas": {
-      "S": true,
-      "M": true,
+      "S": false,
+      "M": false,
       "L": true,
-      "XL": true
+      "XL": false
     },
     "colecciones": [
       "collection-1"
@@ -873,7 +873,7 @@ window.HAKI_PRODUCTOS = [
     "imagen": "images/1789325730011-4e8cd8ff-IMG_2383-_1_.webp",
     "imagenRespaldo": "images/tee-black.svg",
     "tallas": {
-      "S": true,
+      "S": false,
       "M": true,
       "L": true,
       "XL": false
