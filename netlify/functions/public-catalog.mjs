@@ -25,6 +25,7 @@ export default async (request) => {
       200,
       {
         'cache-control': 'no-store, max-age=0',
+        'netlify-cdn-cache-control': 'public, durable, max-age=30, stale-while-revalidate=30',
         'x-haki-catalog-source': 'github-live'
       }
     );

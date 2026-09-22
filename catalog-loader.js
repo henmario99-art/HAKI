@@ -122,6 +122,6 @@
       if(changed){apply(data);window.dispatchEvent(new Event('haki:catalog-updated'));}
     }catch{/* Keep the usable local catalog when the network is slow/offline. */}finally{busy=false;}
   }
-  window.addEventListener('DOMContentLoaded',()=>{refresh();setInterval(refresh,60000);});
+  window.addEventListener('DOMContentLoaded',()=>{refresh();setInterval(refresh,300000);});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});
 })();

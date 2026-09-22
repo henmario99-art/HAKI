@@ -24,7 +24,7 @@ export default async (request) => {
 
     // Unique names allow browser caching while replacements appear immediately.
     name = `${Date.now()}-${crypto.randomUUID().slice(0,8)}-${name}`;
-    const path = `images/${name}`;
+    const path = `images/uploads/${name}`;
     const { owner, repo } = repoParts();
     let sha;
     try {
@@ -46,7 +46,8 @@ export default async (request) => {
       body: JSON.stringify(payload),
     });
 
-    return json({ ok: true, path, commit: result?.commit?.sha || null });
+    const publicPath = `https://raw.githubusercontent.com/${owner}/${repo}/${encodeURIComponent(BRANCH)}/${path.split('/').map(encodeURIComponent).join('/')}`;
+    return json({ ok: true, path: publicPath, repoPath: path, commit: result?.commit?.sha || null });
   } catch (error) {
     console.error(error);
     return json({ error: error.message || 'No se pudo subir la imagen.' }, error.status || 500);
