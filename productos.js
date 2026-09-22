@@ -589,53 +589,6 @@ window.HAKI_PRODUCTOS = [
     "borrador": false
   },
   {
-    "id": 19,
-    "codigo": "YLAC-03",
-    "nombre": "WARRIOR COMPRESIÓN ROJA",
-    "precio": 25,
-    "categoria": "Compresión",
-    "imagen": "images/1789325345114-3b68a2db-4065_black-red_0012_11_25_johnny_ecomm_ee3b524e-f0c5-406c-b6f0-6ecd4305e276.webp",
-    "imagenRespaldo": "images/tee-black.svg",
-    "tallas": {
-      "S": true,
-      "M": false,
-      "L": false,
-      "XL": false
-    },
-    "colecciones": [
-      "collection-1"
-    ],
-    "colores": [
-      "Rojo",
-      "Negro"
-    ],
-    "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO",
-    "borrador": false
-  },
-  {
-    "id": 13,
-    "codigo": "YLA-05",
-    "nombre": "WARRIOR COMPRESIÓN MORADA",
-    "precio": 22,
-    "categoria": "Shorts",
-    "imagen": "images/1789323517674-321c0010-4041_purple_007_01_15_johnny_ecomm.webp",
-    "imagenRespaldo": "images/shorts.svg",
-    "tallas": {
-      "S": false,
-      "M": false,
-      "L": true,
-      "XL": false
-    },
-    "colecciones": [
-      "collection-1"
-    ],
-    "colores": [],
-    "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO",
-    "borrador": false
-  },
-  {
     "id": 11,
     "codigo": "YLAC1-03",
     "nombre": "SUPVILLIAN NEGRO",
@@ -682,6 +635,28 @@ window.HAKI_PRODUCTOS = [
       "Gris",
       "Blanco"
     ],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
+  },
+  {
+    "id": 13,
+    "codigo": "YLA-05",
+    "nombre": "WARRIOR COMPRESIÓN MORADA",
+    "precio": 22,
+    "categoria": "Shorts",
+    "imagen": "images/1789323517674-321c0010-4041_purple_007_01_15_johnny_ecomm.webp",
+    "imagenRespaldo": "images/shorts.svg",
+    "tallas": {
+      "S": false,
+      "M": false,
+      "L": true,
+      "XL": false
+    },
+    "colecciones": [
+      "collection-1"
+    ],
+    "colores": [],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
     "borrador": false
@@ -765,79 +740,6 @@ window.HAKI_PRODUCTOS = [
     "borrador": false
   },
   {
-    "id": 20,
-    "codigo": "GSC-03",
-    "nombre": "ONX ROJA",
-    "precio": 25,
-    "categoria": "Camisetas",
-    "imagen": "images/1789325533912-bac14949-ChatGPT-Image-13-sept-2026-12_52_06-p.m..webp",
-    "imagenRespaldo": "images/tee-gray.svg",
-    "tallas": {
-      "S": true,
-      "M": true,
-      "L": true,
-      "XL": false
-    },
-    "colecciones": [
-      "collection-1"
-    ],
-    "colores": [
-      "Negro",
-      "Rojo"
-    ],
-    "masVendido": true,
-    "etiquetaMasVendido": "MÁS VENDIDO",
-    "borrador": false
-  },
-  {
-    "id": 23,
-    "codigo": "GSC-08",
-    "nombre": "ONX VERDE",
-    "precio": 25,
-    "categoria": "Shorts",
-    "imagen": "images/1789326388009-3686b0fa-ChatGPT-Image-13-sept-2026-12_59_52-p.m..webp",
-    "imagenRespaldo": "images/shorts.svg",
-    "tallas": {
-      "S": true,
-      "M": false,
-      "L": true,
-      "XL": false
-    },
-    "colecciones": [
-      "collection-1"
-    ],
-    "colores": [
-      "Negro"
-    ],
-    "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO",
-    "borrador": false
-  },
-  {
-    "id": 24,
-    "codigo": "GSL1-03",
-    "nombre": "ONX GORRO ROJO",
-    "precio": 30,
-    "categoria": "Leggings",
-    "imagen": "images/1789326262410-3f181837-ChatGPT-Image-13-sept-2026-01_04_11-p.m..webp",
-    "imagenRespaldo": "images/leggings.svg",
-    "tallas": {
-      "S": false,
-      "M": false,
-      "L": false,
-      "XL": false
-    },
-    "colecciones": [
-      "collection-2"
-    ],
-    "colores": [
-      "Negro"
-    ],
-    "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO",
-    "borrador": false
-  },
-  {
     "id": 17,
     "codigo": "SUPH-06",
     "nombre": "SUP-CENTRO GRIS",
@@ -887,6 +789,56 @@ window.HAKI_PRODUCTOS = [
     "borrador": false
   },
   {
+    "id": 19,
+    "codigo": "YLAC-03",
+    "nombre": "WARRIOR COMPRESIÓN ROJA",
+    "precio": 25,
+    "categoria": "Compresión",
+    "imagen": "images/1789325345114-3b68a2db-4065_black-red_0012_11_25_johnny_ecomm_ee3b524e-f0c5-406c-b6f0-6ecd4305e276.webp",
+    "imagenRespaldo": "images/tee-black.svg",
+    "tallas": {
+      "S": true,
+      "M": false,
+      "L": false,
+      "XL": false
+    },
+    "colecciones": [
+      "collection-1"
+    ],
+    "colores": [
+      "Rojo",
+      "Negro"
+    ],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
+  },
+  {
+    "id": 20,
+    "codigo": "GSC-03",
+    "nombre": "ONX ROJA",
+    "precio": 25,
+    "categoria": "Camisetas",
+    "imagen": "images/1789325533912-bac14949-ChatGPT-Image-13-sept-2026-12_52_06-p.m..webp",
+    "imagenRespaldo": "images/tee-gray.svg",
+    "tallas": {
+      "S": true,
+      "M": true,
+      "L": true,
+      "XL": false
+    },
+    "colecciones": [
+      "collection-1"
+    ],
+    "colores": [
+      "Negro",
+      "Rojo"
+    ],
+    "masVendido": true,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
+  },
+  {
     "id": 21,
     "codigo": "BDC1:1-09",
     "nombre": "BREATHE DIVINITY 1:1",
@@ -930,6 +882,54 @@ window.HAKI_PRODUCTOS = [
     "colores": [
       "Negro",
       "Rojo"
+    ],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
+  },
+  {
+    "id": 23,
+    "codigo": "GSC-08",
+    "nombre": "ONX VERDE",
+    "precio": 25,
+    "categoria": "Shorts",
+    "imagen": "images/1789326388009-3686b0fa-ChatGPT-Image-13-sept-2026-12_59_52-p.m..webp",
+    "imagenRespaldo": "images/shorts.svg",
+    "tallas": {
+      "S": true,
+      "M": false,
+      "L": true,
+      "XL": false
+    },
+    "colecciones": [
+      "collection-1"
+    ],
+    "colores": [
+      "Negro"
+    ],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
+    "borrador": false
+  },
+  {
+    "id": 24,
+    "codigo": "GSL1-03",
+    "nombre": "ONX GORRO ROJO",
+    "precio": 30,
+    "categoria": "Leggings",
+    "imagen": "images/1789326262410-3f181837-ChatGPT-Image-13-sept-2026-01_04_11-p.m..webp",
+    "imagenRespaldo": "images/leggings.svg",
+    "tallas": {
+      "S": false,
+      "M": false,
+      "L": false,
+      "XL": false
+    },
+    "colecciones": [
+      "collection-2"
+    ],
+    "colores": [
+      "Negro"
     ],
     "masVendido": false,
     "etiquetaMasVendido": "MÁS VENDIDO",
@@ -1160,31 +1160,6 @@ window.HAKI_PRODUCTOS = [
     "borrador": false
   },
   {
-    "id": 35,
-    "codigo": "YLAF-03",
-    "nombre": "BOXY SKULL ROJA",
-    "precio": 26,
-    "categoria": "Compresión",
-    "imagen": "images/1789334536065-131410ad-IMG_5028.webp",
-    "imagenRespaldo": "images/tee-black.svg",
-    "tallas": {
-      "S": true,
-      "M": true,
-      "L": true,
-      "XL": false
-    },
-    "colecciones": [
-      "collection-4"
-    ],
-    "colores": [
-      "Rojo"
-    ],
-    "masVendido": false,
-    "etiquetaMasVendido": "MÁS VENDIDO",
-    "novedad": true,
-    "borrador": false
-  },
-  {
     "id": 34,
     "codigo": "YLAF1-01",
     "nombre": "BOXY SERPIENTE",
@@ -1207,6 +1182,31 @@ window.HAKI_PRODUCTOS = [
     "masVendido": true,
     "etiquetaMasVendido": "MÁS VENDIDO",
     "imagen2": "images/1789334437869-4e51e8e7-64c7ae95-a57e-4798-99bb-b578c8d51c80.jpeg",
+    "novedad": true,
+    "borrador": false
+  },
+  {
+    "id": 35,
+    "codigo": "YLAF-03",
+    "nombre": "BOXY SKULL ROJA",
+    "precio": 26,
+    "categoria": "Compresión",
+    "imagen": "images/1789334536065-131410ad-IMG_5028.webp",
+    "imagenRespaldo": "images/tee-black.svg",
+    "tallas": {
+      "S": true,
+      "M": true,
+      "L": true,
+      "XL": false
+    },
+    "colecciones": [
+      "collection-4"
+    ],
+    "colores": [
+      "Rojo"
+    ],
+    "masVendido": false,
+    "etiquetaMasVendido": "MÁS VENDIDO",
     "novedad": true,
     "borrador": false
   },
@@ -1579,7 +1579,7 @@ window.HAKI_PRODUCTOS = [
   {
     "id": 51,
     "codigo": "HAKI-051",
-    "nombre": "NUEVO PRODUCTO",
+    "nombre": "PRODUCTO RECUPERADO 01",
     "precio": 0,
     "categoria": "Camisetas",
     "novedad": false,
@@ -1587,7 +1587,7 @@ window.HAKI_PRODUCTOS = [
     "etiquetaMasVendido": "MÁS VENDIDO",
     "colecciones": [],
     "colores": [],
-    "imagen": "images/producto.svg",
+    "imagen": "images/1790039084712-2ffd305c-ChatGPT-Image-21-sept-2026-07_04_31-p.m..webp",
     "imagenRespaldo": "images/producto.svg",
     "imagen2": "",
     "guiaTallas": "",
@@ -1597,12 +1597,13 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true,
+    "recuperado": true
   },
   {
     "id": 52,
     "codigo": "HAKI-052",
-    "nombre": "NUEVO PRODUCTO",
+    "nombre": "PRODUCTO RECUPERADO 02",
     "precio": 0,
     "categoria": "Camisetas",
     "novedad": false,
@@ -1610,7 +1611,7 @@ window.HAKI_PRODUCTOS = [
     "etiquetaMasVendido": "MÁS VENDIDO",
     "colecciones": [],
     "colores": [],
-    "imagen": "images/producto.svg",
+    "imagen": "images/1790039192375-afb42f55-WhatsApp-Image-2026-09-21-at-7.05.59-PM.webp",
     "imagenRespaldo": "images/producto.svg",
     "imagen2": "",
     "guiaTallas": "",
@@ -1620,12 +1621,13 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true,
+    "recuperado": true
   },
   {
     "id": 53,
     "codigo": "HAKI-053",
-    "nombre": "NUEVO PRODUCTO",
+    "nombre": "PRODUCTO RECUPERADO 03",
     "precio": 0,
     "categoria": "Camisetas",
     "novedad": false,
@@ -1633,9 +1635,9 @@ window.HAKI_PRODUCTOS = [
     "etiquetaMasVendido": "MÁS VENDIDO",
     "colecciones": [],
     "colores": [],
-    "imagen": "images/producto.svg",
+    "imagen": "images/1790039416838-11251033-ChatGPT-Image-21-sept-2026-07_10_06-p.m..webp",
     "imagenRespaldo": "images/producto.svg",
-    "imagen2": "",
+    "imagen2": "images/1790039482415-15160791-worth-it-red-blue-onyx-l-fit-check-v0-b3z5k93wh5xf1.webp",
     "guiaTallas": "",
     "tallas": {
       "S": false,
@@ -1643,12 +1645,13 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true,
+    "recuperado": true
   },
   {
     "id": 54,
     "codigo": "HAKI-054",
-    "nombre": "NUEVO PRODUCTO",
+    "nombre": "PRODUCTO RECUPERADO 04",
     "precio": 0,
     "categoria": "Camisetas",
     "novedad": false,
@@ -1656,7 +1659,7 @@ window.HAKI_PRODUCTOS = [
     "etiquetaMasVendido": "MÁS VENDIDO",
     "colecciones": [],
     "colores": [],
-    "imagen": "images/producto.svg",
+    "imagen": "images/1790039694282-78316065-658212146_18581339326032101_3737526298598322689_n.webp",
     "imagenRespaldo": "images/producto.svg",
     "imagen2": "",
     "guiaTallas": "",
@@ -1666,12 +1669,13 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true,
+    "recuperado": true
   },
   {
     "id": 55,
     "codigo": "HAKI-055",
-    "nombre": "NUEVO PRODUCTO",
+    "nombre": "PRODUCTO RECUPERADO 05",
     "precio": 0,
     "categoria": "Camisetas",
     "novedad": false,
@@ -1679,7 +1683,7 @@ window.HAKI_PRODUCTOS = [
     "etiquetaMasVendido": "MÁS VENDIDO",
     "colecciones": [],
     "colores": [],
-    "imagen": "images/producto.svg",
+    "imagen": "images/1790039913580-bf381706-ChatGPT-Image-21-sept-2026-07_18_22-p.m..webp",
     "imagenRespaldo": "images/producto.svg",
     "imagen2": "",
     "guiaTallas": "",
@@ -1689,12 +1693,13 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true,
+    "recuperado": true
   },
   {
     "id": 56,
     "codigo": "HAKI-056",
-    "nombre": "NUEVO PRODUCTO",
+    "nombre": "PRODUCTO RECUPERADO 06",
     "precio": 0,
     "categoria": "Camisetas",
     "novedad": false,
@@ -1702,7 +1707,7 @@ window.HAKI_PRODUCTOS = [
     "etiquetaMasVendido": "MÁS VENDIDO",
     "colecciones": [],
     "colores": [],
-    "imagen": "images/producto.svg",
+    "imagen": "images/1790040029582-4e4ad440-805b9dba-ad98-4284-b0b0-3416d7d98279.4fa40bd70276c2b909509dd812582138.webp",
     "imagenRespaldo": "images/producto.svg",
     "imagen2": "",
     "guiaTallas": "",
@@ -1712,12 +1717,13 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true,
+    "recuperado": true
   },
   {
     "id": 57,
     "codigo": "HAKI-057",
-    "nombre": "NUEVO PRODUCTO",
+    "nombre": "PRODUCTO RECUPERADO 07",
     "precio": 0,
     "categoria": "Camisetas",
     "novedad": false,
@@ -1725,7 +1731,7 @@ window.HAKI_PRODUCTOS = [
     "etiquetaMasVendido": "MÁS VENDIDO",
     "colecciones": [],
     "colores": [],
-    "imagen": "images/producto.svg",
+    "imagen": "images/1790040746513-4aa59e28-bef170c6-78d6-4bd6-b72a-9faec52a6048.webp",
     "imagenRespaldo": "images/producto.svg",
     "imagen2": "",
     "guiaTallas": "",
@@ -1735,12 +1741,13 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true,
+    "recuperado": true
   },
   {
     "id": 58,
     "codigo": "HAKI-058",
-    "nombre": "NUEVO PRODUCTO",
+    "nombre": "PRODUCTO RECUPERADO 08",
     "precio": 0,
     "categoria": "Camisetas",
     "novedad": false,
@@ -1748,7 +1755,7 @@ window.HAKI_PRODUCTOS = [
     "etiquetaMasVendido": "MÁS VENDIDO",
     "colecciones": [],
     "colores": [],
-    "imagen": "images/producto.svg",
+    "imagen": "images/1790040864574-2701606e-ChatGPT-Image-21-sept-2026-07_34_10-p.m..webp",
     "imagenRespaldo": "images/producto.svg",
     "imagen2": "",
     "guiaTallas": "",
@@ -1758,12 +1765,13 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true,
+    "recuperado": true
   },
   {
     "id": 59,
     "codigo": "HAKI-059",
-    "nombre": "NUEVO PRODUCTO",
+    "nombre": "PRODUCTO RECUPERADO 09",
     "precio": 0,
     "categoria": "Camisetas",
     "novedad": false,
@@ -1771,7 +1779,7 @@ window.HAKI_PRODUCTOS = [
     "etiquetaMasVendido": "MÁS VENDIDO",
     "colecciones": [],
     "colores": [],
-    "imagen": "images/producto.svg",
+    "imagen": "images/1790041134256-29783428-S871885b96e324538bcd884cf34266e4cw.jpg_960x960.webp",
     "imagenRespaldo": "images/producto.svg",
     "imagen2": "",
     "guiaTallas": "",
@@ -1781,12 +1789,13 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true,
+    "recuperado": true
   },
   {
     "id": 60,
     "codigo": "HAKI-060",
-    "nombre": "NUEVO PRODUCTO",
+    "nombre": "PRODUCTO RECUPERADO 10",
     "precio": 0,
     "categoria": "Camisetas",
     "novedad": false,
@@ -1794,7 +1803,7 @@ window.HAKI_PRODUCTOS = [
     "etiquetaMasVendido": "MÁS VENDIDO",
     "colecciones": [],
     "colores": [],
-    "imagen": "images/producto.svg",
+    "imagen": "images/1790041425778-0f7a498c-ChatGPT-Image-21-sept-2026-07_43_21-p.m..webp",
     "imagenRespaldo": "images/producto.svg",
     "imagen2": "",
     "guiaTallas": "",
@@ -1804,12 +1813,13 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true,
+    "recuperado": true
   },
   {
     "id": 61,
     "codigo": "HAKI-061",
-    "nombre": "NUEVO PRODUCTO",
+    "nombre": "PRODUCTO RECUPERADO 11",
     "precio": 0,
     "categoria": "Camisetas",
     "novedad": false,
@@ -1817,7 +1827,7 @@ window.HAKI_PRODUCTOS = [
     "etiquetaMasVendido": "MÁS VENDIDO",
     "colecciones": [],
     "colores": [],
-    "imagen": "images/producto.svg",
+    "imagen": "images/1790041491026-0374c5a6-D_NQ_NP_787071-MLM112116095874_062026-F.webp",
     "imagenRespaldo": "images/producto.svg",
     "imagen2": "",
     "guiaTallas": "",
@@ -1827,12 +1837,13 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true,
+    "recuperado": true
   },
   {
     "id": 62,
     "codigo": "HAKI-062",
-    "nombre": "NUEVO PRODUCTO",
+    "nombre": "PRODUCTO RECUPERADO 12",
     "precio": 0,
     "categoria": "Camisetas",
     "novedad": false,
@@ -1840,7 +1851,7 @@ window.HAKI_PRODUCTOS = [
     "etiquetaMasVendido": "MÁS VENDIDO",
     "colecciones": [],
     "colores": [],
-    "imagen": "images/producto.svg",
+    "imagen": "images/1790041550216-d012e957-il_1588xN.7320993702_s2tm.webp",
     "imagenRespaldo": "images/producto.svg",
     "imagen2": "",
     "guiaTallas": "",
@@ -1850,12 +1861,13 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true,
+    "recuperado": true
   },
   {
     "id": 63,
     "codigo": "HAKI-063",
-    "nombre": "NUEVO PRODUCTO",
+    "nombre": "PRODUCTO RECUPERADO 13",
     "precio": 0,
     "categoria": "Camisetas",
     "novedad": false,
@@ -1863,7 +1875,7 @@ window.HAKI_PRODUCTOS = [
     "etiquetaMasVendido": "MÁS VENDIDO",
     "colecciones": [],
     "colores": [],
-    "imagen": "images/producto.svg",
+    "imagen": "images/1790041590987-6a2cdb16-5.webp",
     "imagenRespaldo": "images/producto.svg",
     "imagen2": "",
     "guiaTallas": "",
@@ -1873,12 +1885,13 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true,
+    "recuperado": true
   },
   {
     "id": 64,
     "codigo": "HAKI-064",
-    "nombre": "NUEVO PRODUCTO",
+    "nombre": "PRODUCTO RECUPERADO 14",
     "precio": 0,
     "categoria": "Camisetas",
     "novedad": false,
@@ -1886,7 +1899,7 @@ window.HAKI_PRODUCTOS = [
     "etiquetaMasVendido": "MÁS VENDIDO",
     "colecciones": [],
     "colores": [],
-    "imagen": "images/producto.svg",
+    "imagen": "images/1790041737624-2ba7f01e-images-7-.webp",
     "imagenRespaldo": "images/producto.svg",
     "imagen2": "",
     "guiaTallas": "",
@@ -1896,12 +1909,13 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true,
+    "recuperado": true
   },
   {
     "id": 65,
     "codigo": "HAKI-065",
-    "nombre": "NUEVO PRODUCTO",
+    "nombre": "PRODUCTO RECUPERADO 15",
     "precio": 0,
     "categoria": "Camisetas",
     "novedad": false,
@@ -1909,7 +1923,7 @@ window.HAKI_PRODUCTOS = [
     "etiquetaMasVendido": "MÁS VENDIDO",
     "colecciones": [],
     "colores": [],
-    "imagen": "images/producto.svg",
+    "imagen": "images/1790041878419-d6d88194-s-l1200.webp",
     "imagenRespaldo": "images/producto.svg",
     "imagen2": "",
     "guiaTallas": "",
@@ -1919,7 +1933,8 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true,
+    "recuperado": true
   },
   {
     "id": 66,
@@ -1942,7 +1957,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 67,
@@ -1965,7 +1980,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 68,
@@ -1988,7 +2003,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 69,
@@ -2011,7 +2026,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 70,
@@ -2034,7 +2049,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 71,
@@ -2057,7 +2072,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 72,
@@ -2080,7 +2095,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 73,
@@ -2103,7 +2118,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 74,
@@ -2126,7 +2141,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 75,
@@ -2149,7 +2164,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 76,
@@ -2172,7 +2187,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 77,
@@ -2195,7 +2210,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 78,
@@ -2218,7 +2233,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 79,
@@ -2241,7 +2256,7 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   },
   {
     "id": 80,
@@ -2264,6 +2279,6 @@ window.HAKI_PRODUCTOS = [
       "L": false,
       "XL": false
     },
-    "borrador": false
+    "borrador": true
   }
 ];
