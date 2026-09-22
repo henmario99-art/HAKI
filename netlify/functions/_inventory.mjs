@@ -22,7 +22,7 @@ export async function readInventory() {
 
 export function applyAvailability(products, inventory) {
   return products.map(product => {
-    const stock = inventory[String(product.id)];
+    const stock = inventory[String(product.codigo || '').toUpperCase()] || inventory[String(product.id)];
     if (!stock) return product;
     const tallas = { ...product.tallas };
     for (const size of SIZES) {
