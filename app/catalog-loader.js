@@ -135,3 +135,53 @@
   window.addEventListener('DOMContentLoaded',()=>{refresh();setInterval(refresh,300000);});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});
 })();
+
+
+// Stock operativo HAKI: actualización directa desde Supabase sin deploy ni Netlify Function.
+(() => {
+  const endpoint='https://uysfqzlihiosebqzvfrl.supabase.co/functions/v1/haki-operations?mode=availability';
+  let busy=false;
+
+  async function refreshAvailability(){
+    if(busy||document.hidden)return;
+    busy=true;
+    try{
+      const response=await fetch(endpoint,{cache:'no-store',signal:AbortSignal.timeout(8000)});
+      if(!response.ok)throw new Error('Stock unavailable');
+      const data=await response.json();
+      if(!data?.migrated||!data.inventory||typeof data.inventory!=='object')return;
+
+      const current=window.HAKI_PRODUCTOS||[];
+      let changed=false;
+      const next=current.map(product=>{
+        const stock=data.inventory[String(product.codigo||'').toUpperCase()]||data.inventory[String(product.id)];
+        if(!stock)return product;
+        const tallas={...(product.tallas||{})};
+        for(const size of ['S','M','L','XL']){
+          if(Object.hasOwn(stock,size)){
+            const available=Number(stock[size])>0;
+            if(tallas[size]!==available)changed=true;
+            tallas[size]=available;
+          }
+        }
+        return {...product,tallas};
+      });
+
+      if(!changed)return;
+      window.HAKI_PRODUCTOS=next;
+      try{
+        localStorage.setItem('haki_catalog_cache_v3',JSON.stringify({
+          config:window.HAKI_CONFIG||{},
+          products:next
+        }));
+      }catch{}
+      window.dispatchEvent(new Event('haki:catalog-updated'));
+    }catch{}finally{busy=false;}
+  }
+
+  window.addEventListener('DOMContentLoaded',()=>{
+    refreshAvailability();
+    setInterval(refreshAvailability,45000);
+  });
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshAvailability();});
+})();
