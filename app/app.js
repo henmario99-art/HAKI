@@ -165,6 +165,20 @@
 
     $('#year').textContent = new Date().getFullYear();
     $('#collectionsTitle').textContent = CONFIG.tituloColecciones || 'EXPLORA POR CATEGORÍA';
+
+    const customBrandIcon = String(CONFIG.iconoHaki || '').trim();
+    document.documentElement.classList.toggle('haki-custom-brand-icon', !!customBrandIcon);
+    if (customBrandIcon) {
+      $('.brand-logo').forEach(img => {
+        img.src = freshImage(customBrandIcon, 320);
+        img.removeAttribute('srcset');
+        img.onerror = () => {
+          img.onerror = null;
+          img.src = freshImage('images/haki-wordmark.svg', 320);
+        };
+      });
+    }
+
     const video = $('#heroVideo');
     const isVideo = CONFIG.tipoPortada === 'video' && CONFIG.videoPortada;
     if (isVideo) {
@@ -207,12 +221,122 @@
     return normalize(p.categoria || '') === normalize(collection.categoria || collection.nombre);
   }
 
-  function usesShirtSizeGuide(p) {
-    const collectionNames = (p.colecciones || [])
-      .map(id => COLLECTIONS.find(collection => collection.id === id)?.nombre || '')
-      .join(' ');
-    return /camiseta|centro/.test(normalize(`${p.categoria || ''} ${collectionNames}`));
+  const SIZE_GUIDES = {
+    compression: {
+      label: 'COMPRESIÓN',
+      description: 'Medidas para camisetas de compresión y centros.',
+      headers: ['Talla USA', 'Pecho (cm)', 'Hombro (cm)', 'Largo (cm)'],
+      rows: [
+        ['S', '84–88', '39', '60'],
+        ['M', '88–92', '40', '61'],
+        ['L', '89–105', '41', '62'],
+        ['XL', '93–112', '43', '64']
+      ]
+    },
+    oversized: {
+      label: 'OVERSIZED',
+      description: 'Medidas de camisas oversized según la tabla proporcionada.',
+      headers: ['Talla', 'Hombro (cm)', 'Pecho (cm)', 'Largo (cm)', 'Manga (cm)'],
+      rows: [
+        ['M', '49', '51', '70', '20'],
+        ['L', '51', '53', '72', '20'],
+        ['XL', '53', '55', '74', '22'],
+        ['XXL', '55', '57', '76', '22'],
+        ['XXXL', '57', '59', '78', '24']
+      ]
+    },
+    pants: {
+      label: 'PANTS',
+      description: 'Medidas de pants según la tabla proporcionada.',
+      headers: ['Talla', 'Cintura (in)', 'Entrepierna (in)', 'Largo (in)'],
+      rows: [
+        ['S', '30', '27.9', '40'],
+        ['M', '32', '28.5', '41'],
+        ['L', '34', '29.1', '42'],
+        ['XL', '36', '29.8', '43'],
+        ['XXL', '38', '30.4', '44']
+      ]
+    },
+    shorts: {
+      label: 'SHORTS',
+      description: 'Referencia genérica para shorts de hombre.',
+      headers: ['Talla', 'Cintura (cm)', 'Cadera (cm)'],
+      rows: [
+        ['S', '73–81', '88–96'],
+        ['M', '81–89', '96–104'],
+        ['L', '89–97', '104–112'],
+        ['XL', '97–109', '112–120']
+      ],
+      note: 'Las medidas de shorts son una referencia genérica; el ajuste puede variar según el modelo.'
+    }
+  };
+
+  function productSizeGuideType(p) {
+    const ownCategory = normalize(p?.categoria || '');
+    if (/oversized|oversize/.test(ownCategory)) return 'oversized';
+    if (/short|calzoneta|bermuda/.test(ownCategory)) return 'shorts';
+    if (/pants|pant|jogger|pantalon/.test(ownCategory)) return 'pants';
+    if (/compresion|camiseta|centro|camisa|top/.test(ownCategory)) return 'compression';
+
+    const linkedCollections = (p?.colecciones || [])
+      .map(id => COLLECTIONS.find(collection => collection.id === id))
+      .filter(Boolean);
+    const collectionNames = normalize(linkedCollections.map(collection => collection.nombre || '').join(' '));
+
+    if (/oversized|oversize/.test(collectionNames)) return 'oversized';
+    if (/compresion|camiseta|centro|camisa/.test(collectionNames)) return 'compression';
+
+    const hasShorts = /short|calzoneta|bermuda/.test(collectionNames);
+    const hasPants = /pants|pant|jogger|pantalon/.test(collectionNames);
+    if (hasShorts && !hasPants) return 'shorts';
+    if (hasPants && !hasShorts) return 'pants';
+
+    const collectionCategories = normalize(linkedCollections.map(collection => collection.categoria || '').join(' '));
+    if (/oversized|oversize/.test(collectionCategories)) return 'oversized';
+    if (/short|calzoneta|bermuda/.test(collectionCategories)) return 'shorts';
+    if (/pants|pant|jogger|pantalon/.test(collectionCategories)) return 'pants';
+    if (/compresion|camiseta|centro|camisa|top/.test(collectionCategories)) return 'compression';
+    return null;
   }
+
+  function renderSizeGuide(type = 'compression') {
+    const guide = SIZE_GUIDES[type] || SIZE_GUIDES.compression;
+    const title = $('#sizeGuideTitle');
+    const description = $('#sizeGuideDescription');
+    const content = $('#sizeGuideContent');
+    const tabs = $('#sizeGuideTabs');
+    if (!content) return;
+
+    if (title) title.textContent = `Guía de tallas · ${guide.label}`;
+    if (description) description.textContent = guide.description;
+
+    if (tabs) {
+      $('[data-size-guide]', tabs).forEach(button => {
+        const active = button.dataset.sizeGuide === type;
+        button.classList.toggle('is-active', active);
+        button.setAttribute('aria-selected', String(active));
+        button.onclick = () => renderSizeGuide(button.dataset.sizeGuide);
+      });
+    }
+
+    content.innerHTML = `
+      <div class="menu-size-guide-scroll">
+        <table class="menu-size-guide-table">
+          <thead><tr>${guide.headers.map(header => `<th scope="col">${esc(header)}</th>`).join('')}</tr></thead>
+          <tbody>${guide.rows.map(row => `<tr>${row.map((cell, index) => index === 0 ? `<th scope="row">${esc(cell)}</th>` : `<td>${esc(cell)}</td>`).join('')}</tr>`).join('')}</tbody>
+        </table>
+      </div>
+      ${guide.note ? `<p class="size-guide-note">${esc(guide.note)}</p>` : ''}
+    `;
+  }
+
+  function openSizeGuide(type = 'compression') {
+    renderSizeGuide(type);
+    const dialog = $('#sizeGuideDialog');
+    if (dialog && !dialog.open) dialog.showModal();
+  }
+
+  window.HAKI_OPEN_SIZE_GUIDE = openSizeGuide;
 
   function renderProducts() {
     const list = visibleProducts();
@@ -1161,7 +1285,8 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     document.title = `${p.nombre} — HAKI`;
     const images = [p.imagen || fallbackFor(p), p.imagen2].filter(Boolean);
     const selected = state.selected[p.codigo] || '';
-    const showSizeGuide = usesShirtSizeGuide(p);
+    const sizeGuideType = productSizeGuideType(p);
+    const showSizeGuide = !!sizeGuideType;
     detail.innerHTML = `
       <div class="app-detail-toolbar">
         <a class="detail-back" href="${esc(lastListingHash)}" aria-label="Volver a las prendas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5m7-7-7 7 7 7"/></svg></a>
@@ -1223,14 +1348,14 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       }
       addToCart(p.codigo);
     }));
-    if (showSizeGuide) $('#openSizeGuide').addEventListener('click', () => $('#sizeGuideDialog').showModal());
+    if (showSizeGuide) $('#openSizeGuide').addEventListener('click', () => openSizeGuide(sizeGuideType));
   }
 
   $('#closeSizeGuide').addEventListener('click', () => $('#sizeGuideDialog').close());
   $('#sizeGuideDialog').addEventListener('click', e => { if (e.target === $('#sizeGuideDialog')) $('#sizeGuideDialog').close(); });
   $('#openGlobalSizeGuide').addEventListener('click', () => {
     closeMenu();
-    $('#sizeGuideDialog').showModal();
+    openSizeGuide('compression');
   });
 
   function closeMenu() {
