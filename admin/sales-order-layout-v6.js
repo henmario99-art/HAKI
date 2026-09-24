@@ -34,7 +34,15 @@
         white-space:normal!important;
         font-size:14px!important;
       }
-      .haki-sale-mini:not(.archived-sale-card) .sale-order-codes{
+      .haki-sale-mini:not(.archived-sale-card) .sale-order-inline{
+        display:inline;
+        margin-left:4px;
+        color:#222!important;
+        font-size:13px!important;
+        line-height:1.35;
+        font-weight:700;
+      }
+      .haki-sale-mini:not(.archived-sale-card) .sale-destination{
         display:block!important;
         width:100%;
         margin:4px 0 0!important;
@@ -63,7 +71,8 @@
         width:100%;
       }
       @media(max-width:430px){
-        .haki-sale-mini:not(.archived-sale-card) .sale-order-codes{font-size:12px!important}
+        .haki-sale-mini:not(.archived-sale-card) .sale-order-inline,
+        .haki-sale-mini:not(.archived-sale-card) .sale-destination{font-size:12px!important}
       }
     `;
     document.head.appendChild(style);
@@ -121,19 +130,24 @@
     const fallbackOrder = String(oldOrder?.textContent || oldOrderSpan?.textContent || '')
       .replace(/^\s*-\s*/, '').trim();
     const orderText = codeSummary(sale, fallbackOrder);
+    const destinationText = String(sale?.lugarHorario || oldDestination?.textContent || '').trim() || 'Sin destino';
 
     line.replaceChildren(name);
+
+    const inlineOrder = document.createElement('span');
+    inlineOrder.className = 'sale-order-inline';
+    inlineOrder.textContent = orderText ? ` - ${orderText}` : '';
+    if (inlineOrder.textContent) line.append(inlineOrder);
     if (channel) line.append(channel);
 
-    const order = oldOrder || oldDestination || document.createElement('small');
-    order.className = 'sale-order-codes';
-    order.textContent = orderText;
-    if (order.parentElement !== main) line.insertAdjacentElement('afterend', order);
+    const destination = oldDestination || document.createElement('small');
+    destination.className = 'sale-destination';
+    destination.textContent = destinationText;
+    line.insertAdjacentElement('afterend', destination);
 
-    card.querySelectorAll('.sale-client-separator,.sale-location-inline,.sale-destination')
-      .forEach(node => {
-        if (node !== order) node.remove();
-      });
+    if (oldOrder && oldOrder !== destination) oldOrder.remove();
+    card.querySelectorAll('.sale-client-separator,.sale-location-inline')
+      .forEach(node => node.remove());
 
     controls.querySelectorAll('label').forEach(label => {
       [...label.childNodes].forEach(node => {
