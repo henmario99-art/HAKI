@@ -1039,25 +1039,26 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     return copied;
   }
 
-  function openInstagramChat(handle) {
-    const username = String(handle || '').replace(/^@/, '').trim();
-    if (!/^[a-zA-Z0-9._]{1,30}$/.test(username)) return false;
-    const chat = `https://ig.me/m/${encodeURIComponent(username)}`;
+  function openInstagramOutsideBrowser(url) {
     const ua = navigator.userAgent || '';
-    if (/Instagram/i.test(ua)) {
-      // A WebView may allow closing to restore the originating DM. If it does
-      // not, the recipient-specific universal link is dispatched in this tap.
-      try { window.close(); } catch {}
+    const inInstagram = /Instagram/i.test(ua);
+    const isiOS = /iPad|iPhone|iPod/i.test(ua) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isAndroid = /Android/i.test(ua);
+
+    if (inInstagram && isAndroid) {
+      const target = url.replace(/^https?:\/\//, '');
+      location.href = `intent://${target}#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url=${encodeURIComponent(url)};end`;
+      return 'Chrome';
     }
-    if (/Android/i.test(ua)) {
-      location.assign(`intent://ig.me/m/${encodeURIComponent(username)}#Intent;scheme=https;package=com.instagram.android;S.browser_fallback_url=${encodeURIComponent(chat)};end`);
-    } else if (/iPad|iPhone|iPod|Instagram/i.test(ua) ||
-      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
-      location.assign(chat);
-    } else {
-      window.open(chat, '_blank', 'noopener');
+
+    if (inInstagram && isiOS) {
+      location.href = `x-safari-${url}`;
+      return 'Safari';
     }
-    return true;
+
+    window.open(url, '_blank', 'noopener');
+    return '';
   }
 
   const instagramUA = navigator.userAgent || '';
@@ -1154,24 +1155,24 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     if (!validateQuote()) return;
 
     const text = quoteText();
-    const handle = String(CONFIG.instagram || 'haki__sv').replace(/^@/, '').trim();
-    if (!handle) {
-      showToast('Instagram no está configurado.');
-      return;
-    }
-
+    const handle = String(CONFIG.instagram || '').replace(/^@/, '').trim();
+    const target = `https://ig.me/m/${encodeURIComponent(handle)}`;
     const legacyCopied = legacyCopyQuoteText(text);
     const modernCopy = (navigator.clipboard?.writeText && window.isSecureContext)
       ? navigator.clipboard.writeText(text).then(() => true).catch(() => legacyCopied)
       : Promise.resolve(legacyCopied);
 
-    // Dispatch before awaiting Clipboard: iOS needs the original user gesture.
-    if (isInstagramInAppBrowser) closeCart();
-    openInstagramChat(handle);
+    const externalBrowser = openInstagramOutsideBrowser(target);
     modernCopy.then(copied => {
-      showToast(copied
-        ? 'Cotización copiada. Abriendo el chat de HAKI…'
-        : 'No se pudo copiar la cotización. Vuelve al carrito para intentarlo.');
+      if (externalBrowser) {
+        showToast(copied
+          ? `Cotización copiada. Abriendo ${externalBrowser}…`
+          : `Abriendo ${externalBrowser}… Copia la cotización manualmente.`);
+      } else {
+        showToast(copied
+          ? 'Cotización copiada. Pégala en Instagram.'
+          : 'Instagram abierto. Copia la cotización manualmente.');
+      }
     });
   }
 
