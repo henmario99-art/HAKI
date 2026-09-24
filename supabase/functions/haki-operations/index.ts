@@ -326,7 +326,7 @@ async function uploadImage(body: any) {
 }
 
 Deno.serve(async (req: Request) => {
-  if (req.method === 'OPTIONS') return new Response('', { status:204, headers:CORS });
+  if (req.method === 'OPTIONS') return new Response(null, { status:204, headers:CORS });
   const url = new URL(req.url);
   const mode = url.searchParams.get('mode') || 'week';
 
