@@ -60,39 +60,37 @@
       sessionPromise = null;
       throw new Error('La sesión terminó. Entra de nuevo al administrador.');
     }
-    if (!readyPromise) {
-      // Never write to the old Blobs store when Supabase is unavailable.
-      readyPromise = edgeRequest('mode=status', { method: 'GET', signal: AbortSignal.timeout(6000) }).catch(async error => {
-        if (error.status === 401) throw error;
-        // Some browsers/networks block cross-origin calls. Probe the same-origin
-        // proxy with a READ before choosing it; never retry an uncertain write.
-        const status = await proxyRequest('mode=status', { method: 'GET' });
-        if (!status.migrated) throw error;
-        transport = 'proxy';
-        return status;
-      }).then(status => {
-        if (!status.migrated) throw new Error('No se pudo confirmar la base de datos de ventas.');
-      }).catch(error => { readyPromise = null; throw error; });
-    }
-    return readyPromise;
+    return true;
   }
 
   window.hakiOperationalSession = session;
   window.hakiSupabaseSalesApi = async (path, options = {}) => {
-    const query = String(path || '').replace(/^sales\??/, '');
+    const query = String(path || '').replace(/^sales\\??/, '');
+    const method = String(options.method || 'GET').toUpperCase();
+    const readOnly = method === 'GET' || method === 'HEAD';
+
     try {
       await ready();
       return await (transport === 'proxy' ? proxyRequest(query, options) : edgeRequest(query, options));
     } catch (error) {
-      if (error.status !== 401) throw error;
-      // 401 rejects the request before any mutation; refreshing is safe here.
-      // Network/timeout/5xx failures are never replayed automatically.
-      operationsToken = '';
-      sessionPromise = null;
-      readyPromise = null;
-      transport = 'direct';
-      await ready();
-      return transport === 'proxy' ? proxyRequest(query, options) : edgeRequest(query, options);
+      if (error.status === 401) {
+        // Un 401 rechaza la solicitud antes de mutar datos; renovar y repetir es seguro.
+        operationsToken = '';
+        sessionPromise = null;
+        readyPromise = null;
+        transport = 'direct';
+        await ready();
+        return transport === 'proxy' ? proxyRequest(query, options) : edgeRequest(query, options);
+      }
+
+      // Si una lectura directa falla por red/CORS, usar Netlify como respaldo.
+      // Nunca repetimos automáticamente una escritura incierta.
+      if (transport === 'direct' && readOnly) {
+        const data = await proxyRequest(query, options);
+        transport = 'proxy';
+        return data;
+      }
+      throw error;
     }
   };
 })();

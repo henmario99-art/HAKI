@@ -67,7 +67,7 @@ async function ensureAuth(){
   if(!auth.authenticated){location.href='/admin/';return false}
   return true;
 }
-async function loadProducts(){const data=await api('catalog',{method:'GET'});state.products=data.products||[]}
+async function loadProducts(){const data=await api('catalog',{method:'GET'});state.products=data.products||[];if(Object.keys(state.inventory).length)renderInventory()}
 async function loadWeek(){const data=await api(`sales?weekStart=${encodeURIComponent(state.weekStart)}`,{method:'GET'});state.weekStart=data.weekStart;state.sales=data.sales||[];state.inventory=data.inventory||{};renderWeek();renderInventory()}
 
 function renderWeek(){
@@ -166,4 +166,4 @@ $('#cancelDialog').addEventListener('click',hideEditor);
 $('#deleteSale').addEventListener('click',deleteSale);
 $('#saleForm').addEventListener('submit',event=>{event.preventDefault();saveSale()});
 
-(async()=>{state.weekStart=mondayOf(new Date());try{if(!await ensureAuth())return;await loadProducts();await loadWeek()}catch(err){toast(err.message || 'No se pudo conectar con HAKI. Recarga para intentarlo de nuevo.',true)}})();
+(async()=>{state.weekStart=mondayOf(new Date());try{if(!await ensureAuth())return;await Promise.all([loadProducts(),loadWeek()])}catch(err){toast(err.message || 'No se pudo conectar con HAKI. Recarga para intentarlo de nuevo.',true)}})();

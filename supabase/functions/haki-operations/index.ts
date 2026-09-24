@@ -48,13 +48,18 @@ async function authorize(req: Request) {
   if (!token) return false;
   const hash = await sha256(token);
   const now = new Date().toISOString();
-  const cached = await db(`haki_sessions?token_hash=eq.${encodeURIComponent(hash)}&expires_at=gt.${encodeURIComponent(now)}&select=token_hash,expires_at`);
+  const cached = await db(`haki_sessions?token_hash=eq.${encodeURIComponent(hash)}&expires_at=gt.${encodeURIComponent(now)}&select=token_hash,expires_at,last_used_at`);
   if (Array.isArray(cached) && cached.length) {
-    await db(`haki_sessions?token_hash=eq.${encodeURIComponent(hash)}`, {
-      method: 'PATCH',
-      headers: { prefer: 'return=minimal' },
-      body: JSON.stringify({ last_used_at: now }),
-    }).catch(() => {});
+    const lastUsed = Date.parse(cached[0]?.last_used_at || '');
+    if (!Number.isFinite(lastUsed) || Date.now() - lastUsed > 5 * 60 * 1000) {
+      EdgeRuntime.waitUntil(
+        db(`haki_sessions?token_hash=eq.${encodeURIComponent(hash)}`, {
+          method: 'PATCH',
+          headers: { prefer: 'return=minimal' },
+          body: JSON.stringify({ last_used_at: now }),
+        }).catch(() => {})
+      );
+    }
     return true;
   }
 
@@ -269,9 +274,8 @@ function applyCatalogInventory(products: any[], inventory: Record<string, any>) 
 }
 
 async function catalogResponse(publicOnly = false) {
-  const record = await catalogRecord();
+  const [record, inventory] = await Promise.all([catalogRecord(), inventoryMap()]);
   if (!record) return { exists:false, config:{}, products:[], version:'' };
-  const inventory = await inventoryMap();
   let products = applyCatalogInventory(record.products || [], inventory);
   if (publicOnly) products = products.filter((product:any) => product?.borrador !== true);
   return { exists:true, config:record.config || {}, products, version:record.versionToken || record.savedAt || '' };
@@ -440,8 +444,11 @@ Deno.serve(async (req: Request) => {
       const requested = validDate(url.searchParams.get('weekStart')) || mondayOf(new Date().toISOString().slice(0,10));
       const start = mondayOf(requested);
       const end = addDays(start,6);
-      const rows = await db(`haki_sales?archived_at=is.null&sale_date=gte.${start}&sale_date=lte.${end}&select=payload&order=sale_date.asc`);
-      return json({ weekStart:start, weekEnd:end, sales:(rows||[]).map((r:any)=>r.payload), inventory:await inventoryMap() });
+      const [rows, inventory] = await Promise.all([
+        db(`haki_sales?archived_at=is.null&sale_date=gte.${start}&sale_date=lte.${end}&select=payload&order=sale_date.asc`),
+        inventoryMap(),
+      ]);
+      return json({ weekStart:start, weekEnd:end, sales:(rows||[]).map((r:any)=>r.payload), inventory });
     }
 
     if (req.method === 'POST' && mode === 'restore') {
