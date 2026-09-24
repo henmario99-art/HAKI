@@ -941,8 +941,10 @@
 
   function closeCart() {
     if (els.drawer.getAttribute('aria-hidden') === 'true') return;
+    document.activeElement?.blur?.();
+    els.drawer.dispatchEvent(new Event('haki:close'));
     els.drawer.inert = true;
-    els.openCart.focus();
+    els.openCart.focus({ preventScroll: true });
     els.drawer.classList.remove('open');
 
     els.drawer.setAttribute(
@@ -1039,67 +1041,23 @@ ${settings().totalTexto}: ${money(totals.total)}`;
 
   function openInstagramChat(handle) {
     const username = String(handle || '').replace(/^@/, '').trim();
-    if (!username) return false;
-
-    const encodedUsername = encodeURIComponent(username);
-    const webTarget = `https://ig.me/m/${encodedUsername}`;
-    const directTarget = `instagram://direct?username=${encodedUsername}`;
-    const inboxTarget = 'instagram://direct-inbox';
+    if (!/^[a-zA-Z0-9._]{1,30}$/.test(username)) return false;
+    const chat = `https://ig.me/m/${encodeURIComponent(username)}`;
     const ua = navigator.userAgent || '';
-    const isiOS = /iPad|iPhone|iPod/i.test(ua) ||
-      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    const isAndroid = /Android/i.test(ua);
-    const isInstagramBrowser = /Instagram/i.test(ua);
-
-    const openAndroidInstagram = () => {
-      // Target the installed Instagram package directly. This avoids leaving the
-      // customer on instagram.com (and avoids a second login) when the app exists.
-      location.href = `intent://direct?username=${encodedUsername}#Intent;scheme=instagram;package=com.instagram.android;S.browser_fallback_url=${encodeURIComponent(webTarget)};end`;
-    };
-
-    if (isInstagramBrowser) {
-      // When the catalog was launched from a DM, closing the in-app browser is
-      // the only route that can restore the exact conversation that opened it.
-      // Instagram does not always allow window.close(), so we also use the native
-      // app deep link as a no-login fallback. Never fall back to instagram.com
-      // from inside Instagram's own browser.
+    if (/Instagram/i.test(ua)) {
+      // A WebView may allow closing to restore the originating DM. If it does
+      // not, the recipient-specific universal link is dispatched in this tap.
       try { window.close(); } catch {}
-
-      if (isAndroid) {
-        window.setTimeout(() => {
-          if (document.visibilityState !== 'hidden') openAndroidInstagram();
-        }, 80);
-        return true;
-      }
-
-      if (isiOS) {
-        window.setTimeout(() => {
-          if (document.visibilityState === 'hidden') return;
-          location.href = directTarget;
-
-          window.setTimeout(() => {
-            if (document.visibilityState !== 'hidden') location.href = inboxTarget;
-          }, 650);
-        }, 80);
-        return true;
-      }
-
-      try { history.back(); } catch {}
-      return true;
     }
-
-    if (isAndroid) {
-      openAndroidInstagram();
-      return true;
+    if (/Android/i.test(ua)) {
+      location.assign(`intent://ig.me/m/${encodeURIComponent(username)}#Intent;scheme=https;package=com.instagram.android;S.browser_fallback_url=${encodeURIComponent(chat)};end`);
+    } else if (/iPad|iPhone|iPod|Instagram/i.test(ua) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
+      location.assign(chat);
+    } else {
+      window.open(chat, '_blank', 'noopener');
     }
-
-    if (isiOS) {
-      location.href = webTarget;
-      return true;
-    }
-
-    window.open(webTarget, '_blank', 'noopener');
-    return false;
+    return true;
   }
 
   const instagramUA = navigator.userAgent || '';
@@ -1207,30 +1165,13 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       ? navigator.clipboard.writeText(text).then(() => true).catch(() => legacyCopied)
       : Promise.resolve(legacyCopied);
 
-    if (isInstagramInAppBrowser) {
-      modernCopy.then(copied => {
-        closeCart();
-
-        // Same action on Android and iPhone: try to close Instagram's in-app
-        // browser directly from the quote button. If iOS blocks the close,
-        // keep the native-X instruction as the fallback.
-        try { window.close(); } catch {}
-
-        window.setTimeout(() => {
-          if (document.visibilityState !== 'hidden') {
-            showInstagramReturnOverlay();
-            showToast(copied ? 'Cotización copiada.' : 'Pedido listo.');
-          }
-        }, 320);
-      });
-      return;
-    }
-
+    // Dispatch before awaiting Clipboard: iOS needs the original user gesture.
+    if (isInstagramInAppBrowser) closeCart();
     openInstagramChat(handle);
     modernCopy.then(copied => {
       showToast(copied
-        ? 'Cotización copiada. Abriendo Instagram…'
-        : 'Abriendo Instagram… Copia la cotización manualmente.');
+        ? 'Cotización copiada. Abriendo el chat de HAKI…'
+        : 'No se pudo copiar la cotización. Vuelve al carrito para intentarlo.');
     });
   }
 
@@ -1256,6 +1197,9 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     };
 
     const resetKeyboardState = () => {
+      clearTimeout(settleTimer);
+      clearTimeout(cleanupTimer);
+      cancelAnimationFrame(viewportFrame);
       drawer.classList.remove(
         'keyboard-active',
         'keyboard-android',
@@ -1274,7 +1218,8 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       if (!isInstagramKeyboardSurface()) return;
       cancelAnimationFrame(viewportFrame);
       viewportFrame = requestAnimationFrame(() => {
-        const height = Math.max(250, Math.round(viewport?.height || window.innerHeight));
+        if (!isInstagramKeyboardSurface() || !drawer.classList.contains('open')) return;
+        const height = Math.max(120, Math.round(viewport?.height || window.innerHeight));
         const top = Math.max(0, Math.round(viewport?.offsetTop || 0));
         drawer.style.setProperty('--haki-vvh', `${height}px`);
         drawer.style.setProperty('--haki-vv-top', `${top}px`);
@@ -1368,6 +1313,7 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       }, 260);
     });
 
+    drawer.addEventListener('haki:close', resetKeyboardState);
     viewport?.addEventListener('resize', syncInstagramViewport);
     viewport?.addEventListener('scroll', syncInstagramViewport);
 

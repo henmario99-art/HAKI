@@ -63,9 +63,9 @@
 .sale-quick-controls{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px;cursor:default}
 .sale-quick-controls label{display:grid;gap:4px;min-width:0;font-size:11px;font-weight:600;color:#555}
 .sale-quick-controls select{width:100%;min-width:0;min-height:40px;font:inherit;font-size:16px;font-weight:700;color:#111;border:1px solid #ccc;border-radius:8px;padding:6px 28px 6px 7px;background:#fff}
-.sale-quick-controls select.quick-good{background:#dcf5e5!important;border-color:#9fd9b6!important;color:#126b39!important}
-.sale-quick-controls select.quick-bad{background:#fde2df!important;border-color:#edb7b0!important;color:#9d2a1e!important}
-.sale-quick-controls select.quick-pending{background:#fff1c7!important;border-color:#efd982!important;color:#7b5b00!important}
+.sale-quick-controls select.quick-good{background-color:#dcf5e5!important;border-color:#9fd9b6!important;color:#126b39!important}
+.sale-quick-controls select.quick-bad{background-color:#fde2df!important;border-color:#edb7b0!important;color:#9d2a1e!important}
+.sale-quick-controls select.quick-pending{background-color:#fff1c7!important;border-color:#efd982!important;color:#7b5b00!important}
 .sale-quick-controls select:disabled{opacity:.6}
 .sale-main-copy{min-width:0}
 .sale-client-line{display:flex;align-items:baseline;gap:0;min-width:0;white-space:nowrap;overflow:hidden}
@@ -81,4 +81,28 @@
   .sale-quick-controls label{font-size:10px}
   .sale-quick-controls select{padding-left:6px;padding-right:24px}
   .sale-client-line strong{max-width:48%}
+}
+
+/* Compact controls and channel badges, including narrow phones. */
+.haki-sale-mini .sale-quick-controls{gap:7px;margin-top:6px;max-width:520px}
+.haki-sale-mini .sale-quick-controls label{gap:3px;font-size:10px}
+.haki-sale-mini .sale-quick-controls select{
+ min-height:34px;height:34px;font-size:13px;line-height:1.2;font-weight:600;
+ padding:4px 18px 4px 7px;border-radius:6px;appearance:none;
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='m1 1 4 4 4-4' fill='none' stroke='%23666' stroke-width='1.2'/%3E%3C/svg%3E");
+ background-repeat:no-repeat;background-position:right 6px center;
+}
+.haki-sale-mini .sale-client-line{display:block;white-space:normal;overflow:visible;line-height:1.45}
+.haki-sale-mini .sale-client-line strong{max-width:none;overflow:visible;font-size:14px}
+.haki-sale-mini .sale-client-line span{overflow:visible;overflow-wrap:anywhere}
+.haki-sale-mini .sale-client-line .sale-channel{
+ display:inline-block;vertical-align:middle;margin-left:6px;padding:2px 6px;border-radius:5px;
+ font-size:10px;font-weight:700;line-height:1.4;white-space:nowrap;
+}
+.haki-sale-mini .sale-channel-whatsapp{color:#126b39;background:#dcf5e5}
+.haki-sale-mini .sale-channel-instagram{color:#a52020;background:#ffe3e3}
+.haki-sale-mini .sale-channel-other{color:#555;background:#eee}
+@media(max-width:700px){
+ .haki-sale-mini .sale-quick-controls{gap:5px}
+ .haki-sale-mini .sale-quick-controls select{font-size:12px;padding-left:5px;padding-right:16px}
 }

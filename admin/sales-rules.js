@@ -120,7 +120,7 @@
       img.alt = product.nombre || product.codigo || 'Prenda HAKI';
       img.src = productImage(product);
       img.loading = 'lazy';
-      img.onerror = () => { img.src = '/images/producto.svg'; };
+      img.onerror = () => { img.onerror = null; img.src = '/images/producto.svg'; };
       info.prepend(img);
     });
   }

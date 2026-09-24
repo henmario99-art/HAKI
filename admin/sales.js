@@ -7,7 +7,26 @@ const months=['enero','febrero','marzo','abril','mayo','junio','julio','agosto',
 const state={products:[],inventory:{},sales:[],archived:[],weekStart:'',editing:null,previousWeekStart:''};
 const C807_GUIDE_COST=4.15;
 
-async function api(path,options={}){const res=await fetch(`${API}/${path}`,{credentials:'same-origin',headers:{'content-type':'application/json',...(options.headers||{})},...options});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.error||`Error ${res.status}`);return data}
+async function api(path,options={}) {
+  if (/^sales(?:\?|$)/.test(path) && window.hakiSupabaseSalesApi) {
+    return window.hakiSupabaseSalesApi(path, options);
+  }
+  const res=await fetch(`${API}/${path}`, {
+    credentials:'same-origin', ...options,
+    headers:{'content-type':'application/json',...(options.headers||{})},
+    signal:options.signal || AbortSignal.timeout(20000)
+  });
+  const data=await res.json().catch(()=>null);
+  if(!res.ok || !data) throw new Error(data?.error || `No se pudo conectar con HAKI (${res.status}). Intenta de nuevo.`);
+  return data;
+}
+function channelBadge(value) {
+  const raw=String(value || '').trim();
+  const key=raw.toLowerCase();
+  const channel=key.includes('whats')?'whatsapp':key.includes('insta')?'instagram':'other';
+  const label=channel==='whatsapp'?'WhatsApp':channel==='instagram'?'Instagram':raw || 'Sin canal';
+  return `<span class="sale-channel sale-channel-${channel}" aria-label="Canal: ${escapeHtml(label)}">${escapeHtml(label)}</span>`;
+}
 function toast(message,error=false){const el=$('#status');el.textContent=message;el.classList.toggle('error',error);el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),2800)}
 function isoDate(date){const y=date.getFullYear();const m=String(date.getMonth()+1).padStart(2,'0');const d=String(date.getDate()).padStart(2,'0');return `${y}-${m}-${d}`}
 function parseDate(iso){return new Date(`${iso}T12:00:00`)}
@@ -41,7 +60,13 @@ function editorC807Commission(total,delivery,moneyState){
 }
 function c807GuideCost(delivery){return isC807Delivery(delivery)?C807_GUIDE_COST:0}
 
-async function ensureAuth(){try{const auth=await api('auth',{method:'GET'});if(!auth.authenticated)location.href='/admin/'}catch{location.href='/admin/'}}
+async function ensureAuth(){
+  const auth=window.hakiOperationalSession
+    ? await window.hakiOperationalSession()
+    : await api('auth',{method:'GET'});
+  if(!auth.authenticated){location.href='/admin/';return false}
+  return true;
+}
 async function loadProducts(){const data=await api('catalog',{method:'GET'});state.products=data.products||[]}
 async function loadWeek(){const data=await api(`sales?weekStart=${encodeURIComponent(state.weekStart)}`,{method:'GET'});state.weekStart=data.weekStart;state.sales=data.sales||[];state.inventory=data.inventory||{};renderWeek();renderInventory()}
 
@@ -121,7 +146,7 @@ async function deleteSale(){if(!state.editing||!confirm(`¿Archivar la venta de 
 
 function formatAuditTime(value){if(!value)return'';const d=new Date(value);return Number.isNaN(d.getTime())?'':d.toLocaleString('es-SV',{dateStyle:'medium',timeStyle:'short'})}
 async function loadSaleHistory(saleId,container){if(!container||container.dataset.loaded==='true')return;container.dataset.loaded='true';container.textContent='Cargando historial…';try{const data=await api(`sales?mode=history&id=${encodeURIComponent(saleId)}`,{method:'GET'});const labels={baseline:'Registro protegido',created:'Venta creada',updated:'Venta editada',archived:'Venta archivada',restored:'Venta restaurada',deleted:'Eliminación detectada'};container.replaceChildren();const rows=data.history||[];if(!rows.length){container.textContent='Sin cambios registrados.';return}rows.forEach(entry=>{const line=document.createElement('p');line.style.margin='8px 0';const strong=document.createElement('strong');strong.textContent=labels[entry.action]||entry.action;const small=document.createElement('small');small.style.display='block';small.textContent=formatAuditTime(entry.changed_at);line.append(strong,small);container.append(line)})}catch(err){container.dataset.loaded='';container.textContent=err.message||'No se pudo cargar el historial.'}}
-function renderArchivedSales(){const wrap=$('#archivedSalesList');if(!wrap)return;wrap.replaceChildren();if(!state.archived.length){const empty=document.createElement('div');empty.className='empty-day';empty.textContent='No hay ventas archivadas.';wrap.append(empty);return}state.archived.forEach(sale=>{const card=document.createElement('article');card.className='haki-sale-mini archived-sale-card';const items=(sale.items||[]).map(i=>`${i.codigo} ${i.talla}${Number(i.cantidad)>1?` ×${i.cantidad}`:''}`).join(' · ')||'Pedido';card.innerHTML=`<div class="sale-main-copy"><div class="sale-client-line"><strong>${escapeHtml(sale.cliente||'Cliente')}</strong><span> - ${escapeHtml(items)}</span></div><small class="sale-destination">${escapeHtml(sale.lugarHorario||'Sin destino')}</small></div><div class="amount">${money(sale.total)}</div><div class="meta"><span class="pill cancelled">Archivada</span><span class="pill">${escapeHtml(formatAuditTime(sale.archivedAt)||'')}</span></div>`;const actions=document.createElement('div');actions.className='archived-sale-actions';const restore=document.createElement('button');restore.type='button';restore.className='button primary';restore.textContent='Restaurar venta';restore.addEventListener('click',async()=>{if(!confirm(`¿Restaurar la venta de ${sale.cliente||'este cliente'}? El sistema volverá a reservar el inventario.`))return;restore.disabled=true;try{await api('sales?mode=restore',{method:'POST',body:JSON.stringify({id:sale.id})});await loadArchivedSales();await loadWeek();toast('Venta restaurada y stock reservado nuevamente.')}catch(err){toast(err.message,true)}finally{restore.disabled=false}});const details=document.createElement('details');const summary=document.createElement('summary');summary.textContent='Historial';summary.style.cursor='pointer';const history=document.createElement('div');history.style.padding='8px 0';details.append(summary,history);details.addEventListener('toggle',()=>{if(details.open)loadSaleHistory(sale.id,history)});const permanentDelete=document.createElement('button');permanentDelete.type='button';permanentDelete.className='button danger';permanentDelete.textContent='Borrar definitivamente';permanentDelete.addEventListener('click',async()=>{if(!confirm(`¿Borrar definitivamente la venta de ${sale.cliente||'este cliente'}? Esta acción no se puede deshacer y eliminará también su historial.`))return;if(!confirm('Última confirmación: la venta se eliminará de forma permanente. ¿Continuar?'))return;restore.disabled=true;permanentDelete.disabled=true;try{await api('sales?mode=permanent-delete',{method:'DELETE',body:JSON.stringify({id:sale.id,archivedAt:sale.archivedAt,confirmDelete:true})});await loadArchivedSales();toast('Venta borrada definitivamente.')}catch(err){toast(err.message,true);restore.disabled=false;permanentDelete.disabled=false}});actions.append(restore,permanentDelete,details);card.append(actions);wrap.append(card)})}
+function renderArchivedSales(){const wrap=$('#archivedSalesList');if(!wrap)return;wrap.replaceChildren();if(!state.archived.length){const empty=document.createElement('div');empty.className='empty-day';empty.textContent='No hay ventas archivadas.';wrap.append(empty);return}state.archived.forEach(sale=>{const card=document.createElement('article');card.className='haki-sale-mini archived-sale-card';const items=(sale.items||[]).map(i=>`${i.codigo} ${i.talla}${Number(i.cantidad)>1?` ×${i.cantidad}`:''}`).join(' · ')||'Pedido';card.innerHTML=`<div class="sale-main-copy"><div class="sale-client-line"><strong>${escapeHtml(sale.cliente||'Cliente')}</strong><span> - ${escapeHtml(items)}</span>${channelBadge(sale.canal)}</div><small class="sale-destination">${escapeHtml(sale.lugarHorario||'Sin destino')}</small></div><div class="amount">${money(sale.total)}</div><div class="meta"><span class="pill cancelled">Archivada</span><span class="pill">${escapeHtml(formatAuditTime(sale.archivedAt)||'')}</span></div>`;const actions=document.createElement('div');actions.className='archived-sale-actions';const restore=document.createElement('button');restore.type='button';restore.className='button primary';restore.textContent='Restaurar venta';restore.addEventListener('click',async()=>{if(!confirm(`¿Restaurar la venta de ${sale.cliente||'este cliente'}? El sistema volverá a reservar el inventario.`))return;restore.disabled=true;try{await api('sales?mode=restore',{method:'POST',body:JSON.stringify({id:sale.id})});await loadArchivedSales();await loadWeek();toast('Venta restaurada y stock reservado nuevamente.')}catch(err){toast(err.message,true)}finally{restore.disabled=false}});const details=document.createElement('details');const summary=document.createElement('summary');summary.textContent='Historial';summary.style.cursor='pointer';const history=document.createElement('div');history.style.padding='8px 0';details.append(summary,history);details.addEventListener('toggle',()=>{if(details.open)loadSaleHistory(sale.id,history)});const permanentDelete=document.createElement('button');permanentDelete.type='button';permanentDelete.className='button danger';permanentDelete.textContent='Borrar definitivamente';permanentDelete.addEventListener('click',async()=>{if(!confirm(`¿Borrar definitivamente la venta de ${sale.cliente||'este cliente'}? Esta acción no se puede deshacer y eliminará también su historial.`))return;if(!confirm('Última confirmación: la venta se eliminará de forma permanente. ¿Continuar?'))return;restore.disabled=true;permanentDelete.disabled=true;try{await api('sales?mode=permanent-delete',{method:'DELETE',body:JSON.stringify({id:sale.id,archivedAt:sale.archivedAt,confirmDelete:true})});await loadArchivedSales();toast('Venta borrada definitivamente.')}catch(err){toast(err.message,true);restore.disabled=false;permanentDelete.disabled=false}});actions.append(restore,permanentDelete,details);card.append(actions);wrap.append(card)})}
 async function loadArchivedSales(){const data=await api('sales?mode=archived',{method:'GET'});state.archived=data.archived||[];renderArchivedSales()}
 
 
@@ -141,4 +166,4 @@ $('#cancelDialog').addEventListener('click',hideEditor);
 $('#deleteSale').addEventListener('click',deleteSale);
 $('#saleForm').addEventListener('submit',event=>{event.preventDefault();saveSale()});
 
-(async()=>{await ensureAuth();state.weekStart=mondayOf(new Date());try{await loadProducts();await loadWeek()}catch(err){toast(err.message,true)}})();
+(async()=>{state.weekStart=mondayOf(new Date());try{if(!await ensureAuth())return;await loadProducts();await loadWeek()}catch(err){toast(err.message || 'No se pudo conectar con HAKI. Recarga para intentarlo de nuevo.',true)}})();

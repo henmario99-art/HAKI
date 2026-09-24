@@ -944,8 +944,10 @@
 
   function closeCart() {
     if (els.drawer.getAttribute('aria-hidden') === 'true') return;
+    document.activeElement?.blur?.();
+    els.drawer.dispatchEvent(new Event('haki:close'));
     els.drawer.inert = true;
-    els.openCart.focus();
+    els.openCart.focus({ preventScroll: true });
     els.drawer.classList.remove('open');
 
     els.drawer.setAttribute(
@@ -1016,71 +1018,53 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     link.remove();
   }
 
-  function openInstagramChat(handle) {
-    const username = String(handle || '').replace(/^@/, '').trim();
-    if (!username) return false;
-
-    const encodedUsername = encodeURIComponent(username);
-    const webTarget = `https://ig.me/m/${encodedUsername}`;
-    const ua = navigator.userAgent || '';
-    const isiOS = /iPad|iPhone|iPod/i.test(ua) ||
-      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    const isAndroid = /Android/i.test(ua);
-    const isInstagramBrowser = /Instagram/i.test(ua);
-
-    const openAndroidInstagram = () => {
-      location.href = `intent://ig.me/m/${encodedUsername}#Intent;scheme=https;package=com.instagram.android;S.browser_fallback_url=${encodeURIComponent(webTarget)};end`;
-    };
-
-    // If the catalog was opened from an Instagram DM, first try to dismiss
-    // Instagram's own in-app browser. When the host allows window.close(),
-    // this returns to the exact conversation that launched the catalog.
-    // If it refuses to close, keep the navigation on the same user gesture
-    // and hand control to the native Instagram app instead of instagram.com.
-    if (isInstagramBrowser) {
-      if (isAndroid) {
-        openAndroidInstagram();
-        return true;
-      }
-
-      if (isiOS) {
-        try { window.close(); } catch {}
-
-        if (document.visibilityState !== 'hidden') {
-          const appTarget = `instagram://direct?username=${encodedUsername}`;
-          location.href = appTarget;
-
-          // The username scheme is app-only and can be rejected by some
-          // Instagram builds. Fall back to Meta's ig.me DM link only when the
-          // page is still visible, so a successful app handoff is not replaced.
-          window.setTimeout(() => {
-            if (document.visibilityState !== 'hidden') location.href = webTarget;
-          }, 700);
-        }
-        return true;
-      }
-    }
-
-    // Android browsers: explicitly target the Instagram package so the DM
-    // opens in the installed app, with ig.me as the browser fallback.
-    if (isAndroid) {
-      openAndroidInstagram();
-      return true;
-    }
-
-    // Safari/iOS: ig.me is the supported universal DM link and opens the
-    // conversation in Instagram when the app accepts the universal link.
-    if (isiOS) {
-      location.href = webTarget;
-      return true;
-    }
-
-    window.open(webTarget, '_blank', 'noopener');
-    return false;
+  function legacyCopyQuoteText(text) {
+    const area = document.createElement('textarea');
+    area.value = text;
+    area.setAttribute('readonly', '');
+    area.setAttribute('aria-hidden', 'true');
+    area.style.position = 'fixed';
+    area.style.left = '-9999px';
+    area.style.top = '0';
+    area.style.opacity = '0';
+    document.body.appendChild(area);
+    area.focus({ preventScroll: true });
+    area.select();
+    area.setSelectionRange(0, area.value.length);
+    let copied = false;
+    try { copied = document.execCommand('copy'); } catch {}
+    area.remove();
+    return copied;
   }
 
-  const isInstagramInAppBrowser = /Instagram/i.test(navigator.userAgent || '');
-  const isAndroidInstagramBrowser = isInstagramInAppBrowser && /Android/i.test(navigator.userAgent || '');
+  function openInstagramChat(handle) {
+    const username = String(handle || '').replace(/^@/, '').trim();
+    if (!/^[a-zA-Z0-9._]{1,30}$/.test(username)) return false;
+    const chat = `https://ig.me/m/${encodeURIComponent(username)}`;
+    const ua = navigator.userAgent || '';
+    if (/Instagram/i.test(ua)) {
+      // A WebView may allow closing to restore the originating DM. If it does
+      // not, the recipient-specific universal link is dispatched in this tap.
+      try { window.close(); } catch {}
+    }
+    if (/Android/i.test(ua)) {
+      location.assign(`intent://ig.me/m/${encodeURIComponent(username)}#Intent;scheme=https;package=com.instagram.android;S.browser_fallback_url=${encodeURIComponent(chat)};end`);
+    } else if (/iPad|iPhone|iPod|Instagram/i.test(ua) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
+      location.assign(chat);
+    } else {
+      window.open(chat, '_blank', 'noopener');
+    }
+    return true;
+  }
+
+  const instagramUA = navigator.userAgent || '';
+  const isInstagramInAppBrowser = /Instagram/i.test(instagramUA);
+  const isAndroidInstagramBrowser = isInstagramInAppBrowser && /Android/i.test(instagramUA);
+  const isIOSInstagramBrowser = isInstagramInAppBrowser && (
+    /iPad|iPhone|iPod/i.test(instagramUA) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  );
 
   function instagramReturnOverlay() {
     let overlay = document.getElementById('instagramReturnOverlay');
@@ -1135,7 +1119,8 @@ ${settings().totalTexto}: ${money(totals.total)}`;
         'keyboard-active',
         'keyboard-android',
         'keyboard-ios',
-        'instagram-android-keyboard'
+        'instagram-android-keyboard',
+        'instagram-ios-keyboard'
       );
       drawer.style.removeProperty('--haki-vvh');
       drawer.style.removeProperty('--haki-vv-top');
@@ -1173,35 +1158,18 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       return;
     }
 
-    const legacyCopied = legacyCopyText(text);
+    const legacyCopied = legacyCopyQuoteText(text);
     const modernCopy = (navigator.clipboard?.writeText && window.isSecureContext)
       ? navigator.clipboard.writeText(text).then(() => true).catch(() => legacyCopied)
       : Promise.resolve(legacyCopied);
 
-    if (isInstagramInAppBrowser) {
-      modernCopy.then(copied => {
-        closeCart();
-
-        // Same action on Android and iPhone: try to close Instagram's in-app
-        // browser directly from the quote button. If iOS blocks the close,
-        // keep the native-X instruction as the fallback.
-        try { window.close(); } catch {}
-
-        window.setTimeout(() => {
-          if (document.visibilityState !== 'hidden') {
-            showInstagramReturnOverlay();
-            showToast(copied ? 'Cotización copiada.' : 'Pedido listo.');
-          }
-        }, 320);
-      });
-      return;
-    }
-
+    // Dispatch before awaiting Clipboard: iOS needs the original user gesture.
+    if (isInstagramInAppBrowser) closeCart();
     openInstagramChat(handle);
     modernCopy.then(copied => {
       showToast(copied
-        ? 'Cotización copiada. Abriendo Instagram…'
-        : 'Abriendo Instagram… Copia la cotización manualmente.');
+        ? 'Cotización copiada. Abriendo el chat de HAKI…'
+        : 'No se pudo copiar la cotización. Vuelve al carrito para intentarlo.');
     });
   }
 
@@ -1227,20 +1195,29 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     };
 
     const resetKeyboardState = () => {
+      clearTimeout(settleTimer);
+      clearTimeout(cleanupTimer);
+      cancelAnimationFrame(viewportFrame);
       drawer.classList.remove(
         'keyboard-active',
         'keyboard-android',
         'keyboard-ios',
-        'instagram-android-keyboard'
+        'instagram-android-keyboard',
+        'instagram-ios-keyboard'
       );
       clearViewportVars();
     };
 
-    const syncInstagramAndroidViewport = () => {
-      if (!drawer.classList.contains('instagram-android-keyboard')) return;
+    const isInstagramKeyboardSurface = () =>
+      drawer.classList.contains('instagram-android-keyboard') ||
+      drawer.classList.contains('instagram-ios-keyboard');
+
+    const syncInstagramViewport = () => {
+      if (!isInstagramKeyboardSurface()) return;
       cancelAnimationFrame(viewportFrame);
       viewportFrame = requestAnimationFrame(() => {
-        const height = Math.max(250, Math.round(viewport?.height || window.innerHeight));
+        if (!isInstagramKeyboardSurface() || !drawer.classList.contains('open')) return;
+        const height = Math.max(120, Math.round(viewport?.height || window.innerHeight));
         const top = Math.max(0, Math.round(viewport?.offsetTop || 0));
         drawer.style.setProperty('--haki-vvh', `${height}px`);
         drawer.style.setProperty('--haki-vv-top', `${top}px`);
@@ -1248,37 +1225,53 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     };
 
     const scrollInsideQuoteForm = input => {
-      if (!input || !drawer.classList.contains('instagram-android-keyboard')) return;
+      if (!input || !isInstagramKeyboardSurface()) return;
       const formRect = form.getBoundingClientRect();
       const inputRect = input.getBoundingClientRect();
-      const target = Math.max(0, form.scrollTop + inputRect.top - formRect.top - 70);
+      const target = Math.max(0, form.scrollTop + inputRect.top - formRect.top - 62);
       form.scrollTo({ top: target, behavior: 'auto' });
     };
 
-    const activateInstagramAndroid = input => {
+    const stabilizeInstagramIOS = () => {
+      if (!isIOSInstagramBrowser) return;
+      try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch { window.scrollTo(0, 0); }
+      if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    };
+
+    const activateInstagramKeyboard = (input, platformClass) => {
       clearTimeout(cleanupTimer);
       clearTimeout(settleTimer);
-      drawer.classList.add('keyboard-active', 'instagram-android-keyboard');
-      drawer.classList.remove('keyboard-android', 'keyboard-ios');
-      syncInstagramAndroidViewport();
 
-      settleTimer = window.setTimeout(() => {
-        syncInstagramAndroidViewport();
+      drawer.classList.add('keyboard-active', platformClass);
+      drawer.classList.remove(
+        'keyboard-android',
+        'keyboard-ios',
+        platformClass === 'instagram-ios-keyboard'
+          ? 'instagram-android-keyboard'
+          : 'instagram-ios-keyboard'
+      );
+
+      syncInstagramViewport();
+      stabilizeInstagramIOS();
+
+      const settle = () => {
+        if (document.activeElement !== input) return;
+        syncInstagramViewport();
+        stabilizeInstagramIOS();
         scrollInsideQuoteForm(input);
-      }, 120);
+      };
 
-      window.setTimeout(() => {
-        if (document.activeElement === input) {
-          syncInstagramAndroidViewport();
-          scrollInsideQuoteForm(input);
-        }
-      }, 320);
+      settleTimer = window.setTimeout(settle, 100);
+      window.setTimeout(settle, 280);
+      window.setTimeout(settle, 520);
     };
 
     const settleStandardField = input => {
       clearTimeout(cleanupTimer);
       drawer.classList.add('keyboard-active', 'keyboard-ios');
-      drawer.classList.remove('keyboard-android', 'instagram-android-keyboard');
+      drawer.classList.remove('keyboard-android', 'instagram-android-keyboard', 'instagram-ios-keyboard');
 
       clearTimeout(settleTimer);
       settleTimer = window.setTimeout(() => {
@@ -1302,8 +1295,13 @@ ${settings().totalTexto}: ${money(totals.total)}`;
 
     document.addEventListener('focusin', event => {
       if (!event.target.matches?.('#quoteForm input')) return;
-      if (isAndroidInstagramBrowser) activateInstagramAndroid(event.target);
-      else settleStandardField(event.target);
+      if (isAndroidInstagramBrowser) {
+        activateInstagramKeyboard(event.target, 'instagram-android-keyboard');
+      } else if (isIOSInstagramBrowser) {
+        activateInstagramKeyboard(event.target, 'instagram-ios-keyboard');
+      } else {
+        settleStandardField(event.target);
+      }
     });
 
     document.addEventListener('focusout', () => {
@@ -1313,15 +1311,21 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       }, 260);
     });
 
-    viewport?.addEventListener('resize', syncInstagramAndroidViewport);
-    viewport?.addEventListener('scroll', syncInstagramAndroidViewport);
+    drawer.addEventListener('haki:close', resetKeyboardState);
+    viewport?.addEventListener('resize', syncInstagramViewport);
+    viewport?.addEventListener('scroll', syncInstagramViewport);
 
     window.addEventListener('orientationchange', () => {
       window.setTimeout(() => {
         const input = activeQuoteInput();
         if (!input) return;
-        if (isAndroidInstagramBrowser) activateInstagramAndroid(input);
-        else settleStandardField(input);
+        if (isAndroidInstagramBrowser) {
+          activateInstagramKeyboard(input, 'instagram-android-keyboard');
+        } else if (isIOSInstagramBrowser) {
+          activateInstagramKeyboard(input, 'instagram-ios-keyboard');
+        } else {
+          settleStandardField(input);
+        }
       }, 220);
     }, { passive: true });
   }

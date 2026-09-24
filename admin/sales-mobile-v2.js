@@ -194,12 +194,13 @@
   function saleMiniCard(sale) {
     const card = document.createElement('article');
     card.className = 'haki-sale-mini';
+    card.dataset.saleId = sale.id;
     card.dataset.shippingStage = sale.etapaEnvio || 'Pedido tomado';
     const itemText = (sale.items || []).map(item => `${item.codigo} ${item.talla}${Number(item.cantidad) > 1 ? ` ×${item.cantidad}` : ''}`).join(' · ') || 'Pedido';
     const destination = sale.lugarHorario || 'Sin destino';
     card.innerHTML = `
       <div class="sale-main-copy">
-        <div class="sale-client-line"><strong>${escapeHtml(sale.cliente || 'Cliente')}</strong><span> - ${escapeHtml(itemText)}</span></div>
+        <div class="sale-client-line"><strong>${escapeHtml(sale.cliente || 'Cliente')}</strong><span> - ${escapeHtml(itemText)}</span>${channelBadge(sale.canal)}</div>
         <small class="sale-destination">${escapeHtml(destination)}</small>
       </div>
       <div class="amount">${money(saleNet(sale))}</div>`;
@@ -219,18 +220,24 @@
       select.value = sale[field] || options[0];
       paintQuickSelect(select,field,select.value);
       select.addEventListener('change', async () => {
+        if (card.dataset.saving === 'true') return;
+        card.dataset.saving = 'true';
         controls.querySelectorAll('select').forEach(node => node.disabled = true);
         const previousValue = sale[field] || options[0];
         try {
           const data = await api('sales', { method: 'PATCH', body: JSON.stringify({ id: sale.id, weekStart: mondayOf(sale.fecha), field, value: select.value, updatedAt: sale.updatedAt || '' }) });
+          if (!data.sale || data.sale.id !== sale.id) throw new Error('No se pudo confirmar el cambio. Actualiza la semana antes de intentarlo de nuevo.');
           Object.assign(sale, data.sale);
           card.dataset.shippingStage = sale.etapaEnvio || 'Pedido tomado';
           paintQuickSelect(select,field,sale[field]);
           if (field === 'etapaEnvio') card.dataset.shippingStage = sale.etapaEnvio || 'Pedido tomado';
           if (data.inventory) state.inventory = data.inventory;
-          renderMetrics(); renderInventory(); toast(field === 'dinero' ? 'Estado del dinero actualizado' : 'Pedido actualizado');
+          card.querySelector('.amount').textContent = money(saleNet(sale));
+          renderMetrics();
+          if (!inventoryView.hidden && data.inventory) renderInventory();
+          toast(field === 'dinero' ? 'Estado del dinero actualizado' : 'Pedido actualizado');
         } catch (error) { select.value = previousValue; paintQuickSelect(select,field,previousValue); toast(error.message, true); }
-        finally { controls.querySelectorAll('select').forEach(node => node.disabled = false); }
+        finally { delete card.dataset.saving; controls.querySelectorAll('select').forEach(node => node.disabled = false); }
       });
       label.append(select); controls.append(label);
     }
@@ -345,5 +352,5 @@
   };
 
   // Carga inicial de la semana actual (lunes a domingo).
-  setTimeout(() => loadPeriod(state.salesPeriod), 0);
+  // sales.js starts the single load after authentication and product loading.
 })();
