@@ -3,6 +3,7 @@
   let operationsToken = '';
   let sessionPromise;
   let readyPromise;
+  let transport = 'direct';
 
   async function requestJSON(url, options = {}) {
     let response;
@@ -46,6 +47,13 @@
     });
   }
 
+  function proxyRequest(query, options) {
+    return requestJSON(`/.netlify/functions/sales${query ? `?${query}` : ''}`, {
+      ...options, credentials: 'same-origin',
+      headers: { ...(options.headers || {}), 'content-type': 'application/json' },
+    });
+  }
+
   async function ready() {
     const auth = await session();
     if (!auth.authenticated || !operationsToken) {
@@ -54,7 +62,15 @@
     }
     if (!readyPromise) {
       // Never write to the old Blobs store when Supabase is unavailable.
-      readyPromise = edgeRequest('mode=status', { method: 'GET' }).then(status => {
+      readyPromise = edgeRequest('mode=status', { method: 'GET', signal: AbortSignal.timeout(6000) }).catch(async error => {
+        if (error.status === 401) throw error;
+        // Some browsers/networks block cross-origin calls. Probe the same-origin
+        // proxy with a READ before choosing it; never retry an uncertain write.
+        const status = await proxyRequest('mode=status', { method: 'GET' });
+        if (!status.migrated) throw error;
+        transport = 'proxy';
+        return status;
+      }).then(status => {
         if (!status.migrated) throw new Error('No se pudo confirmar la base de datos de ventas.');
       }).catch(error => { readyPromise = null; throw error; });
     }
@@ -66,7 +82,7 @@
     const query = String(path || '').replace(/^sales\??/, '');
     try {
       await ready();
-      return await edgeRequest(query, options);
+      return await (transport === 'proxy' ? proxyRequest(query, options) : edgeRequest(query, options));
     } catch (error) {
       if (error.status !== 401) throw error;
       // 401 rejects the request before any mutation; refreshing is safe here.
@@ -74,8 +90,9 @@
       operationsToken = '';
       sessionPromise = null;
       readyPromise = null;
+      transport = 'direct';
       await ready();
-      return edgeRequest(query, options);
+      return transport === 'proxy' ? proxyRequest(query, options) : edgeRequest(query, options);
     }
   };
 })();
