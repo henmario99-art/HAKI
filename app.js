@@ -118,6 +118,61 @@
     return ALL_PRODUCTS.find(p => p.codigo === code);
   }
 
+  const ANALYTICS_CURRENCY = 'USD';
+  let checkoutStartedSignature = '';
+
+  function analyticsItem(p, quantity = 1, size = '') {
+    if (!p) return null;
+    const item = {
+      item_id: String(p.codigo || ''),
+      item_name: String(p.nombre || p.codigo || 'Prenda'),
+      item_category: String(p.categoria || ''),
+      price: Number(p.precio) || 0,
+      quantity: Number(quantity) || 1
+    };
+    if (size) item.item_variant = String(size);
+    return item;
+  }
+
+  function analyticsCartItems() {
+    return state.cart
+      .map(i => analyticsItem(productByCode(i.codigo), i.cantidad, i.talla))
+      .filter(Boolean);
+  }
+
+  function analyticsCartSignature() {
+    return state.cart
+      .map(i => `${i.codigo}:${i.talla}:${i.cantidad}`)
+      .sort()
+      .join('|');
+  }
+
+  function trackAnalytics(eventName, params = {}) {
+    if (typeof window.gtag !== 'function') return;
+    try { window.gtag('event', eventName, params); } catch {}
+  }
+
+  function analyticsCartValue() {
+    try {
+      const totals = window.hakiTotals(cartTotal(), itemCount(), CONFIG);
+      return Number(totals?.total) || Number(cartTotal()) || 0;
+    } catch {
+      return Number(cartTotal()) || 0;
+    }
+  }
+
+  function trackQuote(channel) {
+    const params = {
+      currency: ANALYTICS_CURRENCY,
+      value: analyticsCartValue(),
+      method: channel,
+      item_count: itemCount(),
+      items: analyticsCartItems()
+    };
+    trackAnalytics('generate_lead', params);
+    trackAnalytics(channel === 'instagram' ? 'quote_instagram' : 'quote_whatsapp', params);
+  }
+
   function applyConfig() {
     applyExperience();
     $('#announcementText').textContent =
@@ -737,6 +792,12 @@
     }
 
     saveCart();
+    checkoutStartedSignature = '';
+    trackAnalytics('add_to_cart', {
+      currency: ANALYTICS_CURRENCY,
+      value: Number(p.precio) || 0,
+      items: [analyticsItem(p, 1, size)]
+    });
     renderCart();
     openCart();
 
@@ -921,6 +982,13 @@
   function openCart() {
     closeMenu();
     closeSearch();
+    if (state.cart.length) {
+      trackAnalytics('view_cart', {
+        currency: ANALYTICS_CURRENCY,
+        value: analyticsCartValue(),
+        items: analyticsCartItems()
+      });
+    }
     els.drawer.inert = false;
     els.closeCart.focus();
     els.overlay.hidden = false;
@@ -1008,6 +1076,8 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     e.preventDefault();
 
     if (!validateQuote()) return;
+
+    trackQuote('whatsapp');
 
     window.open(
       `https://wa.me/${
@@ -1171,6 +1241,8 @@ ${settings().totalTexto}: ${money(totals.total)}`;
 
   function submitInstagram() {
     if (!validateQuote()) return;
+
+    trackQuote('instagram');
 
     const text = quoteText();
     const handle = String(CONFIG.instagram || '').replace(/^@/, '').trim();
@@ -1438,6 +1510,18 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     }
   );
 
+  els.form.addEventListener('focusin', () => {
+    if (!state.cart.length) return;
+    const signature = analyticsCartSignature();
+    if (!signature || signature === checkoutStartedSignature) return;
+    checkoutStartedSignature = signature;
+    trackAnalytics('begin_checkout', {
+      currency: ANALYTICS_CURRENCY,
+      value: analyticsCartValue(),
+      items: analyticsCartItems()
+    });
+  });
+
   els.form.addEventListener(
     'submit',
     submitWhatsApp
@@ -1536,6 +1620,11 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       detail.innerHTML = '<div class="detail-missing"><h1>Prenda no encontrada</h1><a href="#catalogo">Volver al catálogo</a></div>';
       return;
     }
+    trackAnalytics('view_item', {
+      currency: ANALYTICS_CURRENCY,
+      value: Number(p.precio) || 0,
+      items: [analyticsItem(p, 1, state.selected[p.codigo] || '')]
+    });
     document.title = `${p.nombre} — HAKI`;
     const images = [p.imagen || fallbackFor(p), p.imagen2].filter(Boolean);
     const selected = state.selected[p.codigo] || '';
