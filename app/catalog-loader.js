@@ -198,52 +198,53 @@ window.HAKI_COVER_WAITING_LIVE = true;
 })();
 
 
-// Stock operativo HAKI: actualización directa desde Supabase sin deploy ni Netlify Function.
+// Stock operativo HAKI: cantidades directas desde Supabase, sin deploy ni Netlify Function.
 (() => {
   const endpoint='https://uysfqzlihiosebqzvfrl.supabase.co/functions/v1/haki-operations?mode=availability';
   let busy=false;
-
+  let refreshAgain=false;
   async function refreshAvailability(){
-    if(busy||document.hidden)return;
+    if(document.hidden)return;
+    if(busy){refreshAgain=true;return;}
     busy=true;
     try{
       const response=await fetch(endpoint,{cache:'no-store',signal:AbortSignal.timeout(8000)});
       if(!response.ok)throw new Error('Stock unavailable');
       const data=await response.json();
       if(!data?.migrated||!data.inventory||typeof data.inventory!=='object')return;
-
       const current=window.HAKI_PRODUCTOS||[];
       let changed=false;
       const next=current.map(product=>{
         const stock=data.inventory[String(product.codigo||'').toUpperCase()]||data.inventory[String(product.id)];
         if(!stock)return product;
         const tallas={...(product.tallas||{})};
+        const stockPorTalla={};
+        let stockTotal=0;
         for(const size of ['S','M','L','XL']){
+          const quantity=Object.hasOwn(stock,size)?Math.max(0,Math.trunc(Number(stock[size])||0)):0;
+          stockPorTalla[size]=quantity;
+          stockTotal+=quantity;
           if(Object.hasOwn(stock,size)){
-            const available=Number(stock[size])>0;
+            const available=quantity>0;
             if(tallas[size]!==available)changed=true;
             tallas[size]=available;
           }
+          if(Number(product.stockPorTalla?.[size]??-1)!==quantity)changed=true;
         }
-        return {...product,tallas};
+        if(Number(product.stockTotal??-1)!==stockTotal)changed=true;
+        return {...product,tallas,stockPorTalla,stockTotal};
       });
-
       if(!changed)return;
       window.HAKI_PRODUCTOS=next;
-      try{
-        localStorage.setItem('haki_app_catalog_cache_v4',JSON.stringify({
-          config:window.HAKI_CONFIG||{},
-          products:next
-        }));
-      }catch{}
-      window.dispatchEvent(new Event('haki:catalog-updated'));
-    }catch{}finally{busy=false;}
+      try{localStorage.setItem('haki_catalog_cache_v4',JSON.stringify({config:window.HAKI_CONFIG||{},products:next}));}catch{}
+      window.dispatchEvent(new CustomEvent('haki:catalog-updated',{detail:{availability:true}}));
+    }catch{}finally{
+      busy=false;
+      if(refreshAgain){refreshAgain=false;setTimeout(refreshAvailability,0);}
+    }
   }
-
-  window.addEventListener('DOMContentLoaded',()=>{
-    // The initial public catalog already includes current stock.
-    // Avoid competing with the cover by fetching the same inventory twice.
-    setInterval(refreshAvailability,45000);
-  });
+  window.HAKI_REFRESH_AVAILABILITY=refreshAvailability;
+  window.addEventListener('DOMContentLoaded',()=>{refreshAvailability();setInterval(refreshAvailability,45000);});
+  window.addEventListener('haki:catalog-updated',event=>{if(event.detail?.availability)return;setTimeout(refreshAvailability,150);});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshAvailability();});
 })();

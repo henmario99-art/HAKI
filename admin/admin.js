@@ -202,7 +202,10 @@ function newProduct() {
     etiquetaMasVendido: 'MÁS VENDIDO',
     colecciones: [],
     colores: [],
+    colorDe: '',
     imagen: 'images/producto.svg',
+    imagen2: '',
+    imagen3: '',
     imagenRespaldo: 'images/producto.svg',
     tallas: { S:false, M:false, L:false, XL:false }
   };
@@ -363,6 +366,26 @@ function renderProducts() {
       });
     });
 
+    p.colorDe = String(p.colorDe || '').trim().toUpperCase();
+    const colorParentSelect = $('.color-parent-select', tpl);
+    if (colorParentSelect) {
+      colorParentSelect.replaceChildren();
+      const primaryOption = document.createElement('option');
+      primaryOption.value = '';
+      primaryOption.textContent = 'Prenda principal / no agrupar';
+      colorParentSelect.append(primaryOption);
+      state.products.filter(candidate => candidate !== p && String(candidate.codigo || '').trim()).forEach(candidate => {
+        const option = document.createElement('option');
+        option.value = String(candidate.codigo || '').trim().toUpperCase();
+        option.textContent = `${option.value} — ${candidate.nombre || 'Sin nombre'}`;
+        colorParentSelect.append(option);
+      });
+      const parentExists = !p.colorDe || state.products.some(candidate => String(candidate.codigo || '').trim().toUpperCase() === p.colorDe && candidate !== p);
+      if (!parentExists) p.colorDe = '';
+      colorParentSelect.value = p.colorDe;
+      colorParentSelect.addEventListener('change', () => { p.colorDe = colorParentSelect.value; });
+    }
+
     const newCheck = $('.new-arrival-check', tpl);
     newCheck.checked = p.novedad === true;
     newCheck.addEventListener('change', () => { p.novedad = newCheck.checked; });
@@ -383,7 +406,7 @@ function renderProducts() {
       label.append(checkbox, text); choices.append(label);
     });
 
-    ['imagen2', 'guiaTallas'].forEach(field => {
+    ['imagen2', 'imagen3', 'guiaTallas'].forEach(field => {
       const preview = $(`[data-preview="${field}"]`, tpl);
       const fieldInput = $(`[data-field="${field}"]`, tpl);
       function refresh() { preview.hidden = !p[field]; if (p[field]) preview.src = resolveImage(p[field]); }

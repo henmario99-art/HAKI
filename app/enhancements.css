@@ -401,3 +401,37 @@ body.instagram-return-open{
  #cartDrawer.open.instagram-android-keyboard,
  #cartDrawer.open.instagram-ios-keyboard{transform:none!important;transition:none!important}
 }
+
+/* HAKI · detalle de producto v2 · 2026-09-25 */
+#productDetail .detail-color-variants{margin:32px 0 12px}
+#productDetail .detail-color-heading{display:flex;align-items:baseline;gap:9px;margin:0 0 12px;font-size:11px;letter-spacing:.08em}
+#productDetail .detail-color-heading span{color:var(--muted,#777);font-weight:700}
+#productDetail .detail-color-heading strong{font-size:12px;letter-spacing:0;color:var(--ink,#111)}
+#productDetail .detail-color-rail{display:flex;gap:10px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+#productDetail .detail-color-rail::-webkit-scrollbar{display:none}
+#productDetail .detail-color-option{flex:0 0 72px;min-width:0;color:inherit;text-decoration:none}
+#productDetail .detail-color-option img{display:block;width:72px;height:90px;object-fit:cover;background:var(--soft,#eee);border:1px solid transparent}
+#productDetail .detail-color-option span{display:block;margin-top:7px;font-size:9px;line-height:1.25;color:var(--muted,#777);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#productDetail .detail-color-option.is-active img{border-color:var(--ink,#111);box-shadow:0 0 0 1px var(--ink,#111)}
+#productDetail .detail-color-option.is-active span{color:var(--ink,#111);font-weight:700}
+#productDetail .detail-low-stock{margin:18px 0 0;font-size:13px;line-height:1.35;font-weight:800;color:#b42318}
+#cartDrawer .drawer-head #closeCart{border:0!important;box-shadow:none!important;background:transparent!important;border-radius:0!important;width:44px!important;height:44px!important;padding:0!important}
+#cartDrawer .drawer-head #closeCart:focus-visible{outline:2px solid currentColor!important;outline-offset:2px!important}
+@media(min-width:801px){
+  #productDetail .detail-gallery{display:grid!important;grid-template-columns:1fr!important;gap:5px!important;overflow:visible!important;aspect-ratio:auto!important;background:transparent!important;scroll-snap-type:none!important}
+  #productDetail .detail-gallery img{display:block!important;flex:none!important;width:100%!important;height:auto!important;min-width:0!important;aspect-ratio:4/5!important;object-fit:cover!important;scroll-snap-align:none!important}
+  #productDetail .detail-gallery[data-photo-count="2"]{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  #productDetail .detail-gallery[data-photo-count]:not([data-photo-count="1"]):not([data-photo-count="2"]){grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  #productDetail .detail-gallery[data-photo-count]:not([data-photo-count="1"]):not([data-photo-count="2"]) img:nth-child(n+3){grid-column:1/-1!important;aspect-ratio:8/5!important}
+  #productDetail .detail-media .gallery-controls{display:none!important}
+}
+@media(max-width:800px){
+  #productDetail .detail-gallery{display:flex!important;overflow-x:auto!important;gap:0!important;aspect-ratio:4/5!important;scroll-snap-type:x mandatory!important}
+  #productDetail .detail-gallery img{display:block!important;flex:0 0 100%!important;width:100%!important;height:100%!important;min-width:100%!important;aspect-ratio:auto!important;object-fit:cover!important;scroll-snap-align:start!important;scroll-snap-stop:always!important}
+  #productDetail .detail-media .gallery-controls{display:flex!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;transform:translate(-50%,0)!important;bottom:14px!important;padding:6px 9px!important}
+  #productDetail .detail-media .gallery-controls[hidden]{display:none!important}
+  #productDetail .detail-color-variants{margin-top:24px}
+  #productDetail .detail-color-option{flex-basis:68px}
+  #productDetail .detail-color-option img{width:68px;height:85px}
+}
+:root[data-theme=oscuro] #productDetail .detail-low-stock{color:#ff8a80}

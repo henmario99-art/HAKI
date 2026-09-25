@@ -1641,6 +1641,37 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     if (returningFromIOSDetail) leaveIOSDetail();
   }
 
+  function detailImages(p) {
+    const candidates = [p.imagen || fallbackFor(p), p.imagen2, p.imagen3, ...(Array.isArray(p.imagenesExtra) ? p.imagenesExtra : [])];
+    return [...new Set(candidates.map(value => String(value || '').trim()).filter(Boolean))];
+  }
+
+  function colorVariantRoot(product) {
+    let current = product;
+    const seen = new Set();
+    for (let step = 0; step < 12; step += 1) {
+      const parentCode = String(current?.colorDe || '').trim().toUpperCase();
+      if (!parentCode || seen.has(parentCode)) break;
+      seen.add(parentCode);
+      const parent = productByCode(parentCode);
+      if (!parent || parent === current) break;
+      current = parent;
+    }
+    return String(current?.codigo || product?.codigo || '').trim().toUpperCase();
+  }
+
+  function colorVariantLabel(product) {
+    const colors = Array.isArray(product?.colores) ? product.colores.map(value => String(value || '').trim()).filter(Boolean) : [];
+    return colors.length ? colors.join(' / ') : String(product?.nombre || 'Color');
+  }
+
+  function colorVariantsFor(product) {
+    const rootCode = colorVariantRoot(product);
+    if (!rootCode) return [];
+    const variants = ALL_PRODUCTS.filter(item => item && colorVariantRoot(item) === rootCode);
+    return variants.length > 1 ? variants : [];
+  }
+
   function renderProductDetail(p) {
     const detail = $('#productDetail');
     if (!p) {
@@ -1648,7 +1679,10 @@ ${settings().totalTexto}: ${money(totals.total)}`;
       return;
     }
     document.title = `${p.nombre} — HAKI`;
-    const images = [p.imagen || fallbackFor(p), p.imagen2].filter(Boolean);
+    const images = detailImages(p);
+    const variants = colorVariantsFor(p);
+    const activeColor = colorVariantLabel(p);
+    const stockTotal = Number.isFinite(p.stockTotal) ? p.stockTotal : null;
     const selected = state.selected[p.codigo] || '';
     const sizeGuideType = productSizeGuideType(p);
     const showSizeGuide = !!sizeGuideType;
@@ -1658,8 +1692,8 @@ ${settings().totalTexto}: ${money(totals.total)}`;
         <button class="app-detail-cart" type="button" aria-label="Abrir carrito"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l-1 13H6L5 8Z"/><path d="M9 8V5a3 3 0 0 1 6 0v3"/></svg></button>
       </div>
       <div class="detail-layout">
-        <div class="detail-media">
-          <div id="detailGallery" class="detail-gallery" tabindex="0" aria-label="Fotos de ${esc(p.nombre)}">
+        <div class="detail-media show-gallery-dots">
+          <div id="detailGallery" class="detail-gallery" data-photo-count="${images.length}" tabindex="0" aria-label="Fotos de ${esc(p.nombre)}">
             ${images.map((url, i) => `<img src="${esc(freshImage(url,1400))}" data-fallback="${esc(freshImage(fallbackFor(p)))}" alt="${esc(p.nombre)} · Foto ${i + 1}" width="400" height="500" decoding="async" ${i ? 'loading="lazy"' : 'fetchpriority="high"'}>`).join('')}
           </div>
           <div class="gallery-controls" ${images.length < 2 ? 'hidden' : ''}>
@@ -1675,6 +1709,15 @@ ${settings().totalTexto}: ${money(totals.total)}`;
           </div>
           <div class="detail-options">
             ${p.descripcion ? `<p class="detail-description">${esc(p.descripcion)}</p>` : ''}
+            ${variants.length > 1 ? `
+              <section class="detail-color-variants" aria-label="Colores disponibles">
+                <div class="detail-color-heading"><span>COLOR</span><strong>${esc(activeColor)}</strong></div>
+                <div class="detail-color-rail">
+                  ${variants.map(variant => `<a class="detail-color-option ${String(variant.codigo) === String(p.codigo) ? 'is-active' : ''}" href="#producto/${encodeURIComponent(variant.codigo)}" aria-label="Ver ${esc(variant.nombre)} · ${esc(colorVariantLabel(variant))}" ${String(variant.codigo) === String(p.codigo) ? 'aria-current="true"' : ''}><img src="${esc(freshImage(variant.imagen || fallbackFor(variant),360))}" data-fallback="${esc(freshImage(fallbackFor(variant),360))}" alt="${esc(colorVariantLabel(variant))}" loading="lazy" decoding="async"><span>${esc(colorVariantLabel(variant))}</span></a>`).join('')}
+                </div>
+              </section>
+            ` : ''}
+            ${stockTotal === 1 ? '<p class="detail-low-stock" role="status">Rápido, Solo queda 1</p>' : ''}
             <div class="detail-size-heading"><h2>Seleccioná tu talla</h2>${showSizeGuide ? '<button id="openSizeGuide" type="button" class="size-guide-link">Guía de tallas</button>' : ''}</div>
             <div id="detailSizes" class="detail-sizes" role="group" aria-label="Seleccionar talla">
               ${['S','M','L','XL'].map(size => `<button type="button" class="detail-size ${selected === size ? 'selected' : ''}" data-detail-size="${size}" aria-pressed="${selected === size}" ${p.tallas?.[size] ? '' : 'disabled'}>${size}</button>`).join('')}

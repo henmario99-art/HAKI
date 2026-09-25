@@ -27,6 +27,13 @@
     .color-swatch[data-color="Blanco"].is-selected::after,.color-swatch[data-color="Azul"].is-selected::after,.color-swatch[data-color="Rosa"].is-selected::after{color:#111;text-shadow:none}
     html[data-theme=oscuro] .product-color-setting{border-top-color:#444}
     html[data-theme=oscuro] .color-swatch.is-selected{box-shadow:0 0 0 2px #242424,0 0 0 4px #fff}
+    .product-variant-setting{margin-top:18px;padding-top:16px;border-top:1px solid #e4e4e4}
+    .product-variant-setting>strong{display:block;margin-bottom:5px;font-size:13px}
+    .product-variant-setting>p{margin:0 0 12px;color:#777;font-size:12px;line-height:1.45}
+    .product-variant-setting label{display:grid;gap:7px;font-size:12px;font-weight:700}
+    .product-variant-setting select{min-height:44px;border:1px solid #ccc;background:#fff;padding:0 10px;color:#111;font:inherit}
+    html[data-theme=oscuro] .product-variant-setting{border-top-color:#444}
+    html[data-theme=oscuro] .product-variant-setting select{background:#1b1b1b;color:#fff;border-color:#555}
     @media(max-width:700px){#jumpProductsBtn{flex:1 1 auto;text-align:center}.color-swatch{width:34px;height:34px}}
   </style>
 </head>
@@ -152,6 +159,7 @@
         <label>Texto del distintivo más vendido<input data-field="etiquetaMasVendido" placeholder="MÁS VENDIDO"></label>
         <label class="wide">Imagen<input data-field="imagen"></label>
         <label class="wide">Segunda imagen (opcional)<input data-field="imagen2"></label>
+        <label class="wide">Tercera imagen (opcional)<input data-field="imagen3"></label>
         <label class="wide">Descripción (opcional)<textarea data-field="descripcion" rows="3"></textarea></label>
         <label class="wide">Imagen de guía de tallas (opcional)<input data-field="guiaTallas"></label>
         <label class="wide">Imagen de respaldo<input data-field="imagenRespaldo"></label>
@@ -164,6 +172,7 @@
       </div>
       <div class="extra-media">
         <div><img class="extra-preview" data-preview="imagen2" alt="Segunda imagen" hidden><label class="upload-label">Subir segunda imagen<input class="extra-image-file" data-image-field="imagen2" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label><button type="button" class="ghost" data-clear-image="imagen2">Quitar segunda imagen</button></div>
+        <div><img class="extra-preview" data-preview="imagen3" alt="Tercera imagen" hidden><label class="upload-label">Subir tercera imagen<input class="extra-image-file" data-image-field="imagen3" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label><button type="button" class="ghost" data-clear-image="imagen3">Quitar tercera imagen</button></div>
         <div><img class="extra-preview" data-preview="guiaTallas" alt="Guía de tallas" hidden><label class="upload-label">Subir guía de tallas<input class="extra-image-file" data-image-field="guiaTallas" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label><button type="button" class="ghost" data-clear-image="guiaTallas">Quitar guía de tallas</button></div>
       </div>
       <div class="product-placement">
@@ -183,6 +192,11 @@
           <label class="color-swatch" data-color="Gris" title="Gris" style="--swatch:#a7a7a4;--swatch-border:#91918e"><input type="checkbox" data-color="Gris" aria-label="Gris"></label>
         </div>
       </section>
+      <section class="product-variant-setting">
+        <strong>Variantes de color</strong>
+        <p>Si esta prenda es otro color del mismo diseño, elige aquí la prenda principal. En el catálogo aparecerán juntas como opciones de color.</p>
+        <label>Esta prenda es un color de<select class="color-parent-select"><option value="">Prenda principal / no agrupar</option></select></label>
+      </section>
       <div class="sizes">
         <label><input type="checkbox" data-size="S"> S</label>
         <label><input type="checkbox" data-size="M"> M</label>
@@ -194,8 +208,8 @@
   <script src="../storefront-config.js?v=1"></script>
   <script src="../experience-config.js?v=3"></script>
   <script src="experience-settings.js?v=5"></script>
-  <script src="admin.js?v=14"></script>
-  <script src="info-settings.js?v=1"></script>
+  <script src="admin.js?v=15"></script>
+  <script src="info-settings.js?v=2"></script>
   <script src="personalization-settings.js?v=2"></script>
   <script src="admin-home-v2.js?v=1"></script>
 </body>

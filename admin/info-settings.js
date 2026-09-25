@@ -254,7 +254,7 @@
 
   function compactProductRoot(root) {
     if (!root?.querySelector) return;
-    ['categoria', 'imagen', 'imagen2', 'guiaTallas', 'imagenRespaldo'].forEach(field => hideField(root, field));
+    ['categoria', 'imagen', 'imagen2', 'imagen3', 'guiaTallas', 'imagenRespaldo'].forEach(field => hideField(root, field));
     if (root.querySelector('.product-compact-details')) return;
 
     const labels = ['etiquetaDisponible', 'etiquetaAgotado', 'etiquetaMasVendido']
