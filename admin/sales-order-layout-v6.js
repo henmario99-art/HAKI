@@ -92,8 +92,10 @@
     const parts = sale.items.map(item => {
       const code = String(item?.codigo || '').trim();
       if (!code) return '';
+      const size = String(item?.talla || '').trim();
+      const label = [code, size].filter(Boolean).join(' ');
       const qty = Number(item?.cantidad) || 1;
-      return qty > 1 ? `${code} ×${qty}` : code;
+      return qty > 1 ? `${label} ×${qty}` : label;
     }).filter(Boolean);
     return parts.length ? parts.join(' - ') : (fallback || 'Pedido');
   }

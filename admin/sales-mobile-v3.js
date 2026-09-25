@@ -250,7 +250,7 @@
       const next = stockForRow(row);
       const data = await api('sales?mode=inventory', {
         method: 'PUT',
-        body: JSON.stringify({ productId: product.id, stock: next }),
+        body: JSON.stringify({ productId: product.id, productCode: product.codigo, stock: next }),
       });
       state.inventory = data.inventory || state.inventory;
       row.classList.remove('is-dirty');

@@ -65,7 +65,12 @@
 
   window.hakiOperationalSession = session;
   window.hakiSupabaseSalesApi = async (path, options = {}) => {
-    const query = String(path || '').replace(/^sales\\??/, '');
+    const rawPath = String(path || '');
+    const query = rawPath === 'sales'
+      ? ''
+      : rawPath.startsWith('sales?')
+        ? rawPath.slice(6)
+        : rawPath.replace(/^sales/, '').replace(/^\?/, '');
     const method = String(options.method || 'GET').toUpperCase();
     const readOnly = method === 'GET' || method === 'HEAD';
 

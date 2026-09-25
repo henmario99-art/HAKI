@@ -20,6 +20,7 @@
     .replace(/^SAN SALVADOR PLAZA JEREZ$/i, 'Plaza Jerez');
   const destinationImage = item => item?.image || '';
   const saleNet = sale => Math.max(0, Number(((Number(sale?.total) || 0) - (Number(sale?.comisionC807) || 0)).toFixed(2)));
+  const merchandiseTotal = sale => Number(sale?.subtotal ?? ((Number(sale?.total) || 0) - (Number(sale?.envio) || 0))) || 0;
   const activeSale = sale => !['Cancelado', 'No retirado'].includes(sale?.estado);
   const totalUnits = sale => (sale?.items || []).reduce((sum, item) => sum + (Number(item.cantidad) || 0), 0);
 
@@ -396,10 +397,11 @@
     if (!content) return;
     const active = sales.filter(activeSale);
     const gross = active.reduce((sum, sale) => sum + (Number(sale.total) || 0), 0);
+    const merchandise = active.reduce((sum, sale) => sum + merchandiseTotal(sale), 0);
     const commissions = active.reduce((sum, sale) => sum + (Number(sale.comisionC807) || 0), 0);
-    const salesNet = gross - commissions;
+    const salesNet = merchandise;
     const expenseTotal = expenses.reduce((sum, expense) => sum + (Number(expense.monto) || 0), 0);
-    const weekNet = salesNet - expenseTotal;
+    const weekNet = salesNet - commissions - expenseTotal;
     const pending = active.filter(sale => sale.dinero === 'Pendiente').reduce((sum, sale) => sum + saleNet(sale), 0);
     const inCash = active.filter(sale => sale.dinero === 'En caja').reduce((sum, sale) => sum + saleNet(sale), 0);
     const units = active.reduce((sum, sale) => sum + totalUnits(sale), 0);
@@ -426,8 +428,8 @@
 
     content.innerHTML = `
       <section class="dashboard-grid">
-        <article class="dash-card primary"><span>Total que queda</span><strong>${money(weekNet)}</strong><small>Ventas netas menos gastos registrados</small></article>
-        <article class="dash-card"><span>Ventas totales</span><strong>${money(gross)}</strong><small>Antes de comisiones y gastos</small></article>
+        <article class="dash-card primary"><span>Total que queda</span><strong>${money(weekNet)}</strong><small>Ventas de prendas menos comisiones y gastos</small></article>
+        <article class="dash-card"><span>Ventas totales</span><strong>${money(gross)}</strong><small>Incluye envíos cobrados</small></article>
         <article class="dash-card"><span>Gastos semanales</span><strong>${money(expenseTotal)}</strong><small>${expenses.length} movimiento${expenses.length === 1 ? '' : 's'}</small></article>
         <article class="dash-card"><span>Comisiones C807</span><strong>${money(commissions)}</strong><small>Descontadas de los cobros</small></article>
         <article class="dash-card"><span>En caja</span><strong>${money(inCash)}</strong><small>Ventas marcadas como cobradas</small></article>
@@ -443,7 +445,7 @@
         <article class="insight-list">
           <div><span>Destino más frecuente</span><strong>${escapeHtml(topDestination?.[0] || '—')}</strong><small>${topDestination ? `${topDestination[1]} pedido${topDestination[1] === 1 ? '' : 's'}` : 'Sin destinos esta semana'}</small></div>
           <div><span>Stock bajo</span><strong>${lowStock}</strong><small>Tallas con 1–2 unidades disponibles</small></div>
-          <div><span>Ventas netas</span><strong>${money(salesNet)}</strong><small>Ventas después de comisión C807, antes de gastos</small></div>
+          <div><span>Ventas netas</span><strong>${money(salesNet)}</strong><small>Solo prendas vendidas, sin envíos</small></div>
         </article>
       </section>`;
     content.querySelector('.best-product img')?.addEventListener('error', event => { event.currentTarget.style.display = 'none'; });

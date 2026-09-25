@@ -166,4 +166,5 @@ $('#cancelDialog').addEventListener('click',hideEditor);
 $('#deleteSale').addEventListener('click',deleteSale);
 $('#saleForm').addEventListener('submit',event=>{event.preventDefault();saveSale()});
 
-(async()=>{state.weekStart=mondayOf(new Date());try{if(!await ensureAuth())return;await Promise.all([loadProducts(),loadWeek()])}catch(err){toast(err.message || 'No se pudo conectar con HAKI. Recarga para intentarlo de nuevo.',true)}})();
+function finishAdminLoading(){const loader=$('#hakiAdminLoader');if(!loader)return;requestAnimationFrame(()=>{loader.classList.add('is-hidden');setTimeout(()=>loader.remove(),360)})}
+(async()=>{state.weekStart=mondayOf(new Date());try{if(!await ensureAuth())return;await Promise.all([loadProducts(),loadWeek()])}catch(err){toast(err.message || 'No se pudo conectar con HAKI. Recarga para intentarlo de nuevo.',true)}finally{finishAdminLoading()}})();
