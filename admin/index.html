@@ -5,13 +5,12 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>HAKI Admin</title>
   <meta name="robots" content="noindex,nofollow">
-  <meta name="theme-color" content="#111111">
+  <meta name="theme-color" content="#f5f5f3">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="HAKI Admin">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-v3.png">
   <link rel="stylesheet" href="admin.css?v=3">
-  <link rel="stylesheet" href="admin-home-v2.css?v=1">
   <style id="admin-product-colors">
     html{scroll-behavior:smooth}
     #productsSection{scroll-margin-top:88px}
@@ -36,6 +35,11 @@
     html[data-theme=oscuro] .product-variant-setting select{background:#1b1b1b;color:#fff;border-color:#555}
     @media(max-width:700px){#jumpProductsBtn{flex:1 1 auto;text-align:center}.color-swatch{width:34px;height:34px}}
   </style>
+<link rel="stylesheet" href="satin.css?v=20261002-inventory-total">
+
+<script src="../system-theme.js?v=20261002"></script>
+<script src="satin-common.js"></script>
+<link rel="stylesheet" href="system-theme.css?v=20261002-inventory-total">
 </head>
 <body>
   <main class="shell">
@@ -59,7 +63,7 @@
           <p>Administrador del catálogo</p>
         </div>
         <div class="top-actions">
-          <a class="ghost" href="/" target="_blank">Ver catálogo</a>
+          <a class="ghost" href="/catalogo.html" target="_blank">Ver catálogo</a>
           <button id="logoutBtn" class="ghost" type="button">Salir</button>
         </div>
       </header>
@@ -151,7 +155,6 @@
       </div>
       <div class="grid">
         <label>Código<input data-field="codigo"></label>
-        <label>Nombre<input data-field="nombre"></label>
         <label>Precio<input data-field="precio" type="number" min="0" step="0.01"></label>
         <label>Categoría<input data-field="categoria"></label>
         <label>Texto cuando está disponible<input data-field="etiquetaDisponible" placeholder="Disponible"></label>
@@ -161,7 +164,6 @@
         <label class="wide">Segunda imagen (opcional)<input data-field="imagen2"></label>
         <label class="wide">Tercera imagen (opcional)<input data-field="imagen3"></label>
         <label class="wide">Descripción (opcional)<textarea data-field="descripcion" rows="3"></textarea></label>
-        <label class="wide">Imagen de guía de tallas (opcional)<input data-field="guiaTallas"></label>
         <label class="wide">Imagen de respaldo<input data-field="imagenRespaldo"></label>
       </div>
       <div class="media-row">
@@ -173,7 +175,6 @@
       <div class="extra-media">
         <div><img class="extra-preview" data-preview="imagen2" alt="Segunda imagen" hidden><label class="upload-label">Subir segunda imagen<input class="extra-image-file" data-image-field="imagen2" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label><button type="button" class="ghost" data-clear-image="imagen2">Quitar segunda imagen</button></div>
         <div><img class="extra-preview" data-preview="imagen3" alt="Tercera imagen" hidden><label class="upload-label">Subir tercera imagen<input class="extra-image-file" data-image-field="imagen3" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label><button type="button" class="ghost" data-clear-image="imagen3">Quitar tercera imagen</button></div>
-        <div><img class="extra-preview" data-preview="guiaTallas" alt="Guía de tallas" hidden><label class="upload-label">Subir guía de tallas<input class="extra-image-file" data-image-field="guiaTallas" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label><button type="button" class="ghost" data-clear-image="guiaTallas">Quitar guía de tallas</button></div>
       </div>
       <div class="product-placement">
         <label class="check-label"><input class="new-arrival-check" type="checkbox"> Mostrar en NOVEDADES</label>
@@ -195,22 +196,18 @@
       <section class="product-variant-setting">
         <strong>Variantes de color</strong>
         <p>Si esta prenda es otro color del mismo diseño, elige aquí la prenda principal. En el catálogo aparecerán juntas como opciones de color.</p>
-        <label>Esta prenda es un color de<select class="color-parent-select"><option value="">Prenda principal / no agrupar</option></select></label>
+        <label>Esta prenda es un color de<button type="button" class="color-parent-button" aria-haspopup="dialog" aria-label="Elegir prenda principal">Prenda principal / no agrupar</button></label>
       </section>
-      <div class="sizes">
-        <label><input type="checkbox" data-size="S"> S</label>
-        <label><input type="checkbox" data-size="M"> M</label>
-        <label><input type="checkbox" data-size="L"> L</label>
-        <label><input type="checkbox" data-size="XL"> XL</label>
-      </div>
+      <div class="product-size-guide-setting"><label>Guía de tallas<select class="product-guide-select" aria-label="Guía de tallas de la prenda"></select></label></div>
     </article>
   </template>
   <script src="../storefront-config.js?v=1"></script>
   <script src="../experience-config.js?v=3"></script>
   <script src="experience-settings.js?v=5"></script>
-  <script src="admin.js?v=15"></script>
+  <script src="product-settings.js?v=20261002-inventory-total"></script>
+  <script src="admin.js?v=20261002-inventory-total"></script>
   <script src="info-settings.js?v=2"></script>
   <script src="personalization-settings.js?v=2"></script>
-  <script src="admin-home-v2.js?v=1"></script>
+  <script src="satin-admin.js?v=20261002-inventory-total"></script>
 </body>
 </html>

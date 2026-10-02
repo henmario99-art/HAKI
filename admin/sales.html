@@ -6,14 +6,10 @@
   <meta name="robots" content="noindex,nofollow">
   <meta name="theme-color" content="#f5f5f3">
   <title>HAKI Ventas</title>
-  <link rel="stylesheet" href="sales.css?v=3">
-  <link rel="stylesheet" href="sales-flow.css?v=1">
-  <link rel="stylesheet" href="sales-experience.css?v=4">
+  <link rel="stylesheet" href="sales.css?v=20261002-inventory-total">
+
   <link rel="stylesheet" href="sales-suite.css?v=1">
   <link rel="stylesheet" href="sales-agency-position-fix.css?v=1">
-  <link rel="stylesheet" href="sales-mobile-v2.css?v=2">
-  <link rel="stylesheet" href="sales-mobile-v3.css?v=2">
-  <link rel="stylesheet" href="sales-mobile-v5.css?v=20260924">
   <style>
     .haki-admin-loader{position:fixed;inset:0;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#fff;color:#111;opacity:1;visibility:visible;transition:opacity .28s ease,visibility .28s ease}
     .haki-admin-loader.is-hidden{opacity:0;visibility:hidden;pointer-events:none}
@@ -27,16 +23,18 @@
     @keyframes hakiAdminPulse{0%,100%{transform:scale(.96);opacity:.72}50%{transform:scale(1.04);opacity:1}}
     @media (prefers-reduced-motion:reduce){.haki-admin-loader img{animation:none}}
   </style>
+<link rel="stylesheet" href="satin.css">
+
+<script src="../system-theme.js?v=20261002"></script>
+<script src="satin-common.js"></script>
+<link rel="stylesheet" href="system-theme.css?v=20261002">
 </head>
 <body>
-  <div id="hakiAdminLoader" class="haki-admin-loader" role="status" aria-live="polite">
-    <img src="/images/uploads/1790048891577-40dbc192-HAKI-Post-de-Instagram-45-Photoroom.webp" alt="" aria-hidden="true">
-    <span>Cargando administrador…</span>
-  </div>
+
   <main class="sales-shell">
     <header class="sales-topbar">
       <div><div class="sales-brand">HAKI</div><p>Ventas, inventario y finanzas</p></div>
-      <a class="button secondary" href="/admin/?panel=1">Administrador</a>
+      <a class="round" href="/admin/?panel=1" aria-label="Volver al administrador">←</a>
     </header>
 
     <nav class="sales-tabs" aria-label="Panel de ventas">
@@ -119,7 +117,7 @@
     </section>
 
     <section id="inventoryView" hidden>
-      <div class="inventory-head"><div><h1>Inventario privado</h1><p>Estas cantidades solo se ven en el administrador y no se muestran en el catálogo público.</p></div><input id="inventorySearch" type="search" placeholder="Buscar prenda o código"></div>
+      <div class="inventory-head"><h1 id="inventoryUnitTotal" aria-live="polite" aria-atomic="true" title="Total disponible de todas las prendas y tallas">0 prendas</h1><input id="inventorySearch" type="search" placeholder="Buscar prenda o código"></div>
       <div id="inventoryList" class="inventory-list"></div>
     </section>
 
@@ -168,10 +166,6 @@
         <div><h1>Dashboard semanal</h1></div>
         <div class="suite-actions"><button id="refreshDashboard" class="button secondary" type="button">Actualizar</button></div>
       </header>
-      <div class="suite-week-toolbar">
-        <div class="suite-week-nav"><button class="icon-button" data-suite-prev type="button">←</button><div class="suite-week-copy"><strong>Semana</strong><span data-suite-range></span></div><button class="icon-button" data-suite-next type="button">→</button></div>
-        <button class="button secondary" data-suite-current type="button">Esta semana</button>
-      </div>
       <div id="dashboardContent"></div>
     </section>
 
@@ -192,19 +186,13 @@
       </div>
     </article>
   </template>
-
-  <script src="supabase-sales.js?v=20260924-fix3"></script>
-  <script src="sales.js?v=20260924-loader2"></script>
+  <script src="supabase-sales.js?v=20261002-online"></script>
+  <script src="sales.js?v=20261002-inventory-total"></script>
   <script src="sales-product-picker.js?v=1"></script>
   <script src="sales-rules.js?v=20260924"></script>
   <script src="sales-destinations.js?v=3"></script>
-  <script src="sales-suite.js?v=20260924-dashboard2"></script>
+  <script src="sales-suite.js?v=20261002-inventory-total"></script>
   <script src="sales-agency-search-fix.js?v=1"></script>
-  <script src="sales-receivables-filter.js?v=1"></script>
-  <script src="sales-flow.js?v=3"></script>
-  <script src="sales-mobile-v2.js?v=20260924"></script>
-  <script src="sales-mobile-v3.js?v=20260924-inventory2"></script>
-  <script src="sales-mobile-v5.js?v=1"></script>
-  <script src="sales-order-layout-v6.js?v=20260924-sizes2"></script>
+<script src="satin-sales.js?v=20261002-inventory-total"></script>
 </body>
 </html>

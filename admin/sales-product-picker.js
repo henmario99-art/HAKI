@@ -102,7 +102,7 @@
     renderProducts();
     overlay.hidden = false;
     document.body.style.overflow = 'hidden';
-    requestAnimationFrame(() => search.focus({ preventScroll: true }));
+
   }
 
   function syncVisualButton(select) {

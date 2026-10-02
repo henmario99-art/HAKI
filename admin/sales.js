@@ -67,10 +67,22 @@ async function ensureAuth(){
   if(!auth.authenticated){location.href='/admin/';return false}
   return true;
 }
-async function loadProducts(){const data=await api('catalog',{method:'GET'});state.products=data.products||[];if(Object.keys(state.inventory).length)renderInventory()}
-async function loadWeek(){const data=await api(`sales?weekStart=${encodeURIComponent(state.weekStart)}`,{method:'GET'});state.weekStart=data.weekStart;state.sales=data.sales||[];state.inventory=data.inventory||{};renderWeek();renderInventory()}
+async function loadProducts(){const data=await api('catalog',{method:'GET'});window.HAKITheme.configure(data.config?.tema);state.products=data.products||[];renderInventory()}
+let weekRequest=0;
+async function loadWeek(){
+  const start=state.weekStart,request=++weekRequest;
+  try {
+    const data=await api(`sales?weekStart=${encodeURIComponent(start)}`,{method:'GET'});
+    if(request!==weekRequest||start!==state.weekStart)return;
+    state.sales=(data.sales||[]).filter(sale=>sale.fecha&&mondayOf(sale.fecha)===start);
+    state.inventory=data.inventory||{};renderWeek();renderInventory();
+  } catch(error) {
+    if(request===weekRequest&&start===state.weekStart)throw error;
+  }
+}
 
 function renderWeek(){
+  renderInventoryTotal();
   $('#weekTitle').textContent='Semana de 7 días';
   $('#weekRange').textContent=`${formatDate(state.weekStart)} – ${formatDate(addDays(state.weekStart,6),true)}`;
   const active=state.sales.filter(isActiveSale);
@@ -109,7 +121,66 @@ function switchTab(name){
   if(name==='inventory')renderInventory();
   if(archived){hideEditor();loadArchivedSales().catch(err=>toast(err.message,true))}
 }
-function renderInventory(){if(!state.products.length)return;const q=($('#inventorySearch').value||'').trim().toLowerCase();const wrap=$('#inventoryList');wrap.replaceChildren();state.products.filter(p=>!q||`${p.codigo} ${p.nombre}`.toLowerCase().includes(q)).forEach(product=>{const stock=stockFor(product.id);const row=document.createElement('article');row.className='inventory-row';const productInfo=document.createElement('div');productInfo.className='inventory-product';productInfo.innerHTML=`<strong>${escapeHtml(product.nombre)}</strong><small>${escapeHtml(product.codigo)}</small>`;row.append(productInfo);['S','M','L','XL'].forEach(size=>{const label=document.createElement('label');label.innerHTML=`<span>${size}</span><input type="number" min="0" step="1" value="${Number(stock[size])||0}" data-stock="${size}">`;row.append(label)});const total=document.createElement('div');total.className='inventory-total';total.textContent=String(['S','M','L','XL'].reduce((a,s)=>a+(Number(stock[s])||0),0));row.append(total);const save=document.createElement('button');save.type='button';save.className='button secondary';save.textContent='Guardar';save.addEventListener('click',async()=>{save.disabled=true;try{const next={};$$('[data-stock]',row).forEach(input=>next[input.dataset.stock]=Math.max(0,Math.trunc(Number(input.value)||0)));const data=await api('sales?mode=inventory',{method:'PUT',body:JSON.stringify({productId:product.id,productCode:product.codigo,stock:next})});state.inventory=data.inventory||state.inventory;total.textContent=String(Object.values(next).reduce((a,b)=>a+b,0));toast('Inventario guardado')}catch(err){toast(err.message,true)}finally{save.disabled=false}});$$('[data-stock]',row).forEach(input=>input.addEventListener('input',()=>{total.textContent=String($$('[data-stock]',row).reduce((sum,el)=>sum+Math.max(0,Math.trunc(Number(el.value)||0)),0))}));wrap.append(row)})}
+const inventoryDrafts = new Map();
+let inventorySaving = false;
+const inventorySizes = ['S','M','L','XL'];
+function renderInventoryTotal(){
+  const units=state.products.reduce((total,product)=>total+inventorySizes.reduce((sum,size)=>sum+Math.max(0,Math.trunc(Number(stockFor(product.id)[size])||0)),0),0);
+  $('#inventoryUnitTotal').textContent=`${new Intl.NumberFormat('es-SV').format(units)} ${units===1?'prenda':'prendas'}`;
+}
+function inventorySaveState(){
+  $$('#inventoryList .inventory-save').forEach(button=>{
+    button.disabled=inventorySaving||!inventoryDrafts.has(button.dataset.productId);
+  });
+}
+function renderInventory(){
+  renderInventoryTotal();
+  const q=($('#inventorySearch').value||'').trim().toLowerCase();
+  const wrap=$('#inventoryList');wrap.replaceChildren();
+  state.products.filter(p=>!q||`${p.codigo} ${p.nombre}`.toLowerCase().includes(q)).forEach(product=>{
+    const pid=String(product.id);
+    const draft=inventoryDrafts.get(pid);
+    const stock=draft?.stock||stockFor(pid);
+    const row=document.createElement('article');row.className='inventory-row';row.dataset.productId=pid;
+    const info=document.createElement('div');info.className='inventory-product';
+    info.innerHTML=`<strong>${escapeHtml(product.nombre)}</strong><small>${escapeHtml(product.codigo)}</small>`;row.append(info);
+    for(const size of inventorySizes){
+      const label=document.createElement('label');const name=document.createElement('span');name.textContent=size;
+      const input=document.createElement('input');input.type='number';input.min='0';input.step='1';input.inputMode='numeric';
+      input.value=stock[size]??0;input.dataset.stock=size;input.disabled=inventorySaving;
+      input.setAttribute('aria-label',`${product.nombre}, talla ${size}`);label.append(name,input);row.append(label);
+      input.addEventListener('input',()=>{
+        const existing=inventoryDrafts.get(pid);
+        const expected=existing?.expectedStock||Object.fromEntries(inventorySizes.map(s=>[s,Number(stockFor(pid)[s])||0]));
+        const next=Object.fromEntries($$('[data-stock]',row).map(el=>[el.dataset.stock,el.value]));
+        if(inventorySizes.every(s=>next[s]!==''&&Number(next[s])===expected[s]))inventoryDrafts.delete(pid);
+        else inventoryDrafts.set(pid,{productId:product.id,productCode:product.codigo,stock:next,expectedStock:expected});
+        updateTotal();inventorySaveState();
+      });
+    }
+    const total=document.createElement('div');total.className='inventory-total';row.append(total);
+    const save=document.createElement('button');save.type='button';save.className='button primary inventory-save';
+    save.textContent='Guardar';save.dataset.productId=pid;save.setAttribute('aria-label',`Guardar inventario de ${product.nombre}`);
+    save.addEventListener('click',()=>saveInventory(pid));row.append(save);
+    function updateTotal(){total.textContent=String($$('[data-stock]',row).reduce((n,el)=>n+(Math.max(0,Math.trunc(Number(el.value)||0))),0));}
+    updateTotal();wrap.append(row);
+  });
+  inventorySaveState();
+}
+async function saveInventory(productId){
+  const pid=String(productId),draft=inventoryDrafts.get(pid);
+  if(inventorySaving||!draft)return;
+  const updates=[draft];
+  if(updates.some(update=>inventorySizes.some(size=>update.stock[size]===''||!Number.isInteger(Number(update.stock[size]))||Number(update.stock[size])<0))){
+    toast('Las cantidades deben ser números enteros de cero o más.',true);return;
+  }
+  inventorySaving=true;inventorySaveState();$$('#inventoryList input').forEach(input=>input.disabled=true);
+  try{
+    const data=await api('sales?mode=inventory',{method:'PUT',body:JSON.stringify({updates})});
+    state.inventory=data.inventory;inventoryDrafts.delete(pid);toast('Inventario guardado');
+  }catch(err){toast(err.message,true);}
+  finally{inventorySaving=false;renderInventory();}
+}
 
 function productOptions(selectedId=''){return state.products.map(p=>`<option value="${p.id}" ${String(p.id)===String(selectedId)?'selected':''}>${escapeHtml(p.codigo)} — ${escapeHtml(p.nombre)}</option>`).join('')}
 function addItemRow(item={}){const tpl=$('#itemTemplate').content.cloneNode(true);const row=$('.item-row',tpl);const product=$('[data-item="product"]',row);product.innerHTML='<option value="">Selecciona una prenda</option>'+productOptions(item.productId);const size=$('[data-item="size"]',row);size.value=item.talla||'S';const qty=$('[data-item="qty"]',row);qty.value=item.cantidad||1;const price=$('[data-item="price"]',row);price.value=item.precio??'';const updateProduct=()=>{const p=state.products.find(x=>String(x.id)===product.value);if(p)price.value=Number(p.precio||0).toFixed(2);updateStockNote(row);updateTotals()};product.addEventListener('change',updateProduct);size.addEventListener('change',()=>updateStockNote(row));qty.addEventListener('input',()=>{updateStockNote(row);updateTotals()});price.addEventListener('input',updateTotals);$('[data-item="remove"]',row).addEventListener('click',()=>{row.remove();if(!$('#items').children.length)addItemRow();updateTotals()});$('#items').append(row);updateStockNote(row);updateTotals()}
@@ -140,7 +211,7 @@ function showEditor(){const editor=$('#saleEditor');editor.hidden=false;requestA
 function hideEditor(){const editor=$('#saleEditor');editor.hidden=true;state.editing=null;state.previousWeekStart=''}
 function openNewSale(date=addDays(state.weekStart,0)){resetForm();$('#salePickupDate').value=date;addItemRow();showEditor()}
 function openEditSale(sale){resetForm();state.editing=sale;state.previousWeekStart=mondayOf(sale.fecha);$('#saleDialogTitle').textContent='Editar venta';$('#deleteSale').hidden=false;$('#salePickupDate').value=sale.fechaRetiro||sale.fecha||'';$('#saleChannel').value=sale.canal||'Instagram';$('#saleClient').value=sale.cliente||'';$('#salePlace').value=sale.lugarHorario||'';$('#saleShipping').value=Number(sale.envio)||0;$('#saleDelivery').value=sale.entrega||'Pedido Express';$('#saleState').value=sale.estado||'Pendiente';$('#saleShippingStage').value=sale.etapaEnvio||'Pedido tomado';$('#saleMoney').value=sale.dinero||'Pendiente';(sale.items||[]).forEach(addItemRow);if(!sale.items?.length)addItemRow();updateTotals();showEditor()}
-function formSale(){const pickupDate=$('#salePickupDate').value;const items=$$('.item-row',$('#items')).map(row=>{const product=state.products.find(p=>String(p.id)===$('[data-item="product"]',row).value);return{productId:product?.id,codigo:product?.codigo,nombre:product?.nombre,talla:$('[data-item="size"]',row).value,cantidad:Number($('[data-item="qty"]',row).value)||1,precio:Number($('[data-item="price"]',row).value)||0}});return{id:state.editing?.id,fecha:pickupDate,fechaRetiro:pickupDate,canal:$('#saleChannel').value,cliente:$('#saleClient').value,lugarHorario:$('#salePlace').value,items,envio:Number($('#saleShipping').value)||0,entrega:$('#saleDelivery').value,estado:$('#saleState').value,etapaEnvio:$('#saleShippingStage').value,dinero:$('#saleMoney').value,notas:''}}
+function formSale(){const pickupDate=$('#salePickupDate').value;const items=$$('.item-row',$('#items')).map(row=>{const product=state.products.find(p=>String(p.id)===$('[data-item="product"]',row).value);return{productId:product?.id,codigo:product?.codigo,nombre:product?.nombre,talla:$('[data-item="size"]',row).value,cantidad:Number($('[data-item="qty"]',row).value)||1,precio:Number($('[data-item="price"]',row).value)||0}});return{...(state.editing||{}),id:state.editing?.id,fecha:pickupDate,fechaRetiro:pickupDate,canal:$('#saleChannel').value,cliente:$('#saleClient').value,lugarHorario:$('#salePlace').value,items,envio:Number($('#saleShipping').value)||0,entrega:$('#saleDelivery').value,estado:$('#saleState').value,etapaEnvio:$('#saleShippingStage').value,dinero:$('#saleMoney').value,notas:state.editing?.notas||''}}
 async function saveSale(){const button=$('#saveSale');button.disabled=true;const wasEditing=!!state.editing;try{const sale=formSale();if(!sale.fecha)throw new Error('Selecciona el día que retiró el cliente.');if(!sale.cliente.trim())throw new Error('Escribe el nombre del cliente.');const options=wasEditing?{method:'PUT',body:JSON.stringify({sale,previousWeekStart:state.previousWeekStart})}:{method:'POST',body:JSON.stringify({sale})};const data=await api('sales',options);hideEditor();state.weekStart=data.weekStart||state.weekStart;await loadWeek();toast(wasEditing?'Venta actualizada':'Venta guardada')}catch(err){toast(err.message,true)}finally{button.disabled=false}}
 async function deleteSale(){if(!state.editing||!confirm(`¿Archivar la venta de ${state.editing.cliente||'este cliente'}? Desaparecerá de las ventas activas y el stock reservado se devolverá, pero la venta seguirá guardada.`))return;const button=$('#deleteSale');button.disabled=true;try{await api('sales',{method:'DELETE',body:JSON.stringify({id:state.editing.id,weekStart:state.previousWeekStart})});hideEditor();await loadWeek();toast('Venta archivada. El registro se conservó y el stock fue devuelto.')}catch(err){toast(err.message,true)}finally{button.disabled=false}}
 
@@ -151,12 +222,23 @@ async function loadArchivedSales(){const data=await api('sales?mode=archived',{m
 
 
 $$('.tab').forEach(btn=>btn.addEventListener('click',()=>switchTab(btn.dataset.tab)));
-$('#prevWeek').addEventListener('click',async()=>{state.weekStart=addDays(state.weekStart,-7);hideEditor();await loadWeek()});
-$('#nextWeek').addEventListener('click',async()=>{state.weekStart=addDays(state.weekStart,7);hideEditor();await loadWeek()});
-$('#todayWeek').addEventListener('click',async()=>{state.weekStart=mondayOf(new Date());hideEditor();await loadWeek()});
+let changingWeek=false;
+async function changeWeek(next){
+  if(changingWeek)return;
+  const previous=state.weekStart;
+  const previousSales=state.sales;
+  hideEditor();changingWeek=true;
+  const controls=$$('.period-nav input,.period-nav button');controls.forEach(control=>control.disabled=true);
+  try{state.weekStart=next;state.sales=[];renderWeek();window.hakiCollectionsWeekChanging?.();window.hakiDashboardWeekChanging?.();window.hakiExpensesWeekChanging?.();await loadWeek();await Promise.all([window.hakiCollectionsWeekChanged?.(),window.hakiDashboardWeekChanged?.(),window.hakiExpensesWeekChanged?.()]);}
+  catch(err){state.weekStart=previous;state.sales=previousSales;renderWeek();await Promise.all([window.hakiCollectionsWeekChanged?.(),window.hakiDashboardWeekChanged?.(),window.hakiExpensesWeekChanged?.()]);toast(err.message,true);}
+  finally{changingWeek=false;controls.forEach(control=>control.disabled=false);}
+}
+$('#prevWeek').addEventListener('click',()=>changeWeek(addDays(state.weekStart,-7)));
+$('#nextWeek').addEventListener('click',()=>changeWeek(addDays(state.weekStart,7)));
+$('#todayWeek').addEventListener('click',()=>changeWeek(mondayOf(new Date())));
 $('#newSale').addEventListener('click',()=>{switchTab('sales');const today=isoDate(new Date());openNewSale(mondayOf(today)===state.weekStart?today:state.weekStart)});
 $('#backFromArchived').addEventListener('click',()=>switchTab('sales'));
-$('#inventorySearch').addEventListener('input',renderInventory);
+$('#inventorySearch').addEventListener('input',()=>renderInventory());
 $('#addItem').addEventListener('click',()=>addItemRow());
 $('#saleShipping').addEventListener('input',updateTotals);
 $('#saleDelivery').addEventListener('change',updateTotals);

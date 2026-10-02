@@ -162,7 +162,7 @@ function normalizeSale(input: any, previous: any = null) {
     costoGuiaC807: c807 ? C807_GUIDE_COST : 0,
     comisionC807: Number(comisionC807.toFixed(2)),
     estado,
-    etapaEnvio: ['Pedido tomado','Empacado','Enviado'].includes(input?.etapaEnvio) ? input.etapaEnvio : (previous?.etapaEnvio || 'Pedido tomado'),
+    etapaEnvio: estado === 'Retirado' && previous?.estado !== 'Retirado' ? 'Enviado' : (['Pedido tomado','Empacado','Enviado'].includes(input?.etapaEnvio) ? input.etapaEnvio : (previous?.etapaEnvio || 'Pedido tomado')),
     dinero,
     cobroSolicitadoAt: txt(input?.cobroSolicitadoAt || previous?.cobroSolicitadoAt, 50),
     cobroCanceladoAt: txt(input?.cobroCanceladoAt || previous?.cobroCanceladoAt, 50),
@@ -363,11 +363,21 @@ Deno.serve(async (req: Request) => {
 
     if (req.method === 'PUT' && mode === 'inventory') {
       const body = await req.json();
-      const productCode = txt(body?.productCode,80).toUpperCase();
+      const update = Array.isArray(body?.updates) ? body.updates[0] : body;
+      if (Array.isArray(body?.updates) && body.updates.length !== 1) throw new Error('Guarda el inventario de una prenda a la vez.');
+      if (!update) throw new Error('No hay cambios de inventario para guardar.');
+      const productCode = txt(update?.productCode,80).toUpperCase();
+      const stock: Record<string, any> = {};
+      for (const size of SIZES) {
+        const value = Number(update.stock?.[size]);
+        if (update.stock?.[size] === '' || !Number.isInteger(value) || value < 0) throw new Error('Las cantidades deben ser números enteros de cero o más.');
+        stock[size] = value;
+      }
+      if (update.expectedStock) stock.__expected = update.expectedStock;
       const result = await rpc('haki_set_inventory', {
         p_product_code:productCode,
-        p_product_id:Number(body?.productId),
-        p_stock:body?.stock || {},
+        p_product_id:Number(update?.productId),
+        p_stock:stock,
       });
       return json({ ok:true, stock:Array.isArray(result)?result[0]:result, inventory:await inventoryMap() });
     }
@@ -413,6 +423,14 @@ Deno.serve(async (req: Request) => {
       const id = txt(body?.id,80);
       await db(`haki_expenses?id=eq.${encodeURIComponent(id)}`, { method:'DELETE', headers:{prefer:'return=minimal'} });
       return json({ ok:true });
+    }
+
+    if (req.method === 'GET' && mode === 'receivables' && validDate(url.searchParams.get('weekStart'))) {
+      const start = mondayOf(validDate(url.searchParams.get('weekStart')));
+      const end = addDays(start,6);
+      const rows = await db(`haki_sales?archived_at=is.null&sale_date=gte.${start}&sale_date=lte.${end}&select=payload&order=created_at.asc`);
+      const receivables=(rows||[]).map((row:any)=>row.payload).filter((sale:any)=>sale.dinero==='Pendiente' && sale.estado==='Retirado' && (isPedidoExpress(sale.entrega)||isC807(sale.entrega)));
+      return json({weekStart:start,receivables});
     }
 
     if (req.method === 'GET' && mode === 'receivables') {
@@ -476,6 +494,8 @@ Deno.serve(async (req: Request) => {
       const rows = await db(`haki_sales?id=eq.${encodeURIComponent(id)}&archived_at=is.null&select=payload`);
       const previous = rows?.[0]?.payload;
       if (!previous) throw new Error('No se encontró la venta.');
+      const expectedUpdatedAt = body.updatedAt || input.updatedAt;
+      if (expectedUpdatedAt && expectedUpdatedAt !== previous.updatedAt) throw new Error('La venta cambió. Actualiza la semana antes de guardar.');
       let candidate = input;
       if (req.method === 'PATCH') {
         if (!['estado','etapaEnvio','dinero'].includes(body?.field)) throw new Error('Campo no permitido.');
@@ -483,6 +503,7 @@ Deno.serve(async (req: Request) => {
         if (body?.field === 'etapaEnvio' && !['Pedido tomado','Empacado','Enviado'].includes(body?.value)) throw new Error('Etapa inválida.');
         if (body?.field === 'dinero' && !MONEY_STATES.has(body?.value)) throw new Error('Estado de dinero inválido.');
         candidate = { ...previous, [body.field]:body.value };
+        if (body.field === 'dinero' && body.value === 'En caja' && body.cobroCancelado) candidate.cobroCanceladoAt = new Date().toISOString();
       }
       const sale = normalizeSale(candidate, previous);
       sale.id = id;

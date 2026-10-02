@@ -24,7 +24,9 @@
   const activeSale = sale => !['Cancelado', 'No retirado'].includes(sale?.estado);
   const totalUnits = sale => (sale?.items || []).reduce((sum, item) => sum + (Number(item.cantidad) || 0), 0);
 
+  window.hakiSetPanel = setPanel;
   function setPanel(name) {
+    window.hakiPanelChanged?.(name);
     const archived = name === 'archived';
     Object.entries(panelViews).forEach(([key, view]) => {
       if (!view) return;
@@ -41,9 +43,10 @@
     if (archivedView) archivedView.hidden = !archived;
     if (days) days.hidden = archived;
     if (metrics) metrics.hidden = archived;
-    if (toolbar) toolbar.hidden = archived;
+    if (toolbar) toolbar.hidden = true;
     if (archived && typeof loadArchivedSales === 'function') loadArchivedSales().catch(error => toast(error.message, true));
 
+    if (name === 'inventory') renderInventory();
     if (name === 'collections') loadReceivables();
     if (name === 'expenses') {
       suiteWeekStart = state.weekStart || suiteWeekStart;
@@ -66,16 +69,13 @@
 
   function wireSuiteWeekNav(root, onChange) {
     root?.querySelector('[data-suite-prev]')?.addEventListener('click', () => {
-      suiteWeekStart = addDays(suiteWeekStart, -7);
-      onChange(suiteWeekStart);
+      changeWeek(addDays(state.weekStart, -7));
     });
     root?.querySelector('[data-suite-next]')?.addEventListener('click', () => {
-      suiteWeekStart = addDays(suiteWeekStart, 7);
-      onChange(suiteWeekStart);
+      changeWeek(addDays(state.weekStart, 7));
     });
     root?.querySelector('[data-suite-current]')?.addEventListener('click', () => {
-      suiteWeekStart = mondayOf(new Date());
-      onChange(suiteWeekStart);
+      changeWeek(mondayOf(new Date()));
     });
   }
 
@@ -172,20 +172,39 @@
   }
 
   // ---------- Cobros pendientes de encomiendas ----------
+  let receivablesRequest = 0;
+  function clearReceivables() {
+    const root = panelViews.collections;
+    if (!root) return;
+    root.querySelector('#collectionsList').innerHTML = '<div class="suite-loading">Cargando cobros pendientes…</div>';
+    root.querySelector('#collectionsTotal').textContent = money(0);
+    root.querySelector('#collectionsCount').textContent = '0';
+  }
+  window.hakiCollectionsWeekChanging = () => {
+    ++receivablesRequest;
+    if (!panelViews.collections?.hidden) clearReceivables();
+  };
+  window.hakiCollectionsWeekChanged = () => {
+    if (!panelViews.collections?.hidden) return loadReceivables();
+  };
   async function loadReceivables() {
     const root = panelViews.collections;
     if (!root) return;
     const list = root.querySelector('#collectionsList');
     const total = root.querySelector('#collectionsTotal');
     const count = root.querySelector('#collectionsCount');
-    list.innerHTML = '<div class="suite-loading">Cargando cobros pendientes…</div>';
+    const request = ++receivablesRequest;
+    const weekStart = state.weekStart || mondayOf(new Date());
+    clearReceivables();
     try {
-      const data = await api(`sales?mode=receivables&anchor=${encodeURIComponent(isoDate(new Date()))}&weeks=26`, { method: 'GET' });
-      const receivables = data.receivables || [];
+      const data = await api(`sales?mode=receivables&weekStart=${encodeURIComponent(weekStart)}`, { method: 'GET' });
+      if (request !== receivablesRequest || weekStart !== state.weekStart) return;
+      const receivables = (data.receivables || []).sort((a,b)=>String(a.createdAt || a.fecha || '').localeCompare(String(b.createdAt || b.fecha || '')) || String(a.id).localeCompare(String(b.id)));
       if (total) total.textContent = money(receivables.reduce((sum, sale) => sum + saleNet(sale), 0));
       if (count) count.textContent = String(receivables.length);
       renderReceivables(receivables);
     } catch (error) {
+      if (request !== receivablesRequest || weekStart !== state.weekStart) return;
       list.innerHTML = `<div class="suite-empty">${escapeHtml(error.message)}</div>`;
     }
   }
@@ -194,61 +213,38 @@
     const list = document.querySelector('#collectionsList');
     if (!list) return;
     if (!receivables.length) {
-      list.innerHTML = '<div class="suite-empty"><strong>No hay encomiendas pendientes de cobro.</strong><span>Cuando una venta por Pedido Express o C807 esté Retirada y el dinero siga Pendiente, aparecerá aquí.</span></div>';
+      list.innerHTML = '<div class="suite-empty"><strong>No hay cobros pendientes en esta semana.</strong></div>';
       return;
     }
-    const table = document.createElement('table');
-    table.className = 'suite-table collections-table';
-    table.innerHTML = '<thead><tr><th>Solicitado</th><th>Cancelado</th><th>Fecha entrega</th><th>Cliente</th><th>Destino</th><th>Total cobrado</th><th>Página</th></tr></thead>';
-    const tbody = document.createElement('tbody');
+    list.replaceChildren();
     receivables.forEach(sale => {
-      const row = document.createElement('tr');
+      const card = document.createElement('article');
+      card.className = 'collection-card';
+      card.dataset.saleId = sale.id;
       const delivered = sale.fechaRetiro || sale.fecha;
-      const requested = sale.cobroSolicitadoAt ? new Date(sale.cobroSolicitadoAt).toLocaleDateString('es-SV') : '';
-      row.innerHTML = `
-        <td data-label="Solicitado"></td>
-        <td data-label="Cancelado"></td>
-        <td data-label="Fecha entrega"><strong>${escapeHtml(formatDate(delivered))}</strong></td>
-        <td data-label="Cliente">${escapeHtml(sale.cliente || '—')}</td>
-        <td data-label="Destino">${escapeHtml(sale.lugarHorario || '—')}</td>
-        <td data-label="Total cobrado"><strong>${money(saleNet(sale))}</strong></td>
-        <td data-label="Página">${escapeHtml(sale.canal || '—')}</td>`;
-      const requestCell = row.children[0];
-      const paidCell = row.children[1];
-      const requestButton = document.createElement('button');
-      requestButton.type = 'button';
-      requestButton.className = `mini-check ${requested ? 'is-done' : ''}`;
-      requestButton.textContent = requested ? `✓ ${requested}` : 'Solicitar';
-      requestButton.addEventListener('click', async () => {
-        requestButton.disabled = true;
-        try {
-          const updated = { ...sale, cobroSolicitadoAt: sale.cobroSolicitadoAt || new Date().toISOString() };
-          await api('sales', { method: 'PUT', body: JSON.stringify({ sale: updated, previousWeekStart: sale.weekStart }) });
-          toast('Cobro marcado como solicitado');
-          await loadReceivables();
-        } catch (error) { toast(error.message, true); requestButton.disabled = false; }
+      const copy = document.createElement('dl');
+      for (const [label,value] of [['Fecha entrega:',new Date(delivered+'T12:00:00').toLocaleDateString('es-SV',{weekday:'long',day:'numeric'})],['Cliente:',sale.cliente],['Destino:',sale.lugarHorario],['Total cobrado:',money(saleNet(sale))],['Página:',sale.canal]]) {
+        const dt=document.createElement('dt');dt.textContent=label;
+        const dd=document.createElement('dd');dd.textContent=value || '—';copy.append(dt,dd);
+      }
+      const aside=document.createElement('div');aside.className='collection-aside';
+      const label=document.createElement('label');label.className='paid-toggle';label.append(document.createTextNode('Cancelado:'));
+      const input=document.createElement('input');input.type='checkbox';input.setAttribute('aria-label',`Confirmar cobro recibido de ${sale.cliente}`);input.setAttribute('role','switch');
+      label.append(input);aside.append(label);
+      input.addEventListener('change',async()=>{
+        if(!confirm(`¿Confirmar que ya recibiste ${money(saleNet(sale))} de ${sale.cliente || 'este pedido'}?`)){input.checked=false;return;}
+        input.disabled=true;
+        try{
+          await api('sales',{method:'PATCH',body:JSON.stringify({id:sale.id,field:'dinero',value:'En caja',updatedAt:sale.updatedAt,cobroCancelado:true})});
+          toast('Cobro recibido y enviado a caja');await loadReceivables();await loadWeek();
+        }catch(e){input.checked=false;input.disabled=false;toast(e.message,true);}
       });
-      const paidButton = document.createElement('button');
-      paidButton.type = 'button';
-      paidButton.className = 'mini-check paid';
-      paidButton.textContent = 'Marcar pagado';
-      paidButton.addEventListener('click', async () => {
-        if (!confirm(`¿Confirmar que ya recibiste ${money(saleNet(sale))} de ${sale.cliente || 'este pedido'}?`)) return;
-        paidButton.disabled = true;
-        try {
-          const updated = { ...sale, dinero: 'En caja', cobroCanceladoAt: new Date().toISOString() };
-          await api('sales', { method: 'PUT', body: JSON.stringify({ sale: updated, previousWeekStart: sale.weekStart }) });
-          toast('Cobro recibido y enviado a caja');
-          await loadReceivables();
-          if (state.weekStart === sale.weekStart) await loadWeek();
-        } catch (error) { toast(error.message, true); paidButton.disabled = false; }
-      });
-      requestCell.append(requestButton);
-      paidCell.append(paidButton);
-      tbody.append(row);
+      if(sale.fotoPaquete){
+        const photo=document.createElement('button');photo.type='button';photo.className='collection-photo';photo.setAttribute('aria-label',`Abrir fotografía del paquete de ${sale.cliente}`);
+        const img=document.createElement('img');img.src=sale.fotoPaquete;img.alt='Fotografía del paquete';photo.append(img);photo.onclick=()=>hakiPhotoView(sale.fotoPaquete);aside.append(photo);
+      }
+      card.append(copy,aside);list.append(card);
     });
-    table.append(tbody);
-    list.replaceChildren(table);
   }
 
   document.querySelector('#refreshCollections')?.addEventListener('click', loadReceivables);
@@ -291,16 +287,32 @@
     expenseEditing = null;
   }
 
-  async function loadExpenses(start = suiteWeekStart) {
+  let expensesRequest = 0;
+  function clearExpenses() {
+    const list = document.querySelector('#expensesList');
+    if (list) list.innerHTML = '<div class="suite-loading">Cargando gastos…</div>';
+    document.querySelector('#expensesTotal').textContent = money(0);
+  }
+  window.hakiExpensesWeekChanging = () => {
+    ++expensesRequest;
+    if (!expenseRoot?.hidden) clearExpenses();
+  };
+  window.hakiExpensesWeekChanged = () => {
+    if (!expenseRoot?.hidden) return loadExpenses(state.weekStart);
+  };
+  async function loadExpenses(start = state.weekStart) {
+    const request = ++expensesRequest;
     suiteWeekStart = start;
     const range = expenseRoot?.querySelector('[data-suite-range]');
     if (range) range.textContent = weekRangeText(start);
     const list = document.querySelector('#expensesList');
-    if (list) list.innerHTML = '<div class="suite-loading">Cargando gastos…</div>';
+    clearExpenses();
     try {
       const data = await api(`sales?mode=expenses&weekStart=${encodeURIComponent(start)}`, { method: 'GET' });
-      renderExpenses(data.expenses || []);
+      if (request !== expensesRequest || start !== state.weekStart) return;
+      renderExpenses((data.expenses || []).filter(expense => expense.fecha && mondayOf(expense.fecha) === start));
     } catch (error) {
+      if (request !== expensesRequest || start !== state.weekStart) return;
       if (list) list.innerHTML = `<div class="suite-empty">${escapeHtml(error.message)}</div>`;
     }
   }
@@ -352,8 +364,7 @@
         await api('sales?mode=expenses', { method: 'POST', body: JSON.stringify({ expense }) });
       }
       hideExpenseEditor();
-      suiteWeekStart = mondayOf(expense.fecha);
-      await loadExpenses(suiteWeekStart);
+      await loadExpenses(state.weekStart);
       toast(expenseEditing ? 'Gasto actualizado' : 'Gasto registrado');
     } catch (error) { toast(error.message, true); }
     finally { save.disabled = false; }
@@ -373,9 +384,21 @@
 
   // ---------- Dashboard semanal ----------
   const dashboardRoot = panelViews.dashboard;
-  wireSuiteWeekNav(dashboardRoot, loadDashboard);
+  let dashboardRequest = 0;
+  function clearDashboard() {
+    const content = document.querySelector('#dashboardContent');
+    if (content) { delete content.dataset.weekStart; content.innerHTML = '<div class="suite-loading">Calculando la semana…</div>'; }
+  }
+  window.hakiDashboardWeekChanging = () => {
+    ++dashboardRequest;
+    if (!dashboardRoot?.hidden) clearDashboard();
+  };
+  window.hakiDashboardWeekChanged = () => {
+    if (!dashboardRoot?.hidden) return loadDashboard();
+  };
 
-  async function loadDashboard(start = suiteWeekStart) {
+  async function loadDashboard(start = state.weekStart || mondayOf(new Date())) {
+    const request = ++dashboardRequest;
     suiteWeekStart = start;
     const range = dashboardRoot?.querySelector('[data-suite-range]');
     if (range) range.textContent = weekRangeText(start);
@@ -386,8 +409,15 @@
         api(`sales?weekStart=${encodeURIComponent(start)}`, { method: 'GET' }),
         api(`sales?mode=expenses&weekStart=${encodeURIComponent(start)}`, { method: 'GET' }),
       ]);
-      renderDashboard(weekData.sales || [], expenseData.expenses || [], weekData.inventory || {});
+      if (request !== dashboardRequest || start !== state.weekStart) return;
+      renderDashboard(
+        (weekData.sales || []).filter(sale => sale.fecha && mondayOf(sale.fecha) === start),
+        (expenseData.expenses || []).filter(expense => expense.fecha && mondayOf(expense.fecha) === start),
+        weekData.inventory || {}
+      );
+      content.dataset.weekStart = start;
     } catch (error) {
+      if (request !== dashboardRequest || start !== state.weekStart) return;
       if (content) content.innerHTML = `<div class="suite-empty">${escapeHtml(error.message)}</div>`;
     }
   }
@@ -404,7 +434,6 @@
     const weekNet = salesNet - commissions - expenseTotal;
     const pending = active.filter(sale => sale.dinero === 'Pendiente').reduce((sum, sale) => sum + saleNet(sale), 0);
     const inCash = active.filter(sale => sale.dinero === 'En caja').reduce((sum, sale) => sum + saleNet(sale), 0);
-    const units = active.reduce((sum, sale) => sum + totalUnits(sale), 0);
     const average = active.length ? salesNet / active.length : 0;
 
     const productMap = new Map();
@@ -428,30 +457,30 @@
 
     content.innerHTML = `
       <section class="dashboard-grid">
-        <article class="dash-card primary"><span>Total que queda</span><strong>${money(weekNet)}</strong><small>Ventas de prendas menos comisiones y gastos</small></article>
-        <article class="dash-card"><span>Ventas totales</span><strong>${money(gross)}</strong><small>Incluye envíos cobrados</small></article>
-        <article class="dash-card"><span>Gastos semanales</span><strong>${money(expenseTotal)}</strong><small>${expenses.length} movimiento${expenses.length === 1 ? '' : 's'}</small></article>
-        <article class="dash-card"><span>Comisiones C807</span><strong>${money(commissions)}</strong><small>Descontadas de los cobros</small></article>
-        <article class="dash-card"><span>En caja</span><strong>${money(inCash)}</strong><small>Ventas marcadas como cobradas</small></article>
-        <article class="dash-card"><span>Pendiente de cobro</span><strong>${money(pending)}</strong><small>Dinero todavía fuera de caja</small></article>
-        <article class="dash-card"><span>Pedidos</span><strong>${active.length}</strong><small>${units} prendas vendidas</small></article>
-        <article class="dash-card"><span>Ticket promedio</span><strong>${money(average)}</strong><small>Promedio neto por pedido</small></article>
+        <article class="dash-card primary"><span>Total que queda</span><strong>${money(weekNet)}</strong></article>
+        <article class="dash-card"><span>Ventas totales</span><strong>${money(gross)}</strong></article>
+        <article class="dash-card"><span>Gastos semanales</span><strong>${money(expenseTotal)}</strong></article>
+        <article class="dash-card"><span>Comisiones C807</span><strong>${money(commissions)}</strong></article>
+        <article class="dash-card"><span>En caja</span><strong>${money(inCash)}</strong></article>
+        <article class="dash-card"><span>Pendiente de cobro</span><strong>${money(pending)}</strong></article>
+        <article class="dash-card"><span>Pedidos</span><strong>${active.length}</strong></article>
+        <article class="dash-card"><span>Ticket promedio</span><strong>${money(average)}</strong></article>
       </section>
       <section class="dashboard-insights">
         <article class="best-product">
           ${productImg ? `<img src="${escapeHtml(productImg.startsWith('http') || productImg.startsWith('/') ? productImg : `/${productImg}`)}" alt="">` : '<div class="best-product-placeholder">HAKI</div>'}
-          <div><span>Prenda más vendida</span><strong>${escapeHtml(topProduct?.nombre || 'Sin ventas')}</strong><small>${topProduct ? `${topProduct.qty} unidad${topProduct.qty === 1 ? '' : 'es'} · ${money(topProduct.revenue)}` : 'Aún no hay datos esta semana'}</small></div>
+          <div><span>Prenda más vendida</span><strong>${escapeHtml(topProduct?.nombre || 'Sin ventas')}</strong></div>
         </article>
         <article class="insight-list">
-          <div><span>Destino más frecuente</span><strong>${escapeHtml(topDestination?.[0] || '—')}</strong><small>${topDestination ? `${topDestination[1]} pedido${topDestination[1] === 1 ? '' : 's'}` : 'Sin destinos esta semana'}</small></div>
-          <div><span>Stock bajo</span><strong>${lowStock}</strong><small>Tallas con 1–2 unidades disponibles</small></div>
-          <div><span>Ventas netas</span><strong>${money(salesNet)}</strong><small>Solo prendas vendidas, sin envíos</small></div>
+          <div><span>Destino más frecuente</span><strong>${escapeHtml(topDestination?.[0] || '—')}</strong></div>
+          <div><span>Stock bajo</span><strong>${lowStock}</strong></div>
+          <div><span>Ventas netas</span><strong>${money(salesNet)}</strong></div>
         </article>
       </section>`;
     content.querySelector('.best-product img')?.addEventListener('error', event => { event.currentTarget.style.display = 'none'; });
   }
 
-  document.querySelector('#refreshDashboard')?.addEventListener('click', () => loadDashboard(suiteWeekStart));
+  document.querySelector('#refreshDashboard')?.addEventListener('click', () => loadDashboard());
 
   // Si sales.js cambia la semana, las vistas financieras tomarán la nueva semana al abrirse.
   document.querySelector('#todayWeek')?.addEventListener('click', () => { suiteWeekStart = mondayOf(new Date()); });

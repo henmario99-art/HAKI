@@ -1,7 +1,7 @@
 const $ = (s, el=document) => el.querySelector(s);
 const $$ = (s, el=document) => [...el.querySelectorAll(s)];
 const API = '/.netlify/functions';
-const RAW_BASE = 'https://raw.githubusercontent.com/henmario99-art/HAKI/main/';
+const RAW_BASE = '/';
 
 let state = { config: {}, products: [], filtered: [] };
 
@@ -103,6 +103,7 @@ async function loadCatalog() {
     const data = await api('catalog', { method: 'GET' });
     state.catalogSha = data.sha;
     state.config = window.hakiSettings(data.config || {});
+    state.config.tema = window.HAKITheme.configure(state.config.tema);
     state.products = data.products || [];
     fillConfig();
     renderCollectionSettings();
@@ -118,12 +119,21 @@ async function loadCatalog() {
 function fillConfig() {
   document.querySelectorAll('[data-config]').forEach(input => {
     input.value = state.config[input.dataset.config] ?? '';
-    input.oninput = () => { state.config[input.dataset.config] = input.type==='number'?Number(input.value):input.value; if(input.dataset.config==='tema')document.documentElement.dataset.theme=input.value; };
-    if(input.dataset.config==='tema')document.documentElement.dataset.theme=input.value;
+    input.oninput = () => {
+      state.config[input.dataset.config] = input.type==='number'?Number(input.value):input.value;
+      if (input.dataset.config === 'tema') window.HAKITheme.set(input.value);
+    };
+
   });
   refreshCoverPreview();
   refreshBrandIconPreview();
 }
+
+window.addEventListener('haki-theme-changed', event => {
+  state.config.tema = event.detail;
+  const select = document.querySelector('[data-config="tema"]');
+  if (select) select.value = event.detail;
+});
 
 function refreshCoverPreview() {
   const preview = $('#coverPreview');
@@ -203,7 +213,7 @@ function newProduct() {
     colecciones: [],
     colores: [],
     colorDe: '',
-    imagen: 'images/producto.svg',
+    imagen: '',
     imagen2: '',
     imagen3: '',
     imagenRespaldo: 'images/producto.svg',
@@ -342,15 +352,6 @@ function renderProducts() {
       });
     });
 
-    $$('[data-size]', tpl).forEach(input => {
-      const size = input.dataset.size;
-      input.checked = !!p.tallas?.[size];
-      input.addEventListener('change', () => {
-        p.tallas ||= {};
-        p.tallas[size] = input.checked;
-      });
-    });
-
     if (!Array.isArray(p.colores)) p.colores = p.color ? [p.color] : [];
     p.colores = [...new Set(p.colores.map(String).filter(Boolean))];
     $$('input[data-color]', tpl).forEach(input => {
@@ -366,25 +367,8 @@ function renderProducts() {
       });
     });
 
-    p.colorDe = String(p.colorDe || '').trim().toUpperCase();
-    const colorParentSelect = $('.color-parent-select', tpl);
-    if (colorParentSelect) {
-      colorParentSelect.replaceChildren();
-      const primaryOption = document.createElement('option');
-      primaryOption.value = '';
-      primaryOption.textContent = 'Prenda principal / no agrupar';
-      colorParentSelect.append(primaryOption);
-      state.products.filter(candidate => candidate !== p && String(candidate.codigo || '').trim()).forEach(candidate => {
-        const option = document.createElement('option');
-        option.value = String(candidate.codigo || '').trim().toUpperCase();
-        option.textContent = `${option.value} — ${candidate.nombre || 'Sin nombre'}`;
-        colorParentSelect.append(option);
-      });
-      const parentExists = !p.colorDe || state.products.some(candidate => String(candidate.codigo || '').trim().toUpperCase() === p.colorDe && candidate !== p);
-      if (!parentExists) p.colorDe = '';
-      colorParentSelect.value = p.colorDe;
-      colorParentSelect.addEventListener('change', () => { p.colorDe = colorParentSelect.value; });
-    }
+    setupColorParentPicker(p, tpl);
+    setupProductGuide(p, tpl);
 
     const newCheck = $('.new-arrival-check', tpl);
     newCheck.checked = p.novedad === true;
@@ -406,7 +390,7 @@ function renderProducts() {
       label.append(checkbox, text); choices.append(label);
     });
 
-    ['imagen2', 'imagen3', 'guiaTallas'].forEach(field => {
+    ['imagen2', 'imagen3'].forEach(field => {
       const preview = $(`[data-preview="${field}"]`, tpl);
       const fieldInput = $(`[data-field="${field}"]`, tpl);
       function refresh() { preview.hidden = !p[field]; if (p[field]) preview.src = resolveImage(p[field]); }
@@ -455,7 +439,7 @@ function renderProducts() {
         const imageInput = $('[data-field="imagen"]', card);
         imageInput.value = data.path;
         preview.src = `${resolveImage(data.path)}?v=${Date.now()}`;
-        toast('Imagen subida a Supabase. No genera deploy. Guarda el catálogo cuando termines.', true);
+        toast('Imagen lista. Guarda el catálogo cuando termines.', true);
       } catch (err) {
         toast(err.message);
       } finally {
@@ -666,7 +650,7 @@ $('#coverFile')?.addEventListener('change', async (e) => {
   }
 });
 
-$('#search').addEventListener('input', renderProducts);
+$('#search').addEventListener('input', () => renderProducts({collapse:true}));
 
 const reorderDialog = $('#reorderDialog');
 $('#reorderBtn').addEventListener('click', () => {
@@ -677,7 +661,7 @@ function closeReorderDialog() { reorderDialog.close(); }
 $('#closeReorderBtn').addEventListener('click', closeReorderDialog);
 $('#closeReorderFooterBtn').addEventListener('click', closeReorderDialog);
 reorderDialog.addEventListener('click', event => { if (event.target === reorderDialog) closeReorderDialog(); });
-reorderDialog.addEventListener('close', renderProducts);
+reorderDialog.addEventListener('close', () => renderProducts());
 
 $('#addBtn').addEventListener('click', () => {
   const p = newProduct();
@@ -687,39 +671,25 @@ $('#addBtn').addEventListener('click', () => {
   window.scrollTo({ top: document.querySelector('.section-title').offsetTop - 80, behavior: 'smooth' });
 });
 
-async function saveDirtyInventory() {
-  const dirty = [...document.querySelectorAll('.private-inventory[data-dirty="true"]')];
-  for (const section of dirty) {
-    const product = state.products.find(p => String(p.id) === String(section.dataset.productId));
-    if (!product) throw new Error('No se pudo identificar una prenda con inventario pendiente.');
-    const stock = {};
-    section.querySelectorAll('[data-private-size]').forEach(input => {
-      stock[input.dataset.privateSize] = Math.max(0, Math.trunc(Number(input.value) || 0));
-    });
-    await api('sales?mode=inventory', {
-      method: 'PUT',
-      body: JSON.stringify({ productId: product.id, productCode: product.codigo, stock })
-    });
-    product.tallas ||= {};
-    ['S','M','L','XL'].forEach(size => { product.tallas[size] = Number(stock[size]) > 0; });
-    delete section.dataset.dirty;
-  }
-}
-
 async function saveCatalog() {
   for (const input of document.querySelectorAll('#experienceSettings input')) { if (!input.reportValidity()) return; }
-  if (!confirm('¿Guardar estos cambios en el catálogo?')) return false;
+
   const buttons = [$('#saveBtn'), $('#saveOrderBtn')];
   buttons.forEach(button => { button.disabled = true; button.dataset.label = button.textContent; button.textContent = 'Guardando…'; });
   try {
-    await saveDirtyInventory();
     const data = await api('catalog', {
       method: 'PUT',
       body: JSON.stringify({ config: state.config, products: state.products, sha: state.catalogSha })
     });
     state.catalogSha = data.sha || state.catalogSha;
-    if (Array.isArray(data.products)) state.products = data.products;
-    toast('Catálogo guardado en Supabase. No genera deploy.', true);
+    if (Array.isArray(data.products)) {
+      const existing = new Map(state.products.map(product => [String(product.id), product]));
+      state.products = data.products.map(product => {
+        const current = existing.get(String(product.id));
+        return current ? Object.assign(current, product) : product;
+      });
+    }
+    toast('Cambios guardados y visibles en el catálogo.', true);
     return true;
   } catch (err) {
     toast(err.message);

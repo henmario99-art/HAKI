@@ -31,7 +31,8 @@
       const badge = $('.product-number', card);
       if (!badge) return;
       const out = soldOut(p);
-      const text = labelFor(p);
+      const text = p.novedad === true ? 'NUEVO' : '';
+      badge.hidden = !text;
       if (badge.textContent.trim() !== text) badge.textContent = text;
       badge.classList.add('availability-badge');
       badge.classList.toggle('sold-out', out);
@@ -343,7 +344,7 @@
       syncEmptyCart();
       setupShippingProgress();
 
-      ['products','newProducts','productDetail'].forEach(id=>observer.observe(document.getElementById(id),{childList:true,subtree:true}));
+      ['products','newProducts','latestProducts','productDetail'].forEach(id=>observer.observe(document.getElementById(id),{childList:true,subtree:true}));
 
     });
   }
@@ -353,7 +354,7 @@
   smoothCategoryDialog();
   const observer = new MutationObserver(enhance);
   window.addEventListener('haki:listing-surface', enhance);
-  ['products','newProducts','productDetail'].forEach(id=>observer.observe(document.getElementById(id),{childList:true,subtree:true}));
+  ['products','newProducts','latestProducts','productDetail'].forEach(id=>observer.observe(document.getElementById(id),{childList:true,subtree:true}));
   const cartItems = $('#cartItems');
   if (cartItems) new MutationObserver(() => {
     const animateFromAdd = animateProgressOnNextCartChange;

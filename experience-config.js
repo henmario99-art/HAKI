@@ -13,7 +13,7 @@
     sugerenciasTitulo:'COMPLETA TU PEDIDO', sugerenciasTexto:'Añade una de estas prendas y acércate al envío gratis.',
     sugerenciasAgregar:'Añadir', sugerenciasTalla:'Talla',
     resumenTitulo:'RESUMEN DEL PEDIDO', subtotalTexto:'Subtotal de prendas', envioTexto:'Envío estimado', totalTexto:'Total estimado', gratisTexto:'GRATIS', eliminarTexto:'Eliminar',
-    datosTitulo:'DATOS PARA COTIZAR', nombreTexto:'Nombre', nombrePlaceholder:'Tu nombre', departamentoTexto:'Departamento', departamentoPlaceholder:'Ej. Santa Ana', municipioTexto:'Municipio', municipioPlaceholder:'Ej. Santa Ana',
+    datosTitulo:'COTIZA', nombreTexto:'Nombre', nombrePlaceholder:'Tu nombre', departamentoTexto:'Departamento', departamentoPlaceholder:'Ej. Santa Ana', municipioTexto:'Municipio', municipioPlaceholder:'Ej. Santa Ana',
     whatsappTexto:'SOLICITAR POR WHATSAPP', instagramTexto:'SOLICITAR POR INSTAGRAM', carritoAyuda:'Confirma tu envío y disponibilidad al solicitar la cotización. Para Instagram, pegá el texto copiado en el chat.',
     saludoCotizacion:'Hola HAKI 👋\nQuiero solicitar una cotización.'
   };
@@ -42,7 +42,7 @@
     if(!url) return 'images/producto.svg';
     if(/^(https?:|data:|blob:)/i.test(url))return url;
     if(/\.svg$/i.test(url))return url;
-    return 'https://raw.githubusercontent.com/henmario99-art/HAKI/main/'+String(url).replace(/^\/?(?:\.\/)?/,'');
+    return '/'+String(url).replace(/^\/?(?:\.\/)?/,'');
   };
   window.hakiSrcset=url=>imageItems(url).map(v=>`${v.src} ${v.width}w`).join(', ');
   window.hakiSafeLink=(value,fallback='#catalogo')=>{try{const u=new URL(value,location.href);return ['https:','http:'].includes(u.protocol)?value:fallback;}catch{return fallback;}};
@@ -98,7 +98,7 @@
     const next=theme==='oscuro'?'oscuro':'claro';
     root.dataset.theme=next;
     if(window.HAKI_CONFIG)window.HAKI_CONFIG.tema=next;
-    if(save){try{localStorage.setItem(THEME_KEY,next);}catch{}}
+    if(save){if(window.HAKITheme)window.HAKITheme.set(next);else{try{localStorage.setItem(THEME_KEY,next);}catch{}}}
     syncThemeButton(button);
   }
 
