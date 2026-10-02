@@ -322,7 +322,7 @@
   }
 
   function dropCodes() {
-    return ALL_PRODUCTS.filter(p=>p.nuevoDrop===true).map(p=>String(p.codigo));
+    return ALL_PRODUCTS.filter(p=>p.novedad===true).map(p=>String(p.codigo));
   }
   function visibleProducts() {
     const q = normalize(state.query.trim());
