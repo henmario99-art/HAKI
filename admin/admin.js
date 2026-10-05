@@ -99,6 +99,9 @@ async function showAdmin() {
 
 async function loadCatalog() {
   $('#saveBtn').disabled = true;
+  const finishProducts = window.HAKI_UI?.begin($('#products'),'admin',12);
+  const finishCollections = window.HAKI_UI?.begin($('#collectionSettings'),'rows',4);
+  let loaded = false;
   try {
     const data = await api('catalog', { method: 'GET' });
     state.catalogSha = data.sha;
@@ -108,10 +111,12 @@ async function loadCatalog() {
     fillConfig();
     renderCollectionSettings();
     renderProducts();
+    loaded = true;
     toast('Catálogo cargado', true);
   } catch (err) {
     toast(err.message);
   } finally {
+    finishProducts?.(loaded);finishCollections?.(loaded);
     $('#saveBtn').disabled = false;
   }
 }
@@ -341,7 +346,6 @@ function renderProducts() {
     publish.addEventListener('change', () => { p.borrador = !publish.checked; });
     publishLabel.append(publish, document.createTextNode('Mostrar en el catálogo'));
     card.append(publishLabel);
-
     $$('[data-field]', tpl).forEach(input => {
       const key = input.dataset.field;
       input.value = p[key] ?? '';

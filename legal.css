@@ -1,0 +1,13 @@
+:root{--legal-bg:#fff;--legal-ink:#141414;--legal-line:#dcdcdc}
+:root[data-theme=oscuro]{--legal-bg:#141414;--legal-ink:#f7f7f7;--legal-line:#484848}
+body.legal-page{margin:0;background:var(--legal-bg);color:var(--legal-ink);font:16px/1.75 system-ui,-apple-system,sans-serif}
+.legal-header,.legal-main,.legal-footer{max-width:900px;margin:auto;padding:24px}
+.legal-header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--legal-line)}
+.legal-header a,.legal-main a,.legal-footer a,.haki-legal-links a{color:inherit;text-underline-offset:4px}
+.legal-header strong{font-size:26px;letter-spacing:.08em}.legal-main h1{font-size:clamp(28px,5vw,44px);line-height:1.2}.legal-main h2{font-size:21px;margin-top:32px}
+.legal-main .draft{border:1px solid var(--legal-line);border-left:4px solid #986300;padding:16px}.legal-main dl{display:grid;grid-template-columns:minmax(100px,180px) 1fr;gap:8px 20px}.legal-main dd{margin:0;overflow-wrap:anywhere}.legal-main table{width:100%;border-collapse:collapse}.legal-main th,.legal-main td{padding:12px;text-align:left;border:1px solid var(--legal-line);overflow-wrap:anywhere}
+.legal-main button{font:inherit;padding:10px 16px;border:1px solid var(--legal-ink);color:inherit;background:transparent;cursor:pointer}.legal-footer{border-top:1px solid var(--legal-line);font-size:14px}.legal-footer nav,.haki-legal-links{display:flex;flex-wrap:wrap;gap:12px 22px}
+.haki-legal-links{grid-column:1/-1!important;width:100%;border-top:1px solid var(--line,#ddd);padding-top:20px;font-size:12px;line-height:1.5}.haki-provider-note{grid-column:1/-1!important;font-size:12px;line-height:1.6;overflow-wrap:anywhere}
+#quoteForm .quote-policy-note{font-size:12px;line-height:1.65;margin:10px 0 16px}#quoteForm .quote-authorization{display:grid!important;grid-template-columns:18px 1fr;gap:9px!important;align-items:start;font-size:12px;line-height:1.6;text-align:left}#quoteForm .quote-authorization input{width:17px!important;min-width:17px!important;height:17px!important;min-height:17px!important;padding:0!important;margin-top:3px}#quoteForm .quote-authorization a{color:inherit;text-decoration:underline}
+@media(max-width:500px){.legal-header,.legal-main,.legal-footer{padding:20px}.legal-main dl{display:block}.legal-main dd{margin-bottom:12px}.legal-main table{font-size:12px}}
+@media print{.legal-header a,.legal-footer,.legal-main button,.draft{display:none!important}.legal-main{max-width:none;padding:0}body.legal-page{color:#000;background:#fff}a{color:#000}}

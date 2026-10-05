@@ -1,0 +1,37 @@
+/* Shared HAKI feedback. Independent scale preserves existing sticky/gallery transforms. */
+:root{--haki-placeholder:#e8e8e6;--haki-glint:rgba(255,255,255,.28)}
+html[data-theme=oscuro]{--haki-placeholder:#292929;--haki-glint:rgba(255,255,255,.045)}
+.haki-touch-target.haki-pressed{scale:.98}
+@supports not (scale:1){.haki-touch-target.haki-pressed{opacity:.82}}
+.haki-skeleton-list{display:grid;gap:12px;width:100%;grid-column:1/-1;pointer-events:none}
+.haki-skeleton-list[data-shape=products]{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.haki-skeleton-card{display:grid;gap:10px;min-width:0;padding:14px;border-radius:14px;background:var(--surface,#f7f7f5)}
+html[data-theme=oscuro] .haki-skeleton-card{background:#1c1c1c}
+.haki-skeleton-card[data-shape=admin]{padding:12px 16px;grid-template-columns:24px minmax(0,1fr) 18px;align-items:center;min-height:42px;border-radius:999px}
+.haki-skeleton-card[data-shape=inventory]{grid-template-columns:48px minmax(0,1fr);align-items:center}
+.haki-skeleton-card[data-shape=days]{grid-template-columns:minmax(0,1fr) 42px;align-items:center;min-height:56px;padding:12px}
+.haki-skeleton-copy{display:grid;gap:8px;min-width:0}
+.haki-skeleton-block{display:block;position:relative;overflow:hidden;background:var(--haki-placeholder);border-radius:5px;height:10px;width:76%}
+.haki-skeleton-block.short{width:38%;height:8px}
+.haki-skeleton-block.round{width:24px;height:24px;border-radius:50%}
+.haki-skeleton-block.photo{width:100%;height:auto;aspect-ratio:3/4}
+.haki-skeleton-card[data-shape=inventory] .photo{height:54px;aspect-ratio:auto}
+.haki-skeleton-block::after,.haki-image-frame[data-haki-image-pending]::before{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(100deg,transparent 25%,var(--haki-glint) 50%,transparent 75%);transform:translateX(-100%);animation:haki-soft-shimmer 1.8s ease-in-out infinite}
+.haki-image-frame[data-haki-image-pending]{position:relative;overflow:hidden;background:var(--haki-placeholder)}
+.haki-image-frame[data-haki-image-pending]::before{z-index:1}
+img[data-haki-image-pending]{background:var(--haki-placeholder)}
+[data-haki-metric-pending]{position:relative;color:transparent!important;min-width:28px}
+[data-haki-metric-pending]::after{content:'';position:absolute;top:35%;left:0;width:75%;height:9px;border-radius:4px;background:var(--haki-placeholder)}
+@keyframes haki-soft-shimmer{to{transform:translateX(100%)}}
+@media(min-width:801px){.haki-skeleton-list[data-shape=products]{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){
+  .haki-touch-target.haki-pressed{scale:1;opacity:.82}
+  .haki-skeleton-block::after,.haki-image-frame[data-haki-image-pending]::before{animation:none;display:none}
+}
+
+.haki-skeleton-stock{grid-column:1/-1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.haki-skeleton-stock .haki-skeleton-block{width:100%;height:28px}
+.haki-skeleton-list[data-shape=detail]{padding:20px;max-width:1000px;margin:auto}
+.haki-skeleton-list[data-shape=detail] .photo{max-height:65svh}
+@media(min-width:801px){.haki-skeleton-card[data-shape=detail]{grid-template-columns:1fr 1fr;align-items:start}}
+body[data-haki-catalog-pending] :is(#newEmpty,#latestEmpty,#catalogNotice){visibility:hidden}

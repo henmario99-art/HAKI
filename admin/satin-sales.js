@@ -102,7 +102,7 @@
   }
   renderWeek=function(){
     renderInventoryTotal();
-    if(!state.weekStart)return;period();updateMetrics();const days=document.getElementById('days');days.replaceChildren();
+    if(!state.weekStart)return;period();if(state.loadedWeek!==state.weekStart)return;updateMetrics();const days=document.getElementById('days');days.replaceChildren();
     for(let i=0;i<7;i++){
       const date=addDays(state.weekStart,i);const rows=state.sales.filter(s=>s.fecha===date).sort((a,b)=>String(a.createdAt||'').localeCompare(String(b.createdAt||'')));
       const section=document.createElement('section');section.className='satin-day';
@@ -112,7 +112,7 @@
       const detail=document.createElement('div');detail.className='satin-day-detail';detail.hidden=!opened.has(date);
       const add=document.createElement('button');add.type='button';add.className='button primary day-add';add.textContent='+ Nueva venta';add.onclick=()=>openNewSale(date);detail.append(add);
       rows.forEach(s=>detail.append(saleCard(s)));
-      toggle.onclick=()=>{detail.hidden=!detail.hidden;toggle.setAttribute('aria-expanded',String(!detail.hidden));if(detail.hidden)opened.delete(date);else opened.add(date);};
+      toggle.onclick=()=>{detail.hidden=!detail.hidden;toggle.setAttribute('aria-expanded',String(!detail.hidden));if(detail.hidden)opened.delete(date);else {opened.add(date);window.HAKI_UI?.reveal(detail);}};
       section.append(toggle,detail);days.append(section);
     }
   };
@@ -120,7 +120,7 @@
 
   // The original editor and order fields are retained; only their layout changes.
   let returnScroll=0;
-  showEditor=function(){returnScroll=window.scrollY;document.getElementById('saleEditor').hidden=false;document.body.classList.add('sale-editor-mode');window.scrollTo(0,0);};
+  showEditor=function(){returnScroll=window.scrollY;document.getElementById('saleEditor').hidden=false;document.body.classList.add('sale-editor-mode');window.HAKI_UI?.reveal(document.getElementById('saleEditor'));window.scrollTo(0,0);};
   hideEditor=function(){document.getElementById('saleEditor').hidden=true;document.body.classList.remove('sale-editor-mode');state.editing=null;state.previousWeekStart='';window.scrollTo(0,returnScroll);};
   ['closeDialog','cancelDialog'].forEach(id=>document.getElementById(id).addEventListener('click',()=>hideEditor()));
   const meta=document.querySelector('.order-meta');['saleDelivery','saleState','saleShippingStage','saleMoney','saleShipping'].forEach(id=>meta.append(document.getElementById(id).closest('label')));

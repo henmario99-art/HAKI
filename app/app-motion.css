@@ -3,7 +3,7 @@
 html.doufu-app .header{top:env(safe-area-inset-top,0px)}
 html.doufu-app .cart-drawer{transition:transform 300ms var(--app-ease)}
 html.doufu-app :is(.solid,.outline,.header-icon,.size-option,.gymrat-option){transition:background-color 160ms ease,color 160ms ease,border-color 160ms ease,opacity 120ms ease}
-html.doufu-app :is(button,a):active{opacity:.72}
+html.doufu-app :is(button,a):active{opacity:.94}
 html.doufu-app :is(.product-image,.collection-image) img{transform:none!important}
 html.doufu-app .category-menu[open]{animation:app-menu-in 260ms var(--app-ease)}
 html.doufu-app .size-guide-dialog[open],html.doufu-app .gymrat-dialog[open]{animation:app-sheet-in 280ms var(--app-ease)}

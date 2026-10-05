@@ -67,18 +67,20 @@ async function ensureAuth(){
   if(!auth.authenticated){location.href='/admin/';return false}
   return true;
 }
-async function loadProducts(){const data=await api('catalog',{method:'GET'});window.HAKITheme.configure(data.config?.tema);state.products=data.products||[];renderInventory()}
+async function loadProducts(){const data=await api('catalog',{method:'GET'});window.HAKITheme.configure(data.config?.tema);state.products=data.products||[];state.productsReady=true;renderInventory()}
 let weekRequest=0;
 async function loadWeek(){
   const start=state.weekStart,request=++weekRequest;
+  const finish=window.HAKI_UI?.begin($('#days'),'days',7,{reset:state.loadedWeek!==start,metrics:$$('.metrics strong')});
+  let loaded=false;
   try {
     const data=await api(`sales?weekStart=${encodeURIComponent(start)}`,{method:'GET'});
     if(request!==weekRequest||start!==state.weekStart)return;
     state.sales=(data.sales||[]).filter(sale=>sale.fecha&&mondayOf(sale.fecha)===start);
-    state.inventory=data.inventory||{};renderWeek();renderInventory();
+    state.inventory=data.inventory||{};state.inventoryReady=true;state.loadedWeek=start;loaded=true;renderWeek();renderInventory();
   } catch(error) {
     if(request===weekRequest&&start===state.weekStart)throw error;
-  }
+  } finally { finish?.(loaded); }
 }
 
 function renderWeek(){
@@ -134,6 +136,7 @@ function inventorySaveState(){
   });
 }
 function renderInventory(){
+  if(!state.productsReady||!state.inventoryReady)return;
   renderInventoryTotal();
   const q=($('#inventorySearch').value||'').trim().toLowerCase();
   const wrap=$('#inventoryList');wrap.replaceChildren();
@@ -218,10 +221,12 @@ async function deleteSale(){if(!state.editing||!confirm(`¿Archivar la venta de 
 function formatAuditTime(value){if(!value)return'';const d=new Date(value);return Number.isNaN(d.getTime())?'':d.toLocaleString('es-SV',{dateStyle:'medium',timeStyle:'short'})}
 async function loadSaleHistory(saleId,container){if(!container||container.dataset.loaded==='true')return;container.dataset.loaded='true';container.textContent='Cargando historial…';try{const data=await api(`sales?mode=history&id=${encodeURIComponent(saleId)}`,{method:'GET'});const labels={baseline:'Registro protegido',created:'Venta creada',updated:'Venta editada',archived:'Venta archivada',restored:'Venta restaurada',deleted:'Eliminación detectada'};container.replaceChildren();const rows=data.history||[];if(!rows.length){container.textContent='Sin cambios registrados.';return}rows.forEach(entry=>{const line=document.createElement('p');line.style.margin='8px 0';const strong=document.createElement('strong');strong.textContent=labels[entry.action]||entry.action;const small=document.createElement('small');small.style.display='block';small.textContent=formatAuditTime(entry.changed_at);line.append(strong,small);container.append(line)})}catch(err){container.dataset.loaded='';container.textContent=err.message||'No se pudo cargar el historial.'}}
 function renderArchivedSales(){const wrap=$('#archivedSalesList');if(!wrap)return;wrap.replaceChildren();if(!state.archived.length){const empty=document.createElement('div');empty.className='empty-day';empty.textContent='No hay ventas archivadas.';wrap.append(empty);return}state.archived.forEach(sale=>{const card=document.createElement('article');card.className='haki-sale-mini archived-sale-card';const items=(sale.items||[]).map(i=>`${i.codigo} ${i.talla}${Number(i.cantidad)>1?` ×${i.cantidad}`:''}`).join(' · ')||'Pedido';card.innerHTML=`<div class="sale-main-copy"><div class="sale-client-line"><strong>${escapeHtml(sale.cliente||'Cliente')}</strong><span> - ${escapeHtml(items)}</span>${channelBadge(sale.canal)}</div><small class="sale-destination">${escapeHtml(sale.lugarHorario||'Sin destino')}</small></div><div class="amount">${money(sale.total)}</div><div class="meta"><span class="pill cancelled">Archivada</span><span class="pill">${escapeHtml(formatAuditTime(sale.archivedAt)||'')}</span></div>`;const actions=document.createElement('div');actions.className='archived-sale-actions';const restore=document.createElement('button');restore.type='button';restore.className='button primary';restore.textContent='Restaurar venta';restore.addEventListener('click',async()=>{if(!confirm(`¿Restaurar la venta de ${sale.cliente||'este cliente'}? El sistema volverá a reservar el inventario.`))return;restore.disabled=true;try{await api('sales?mode=restore',{method:'POST',body:JSON.stringify({id:sale.id})});await loadArchivedSales();await loadWeek();toast('Venta restaurada y stock reservado nuevamente.')}catch(err){toast(err.message,true)}finally{restore.disabled=false}});const details=document.createElement('details');const summary=document.createElement('summary');summary.textContent='Historial';summary.style.cursor='pointer';const history=document.createElement('div');history.style.padding='8px 0';details.append(summary,history);details.addEventListener('toggle',()=>{if(details.open)loadSaleHistory(sale.id,history)});const permanentDelete=document.createElement('button');permanentDelete.type='button';permanentDelete.className='button danger';permanentDelete.textContent='Borrar definitivamente';permanentDelete.addEventListener('click',async()=>{if(!confirm(`¿Borrar definitivamente la venta de ${sale.cliente||'este cliente'}? Esta acción no se puede deshacer y eliminará también su historial.`))return;if(!confirm('Última confirmación: la venta se eliminará de forma permanente. ¿Continuar?'))return;restore.disabled=true;permanentDelete.disabled=true;try{await api('sales?mode=permanent-delete',{method:'DELETE',body:JSON.stringify({id:sale.id,archivedAt:sale.archivedAt,confirmDelete:true})});await loadArchivedSales();toast('Venta borrada definitivamente.')}catch(err){toast(err.message,true);restore.disabled=false;permanentDelete.disabled=false}});actions.append(restore,permanentDelete,details);card.append(actions);wrap.append(card)})}
-async function loadArchivedSales(){const data=await api('sales?mode=archived',{method:'GET'});state.archived=data.archived||[];renderArchivedSales()}
+let archivedRequest=0;
+async function loadArchivedSales(){const request=++archivedRequest;const finish=window.HAKI_UI?.begin($('#archivedSalesList'),'rows',4);let loaded=false;try{const data=await api('sales?mode=archived',{method:'GET'});if(request!==archivedRequest)return;state.archived=data.archived||[];renderArchivedSales();loaded=true}finally{finish?.(loaded)}}
 
 
-$$('.tab').forEach(btn=>btn.addEventListener('click',()=>switchTab(btn.dataset.tab)));
+// The suite owns tab navigation when present; retain the legacy fallback without a second load.
+$$('.tab').forEach(btn=>btn.addEventListener('click',()=>{if(!window.hakiSetPanel)switchTab(btn.dataset.tab)}));
 let changingWeek=false;
 async function changeWeek(next){
   if(changingWeek)return;
@@ -248,5 +253,4 @@ $('#cancelDialog').addEventListener('click',hideEditor);
 $('#deleteSale').addEventListener('click',deleteSale);
 $('#saleForm').addEventListener('submit',event=>{event.preventDefault();saveSale()});
 
-function finishAdminLoading(){const loader=$('#hakiAdminLoader');if(!loader)return;requestAnimationFrame(()=>{loader.classList.add('is-hidden');setTimeout(()=>loader.remove(),360)})}
-(async()=>{state.weekStart=mondayOf(new Date());try{if(!await ensureAuth())return;await Promise.all([loadProducts(),loadWeek()])}catch(err){toast(err.message || 'No se pudo conectar con HAKI. Recarga para intentarlo de nuevo.',true)}finally{finishAdminLoading()}})();
+(async()=>{state.weekStart=mondayOf(new Date());const finish=window.HAKI_UI?.begin($('#inventoryList'),'inventory',8,{metrics:[$('#inventoryUnitTotal')]});const finishDays=window.HAKI_UI?.begin($('#days'),'days',7,{metrics:$$('.metrics strong')});let loaded=false;try{if(!await ensureAuth())return;await Promise.all([loadProducts(),loadWeek()]);loaded=true}catch(err){toast(err.message || 'No se pudo conectar con HAKI. Recarga para intentarlo de nuevo.',true)}finally{finish?.(loaded);finishDays?.(loaded)}})();

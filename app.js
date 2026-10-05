@@ -149,7 +149,7 @@
   }
 
   function trackAnalytics(eventName, params = {}) {
-    if (typeof window.gtag !== 'function') return;
+    if (window.HAKI_ANALYTICS_CONSENT !== true || typeof window.gtag !== 'function') return;
     try { window.gtag('event', eventName, params); } catch {}
   }
 
@@ -1063,7 +1063,7 @@ ${lines.join('\n')}
 
 ${settings().subtotalTexto}: ${money(totals.subtotal)}
 ${settings().envioTexto}: ${totals.free ? settings().gratisTexto : money(totals.shipping)}
-${settings().totalTexto}: ${money(totals.total)}`;
+${settings().totalTexto}: ${money(totals.total)}\n\nSolicitud de cotización. Condiciones y privacidad: versión ${window.HAKI_LEGAL?.version || '2026-10-05'}. Autorizo usar mi nombre y ubicación para atender esta solicitud y transferirlos al canal elegido; no autorizo publicidad.`;
   }
 
   function validateQuote() {
@@ -1561,39 +1561,17 @@ ${settings().totalTexto}: ${money(totals.total)}`;
     $('.rail-actions').hidden = !fresh.length;
   }
 
-  let routeAnimation = null;
-  let routeTarget = null;
-  let routeSequence = 0;
+  let motionHash = null;
   function route(event) {
     const target = location.hash || '#top';
-    if (routeAnimation && routeTarget === target) return;
-    const token = ++routeSequence;
-    routeAnimation?.cancel(); routeAnimation = null;
-    const fromDetail = !!detailCode;
-    const toDetail = target.startsWith('#producto/');
-    const mobile = matchMedia('(max-width:800px)').matches;
-    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const detail = $('#productDetail');
-    const finish = () => {
-      if (token !== routeSequence) return;
-      routeAnimation = null;
-      routeCore(event);
-      window.dispatchEvent(new CustomEvent('haki:local-route', {detail:{fromDetail,toDetail}}));
-      if (mobile && !reduce && toDetail && !fromDetail && !detail.hidden) {
-        routeTarget = target;
-        routeAnimation = detail.animate([{transform:'translateX(100%)'},{transform:'translateX(0)'}],
-          {duration:340,easing:'cubic-bezier(.22,1,.36,1)'});
-        routeAnimation.finished.catch(()=>{}).then(()=>{if(token===routeSequence)routeAnimation=null;});
-      }
-    };
-    if (mobile && !reduce && fromDetail && !toDetail && !detail.hidden) {
-      routeTarget = target;
-      window.dispatchEvent(new Event('haki:detail-leaving'));
-      routeAnimation = detail.animate([{transform:'translateX(0)'},{transform:'translateX(100%)'}],
-        {duration:260,easing:'cubic-bezier(.4,0,.2,1)',fill:'forwards'});
-      const leaving = routeAnimation;
-      leaving.finished.then(()=>{leaving.cancel();finish();}).catch(()=>{});
-    } else finish();
+    const previous = motionHash;
+    routeCore(event);
+    motionHash = target;
+    if (previous === null || previous === target) return;
+    window.dispatchEvent(new CustomEvent('haki:local-route', {detail:{fromDetail:previous.startsWith('#producto/'),toDetail:target.startsWith('#producto/')}}));
+    // Preserve the fixed sheet and sticky CTA: animate inner content only.
+    const selector = target.startsWith('#producto/') ? '#productDetail .detail-summary' : '#catalogo .catalog-heading';
+    window.HAKI_UI?.reveal(document.querySelector(selector));
   }
 
   function routeCore(event) {
@@ -1699,10 +1677,15 @@ ${settings().totalTexto}: ${money(totals.total)}`;
   function renderProductDetail(p) {
     const detail = $('#productDetail');
     if (!p) {
-      if (window.HAKI_CATALOG_READY === false) return;
+      if (window.HAKI_CATALOG_READY === false) {
+        if(window.HAKI_COVER_WAITING_LIVE){if(!detail.hasAttribute('aria-busy'))window.HAKI_UI?.begin(detail,'detail',1);}
+        else window.HAKI_UI?.end(detail,false);
+        return;
+      }
       detail.innerHTML = '<div class="detail-missing"><h1>Prenda no encontrada</h1><a href="#catalogo">Volver al catálogo</a></div>';
       return;
     }
+    window.HAKI_UI?.end(detail);
     trackAnalytics('view_item', {
       currency: ANALYTICS_CURRENCY,
       value: Number(p.precio) || 0,

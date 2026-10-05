@@ -56,6 +56,7 @@
       suiteWeekStart = state.weekStart || suiteWeekStart;
       loadDashboard(suiteWeekStart);
     }
+    window.HAKI_UI?.reveal(name==='archived'?archivedView:panelViews[name]);
     requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'auto' }));
   }
 
@@ -173,12 +174,12 @@
 
   // ---------- Cobros pendientes de encomiendas ----------
   let receivablesRequest = 0;
-  function clearReceivables() {
+  function clearReceivables(reset=true) {
     const root = panelViews.collections;
     if (!root) return;
-    root.querySelector('#collectionsList').innerHTML = '<div class="suite-loading">Cargando cobros pendientes…</div>';
-    root.querySelector('#collectionsTotal').textContent = money(0);
-    root.querySelector('#collectionsCount').textContent = '0';
+    const finish=window.HAKI_UI?.begin(root.querySelector('#collectionsList'),'rows',4,{reset,metrics:[root.querySelector('#collectionsTotal'),root.querySelector('#collectionsCount')]});
+    if(reset){root.querySelector('#collectionsTotal').textContent = money(0);root.querySelector('#collectionsCount').textContent = '0';}
+    return finish;
   }
   window.hakiCollectionsWeekChanging = () => {
     ++receivablesRequest;
@@ -195,18 +196,19 @@
     const count = root.querySelector('#collectionsCount');
     const request = ++receivablesRequest;
     const weekStart = state.weekStart || mondayOf(new Date());
-    clearReceivables();
+    const finish=clearReceivables(list.dataset.uiWeek!==weekStart);
+    let loaded=false;
     try {
       const data = await api(`sales?mode=receivables&weekStart=${encodeURIComponent(weekStart)}`, { method: 'GET' });
       if (request !== receivablesRequest || weekStart !== state.weekStart) return;
       const receivables = (data.receivables || []).sort((a,b)=>String(a.createdAt || a.fecha || '').localeCompare(String(b.createdAt || b.fecha || '')) || String(a.id).localeCompare(String(b.id)));
       if (total) total.textContent = money(receivables.reduce((sum, sale) => sum + saleNet(sale), 0));
       if (count) count.textContent = String(receivables.length);
-      renderReceivables(receivables);
+      renderReceivables(receivables);list.dataset.uiWeek=weekStart;loaded=true;
     } catch (error) {
       if (request !== receivablesRequest || weekStart !== state.weekStart) return;
       list.innerHTML = `<div class="suite-empty">${escapeHtml(error.message)}</div>`;
-    }
+    } finally {finish?.(loaded);}
   }
 
   function renderReceivables(receivables) {
@@ -288,10 +290,11 @@
   }
 
   let expensesRequest = 0;
-  function clearExpenses() {
+  function clearExpenses(reset=true) {
     const list = document.querySelector('#expensesList');
-    if (list) list.innerHTML = '<div class="suite-loading">Cargando gastos…</div>';
-    document.querySelector('#expensesTotal').textContent = money(0);
+    const finish=window.HAKI_UI?.begin(list,'rows',4,{reset,metrics:[document.querySelector('#expensesTotal')]});
+    if(reset)document.querySelector('#expensesTotal').textContent = money(0);
+    return finish;
   }
   window.hakiExpensesWeekChanging = () => {
     ++expensesRequest;
@@ -306,15 +309,16 @@
     const range = expenseRoot?.querySelector('[data-suite-range]');
     if (range) range.textContent = weekRangeText(start);
     const list = document.querySelector('#expensesList');
-    clearExpenses();
+    const finish=clearExpenses(list?.dataset.uiWeek!==start);
+    let loaded=false;
     try {
       const data = await api(`sales?mode=expenses&weekStart=${encodeURIComponent(start)}`, { method: 'GET' });
       if (request !== expensesRequest || start !== state.weekStart) return;
-      renderExpenses((data.expenses || []).filter(expense => expense.fecha && mondayOf(expense.fecha) === start));
+      renderExpenses((data.expenses || []).filter(expense => expense.fecha && mondayOf(expense.fecha) === start));if(list)list.dataset.uiWeek=start;loaded=true;
     } catch (error) {
       if (request !== expensesRequest || start !== state.weekStart) return;
       if (list) list.innerHTML = `<div class="suite-empty">${escapeHtml(error.message)}</div>`;
-    }
+    } finally {finish?.(loaded);}
   }
 
   function renderExpenses(expenses) {
@@ -385,9 +389,10 @@
   // ---------- Dashboard semanal ----------
   const dashboardRoot = panelViews.dashboard;
   let dashboardRequest = 0;
-  function clearDashboard() {
+  function clearDashboard(reset=true) {
     const content = document.querySelector('#dashboardContent');
-    if (content) { delete content.dataset.weekStart; content.innerHTML = '<div class="suite-loading">Calculando la semana…</div>'; }
+    if (content && reset) delete content.dataset.weekStart;
+    return window.HAKI_UI?.begin(content,'rows',6,{reset});
   }
   window.hakiDashboardWeekChanging = () => {
     ++dashboardRequest;
@@ -403,7 +408,8 @@
     const range = dashboardRoot?.querySelector('[data-suite-range]');
     if (range) range.textContent = weekRangeText(start);
     const content = document.querySelector('#dashboardContent');
-    if (content) content.innerHTML = '<div class="suite-loading">Calculando la semana…</div>';
+    const finish=clearDashboard(content?.dataset.weekStart!==start);
+    let loaded=false;
     try {
       const [weekData, expenseData] = await Promise.all([
         api(`sales?weekStart=${encodeURIComponent(start)}`, { method: 'GET' }),
@@ -415,11 +421,11 @@
         (expenseData.expenses || []).filter(expense => expense.fecha && mondayOf(expense.fecha) === start),
         weekData.inventory || {}
       );
-      content.dataset.weekStart = start;
+      content.dataset.weekStart = start;loaded=true;
     } catch (error) {
       if (request !== dashboardRequest || start !== state.weekStart) return;
       if (content) content.innerHTML = `<div class="suite-empty">${escapeHtml(error.message)}</div>`;
-    }
+    } finally {finish?.(loaded);}
   }
 
   function renderDashboard(sales, expenses, inventory) {

@@ -1,0 +1,51 @@
+{
+  "files": {
+    "productos.js": "25ca605de7cbf9fb238ae5d178f1627279cf047615b07c14b9b5f157fd3110f6",
+    "catalog-loader.js": "cd948d33c9322060340ea9e2322041285ffa410ec34dc8adeff551c5396d971c",
+    "app/catalog-loader.js": "605294b150c0d7249c77324c02019c04c35e89f6a0539231c55f0b950ec29391",
+    "online-catalog.js": "dfb34176a5260475877798322dbbac78e6a7ed33e05b099e798593749d9d5913",
+    "mobile-detail.js": "718ca786e197f22f1d2533d86d6acc784427af4d76790399881f1507f9b774a8",
+    "safari-internal-detail.js": "b44ef0f9c2f8cd8bff913dffed38884422bfac9b726583d9da45a8fb19b7b758",
+    "admin/supabase-sales.js": "b00a66a6bd2c50bbcf00ae04f19d916fb5b9eb364a00e340095603b120efa799",
+    "admin/sales-rules.js": "90f442461d1c55f4bad8c9b345594865583b5a1c65837bc747b6b1eb8088b71d",
+    "admin/sales-product-picker.js": "1014b4600b3e6fc1f794b0ea7b819057303f5c9af2384e142a0e966ea3dfcf2d"
+  },
+  "sections": [
+    {
+      "file": "app.js",
+      "start": "    document.title = `${p.nombre} \u2014 HAKI`;",
+      "end": "  $('#closeSizeGuide').addEventListener",
+      "sha256": "cafd3dcfa82bf16263efeb9d1b059a25018438bf0aa54ccb27ca4c1483a141ad"
+    },
+    {
+      "file": "app.js",
+      "start": "  function renderCart()",
+      "end": "  function openCart(",
+      "sha256": "17f34cbf3d55499500061c5b53ba2b5bc37b70172d61e13096cf14cfc5880b4b"
+    },
+    {
+      "file": "app.js",
+      "start": "  function addToCart(",
+      "end": "  function removeItem(",
+      "sha256": "229d8daf85d4209f202f704b96a050258a9be49179c3a5547423f9ea7b036535"
+    },
+    {
+      "file": "app/app.js",
+      "start": "    document.title = `${p.nombre} \u2014 HAKI`;",
+      "end": "  $('#closeSizeGuide').addEventListener",
+      "sha256": "8e0bc398cf98094460568f6a8a4f7346ef3bc3bfcdd15a7880146475f437896d"
+    },
+    {
+      "file": "app/app.js",
+      "start": "  function renderCart()",
+      "end": "  function openCart(",
+      "sha256": "17f34cbf3d55499500061c5b53ba2b5bc37b70172d61e13096cf14cfc5880b4b"
+    },
+    {
+      "file": "app/app.js",
+      "start": "  function addToCart(",
+      "end": "  function removeItem(",
+      "sha256": "04e6100c8b5bd80ca4ad9f5481b60c3188c71af9c45e7b59ed3277ea72f5dbf7"
+    }
+  ]
+}

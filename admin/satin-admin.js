@@ -43,6 +43,7 @@
     settings.hidden=!match;document.getElementById('productsSection').hidden=!!match;search.hidden=true;
     groups.forEach(g=>{if(g[2])g[2].hidden=g!==match;});
     if(match)settings.querySelector('h1').textContent=match[1];
+    window.HAKI_UI?.reveal(match?settings:document.getElementById('productsSection'));
     window.scrollTo(0,0);
   }
   history.replaceState({setting:null},'',location.pathname+location.search);
@@ -88,7 +89,7 @@
       }toast('Imágenes listas. Pulsa GUARDAR.',true);}catch(e){toast(e.message);}finally{file.value='';save.disabled=false;photos();}
     };
     actions.append(add,more,file);images.append(thumbs,actions);body.append(basic,images,advanced);card.append(body);photos();
-    function change(){body.hidden=!body.hidden;toggle.setAttribute('aria-expanded',String(!body.hidden));if(body.hidden)expanded.delete(p.id);else expanded.add(p.id);}
+    function change(){body.hidden=!body.hidden;toggle.setAttribute('aria-expanded',String(!body.hidden));if(body.hidden)expanded.delete(p.id);else {expanded.add(p.id);window.HAKI_UI?.reveal(body);}}
     const title=toggle.querySelector('.product-title');
     toggle.title='Doble clic para editar el nombre';
     let clickTimer,originalName;
