@@ -1,7 +1,7 @@
 (() => {
   const config = window.HAKI_LEGAL || {};
   const links = [['Términos y condiciones','terminos.html'],['Privacidad','privacidad.html'],['Cookies y almacenamiento','cookies.html'],['Envíos','envios.html'],['Cambios y devoluciones','cambios-devoluciones.html'],['Contacto y reclamos','reclamaciones.html']];
-  const relative = location.pathname.startsWith('/app/') ? '../' : '';
+  const relative = location.pathname.startsWith('/app/') ? '../' : './';
   function navigation() {
     const nav = document.createElement('nav'); nav.className = 'haki-legal-links'; nav.setAttribute('aria-label','Políticas de HAKI');
     for (const [label, path] of links) { const a = document.createElement('a'); a.href = relative + path; a.textContent = label; nav.append(a); }
