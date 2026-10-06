@@ -992,7 +992,7 @@ ${lines.join('\n')}
 
 ${settings().subtotalTexto}: ${money(totals.subtotal)}
 ${settings().envioTexto}: ${totals.free ? settings().gratisTexto : money(totals.shipping)}
-${settings().totalTexto}: ${money(totals.total)}\n\nSolicitud de cotización. Condiciones y privacidad: versión ${window.HAKI_LEGAL?.version || '2026-10-05'}. Autorizo usar mi nombre y ubicación para atender esta solicitud y transferirlos al canal elegido; no autorizo publicidad.`;
+${settings().totalTexto}: ${money(totals.total)}`;
   }
 
   function validateQuote() {
