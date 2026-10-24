@@ -1,2 +1,6 @@
-/product /index.html 200
-/product.html /index.html 200
+# Pausa temporal del catálogo HAKI (revertir estas reglas al reactivar).
+# Redirigir solo las páginas públicas: administración y funciones siguen operativas.
+/             /catalogo-en-pausa.html  302!
+/index.html   /catalogo-en-pausa.html  302!
+/product      /catalogo-en-pausa.html  302!
+/product.html /catalogo-en-pausa.html  302!
