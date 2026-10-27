@@ -26,3 +26,10 @@
   for = "/fonts/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+# All public paths, including product query strings and the installed app.
+# Keep crawling allowed so search engines can discover noindex.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex"
