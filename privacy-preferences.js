@@ -69,9 +69,6 @@
     panel.querySelector('[data-privacy-details]').hidden = !expanded;
     panel.querySelector('[data-privacy-save]').hidden = !expanded;
     panel.querySelector('[data-privacy-close]').hidden = !expanded;
-    const configure = panel.querySelector('[data-privacy-configure]');
-    configure.hidden = expanded;
-    configure.setAttribute('aria-expanded', String(expanded));
     panel.querySelector('#hakiPrivacyAppearance').checked = choice?.preferences === true;
   }
   function restoreFocus() {
@@ -97,7 +94,7 @@
     panel.setAttribute('aria-labelledby', 'hakiPrivacyTitle');
     panel.setAttribute('aria-describedby', 'hakiPrivacyIntro');
     panel.innerHTML = [
-      '<h2 id="hakiPrivacyTitle" tabindex="-1">Cookies</h2>',
+      '<h2 id="hakiPrivacyTitle" tabindex="-1"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.5A9 9 0 1 1 11.5 3a4.5 4.5 0 0 0 4.5 4.5 4.5 4.5 0 0 0 5 5Z"/><circle cx="7.5" cy="9" r=".7" fill="currentColor" stroke="none"/><circle cx="7" cy="14" r=".9" fill="currentColor" stroke="none"/><circle cx="12" cy="17" r=".8" fill="currentColor" stroke="none"/><circle cx="14.5" cy="11.5" r=".8" fill="currentColor" stroke="none"/></svg><span>Cookies</span></h2>',
       '<p id="hakiPrivacyIntro">Guardamos tu bolsa. Tú eliges si recordamos el tema.</p>',
       '<div data-privacy-details hidden>',
       '<div class="haki-privacy-category"><strong>Necesario · Siempre activo</strong><p>Bolsa de compras, funcionamiento del catálogo y elección de privacidad. La cookie de inicio de sesión corresponde al administrador.</p></div>',
@@ -107,7 +104,6 @@
       '</div><div class="haki-privacy-actions">',
       '<button type="button" data-privacy-reject>Rechazar</button>',
       '<button type="button" data-privacy-accept>Aceptar</button>',
-      '<button type="button" data-privacy-configure aria-label="Configurar cookies" title="Preferencias de cookies" aria-controls="hakiPrivacyPanel" aria-expanded="false"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.5A9 9 0 1 1 11.5 3a4.5 4.5 0 0 0 4.5 4.5 4.5 4.5 0 0 0 5 5Z"/><circle cx="7.5" cy="9" r=".7" fill="currentColor" stroke="none"/><circle cx="7" cy="14" r=".9" fill="currentColor" stroke="none"/><circle cx="12" cy="17" r=".8" fill="currentColor" stroke="none"/><circle cx="14.5" cy="11.5" r=".8" fill="currentColor" stroke="none"/></svg></button>',
       '<button type="button" data-privacy-save hidden>Guardar preferencias</button>',
       '<button type="button" data-privacy-close hidden>Cerrar sin guardar</button>',
       '</div><p class="haki-privacy-links"><a href="/cookies.html">Más información</a></p>'
@@ -122,7 +118,6 @@
     panel.querySelector('[data-privacy-reject]').addEventListener('click', () => save({ preferences: false }));
     panel.querySelector('[data-privacy-accept]').addEventListener('click', () => save({ preferences: true }));
     panel.querySelector('[data-privacy-save]').addEventListener('click', () => save({ preferences: panel.querySelector('#hakiPrivacyAppearance').checked }));
-    panel.querySelector('[data-privacy-configure]').addEventListener('click', open);
     panel.querySelector('[data-privacy-close]').addEventListener('click', close);
     panel.addEventListener('keydown', event => {
       if (event.key === 'Escape' && expanded) { event.preventDefault(); close(); }
