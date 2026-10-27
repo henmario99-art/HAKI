@@ -2,6 +2,8 @@
   'use strict';
   if (window.HAKI_PRIVACY) return;
   const VERSION = '2026-10-27.2';
+  // Renew the notice once without changing the policy or resetting the bag.
+  const NOTICE_REVISION = '2026-10-27.1';
   const KEY = 'haki_privacy_preferences_v1';
   const MAX_AGE = 180 * 24 * 60 * 60 * 1000;
   const THEME_KEYS = ['haki_store_theme_v1', 'haki_app_theme_v1'];
@@ -10,17 +12,20 @@
   function parse(raw) {
     try {
       const value = JSON.parse(raw), date = Date.parse(value?.savedAt);
-      if (value?.version !== VERSION || typeof value.preferences !== 'boolean' ||
+      if (value?.version !== VERSION || value.noticeRevision !== NOTICE_REVISION ||
+          typeof value.preferences !== 'boolean' ||
           value.analytics !== false || value.marketing !== false ||
           !Number.isFinite(date) || date > Date.now() || Date.now() - date >= MAX_AGE) return null;
-      return { ...empty(), preferences: value.preferences, version: VERSION, savedAt: value.savedAt };
+      return { ...empty(), preferences: value.preferences, version: VERSION,
+        noticeRevision: NOTICE_REVISION, savedAt: value.savedAt };
     } catch { return null; }
   }
   function read() {
     try { return parse(localStorage.getItem(KEY)); } catch { return null; }
   }
   function snapshot() {
-    return { ...empty(), ...(choice || {}), decided: !!choice, version: VERSION };
+    return { ...empty(), ...(choice || {}), decided: !!choice, version: VERSION,
+      noticeRevision: NOTICE_REVISION };
   }
   function apply(next) {
     choice = next;
@@ -35,7 +40,7 @@
   }
   function save(values) {
     const next = { ...empty(), preferences: values?.preferences === true,
-      version: VERSION, savedAt: new Date().toISOString() };
+      version: VERSION, noticeRevision: NOTICE_REVISION, savedAt: new Date().toISOString() };
     let persisted = true;
     try { localStorage.setItem(KEY, JSON.stringify(next)); } catch { persisted = false; }
     apply(next);
