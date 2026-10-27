@@ -992,7 +992,7 @@ ${lines.join('\n')}
 
 ${settings().subtotalTexto}: ${money(totals.subtotal)}
 ${settings().envioTexto}: ${totals.free ? settings().gratisTexto : money(totals.shipping)}
-${settings().totalTexto}: ${money(totals.total)}`;
+${settings().totalTexto}: ${money(totals.total)}${window.HAKI_QUOTE_PRIVACY?.proof() || ''}`;
   }
 
   function validateQuote() {

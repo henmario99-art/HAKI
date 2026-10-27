@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="es">
-<head>
+<head><link rel="stylesheet" href="privacy-preferences.css?v=20261027-2"><script src="privacy-preferences.js?v=20261027-2"></script>
   <meta name="robots" content="noindex">
 <script>document.addEventListener("DOMContentLoaded",()=>document.documentElement.classList.add("haki-ready"),{once:true});</script>
 <meta charset="utf-8">
@@ -642,15 +642,15 @@ h1{overflow-wrap:anywhere}.hero h1{line-height:1.1;font-size:clamp(38px,6vw,84px
 }
 </style>
 <script>
-/* One preference for the catalogue and every administrator screen. */
+/* Optional appearance preference for the public catalogue. */
 (() => {
-  const key = 'haki_theme_v1';
+  const key = 'haki_store_theme_v1';
   const root = document.documentElement;
   const valid = value => value === 'oscuro' || value === 'claro';
-  const saved = () => { try { return localStorage.getItem(key); } catch { return null; } };
+  const saved = () => { try { return (window.HAKI_PRIVACY?.allows('preferences') ? localStorage.getItem(key) : null); } catch { return null; } };
   function set(theme, persist = true) {
     const next = theme === 'oscuro' ? 'oscuro' : 'claro';
-    if (persist) { try { localStorage.setItem(key, next); } catch {} }
+    if (persist && window.HAKI_PRIVACY?.allows('preferences')) { try { localStorage.setItem(key, next); } catch {} }
     root.dataset.theme = next;
     if (window.HAKI_CONFIG) window.HAKI_CONFIG.tema = next;
     const meta = document.querySelector('meta[name="theme-color"]');
@@ -681,7 +681,7 @@ h1{overflow-wrap:anywhere}.hero h1{line-height:1.1;font-size:clamp(38px,6vw,84px
 </script>
 <link rel="manifest" href="/manifest.webmanifest">
 <script defer src="/pwa-mode.js?v=20261002-definitivo"></script>
-<script src="legal-config.js?v=20261005-3"></script><link rel="stylesheet" href="legal.css?v=20261005-2">
+<script src="legal-config.js?v=20261027-2"></script><link rel="stylesheet" href="legal.css?v=20261027-2">
 <link rel="stylesheet" href="native-ui.css?v=20261005-1">
 <script src="native-ui.js?v=20261005-1"></script>
 </head>
@@ -793,6 +793,7 @@ h1{overflow-wrap:anywhere}.hero h1{line-height:1.1;font-size:clamp(38px,6vw,84px
         <label><span class="sr-only" id="departmentLabel">Departamento</span><select id="customerDepartment" required aria-label="Departamento"><option value="">Departamento</option></select></label>
         <label><span class="sr-only" id="municipalityLabel">Municipio</span><select id="customerMunicipality" required aria-label="Municipio" disabled><option value="">Municipio</option></select></label>
       </div>
+      <div class="quote-policy-note"><label class="quote-authorization"><input type="checkbox" id="quoteAuthorization" name="quoteAuthorization" required aria-describedby="quotePrivacyNote"><span>Autorizo a HAKI a utilizar mi nombre, localidad y prendas seleccionadas para atender esta cotización y comunicarla por WhatsApp o Instagram, según el canal que elija, conforme al Aviso de privacidad. <a href="/privacidad.html" target="_blank" rel="noopener">Leer el aviso</a></span></label><p id="quotePrivacyNote">Esta autorización solo permite gestionar tu cotización. No confirma una compra ni autoriza publicidad. <a href="/terminos.html" target="_blank" rel="noopener">Consultar términos y condiciones</a>.</p></div>
       <div class="quote-actions">
         <button class="solid whatsapp" type="submit">SOLICITAR POR WHATSAPP ↗</button>
         <button class="outline" id="instagramQuote" type="button">SOLICITAR POR INSTAGRAM ↗</button>
@@ -853,11 +854,11 @@ h1{overflow-wrap:anywhere}.hero h1{line-height:1.1;font-size:clamp(38px,6vw,84px
   </script>
 <script src="online-catalog.js?v=20261002-definitivo"></script>
 <script src="storefront-config.js?v=20261002-definitivo"></script>
-<script src="experience-config.js?v=20261002-definitivo"></script>
+<script src="experience-config.js?v=20261027-2"></script>
 
 
 <script src="ios-safari-fix.js?v=20261002-definitivo"></script>
-<script src="app.js?v=20261006-quote-cleanup-1"></script>
+<script src="app.js?v=20261027-quote-privacy-2"></script>
 <script src="safari-internal-detail.js?v=20261002-definitivo"></script>
 <script src="enhancements.js?v=20261002-definitivo"></script>
 <script src="personalization.js?v=20261002-definitivo"></script>
@@ -2485,6 +2486,7 @@ html[data-theme=oscuro] #openCart b,html[data-theme=oscuro] #productDetail .loca
 </script>
 
 
-<script src="legal.js?v=20261006-quote-cleanup-1"></script>
+<script src="legal.js?v=20261027-2"></script>
+<script defer src="quote-consent.js?v=20261027-2"></script>
 </body>
 </html>

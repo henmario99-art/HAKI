@@ -5,15 +5,16 @@
   function navigation() {
     const nav = document.createElement('nav'); nav.className = 'haki-legal-links'; nav.setAttribute('aria-label','Políticas de HAKI');
     for (const [label, path] of links) { const a = document.createElement('a'); a.href = relative + path; a.textContent = label; nav.append(a); }
+    const privacy = document.createElement('button'); privacy.type = 'button'; privacy.className = 'haki-privacy-link'; privacy.setAttribute('data-privacy-open', ''); privacy.textContent = 'Preferencias de cookies'; nav.append(privacy);
     return nav;
   }
   function init() {
-    document.querySelectorAll('[data-legal="version"]').forEach(node => { node.textContent = config.version || '2026-10-05.3'; });
+    document.querySelectorAll('[data-legal="version"]').forEach(node => { node.textContent = config.version || '2026-10-27.2'; });
     const footer = document.querySelector('footer.footer, footer.info-footer, footer.legal-footer');
     if (footer && !footer.querySelector('.haki-legal-links')) footer.append(navigation());
     document.querySelector('[data-clear-browser]')?.addEventListener('click', () => {
-      const keys = ['haki_cart_v1','haki_theme_v1','haki_catalog_cache_v4','haki_online_catalog_definitivo_v1','haki_cover_config_v1'];
-      try { keys.forEach(key => localStorage.removeItem(key)); document.querySelector('[data-clear-result]').textContent = 'Se borraron la bolsa y estas preferencias locales. Los registros de compras y los mensajes se gestionan mediante una solicitud de privacidad.'; } catch { document.querySelector('[data-clear-result]').textContent = 'El navegador no permitió borrar estos datos. Usa sus ajustes de almacenamiento.'; }
+      const keys = ['haki_cart_v1','haki_store_theme_v1','haki_app_theme_v1','haki_catalog_cache_v4','haki_online_catalog_definitivo_v1','haki_cover_config_v1'];
+      try { keys.forEach(key => localStorage.removeItem(key)); window.HAKI_PRIVACY?.reset(); document.querySelector('[data-clear-result]').textContent = 'Se borraron la bolsa y estas preferencias locales. Los registros de compras y los mensajes se gestionan mediante una solicitud de privacidad.'; } catch { document.querySelector('[data-clear-result]').textContent = 'El navegador no permitió borrar estos datos. Usa sus ajustes de almacenamiento.'; }
     });
   }
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded',init); else init();

@@ -69,9 +69,11 @@
   };
   document.getElementById('openCart')?.addEventListener('click',animateShippingProgressOnManualOpen);
 
-  const THEME_KEY='haki_theme_v1';
+  const isAdminTheme = /^\/admin(?:\/|$)/.test(location.pathname);
+  const THEME_KEY=isAdminTheme?'haki_theme_v1':'haki_store_theme_v1';
+  const canRememberTheme=()=>isAdminTheme || window.HAKI_PRIVACY?.allows('preferences') === true;
   const root=document.documentElement;
-  const savedTheme=(()=>{try{return localStorage.getItem(THEME_KEY)||'';}catch{return '';}})();
+  const savedTheme=(()=>{try{return (canRememberTheme() ? localStorage.getItem(THEME_KEY) : null)||'';}catch{return '';}})();
   if(savedTheme==='oscuro'||savedTheme==='claro'){
     root.dataset.theme=savedTheme;
     if(window.HAKI_CONFIG) window.HAKI_CONFIG.tema=savedTheme;
@@ -98,7 +100,7 @@
     const next=theme==='oscuro'?'oscuro':'claro';
     root.dataset.theme=next;
     if(window.HAKI_CONFIG)window.HAKI_CONFIG.tema=next;
-    if(save){if(window.HAKITheme)window.HAKITheme.set(next);else{try{localStorage.setItem(THEME_KEY,next);}catch{}}}
+    if(save && canRememberTheme()){if(window.HAKITheme)window.HAKITheme.set(next);else{try{localStorage.setItem(THEME_KEY,next);}catch{}}}
     syncThemeButton(button);
   }
 
@@ -150,14 +152,14 @@
       });
     }
 
-    const saved=(()=>{try{return localStorage.getItem(THEME_KEY)||'';}catch{return '';}})();
+    const saved=(()=>{try{return (canRememberTheme() ? localStorage.getItem(THEME_KEY) : null)||'';}catch{return '';}})();
     const configured=window.hakiSettings(window.HAKI_CONFIG||{}).tema==='oscuro'?'oscuro':'claro';
     applyUserTheme(saved==='oscuro'||saved==='claro'?saved:configured,button,false);
 
     if(!root.dataset.themeToggleObserved){
       root.dataset.themeToggleObserved='1';
       new MutationObserver(()=>{
-        const preference=(()=>{try{return localStorage.getItem(THEME_KEY)||'';}catch{return '';}})();
+        const preference=(()=>{try{return (canRememberTheme() ? localStorage.getItem(THEME_KEY) : null)||'';}catch{return '';}})();
         if((preference==='oscuro'||preference==='claro')&&currentTheme()!==preference){
           root.dataset.theme=preference;
           if(window.HAKI_CONFIG)window.HAKI_CONFIG.tema=preference;

@@ -69,9 +69,9 @@
   };
   document.getElementById('openCart')?.addEventListener('click',animateShippingProgressOnManualOpen);
 
-  const THEME_KEY='haki_app_theme_v1';
+  const THEME_KEY='haki_store_theme_v1';
   const root=document.documentElement;
-  const savedTheme=(()=>{try{return localStorage.getItem(THEME_KEY)||'';}catch{return '';}})();
+  const savedTheme=(()=>{try{return (window.HAKI_PRIVACY?.allows('preferences') ? localStorage.getItem(THEME_KEY) : null)||'';}catch{return '';}})();
   if(savedTheme==='oscuro'||savedTheme==='claro'){
     root.dataset.theme=savedTheme;
     if(window.HAKI_CONFIG) window.HAKI_CONFIG.tema=savedTheme;
@@ -98,7 +98,7 @@
     const next=theme==='oscuro'?'oscuro':'claro';
     root.dataset.theme=next;
     if(window.HAKI_CONFIG)window.HAKI_CONFIG.tema=next;
-    if(save){try{localStorage.setItem(THEME_KEY,next);}catch{}}
+    if(save && window.HAKI_PRIVACY?.allows('preferences')){try{localStorage.setItem(THEME_KEY,next);}catch{}}
     syncThemeButton(button);
   }
 
@@ -150,14 +150,14 @@
       });
     }
 
-    const saved=(()=>{try{return localStorage.getItem(THEME_KEY)||'';}catch{return '';}})();
+    const saved=(()=>{try{return (window.HAKI_PRIVACY?.allows('preferences') ? localStorage.getItem(THEME_KEY) : null)||'';}catch{return '';}})();
     const configured=window.hakiSettings(window.HAKI_CONFIG||{}).tema==='oscuro'?'oscuro':'claro';
     applyUserTheme(saved==='oscuro'||saved==='claro'?saved:configured,button,false);
 
     if(!root.dataset.themeToggleObserved){
       root.dataset.themeToggleObserved='1';
       new MutationObserver(()=>{
-        const preference=(()=>{try{return localStorage.getItem(THEME_KEY)||'';}catch{return '';}})();
+        const preference=(()=>{try{return (window.HAKI_PRIVACY?.allows('preferences') ? localStorage.getItem(THEME_KEY) : null)||'';}catch{return '';}})();
         if((preference==='oscuro'||preference==='claro')&&currentTheme()!==preference){
           root.dataset.theme=preference;
           if(window.HAKI_CONFIG)window.HAKI_CONFIG.tema=preference;

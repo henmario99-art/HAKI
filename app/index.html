@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="es">
-<head>
+<head><link rel="stylesheet" href="../privacy-preferences.css?v=20261027-2"><script src="../privacy-preferences.js?v=20261027-2"></script>
   <meta name="robots" content="noindex">
   <meta charset="utf-8">
   <link rel="preconnect" href="https://uysfqzlihiosebqzvfrl.supabase.co" crossorigin>
@@ -53,7 +53,7 @@
   <link rel="stylesheet" href="app-detail.css">
   <link rel="stylesheet" href="cover-v15.css?v=35">
   <link rel="stylesheet" href="android-cover-v27.css?v=30">
-<script src="../legal-config.js?v=20261005-3"></script><link rel="stylesheet" href="../legal.css?v=20261005-2">
+<script src="../legal-config.js?v=20261027-2"></script><link rel="stylesheet" href="../legal.css?v=20261027-2">
 <link rel="stylesheet" href="../native-ui.css?v=20261005-1">
 <script src="../native-ui.js?v=20261005-1"></script>
 </head>
@@ -158,6 +158,7 @@
         <label><span id="departmentLabel">Departamento</span><input id="customerDepartment" required placeholder="Ej. Santa Ana"></label>
         <label><span id="municipalityLabel">Municipio</span><input id="customerMunicipality" required placeholder="Ej. Santa Ana"></label>
       </div>
+      <div class="quote-policy-note"><label class="quote-authorization"><input type="checkbox" id="quoteAuthorization" name="quoteAuthorization" required aria-describedby="quotePrivacyNote"><span>Autorizo a HAKI a utilizar mi nombre, localidad y prendas seleccionadas para atender esta cotización y comunicarla por WhatsApp o Instagram, según el canal que elija, conforme al Aviso de privacidad. <a href="/privacidad.html" target="_blank" rel="noopener">Leer el aviso</a></span></label><p id="quotePrivacyNote">Esta autorización solo permite gestionar tu cotización. No confirma una compra ni autoriza publicidad. <a href="/terminos.html" target="_blank" rel="noopener">Consultar términos y condiciones</a>.</p></div>
       <div class="quote-actions">
         <button class="solid whatsapp" type="submit">SOLICITAR POR WHATSAPP ↗</button>
         <button class="outline" id="instagramQuote" type="button">SOLICITAR POR INSTAGRAM ↗</button>
@@ -181,13 +182,13 @@
 
   <script defer src="image-manifest.js"></script>
   <script defer src="storefront-config.js"></script>
-  <script defer src="experience-config.js"></script>
+  <script defer src="experience-config.js?v=20261027-2"></script>
   <script defer src="../productos.js?v=34"></script>
   <script defer src="cover-bootstrap.js?v=20260922-fast-cover"></script>
   <script defer src="catalog-loader.js?v=20260925-stock-count-v2"></script>
   <script defer src="doufu-runtime.js?v=31"></script>
   <script defer src="ios-safari-fix.js"></script>
-  <script defer src="app.js?v=20261006-quote-cleanup-1"></script>
+  <script defer src="app.js?v=20261027-quote-privacy-2"></script>
   <script defer src="safari-internal-detail.js"></script>
   <script defer src="enhancements.js"></script>
   <script defer src="personalization.js"></script>
@@ -200,6 +201,7 @@
   <script defer src="cover-v16-fix.js?v=3"></script>
   <script defer src="native-android-cover-fix.js?v=20260922-fast-cover"></script>
 <script defer src="pwa-status.js"></script>
-<script src="../legal.js?v=20261006-quote-cleanup-1"></script>
+<script src="../legal.js?v=20261027-2"></script>
+<script defer src="../quote-consent.js?v=20261027-2"></script>
 </body>
 </html>
