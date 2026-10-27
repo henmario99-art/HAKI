@@ -49,8 +49,8 @@ for(const [pathname,allowed,expected] of [['/admin/index.html',false,'oscuro'],[
 }
 for(const path of ['index.html','app/index.html','cookies.html','privacidad.html','terminos.html','envios.html','domicilios.html','encomiendas.html','cambios-devoluciones.html','reclamaciones.html','app/domicilios.html','app/encomiendas.html']){
  const html=fs.readFileSync(new URL('../'+path,import.meta.url),'utf8');
- assert.match(html,/privacy-preferences\.js\?v=20261027-2/);
- assert.match(html,/privacy-preferences\.css\?v=20261027-2/);
+ assert.match(html,/privacy-preferences\.js\?v=20261027-3/);
+ assert.match(html,/privacy-preferences\.css\?v=20261027-3/);
  assert.match(html,/<meta name="robots" content="noindex">/);
  if(path==='index.html')assert.ok(html.indexOf('privacy-preferences.js')<html.indexOf('haki_store_theme_v1'));
 }
