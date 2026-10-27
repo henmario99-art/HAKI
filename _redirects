@@ -1,3 +1,5 @@
 # Entradas públicas compatibles con el catálogo activo.
 /product      /index.html  200
 /product.html /index.html  200
+/catalogo-en-pausa.html / 302!
+/catalogo-en-pausa      / 302!
