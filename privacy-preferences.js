@@ -95,7 +95,7 @@
     panel.setAttribute('aria-describedby', 'hakiPrivacyIntro');
     panel.innerHTML = [
       '<h2 id="hakiPrivacyTitle" tabindex="-1"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.5A9 9 0 1 1 11.5 3a4.5 4.5 0 0 0 4.5 4.5 4.5 4.5 0 0 0 5 5Z"/><circle cx="7.5" cy="9" r=".7" fill="currentColor" stroke="none"/><circle cx="7" cy="14" r=".9" fill="currentColor" stroke="none"/><circle cx="12" cy="17" r=".8" fill="currentColor" stroke="none"/><circle cx="14.5" cy="11.5" r=".8" fill="currentColor" stroke="none"/></svg><span>Cookies</span></h2>',
-      '<p id="hakiPrivacyIntro">Guardamos tu bolsa. Tú eliges si recordamos el tema.</p>',
+      '<p id="hakiPrivacyIntro">Aceptar permite recordar el modo claro u oscuro. Rechazar no afecta tu bolsa.</p>',
       '<div data-privacy-details hidden>',
       '<div class="haki-privacy-category"><strong>Necesario · Siempre activo</strong><p>Bolsa de compras, funcionamiento del catálogo y elección de privacidad. La cookie de inicio de sesión corresponde al administrador.</p></div>',
       '<label class="haki-privacy-category haki-privacy-option" for="hakiPrivacyAppearance"><span><strong>Recordar apariencia · Opcional</strong><span>Guardar tu elección de tema claro u oscuro para próximas visitas. Si lo rechazas, puedes cambiar el tema durante esta visita.</span></span><input id="hakiPrivacyAppearance" type="checkbox" name="appearance"></label>',
