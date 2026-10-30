@@ -55,6 +55,7 @@
   };
   document.getElementById('products').addEventListener('input', () => bridge.changed());
   document.getElementById('products').addEventListener('change', () => bridge.changed());
+  document.getElementById('products').addEventListener('productphotoschange', () => bridge.changed());
   document.getElementById('products').addEventListener('click', event => {
     if (event.target.closest('.remove-photo, [data-clear-image]')) bridge.changed();
   });

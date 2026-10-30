@@ -186,3 +186,13 @@ body.sale-editor-mode .sale-editor{background:linear-gradient(125deg,#fbfcfce8,#
  .color-parent-dialog .variant-option small{font-size:11px}
  .color-parent-dialog .variant-choice{width:23px;height:23px;font-size:15px}
 }
+.product-photo-item{min-width:0}
+.product-photo-item .product-photo{margin-bottom:7px}
+.photo-position{position:absolute;left:7px;top:7px;padding:3px 7px;border-radius:7px;background:#14232edd;color:#fff;font-size:11px;line-height:1.4;pointer-events:none}
+.product-photo-item .remove-photo{width:30px;height:30px;right:-4px;top:-4px}
+.photo-controls{display:grid;gap:5px}
+.photo-controls button{min-height:36px;border:1px solid var(--line,#d7dfe7);border-radius:9px;background:var(--surface,#fff);color:var(--ink,#15171b);padding:5px 6px;box-shadow:none;font:inherit;font-size:12px;line-height:1.2}
+.photo-order{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.photo-order button{font-size:20px;min-width:0;min-height:36px}
+.photo-controls button:disabled{cursor:default;opacity:.35}
+@media(max-width:700px){.inventory-product-editor .product-images .product-thumbs{grid-template-columns:repeat(2,minmax(0,1fr))}.photo-order button{min-height:44px}.photo-controls .replace-photo{min-height:38px}}
