@@ -30,3 +30,10 @@
   Cache-Control: no-cache, no-store, must-revalidate
 /app/index.html
   Cache-Control: no-cache, no-store, must-revalidate
+
+/nuevo-drop
+  Cache-Control: no-cache, no-store, must-revalidate
+/nuevo-drop.html
+  Cache-Control: no-cache, no-store, must-revalidate
+/drop-launch.js
+  Cache-Control: no-cache, no-store, must-revalidate

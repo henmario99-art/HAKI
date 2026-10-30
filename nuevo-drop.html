@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es" style="background:#000;color:#fff">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="description" content="El nuevo drop de HAKI está por llegar.">
+  <title>NUEVO DROP — HAKI</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="preload" href="/fonts/Poppins-Black.woff2" as="font" type="font/woff2" crossorigin>
+  <script src="/drop-launch.js?v=20261030-1"></script>
+  <style>
+    @font-face{font-family:Poppins;src:url('/fonts/Poppins-Regular.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+    @font-face{font-family:Poppins;src:url('/fonts/Poppins-Black.woff2') format('woff2');font-style:normal;font-weight:900;font-display:swap}
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:#000;color:#fff}
+    body{font-family:Poppins,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+    .launch{min-height:100vh;min-height:100svh;width:100%;padding:48px 24px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+    .launch-logo{display:block;width:clamp(118px,12vw,168px);height:auto;filter:invert(1);margin-bottom:64px}
+    .launch-title{margin:0 0 56px;font-size:clamp(64px,10vw,152px);font-weight:900;line-height:1;letter-spacing:-.065em}
+    .countdown{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:min(100%,600px);gap:24px}
+    .countdown-unit{display:flex;flex-direction:column;align-items:center;gap:12px}
+    .countdown-value{font-size:clamp(36px,4.5vw,60px);line-height:1;font-weight:400;letter-spacing:-.045em;font-variant-numeric:tabular-nums}
+    .countdown-label{font-size:12px;line-height:1.4;color:#909090}
+    @media(max-width:600px){
+      .launch{padding:40px 20px}
+      .launch-logo{width:132px;margin-bottom:56px}
+      .launch-title{font-size:clamp(64px,20vw,104px);margin-bottom:48px;line-height:.98}
+      .launch-title span{display:block}
+      .countdown{max-width:340px;gap:14px}
+      .countdown-value{font-size:clamp(34px,10vw,46px)}
+      .countdown-label{font-size:10px}
+    }
+    @media(max-height:500px) and (min-width:601px){
+      .launch{padding:24px}
+      .launch-logo{width:110px;margin-bottom:28px}
+      .launch-title{font-size:72px;margin-bottom:28px}
+      .countdown-value{font-size:36px}
+      .countdown-unit{gap:8px}
+    }
+  </style>
+</head>
+<body>
+  <main class="launch">
+    <img class="launch-logo" src="/images/haki-wordmark.svg" width="316" height="70" alt="HAKI">
+    <h1 class="launch-title"><span>NUEVO</span> <span>DROP</span></h1>
+    <div class="countdown" role="timer" aria-label="Tiempo restante para el nuevo drop de HAKI" aria-live="off">
+      <div class="countdown-unit"><span class="countdown-value" data-countdown>00</span><span class="countdown-label">Días</span></div>
+      <div class="countdown-unit"><span class="countdown-value" data-countdown>00</span><span class="countdown-label">Horas</span></div>
+      <div class="countdown-unit"><span class="countdown-value" data-countdown>00</span><span class="countdown-label">Minutos</span></div>
+      <div class="countdown-unit"><span class="countdown-value" data-countdown>00</span><span class="countdown-label">Segundos</span></div>
+    </div>
+  </main>
+</body>
+</html>
