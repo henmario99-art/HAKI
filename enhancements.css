@@ -9,6 +9,7 @@
 /* Estado de disponibilidad: arriba a la izquierda y sin marco */
 .product-number.availability-badge,.detail-availability{background:#fff;color:#111;border:0!important;font-size:9px;line-height:1;letter-spacing:.09em;text-transform:uppercase;font-weight:800;padding:7px 9px}.product-number.availability-badge{top:14px!important;left:14px!important;right:auto!important;bottom:auto!important}.product-number.availability-badge.sold-out,.detail-availability.sold-out{background:#111;color:#fff}.detail-media{position:relative}.detail-availability{position:absolute;top:14px;left:14px;z-index:6}
 .best-seller-badge{position:absolute;top:44px;left:14px;z-index:6;display:inline-flex;align-items:center;min-height:25px;padding:5px 9px;background:#111;color:#fff;font-size:9px;line-height:1;letter-spacing:.16em;text-transform:uppercase;font-weight:800}.detail-best-seller{top:44px}
+.product-image .best-seller-badge{top:14px}.product-image .availability-badge+.best-seller-badge{top:44px}
 
 /* En detalle dejamos un solo botón de añadir, debajo de las tallas */
 .detail-summary .detail-add{display:none!important}

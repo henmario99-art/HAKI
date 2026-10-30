@@ -493,7 +493,8 @@
   window.addEventListener('haki:drop-updated',()=>{if(state.newDrop)renderProducts();});
 
   function renderProductList(container, list) {
-    const signature = JSON.stringify(list);
+    const showNew = container === els.products && state.newDrop;
+    const signature = JSON.stringify({ list, showNew });
     if (renderedLists.get(container) === signature) {
       syncCardSelections(container);
       return;
@@ -562,7 +563,7 @@
                 loading="lazy" decoding="async" width="400" height="500" srcset="${esc(window.hakiSrcset(p.imagen))}" sizes="(max-width:800px) 50vw, 25vw"
               >
 
-              ${p.novedad === true ? '<span class="product-number availability-badge">NUEVO</span>' : ''}
+              ${showNew && p.novedad === true ? '<span class="product-number availability-badge">NUEVO</span>' : ''}
 
               ${p.masVendido === true ? `<span class="best-seller-badge">${esc(String(p.etiquetaMasVendido || '').trim() || 'MÁS VENDIDO')}</span>` : ''}
 
@@ -1552,13 +1553,13 @@ ${settings().totalTexto}: ${money(totals.total)}${window.HAKI_QUOTE_PRIVACY?.pro
       return `<a class="collection-tile" href="#coleccion/${encodeURIComponent(c.id)}"><div class="collection-image"><img src="${esc(freshImage(picture))}" alt="${esc(c.nombre)}" loading="lazy"></div><h3>${esc(c.nombre)}</h3></a>`;
     }).join('');
     $$('#collectionsGrid img').forEach(img => img.addEventListener('error', () => { img.src = freshImage('images/producto.svg'); }, { once: true }));
-    const fresh = ALL_PRODUCTS.filter(p => p.novedad === true && hasStock(p));
-    renderProductList($('#newProducts'), fresh);
+    const bestSellers = ALL_PRODUCTS.filter(p => p.masVendido === true && hasStock(p));
+    renderProductList($('#newProducts'), bestSellers);
     const latest = ALL_PRODUCTS.filter(hasStock).slice(-12);
     renderProductList($('#latestProducts'), latest);
     $('#latestEmpty').hidden = latest.length > 0;
-    $('#newEmpty').hidden = fresh.length > 0;
-    $('.rail-actions').hidden = !fresh.length;
+    $('#newEmpty').hidden = bestSellers.length > 0;
+    $('.rail-actions').hidden = !bestSellers.length;
   }
 
   let motionHash = null;
@@ -1715,7 +1716,7 @@ ${settings().totalTexto}: ${money(totals.total)}${window.HAKI_QUOTE_PRIVACY?.pro
         </div>
         <div class="detail-content">
           <div class="detail-summary">
-            ${p.novedad ? '<span class="detail-new">NUEVO</span>' : ''}
+            ${state.newDrop && p.novedad === true ? '<span class="detail-new">NUEVO</span>' : ''}
             <h1>${esc(p.nombre)}</h1>
             <p class="detail-code">${esc(p.codigo)}</p>
             <button class="solid detail-add" type="button">AÑADIR AL CARRITO</button>

@@ -31,7 +31,8 @@
       const badge = $('.product-number', card);
       if (!badge) return;
       const out = soldOut(p);
-      const text = p.novedad === true ? 'NUEVO' : '';
+      const inNewDrop = card.closest('#products') && document.body.classList.contains('new-drop-view');
+      const text = inNewDrop && p.novedad === true ? 'NUEVO' : '';
       badge.hidden = !text;
       if (badge.textContent.trim() !== text) badge.textContent = text;
       badge.classList.add('availability-badge');

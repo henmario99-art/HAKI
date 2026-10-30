@@ -92,6 +92,7 @@ iframe#nl-badge-frame[title="Powered by Netlify"]{display:none!important}
 /* Estado de disponibilidad: arriba a la izquierda y sin marco */
 .product-number.availability-badge,.detail-availability{background:#fff;color:#111;border:0!important;font-size:9px;line-height:1;letter-spacing:.09em;text-transform:uppercase;font-weight:800;padding:7px 9px}.product-number.availability-badge{top:14px!important;left:14px!important;right:auto!important;bottom:auto!important}.product-number.availability-badge.sold-out,.detail-availability.sold-out{background:#111;color:#fff}.detail-media{position:relative}.detail-availability{position:absolute;top:14px;left:14px;z-index:6}
 .best-seller-badge{position:absolute;top:44px;left:14px;z-index:6;display:inline-flex;align-items:center;min-height:25px;padding:5px 9px;background:#111;color:#fff;font-size:9px;line-height:1;letter-spacing:.16em;text-transform:uppercase;font-weight:800}.detail-best-seller{top:44px}
+.product-image .best-seller-badge{top:14px}.product-image .availability-badge+.best-seller-badge{top:44px}
 
 /* En detalle dejamos un solo botón de añadir, debajo de las tallas */
 .detail-summary .detail-add{display:none!important}
@@ -732,9 +733,9 @@ h1{overflow-wrap:anywhere}.hero h1{line-height:1.1;font-size:clamp(38px,6vw,84px
     </section>
 
     <section id="novedades" class="new-arrivals" aria-labelledby="newTitle">
-      <div class="section-heading"><h2 id="newTitle">NOVEDADES</h2><div class="rail-actions"><button class="header-icon rail-prev" type="button" aria-label="Prendas anteriores">←</button><button class="header-icon rail-next" type="button" aria-label="Prendas siguientes">→</button></div></div>
-      <div id="newProducts" class="product-rail" tabindex="0" aria-label="Novedades, desliza horizontalmente"></div>
-      <p id="newEmpty" class="empty-message" hidden>Próximamente, nuevos ingresos.</p>
+      <div class="section-heading"><h2 id="newTitle">MÁS VENDIDO</h2><div class="rail-actions"><button class="header-icon rail-prev" type="button" aria-label="Prendas anteriores">←</button><button class="header-icon rail-next" type="button" aria-label="Prendas siguientes">→</button></div></div>
+      <div id="newProducts" class="product-rail" tabindex="0" aria-label="Más vendido, desliza horizontalmente"></div>
+      <p id="newEmpty" class="empty-message" hidden>Aún no hay prendas más vendidas disponibles.</p>
     </section>
 
     <section id="collectionsSection" class="collections" aria-labelledby="collectionsTitle">
@@ -858,9 +859,9 @@ h1{overflow-wrap:anywhere}.hero h1{line-height:1.1;font-size:clamp(38px,6vw,84px
 
 
 <script src="ios-safari-fix.js?v=20261002-definitivo"></script>
-<script src="app.js?v=20261027-quote-privacy-2"></script>
+<script src="app.js?v=20261030-best-sellers"></script>
 <script src="safari-internal-detail.js?v=20261002-definitivo"></script>
-<script src="enhancements.js?v=20261002-definitivo"></script>
+<script src="enhancements.js?v=20261030-best-sellers"></script>
 <script src="personalization.js?v=20261002-definitivo"></script>
 <script src="gymrat-test.js?v=20261002-definitivo"></script>
 <script src="mobile-detail.js?v=20261002-definitivo"></script>
@@ -1593,10 +1594,10 @@ h1{overflow-wrap:anywhere}.hero h1{line-height:1.1;font-size:clamp(38px,6vw,84px
     object-fit:cover!important;
     object-position:center center!important;
   }
-  #productDetail .detail-availability,
-  #productDetail .detail-best-seller{
+  #productDetail .detail-availability{
     display:none!important;
   }
+  #productDetail .detail-best-seller{top:14px}
 
   /* Indicador compacto tipo píldora */
   #productDetail .detail-media .gallery-controls{
@@ -2274,7 +2275,6 @@ document.addEventListener('DOMContentLoaded',()=>document.body.append(document.g
   .footer .footer-links{grid-column:3!important;grid-row:1!important;justify-self:end!important}
   .footer small{grid-column:1/-1!important}
   #allStockLink{text-transform:none!important}
-  .best-seller-badge{display:none!important}
 }
 </style>
 <script>
