@@ -145,14 +145,21 @@ window.addEventListener('haki-theme-changed', event => {
 });
 
 function refreshCoverPreview() {
-  const preview = $('#coverPreview');
-  if (!preview) return;
-  const source = state.config.portada || state.config.portadaRespaldo || 'images/hero-fallback.svg';
-  preview.onerror = () => {
-    preview.onerror = null;
-    preview.src = resolveImage('images/hero-fallback.svg');
-  };
-  preview.src = `${resolveImage(source)}?v=${Date.now()}`;
+  const desktop = state.config.portadaOriginal || state.config.portadaDesktop || state.config.portada || state.config.portadaRespaldo || 'images/hero-fallback.svg';
+  for (const [selector, source, revision] of [
+    ['#coverPreview', desktop, state.config.portadaRevision],
+    ['#mobileCoverPreview', state.config.portadaMovil || desktop, state.config.portadaMovil ? state.config.portadaMovilRevision : state.config.portadaRevision],
+  ]) {
+    const preview = $(selector);
+    if (!preview) continue;
+    preview.onerror = () => {
+      preview.onerror = null;
+      preview.src = resolveImage('images/hero-fallback.svg');
+    };
+    const url = new URL(resolveImage(source), location.href);
+    if (revision && !/^(data:|blob:)/i.test(url.protocol)) url.searchParams.set('v', revision);
+    preview.src = url.href;
+  }
 }
 
 function refreshBrandIconPreview() {
@@ -535,7 +542,7 @@ async function uploadCoverPayload(payload) {
 async function persistCoverConfig(configPatch) {
   const data = await api('catalog', {
     method: 'PATCH',
-    body: JSON.stringify({ config: configPatch }),
+    body: JSON.stringify({ config: configPatch, sha: state.catalogSha }),
   });
   state.catalogSha = data.sha || state.catalogSha;
   Object.assign(state.config, configPatch);
@@ -573,16 +580,22 @@ $('#clearBrandIcon')?.addEventListener('click', () => {
   toast('Se usará el logo predeterminado al guardar.', true);
 });
 
-$('#coverFile')?.addEventListener('change', async (e) => {
+let coverUploadPending = false;
+async function uploadCover(e, mobile = false) {
   const file = e.target.files?.[0];
-  if (!file) return;
+  if (!file || coverUploadPending) return;
   try {
-    e.target.disabled = true;
+    coverUploadPending = true;
+    const controls = ['#coverFile', '#mobileCoverFile', '#saveBtn', '#saveOrderBtn'].map(selector => $(selector)).filter(Boolean);
+    for (const control of controls) {
+      control.dataset.coverWasDisabled = String(control.disabled);
+      control.disabled = true;
+    }
     if (!['image/jpeg','image/png','image/webp'].includes(file.type)) {
       throw new Error('Para máxima calidad usa JPG, PNG o WebP.');
     }
 
-    toast('Subiendo portada original sin reducir calidad…');
+    toast(`Subiendo portada de ${mobile ? 'móvil' : 'PC'} sin reducir calidad…`);
     const decoded = await decodeCoverImage(file);
     try {
       const sourceWidth = decoded.image.naturalWidth || decoded.image.width;
@@ -608,32 +621,27 @@ $('#coverFile')?.addEventListener('change', async (e) => {
         masterHeight = master.height;
       }
 
-      // The tall mobile hero crops a wide image with object-fit: cover.
-      // A 1440px-wide panorama loses most of its pixels in that crop.
-      // Reuse the preserved original at every breakpoint, including Retina.
-      const mobileUpload = masterUpload;
-      const mobileWidth = masterWidth;
-      const mobileHeight = masterHeight;
-      const tabletUpload = masterUpload;
-      const tabletWidth = masterWidth;
-      const tabletHeight = masterHeight;
-
       const revision = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
-      const patch = {
+      // Mobile art direction is separate from the legacy generated size variants.
+      // Uploading a PC cover must never replace the independently chosen mobile image.
+      const patch = mobile ? {
+        portadaMovil: masterUpload.path,
+        portadaMovilWidth: masterWidth,
+        portadaMovilHeight: masterHeight,
+        portadaMovilRevision: revision,
+        tipoPortada: 'imagen',
+      } : {
         portada: masterUpload.path,
         portadaRespaldo: masterUpload.path,
         portadaOriginal: masterUpload.path,
         portadaDesktop: masterUpload.path,
-        portadaTablet: tabletUpload.path,
-        portadaMobile: mobileUpload.path,
+        portadaTablet: masterUpload.path,
         portadaOriginalWidth: masterWidth,
         portadaOriginalHeight: masterHeight,
         portadaDesktopWidth: masterWidth,
         portadaDesktopHeight: masterHeight,
-        portadaTabletWidth: tabletWidth,
-        portadaTabletHeight: tabletHeight,
-        portadaMobileWidth: mobileWidth,
-        portadaMobileHeight: mobileHeight,
+        portadaTabletWidth: masterWidth,
+        portadaTabletHeight: masterHeight,
         portadaRevision: revision,
         tipoPortada: 'imagen',
       };
@@ -641,20 +649,30 @@ $('#coverFile')?.addEventListener('change', async (e) => {
       toast('Publicando portada nueva…');
       await persistCoverConfig(patch);
 
-      const pathInput = $('#coverPath');
+      const pathInput = $(mobile ? '#mobileCoverPath' : '#coverPath');
       if (pathInput) pathInput.value = masterUpload.path;
+      const typeInput = $('[data-config="tipoPortada"]');
+      if (typeInput) typeInput.value = 'imagen';
       refreshCoverPreview();
-      toast('Portada publicada en máxima calidad. Ya no necesitas pulsar “Guardar y publicar”.', true);
+      toast(`Portada de ${mobile ? 'móvil' : 'PC'} publicada. La otra imagen se conserva.`, true);
     } finally {
       URL.revokeObjectURL(decoded.objectUrl);
     }
   } catch (err) {
     toast(err.message);
   } finally {
-    e.target.disabled = false;
+    coverUploadPending = false;
+    for (const selector of ['#coverFile', '#mobileCoverFile', '#saveBtn', '#saveOrderBtn']) {
+      const control = $(selector);
+      if (!control) continue;
+      control.disabled = control.dataset.coverWasDisabled === 'true';
+      delete control.dataset.coverWasDisabled;
+    }
     e.target.value = '';
   }
-});
+}
+$('#coverFile')?.addEventListener('change', event => uploadCover(event));
+$('#mobileCoverFile')?.addEventListener('change', event => uploadCover(event, true));
 
 $('#search').addEventListener('input', () => renderProducts({collapse:true}));
 
@@ -678,6 +696,7 @@ $('#addBtn').addEventListener('click', () => {
 });
 
 async function saveCatalog() {
+  if (coverUploadPending) { toast('Espera a que termine de subirse la portada.'); return false; }
   for (const input of document.querySelectorAll('#experienceSettings input')) { if (!input.reportValidity()) return; }
   if (window.HAKIProductEditor && !window.HAKIProductEditor.validate()) return false;
 

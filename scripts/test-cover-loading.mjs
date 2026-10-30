@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 
 // Exercise the real head loader and both existing catalog consumers together.
-function runtime(cached) {
+function runtime(cached, mobile = false) {
   const events = new Map(), storage = new Map(), requests = [], images = [];
   if (cached) storage.set('haki_cover_prefetch_v1', JSON.stringify({config:cached}));
   const listen = (name, fn) => events.set(name, [...(events.get(name) || []), fn]);
@@ -14,9 +14,11 @@ function runtime(cached) {
     getAttribute(key) { return this.attrs[key] ?? null; },
     removeAttribute(key) { delete this.attrs[key]; },
   };
+  const mobileViewport = {matches:mobile,addEventListener:(event,fn)=>listen('cover:viewport',fn)};
   const ctx = {
     URL, AbortSignal, console, Date,
-    navigator:{}, location:{pathname:'/'}, matchMedia:()=>({matches:false}),
+    navigator:{}, location:{pathname:'/',href:'https://haki-sv.netlify.app/'}, matchMedia:query=>query==='(max-width:800px)'?mobileViewport:{matches:false},
+    HAKI_PRODUCTOS:[{codigo:'TEST',nombre:'Synthetic product'}],
     localStorage: {getItem:k=>storage.get(k) || null,setItem:(k,v)=>storage.set(k,v)},
     Image: class { constructor() { images.push(this); } },
     fetch: (url,options) => new Promise((resolve,reject)=>requests.push({url,options,resolve,reject})),
@@ -24,7 +26,7 @@ function runtime(cached) {
     CustomEvent: class { constructor(type,options) { this.type=type;this.detail=options?.detail; } },
     Event: class { constructor(type) { this.type=type; } },
     document: {
-      hidden:false, currentScript:{src:'https://haki-sv.netlify.app/cover-loader.js?v=1'},
+      hidden:false, readyState:'loading', currentScript:{src:'https://haki-sv.netlify.app/cover-loader.js?v=1'},
       addEventListener:listen, createElement:()=>({}),head:{append(){}},
       getElementById: id => id==='heroImage' ? hero : null,
     },
@@ -34,7 +36,7 @@ function runtime(cached) {
   ctx.window=ctx;
   vm.createContext(ctx);
   const run = path => vm.runInContext(readFileSync(new URL('../'+path,import.meta.url),'utf8'),ctx);
-  return {ctx,run,hero,requests,images,storage,events};
+  return {ctx,run,hero,requests,images,storage,events,mobileViewport};
 }
 const config = {portadaOriginal:'https://example.com/original.jpg',portadaMobile:'https://example.com/small.jpg',portadaRevision:'cover-1',portadaOriginalWidth:4160,portadaOriginalHeight:1560};
 const settle=()=>new Promise(resolve=>setImmediate(resolve));
@@ -48,8 +50,8 @@ for (const loader of ['catalog-loader.js','app/catalog-loader.js']) {
   assert.equal(t.hero.src,undefined,'do not paint old/unverified cover');
   t.run(loader);
   t.ctx.dispatchEvent(new t.ctx.Event('DOMContentLoaded'));
-  assert.equal(t.requests.length,1,'no duplicate catalog or initial inventory request');
-  t.requests[0].resolve({ok:true,json:async()=>({config:{...config},products:[],version:'catalog-1'})});
+  assert.equal(t.requests.filter(request=>request.url.includes('mode=public-catalog')).length,1,'no duplicate catalog request');
+  t.requests[0].resolve({ok:true,json:async()=>({config:{...config},products:[{codigo:'TEST',nombre:'Synthetic product'}],version:'catalog-1'})});
   await settle();
   assert.equal(t.ctx.HAKI_COVER_WAITING_LIVE,false);
   t.ctx.HAKI_COVER.paint(t.hero,t.ctx.HAKI_CONFIG);
@@ -67,6 +69,30 @@ for (const loader of ['catalog-loader.js','app/catalog-loader.js']) {
   assert.match(t.hero.src,/v=cover-2$/,'cover replacement invalidates cache');
   assert.equal(t.ctx.HAKI_COVER.source({...config,portadaOriginal:'images/new.jpg'}),'https://haki-sv.netlify.app/images/new.jpg?v=cover-1');
   console.log('PASS',loader,'early loading, single request, full resolution, stable URL, fresh cover');
+}
+for (const mobile of [false,true]) {
+  const selected={...config,portadaMovil:'images/mobile-original.jpg',portadaMovilRevision:'mobile-1'};
+  const t=runtime(selected,mobile);t.run('cover-loader.js');
+  t.ctx.HAKI_COVER.paint(t.hero,selected);
+  const expected=mobile?'https://haki-sv.netlify.app/images/mobile-original.jpg?v=mobile-1':'https://example.com/original.jpg?v=cover-1';
+  assert.equal(t.hero.src,expected);
+  assert.equal(t.images[0].src,expected,'preload must select the same artwork');
+  assert.equal(t.hero.getAttribute('srcset'),null,'artwork is never mixed in a resolution srcset');
+  const writes=t.hero.writes;
+  t.ctx.HAKI_COVER.paint(t.hero,{...selected,[mobile?'portadaRevision':'portadaMovilRevision']:'other-cover-updated'});
+  assert.equal(t.hero.writes,writes,'replacing the other device cover keeps the current image cached');
+  t.ctx.HAKI_COVER.paint(t.hero,selected);
+  t.hero.onerror();
+  assert.equal(t.hero.src,'https://example.com/original.jpg?v=cover-1','broken mobile artwork uses the PC fallback');
+  t.mobileViewport.matches=!mobile;
+  for(const fn of t.events.get('cover:viewport')||[])fn();
+  assert.equal(t.hero.src,mobile?'https://example.com/original.jpg?v=cover-1':'https://haki-sv.netlify.app/images/mobile-original.jpg?v=mobile-1');
+  t.requests[0].resolve({ok:true,json:async()=>({config:selected,products:[]})});
+  await settle();
+  const cached=JSON.parse(t.storage.get('haki_cover_prefetch_v1')).config;
+  assert.equal(cached.portadaMovil,selected.portadaMovil);
+  assert.equal(cached.portadaMovilRevision,'mobile-1');
+  console.log('PASS',mobile?'mobile':'PC','independent artwork, revisions, preload, resize, fallback and cache');
 }
 for (const result of ['offline','invalid']) {
   const t=runtime();t.ctx.HAKI_CONFIG={...config};t.ctx.HAKI_PRODUCTOS=[];

@@ -10,15 +10,19 @@
   const endpoint = 'https://uysfqzlihiosebqzvfrl.supabase.co/functions/v1/haki-operations?mode=public-catalog';
   const cacheKey = 'haki_cover_prefetch_v1';
   const warmed = new Map();
+  const mobileViewport = matchMedia('(max-width:800px)');
+  let activeHero, activeConfig;
 
   function source(config, fallback = false) {
-    const value = String((fallback ? config.portadaRespaldo :
-      config.portadaOriginal || config.portadaDesktop || config.portada || config.portadaRespaldo) || '').trim();
+    const desktop = config.portadaOriginal || config.portadaDesktop || config.portada || config.portadaRespaldo;
+    const mobile = mobileViewport.matches && String(config.portadaMovil || '').trim();
+    const value = String((fallback ? (mobile ? desktop : config.portadaRespaldo) : mobile || desktop) || '').trim();
     if (!value || /^(data:|blob:)/i.test(value)) return value;
     const url = new URL(value, new URL('./', scriptURL));
     if (!['http:', 'https:'].includes(url.protocol)) return '';
     // Only replacing the cover invalidates it; sales/catalog edits reuse its cache.
-    if (config.portadaRevision) url.searchParams.set('v', config.portadaRevision);
+    const revision = !fallback && mobile ? config.portadaMovilRevision : config.portadaRevision;
+    if (revision) url.searchParams.set('v', revision);
     return url.href;
   }
 
@@ -35,6 +39,8 @@
 
   function paint(hero, config) {
     if (!hero) return;
+    activeHero = hero;
+    activeConfig = config;
     if (window.HAKI_COVER_WAITING_LIVE) {
       hero.removeAttribute('src');
       hero.removeAttribute('srcset');
@@ -57,6 +63,9 @@
     hero.style.visibility = url ? '' : 'hidden';
   }
 
+  mobileViewport.addEventListener?.('change', () => {
+    if (activeHero && activeConfig) paint(activeHero, activeConfig);
+  });
   window.HAKI_COVER = { source, warm, paint };
   // Speculatively download the last verified image, but never display it until
   // the live catalog confirms the current cover (offline fallback is separate).
@@ -77,7 +86,7 @@
             !data.products.every(p => p && typeof p.codigo === 'string' && typeof p.nombre === 'string')) return null;
         warm(data.config);
         const config = {};
-        for (const field of ['portadaOriginal','portadaDesktop','portada','portadaRespaldo','portadaRevision','tipoPortada']) {
+        for (const field of ['portadaOriginal','portadaDesktop','portada','portadaRespaldo','portadaRevision','portadaMovil','portadaMovilRevision','tipoPortada']) {
           if (data.config[field]) config[field] = data.config[field];
         }
         try { localStorage.setItem(cacheKey, JSON.stringify({ config })); } catch {}

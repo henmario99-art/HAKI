@@ -62,6 +62,10 @@ export default async request => {
       const body = await bodyJson(request);
       const partial = body?.config && typeof body.config === 'object' ? body.config : {};
       const current = await edge('catalog', { method:'GET' });
+      if (Object.keys(partial).some(field => field.startsWith('portada')) &&
+          (!body.sha || String(body.sha) !== String(current.version || ''))) {
+        return json({ error:'El catálogo cambió en otro lugar. Recarga antes de guardar la portada.' },409);
+      }
       if (Object.hasOwn(partial, 'nuevoDropIds')) {
         if (!body.sha || String(body.sha) !== String(current.version || '')) {
           return json({ error:'El catálogo cambió en otro lugar. Recarga antes de guardar Nuevo Drop.' },409);

@@ -12,6 +12,12 @@
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon-v3.png">
   <link rel="stylesheet" href="admin.css?v=3">
   <style id="admin-product-colors">
+    .config-grid>*{min-width:0}
+    #coverUploadRow,#mobileCoverUploadRow{flex-wrap:wrap}
+    #coverUploadRow .upload-label,#mobileCoverUploadRow .upload-label{max-width:100%;overflow-wrap:anywhere}
+    #coverUploadRow .upload-label span,#mobileCoverUploadRow .upload-label span{font-weight:400;font-size:12px}
+    #coverPreview,#mobileCoverPreview{object-fit:contain}
+    #mobileCoverHelp{margin:0;font-size:12px;line-height:1.5;color:inherit}
     html{scroll-behavior:smooth}
     #productsSection{scroll-margin-top:88px}
     .product-color-setting{margin-top:18px;padding-top:16px;border-top:1px solid #e4e4e4}
@@ -101,11 +107,21 @@
           <label>Tipo de portada<select data-config="tipoPortada"><option value="imagen">Foto</option><option value="video">Video</option></select></label>
           <input id="coverPath" data-config="portada" type="hidden">
           <div class="wide media-row" id="coverUploadRow">
-            <img id="coverPreview" class="preview" alt="Vista previa de la portada">
-            <label class="upload-label">Subir / reemplazar foto de portada (alta calidad)
-              <input id="coverFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+            <img id="coverPreview" class="preview" alt="Vista previa de la portada de PC">
+            <label class="upload-label">Portada de PC
+              <span>Subir / reemplazar imagen para computadoras</span>
+              <input id="coverFile" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Subir portada de PC">
             </label>
           </div>
+          <input id="mobileCoverPath" data-config="portadaMovil" type="hidden">
+          <div class="wide media-row" id="mobileCoverUploadRow">
+            <img id="mobileCoverPreview" class="preview" alt="Vista previa de la portada de móvil">
+            <label class="upload-label">Portada de móvil
+              <span>Subir / reemplazar imagen para celulares</span>
+              <input id="mobileCoverFile" type="file" accept="image/jpeg,image/png,image/webp" aria-label="Subir portada de móvil" aria-describedby="mobileCoverHelp">
+            </label>
+          </div>
+          <p class="wide" id="mobileCoverHelp">Las dos imágenes se guardan por separado. Sin una portada de móvil, se usa la de PC.</p>
           <label class="wide">Enlace del video de portada (MP4 o WebM)<input data-config="videoPortada" type="url"></label>
           <label class="wide">Anuncio<input data-config="anuncio"></label>
           <label>País<input data-config="pais"></label>
@@ -210,7 +226,7 @@
   <script src="../experience-config.js?v=3"></script>
   <script src="experience-settings.js?v=5"></script>
   <script src="product-settings.js?v=20261002-inventory-total"></script>
-  <script src="admin.js?v=20261030-drop-1"></script>
+  <script src="admin.js?v=20261030-independent-covers-1"></script>
   <script src="info-settings.js?v=2"></script>
   <script src="personalization-settings.js?v=2"></script>
   <script src="new-drop-settings.js?v=20261030-1"></script>

@@ -118,6 +118,41 @@
     return ALL_PRODUCTS.find(p => p.codigo === code);
   }
 
+  const coverViewport = matchMedia('(max-width:800px)');
+  function applyCoverImage() {
+    const hero = $('#heroImage');
+    if (!hero) return;
+    if (window.HAKI_COVER_WAITING_LIVE) {
+      hero.removeAttribute('src');
+      hero.removeAttribute('srcset');
+      hero.style.visibility = 'hidden';
+      return;
+    }
+    if (window.HAKI_COVER) {
+      window.HAKI_COVER.paint(hero, CONFIG);
+      return;
+    }
+    const desktop = CONFIG.portadaOriginal || CONFIG.portadaDesktop || CONFIG.portada || CONFIG.portadaRespaldo || 'images/hero-fallback.svg';
+    const mobile = coverViewport.matches && String(CONFIG.portadaMovil || '').trim();
+    const versioned = (source, revision) => {
+      const url = new URL(source, new URL('/', location.href));
+      if (revision && !/^(data:|blob:)/i.test(url.protocol)) url.searchParams.set('v', revision);
+      return url.href;
+    };
+    const source = versioned(mobile || desktop, mobile ? CONFIG.portadaMovilRevision : CONFIG.portadaRevision);
+    hero.removeAttribute('srcset');
+    hero.removeAttribute('sizes');
+    if (hero.getAttribute('src') !== source) hero.src = source;
+    hero.fetchPriority = 'high';
+    hero.decoding = 'async';
+    hero.style.visibility = '';
+    hero.onerror = () => {
+      hero.onerror = null;
+      hero.src = versioned(mobile ? desktop : CONFIG.portadaRespaldo || 'images/hero-fallback.svg', CONFIG.portadaRevision);
+    };
+  }
+  coverViewport.addEventListener('change', applyCoverImage);
+
   function applyConfig() {
     applyExperience();
     $('#announcementText').textContent =
@@ -139,51 +174,7 @@
       coverDescription.setAttribute('aria-hidden', 'true');
     }
 
-    const hero = $('#heroImage');
-    if (window.HAKI_COVER_WAITING_LIVE) {
-      hero.removeAttribute('src');
-      hero.removeAttribute('srcset');
-      hero.style.visibility = 'hidden';
-    } else if (window.HAKI_COVER) {
-      window.HAKI_COVER.paint(hero, CONFIG);
-    } else {
-      const coverVersion = String(CONFIG.portadaRevision || CONFIG.catalogVersion || '');
-      const versioned = url => {
-        const value = String(url || '').trim();
-        if (!value || !coverVersion || /^(?:data:|blob:)/i.test(value)) return value;
-        return `${value}${value.includes('?') ? '&' : '?'}v=${encodeURIComponent(coverVersion)}`;
-      };
-      const coverBase = CONFIG.portadaOriginal || CONFIG.portadaDesktop || CONFIG.portada || CONFIG.portadaRespaldo || '';
-      const desktopCover = CONFIG.portadaOriginal || CONFIG.portadaDesktop || CONFIG.portada || CONFIG.portadaRespaldo || '';
-      const coverVariants = [
-        [CONFIG.portadaMobile, Number(CONFIG.portadaMobileWidth) || 1440],
-        [CONFIG.portadaTablet, Number(CONFIG.portadaTabletWidth) || 2200],
-        [CONFIG.portadaDesktop, Number(CONFIG.portadaDesktopWidth) || 3200],
-        [CONFIG.portadaOriginal || CONFIG.portada, Number(CONFIG.portadaOriginalWidth || CONFIG.portadaDesktopWidth) || 4096],
-      ].filter(([url,width]) => String(url || '').trim() && Number(width) > 0);
-      const uniqueCoverVariants = coverVariants.filter(([url], index, list) =>
-        list.findIndex(([candidate]) => candidate === url) === index
-      );
-      const responsiveCoverSrcset = uniqueCoverVariants.length > 1
-        ? uniqueCoverVariants.map(([url, width]) => `${versioned(url)} ${width}w`).join(', ')
-        : '';
-
-      hero.src = desktopCover
-        ? versioned(desktopCover)
-        : versioned(freshImage(CONFIG.portadaRespaldo || 'images/hero-fallback.svg', 2560));
-      if (responsiveCoverSrcset) hero.srcset = responsiveCoverSrcset;
-      else hero.removeAttribute('srcset');
-      hero.sizes = '100vw';
-      hero.fetchPriority = 'high';
-      hero.decoding = 'async';
-      hero.style.visibility = '';
-
-      hero.onerror = () => {
-        hero.onerror = null;
-        hero.removeAttribute('srcset');
-        hero.src = versioned(freshImage(CONFIG.portadaRespaldo || 'images/hero-fallback.svg', 2560));
-      };
-    }
+    applyCoverImage();
 
     const ig = `https://www.instagram.com/${
       CONFIG.instagram || 'haki__sv'
