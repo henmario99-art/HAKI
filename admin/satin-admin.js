@@ -18,7 +18,7 @@
   const categories=cards.find(c=>c.querySelector('h2')?.textContent==='Las cuatro categorías de inicio');
   if(categories&&general){const d=document.createElement('details');d.innerHTML='<summary>Categorías de inicio</summary>';d.append(...[...categories.children].filter(n=>n.tagName!=='H2'));general.append(d);categories.remove();}
   const info=cards.find(c=>/Encomiendas, domicilios/.test(c.querySelector('h2')?.textContent||''));
-  const groups=[['general','Configuración general',general],['appearance','Apariencia, portada y bolsa',document.getElementById('experienceSettings')],['typography','Tipografía',document.getElementById('typographySettings')],['gymrat','GYMRAT TEST',document.getElementById('gymratSettings')],['shipping','Envíos y cambios',info]];
+  const groups=[['general','Configuración general',general],['new-drop','Nuevo Drop',document.getElementById('newDropSettings')],['appearance','Apariencia, portada y bolsa',document.getElementById('experienceSettings')],['typography','Tipografía',document.getElementById('typographySettings')],['gymrat','GYMRAT TEST',document.getElementById('gymratSettings')],['shipping','Envíos y cambios',info]];
   groups.forEach(([id,title,card])=>{
     if(card){card.hidden=true;card.dataset.setting=id;settings.querySelector('.settings-content').append(card);}
     const btn=document.createElement('button');btn.type='button';btn.innerHTML=`${hakiIcon('settings')}<span>${title}</span><span>›</span>`;
@@ -43,6 +43,8 @@
     settings.hidden=!match;document.getElementById('productsSection').hidden=!!match;search.hidden=true;
     groups.forEach(g=>{if(g[2])g[2].hidden=g!==match;});
     if(match)settings.querySelector('h1').textContent=match[1];
+    save.hidden=id==='new-drop';
+    if(id==='new-drop')window.HAKINewDropEditor?.open();
     window.HAKI_UI?.reveal(match?settings:document.getElementById('productsSection'));
     window.scrollTo(0,0);
   }

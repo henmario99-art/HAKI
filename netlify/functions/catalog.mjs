@@ -62,6 +62,16 @@ export default async request => {
       const body = await bodyJson(request);
       const partial = body?.config && typeof body.config === 'object' ? body.config : {};
       const current = await edge('catalog', { method:'GET' });
+      if (Object.hasOwn(partial, 'nuevoDropIds')) {
+        if (!body.sha || String(body.sha) !== String(current.version || '')) {
+          return json({ error:'El catálogo cambió en otro lugar. Recarga antes de guardar Nuevo Drop.' },409);
+        }
+        const validIds = new Set((current.products || []).map(product => String(product.id)));
+        if (!Array.isArray(partial.nuevoDropIds) || partial.nuevoDropIds.some(id => !validIds.has(String(id)))) {
+          return json({ error:'La selección incluye una prenda que ya no está en el catálogo. Recarga e inténtalo de nuevo.' },400);
+        }
+        partial.nuevoDropIds = [...new Set(partial.nuevoDropIds.map(String))];
+      }
       const mergedConfig = { ...(current.config || {}), ...partial };
       const data = await edge('catalog', {
         method:'PUT',

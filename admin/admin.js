@@ -114,6 +114,7 @@ async function loadCatalog() {
     fillConfig();
     renderCollectionSettings();
     renderProducts();
+    window.HAKINewDropEditor?.catalogLoaded();
     loaded = true;
     toast('Catálogo cargado', true);
   } catch (err) {
@@ -378,9 +379,6 @@ function renderProducts() {
     setupColorParentPicker(p, tpl);
     setupProductGuide(p, tpl);
 
-    const newCheck = $('.new-arrival-check', tpl);
-    newCheck.checked = p.novedad === true;
-    newCheck.addEventListener('change', () => { p.novedad = newCheck.checked; });
     const bestSellerCheck = $('.best-seller-check', tpl);
     bestSellerCheck.checked = p.masVendido === true;
     bestSellerCheck.addEventListener('change', () => { p.masVendido = bestSellerCheck.checked; });
@@ -703,6 +701,7 @@ async function saveCatalog() {
       });
     }
     if (window.HAKIProductEditor) await window.HAKIProductEditor.saved();
+    window.HAKINewDropEditor?.catalogLoaded();
     toast('Cambios guardados y visibles en el catálogo.', true);
     return true;
   } catch (err) {

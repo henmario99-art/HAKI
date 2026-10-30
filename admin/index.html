@@ -44,6 +44,7 @@
 <link rel="stylesheet" href="../native-ui.css?v=20261005-1">
 <script src="../native-ui.js?v=20261005-1"></script>
 <link rel="stylesheet" href="inventory-editor.css?v=20261030">
+<link rel="stylesheet" href="new-drop-settings.css?v=20261030-1">
 </head>
 <body>
   <main class="shell">
@@ -181,7 +182,7 @@
         <div><img class="extra-preview" data-preview="imagen3" alt="Tercera imagen" hidden><label class="upload-label">Subir tercera imagen<input class="extra-image-file" data-image-field="imagen3" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label><button type="button" class="ghost" data-clear-image="imagen3">Quitar tercera imagen</button></div>
       </div>
       <div class="product-placement">
-        <label class="check-label"><input class="new-arrival-check" type="checkbox"> Mostrar en NOVEDADES</label>
+        <p class="new-drop-product-hint">Elige las prendas y su orden desde «Nuevo Drop» en el menú.</p>
         <label class="check-label"><input class="best-seller-check" type="checkbox"> Mostrar distintivo MÁS VENDIDO</label>
         <fieldset><legend>Mostrar en categorías de inicio</legend><div class="collection-choices"></div></fieldset>
       </div>
@@ -205,14 +206,15 @@
       <div class="product-size-guide-setting"><label>Guía de tallas<select class="product-guide-select" aria-label="Guía de tallas de la prenda"></select></label></div>
     </article>
   </template>
-  <script src="../storefront-config.js?v=1"></script>
+  <script src="../storefront-config.js?v=20261030-drop-1"></script>
   <script src="../experience-config.js?v=3"></script>
   <script src="experience-settings.js?v=5"></script>
   <script src="product-settings.js?v=20261002-inventory-total"></script>
-  <script src="admin.js?v=20261030-product-editor"></script>
+  <script src="admin.js?v=20261030-drop-1"></script>
   <script src="info-settings.js?v=2"></script>
   <script src="personalization-settings.js?v=2"></script>
-  <script src="satin-admin.js?v=20261005-motion-1"></script>
+  <script src="new-drop-settings.js?v=20261030-1"></script>
+  <script src="satin-admin.js?v=20261030-drop-1"></script>
   <script src="inventory-product-editor.js?v=20261030"></script>
 </body>
 </html>

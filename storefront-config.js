@@ -9,6 +9,15 @@ window.hakiCollections = config => window.HAKI_COLLECTION_DEFAULTS.map((item, in
   ...item, ...(Array.isArray(config.colecciones) ? config.colecciones[index] : {}), id: item.id
 }));
 
+// A dedicated list controls New Drop without changing the catalogue's order.
+// Until it is first saved, retain the existing selection marked as novedad.
+window.hakiDropProducts = (config = {}, products = []) => {
+  const list = Array.isArray(products) ? products : [];
+  if (!Array.isArray(config.nuevoDropIds)) return list.filter(product => product.novedad === true);
+  const byId = new Map(list.map(product => [String(product.id), product]));
+  return [...new Set(config.nuevoDropIds.map(String))].map(id => byId.get(id)).filter(Boolean);
+};
+
 // Pulido visual del menú bajo TODAS LAS PRENDAS.
 // Se mantiene únicamente en la vista general del catálogo.
 (() => {

@@ -322,15 +322,15 @@
   }
 
   function dropCodes() {
-    return ALL_PRODUCTS.filter(p=>p.novedad===true).map(p=>String(p.codigo));
+    return window.hakiDropProducts(CONFIG, ALL_PRODUCTS).map(p => String(p.codigo));
   }
   function visibleProducts() {
     const q = normalize(state.query.trim());
 
-    return ALL_PRODUCTS.filter(
+    const source = state.newDrop ? window.hakiDropProducts(CONFIG, ALL_PRODUCTS) : ALL_PRODUCTS;
+    return source.filter(
       p =>
         hasStock(p) &&
-        (!state.newDrop || dropCodes().includes(String(p.codigo))) &&
         (state.category === 'Todos' ||
           normalize(p.categoria || '') === normalize(state.category)) &&
         (!state.collection || inCollection(p, state.collection)) &&
@@ -563,7 +563,7 @@
                 loading="lazy" decoding="async" width="400" height="500" srcset="${esc(window.hakiSrcset(p.imagen))}" sizes="(max-width:800px) 50vw, 25vw"
               >
 
-              ${showNew && p.novedad === true ? '<span class="product-number availability-badge">NUEVO</span>' : ''}
+              ${showNew ? '<span class="product-number availability-badge">NUEVO</span>' : ''}
 
               ${p.masVendido === true ? `<span class="best-seller-badge">${esc(String(p.etiquetaMasVendido || '').trim() || 'MÁS VENDIDO')}</span>` : ''}
 
@@ -1716,7 +1716,7 @@ ${settings().totalTexto}: ${money(totals.total)}${window.HAKI_QUOTE_PRIVACY?.pro
         </div>
         <div class="detail-content">
           <div class="detail-summary">
-            ${state.newDrop && p.novedad === true ? '<span class="detail-new">NUEVO</span>' : ''}
+            ${state.newDrop && dropCodes().includes(String(p.codigo)) ? '<span class="detail-new">NUEVO</span>' : ''}
             <h1>${esc(p.nombre)}</h1>
             <p class="detail-code">${esc(p.codigo)}</p>
             <button class="solid detail-add" type="button">AÑADIR AL CARRITO</button>
