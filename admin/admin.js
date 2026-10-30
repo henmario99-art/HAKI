@@ -2,6 +2,8 @@ const $ = (s, el=document) => el.querySelector(s);
 const $$ = (s, el=document) => [...el.querySelectorAll(s)];
 const API = '/.netlify/functions';
 const RAW_BASE = '/';
+const inventoryEditorProductId = new URLSearchParams(location.search).get('inventoryEditor') === '1'
+  ? new URLSearchParams(location.search).get('product') || '' : '';
 
 let state = { config: {}, products: [], filtered: [] };
 
@@ -105,6 +107,7 @@ async function loadCatalog() {
   try {
     const data = await api('catalog', { method: 'GET' });
     state.catalogSha = data.sha;
+    if (inventoryEditorProductId) state.catalogSnapshot = structuredClone({ config: data.config || {}, products: data.products || [] });
     state.config = window.hakiSettings(data.config || {});
     state.config.tema = window.HAKITheme.configure(state.config.tema);
     state.products = data.products || [];
@@ -329,7 +332,8 @@ function renderReorderList() {
 
 function renderProducts() {
   const q = ($('#search').value || '').trim().toLowerCase();
-  state.filtered = state.products.filter(p => !q || `${p.codigo} ${p.nombre} ${p.categoria}`.toLowerCase().includes(q));
+  state.filtered = state.products.filter(p => (!inventoryEditorProductId || String(p.id) === inventoryEditorProductId)
+    && (!q || `${p.codigo} ${p.nombre} ${p.categoria}`.toLowerCase().includes(q)));
   $('#count').textContent = `${state.products.length} productos`;
   const wrap = $('#products');
   wrap.innerHTML = '';
@@ -677,15 +681,20 @@ $('#addBtn').addEventListener('click', () => {
 
 async function saveCatalog() {
   for (const input of document.querySelectorAll('#experienceSettings input')) { if (!input.reportValidity()) return; }
+  if (window.HAKIProductEditor && !window.HAKIProductEditor.validate()) return false;
 
   const buttons = [$('#saveBtn'), $('#saveOrderBtn')];
   buttons.forEach(button => { button.disabled = true; button.dataset.label = button.textContent; button.textContent = 'Guardando…'; });
   try {
+    const snapshot = inventoryEditorProductId ? state.catalogSnapshot : null;
+    const products = snapshot ? snapshot.products.map(product => String(product.id) === inventoryEditorProductId
+      ? state.products.find(current => String(current.id) === inventoryEditorProductId) : product) : state.products;
     const data = await api('catalog', {
       method: 'PUT',
-      body: JSON.stringify({ config: state.config, products: state.products, sha: state.catalogSha })
+      body: JSON.stringify({ config: snapshot ? snapshot.config : state.config, products, sha: state.catalogSha })
     });
     state.catalogSha = data.sha || state.catalogSha;
+    if (snapshot) state.catalogSnapshot = structuredClone({ config: data.config || snapshot.config, products: data.products || products });
     if (Array.isArray(data.products)) {
       const existing = new Map(state.products.map(product => [String(product.id), product]));
       state.products = data.products.map(product => {
@@ -693,12 +702,14 @@ async function saveCatalog() {
         return current ? Object.assign(current, product) : product;
       });
     }
+    if (window.HAKIProductEditor) await window.HAKIProductEditor.saved();
     toast('Cambios guardados y visibles en el catálogo.', true);
     return true;
   } catch (err) {
     toast(err.message);
     return false;
   } finally {
+    window.HAKIProductEditor?.finished();
     buttons.forEach(button => { button.disabled = false; button.textContent = button.dataset.label || 'Guardar y publicar'; });
   }
 }

@@ -165,6 +165,9 @@ function renderInventory(){
     const save=document.createElement('button');save.type='button';save.className='button primary inventory-save';
     save.textContent='Guardar';save.dataset.productId=pid;save.setAttribute('aria-label',`Guardar inventario de ${product.nombre}`);
     save.addEventListener('click',()=>saveInventory(pid));row.append(save);
+    const edit=document.createElement('button');edit.type='button';edit.className='button secondary inventory-edit';
+    edit.textContent='Editar';edit.setAttribute('aria-label',`Editar prenda ${product.nombre}`);
+    edit.addEventListener('click',()=>window.HAKIInventoryEditor.open(product,edit));row.append(edit);
     function updateTotal(){total.textContent=String($$('[data-stock]',row).reduce((n,el)=>n+(Math.max(0,Math.trunc(Number(el.value)||0))),0));}
     updateTotal();wrap.append(row);
   });
