@@ -6,11 +6,36 @@
 
   if (!onCountdown) {
     if (Date.now() < launchAt) {
-      // Keep the storefront from flashing while the browser opens the launch page.
+      const preview = new URLSearchParams(location.search).get('preview') === '1';
+      // Keep content hidden until the session is verified or the launch page opens.
       const blackout = document.createElement('style');
       blackout.textContent = 'html{background:#000!important}body{display:none!important}';
       document.head.append(blackout);
-      location.replace('/nuevo-drop');
+      if (!preview) {
+        location.replace('/nuevo-drop');
+        return;
+      }
+      let checking = false;
+      async function verifyPreview() {
+        if (checking) return;
+        if (Date.now() >= launchAt) { blackout.remove(); return; }
+        checking = true;
+        try {
+          const response = await fetch('/.netlify/functions/auth', {
+            credentials:'same-origin', cache:'no-store', signal:AbortSignal.timeout(8000),
+          });
+          const data = response.ok ? await response.json() : null;
+          if (Date.now() >= launchAt || data?.authenticated === true) blackout.remove();
+          else location.replace('/nuevo-drop');
+        } catch {
+          if (Date.now() >= launchAt) blackout.remove();
+          else location.replace('/nuevo-drop');
+        } finally { checking = false; }
+      }
+      verifyPreview();
+      window.addEventListener('focus', verifyPreview);
+      window.addEventListener('pageshow', verifyPreview);
+      document.addEventListener('visibilitychange', () => { if (!document.hidden) verifyPreview(); });
     }
     return;
   }

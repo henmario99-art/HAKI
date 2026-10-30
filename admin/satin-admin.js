@@ -25,8 +25,8 @@
     btn.onclick=()=>{drawer.close();history.pushState({setting:id},'',`#${id}`);showSetting(id);};drawer.nav.append(btn);
   });
   const catalogLink=document.createElement('button');catalogLink.type='button';
-  catalogLink.innerHTML=`${hakiIcon('image')}<span>Ver catálogo</span><span>›</span>`;
-  catalogLink.onclick=()=>{drawer.close();window.open('/','_blank','noopener');};drawer.nav.append(catalogLink);
+  catalogLink.innerHTML=`${hakiIcon('image')}<span>Vista previa privada</span><span>›</span>`;
+  catalogLink.onclick=()=>{drawer.close();window.open('/?preview=1','_blank','noopener');};drawer.nav.append(catalogLink);
   const logout=document.createElement('button');logout.type='button';logout.innerHTML=`${hakiIcon('back')}<span>Cerrar sesión</span><span>›</span>`;
   logout.onclick=async()=>{await api('auth',{method:'DELETE'});location.replace('/admin/');};drawer.nav.append(logout);
   let currentSetting=null;
