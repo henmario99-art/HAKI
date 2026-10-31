@@ -3,10 +3,10 @@
   const $ = (selector, parent=document) => parent.querySelector(selector);
   const $$ = (selector, parent=document) => [...parent.querySelectorAll(selector)];
   const shapes = {
-    Instagram:'<rect x="5" y="5" width="14" height="14" rx="4"/><circle cx="12" cy="12" r="3.4"/><circle cx="16.8" cy="7.4" r=".8" fill="white" stroke="none"/>',
+    Instagram:'<rect x="5" y="5" width="14" height="14" rx="4"/><circle cx="12" cy="12" r="3.4"/><circle cx="16.8" cy="7.4" r=".8" fill="currentColor" stroke="none"/>',
     WhatsApp:'<path d="M4 20l1-4a8 8 0 1 1 3 3z"/><path d="M9 7c-1 1-1 3 1 5s4 3 5 2l1-2-3-1-1 1-2-2 1-1z"/>',
-    Facebook:'<path d="M14.5 21v-8h2.8l.5-3.3h-3.3V7.6c0-.9.5-1.6 1.7-1.6H18V3.1A23 23 0 0 0 15.5 3C12.9 3 11 4.6 11 7.4v2.3H8V13h3v8" fill="white" stroke="none"/>',
-    TikTok:'<path d="M14 3h3c.2 2.3 1.5 3.7 4 4v3a9 9 0 0 1-4-1.2v7a5.5 5.5 0 1 1-5.5-5.5v3a2.5 2.5 0 1 0 2.5 2.5z" fill="white" stroke="none"/>'
+    Facebook:'<path d="M14.5 21v-8h2.8l.5-3.3h-3.3V7.6c0-.9.5-1.6 1.7-1.6H18V3.1A23 23 0 0 0 15.5 3C12.9 3 11 4.6 11 7.4v2.3H8V13h3v8" fill="currentColor" stroke="none"/>',
+    TikTok:'<path d="M14 3h3c.2 2.3 1.5 3.7 4 4v3a9 9 0 0 1-4-1.2v7a5.5 5.5 0 1 1-5.5-5.5v3a2.5 2.5 0 1 0 2.5 2.5z" fill="currentColor" stroke="none"/>'
   };
   let scheduled=false;
   function queue(){if(scheduled)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;polish();});}
@@ -53,8 +53,7 @@
     const guideLabels={compression:'Compresión',oversized:'Oversized',pants:'Pants',shorts:'Shorts'};
     $$('#collectionsGrid .collection-tile').forEach(tile=>{if(mobile.matches)tile.dataset.hakiPress='none';else delete tile.dataset.hakiPress;if(!$('.haki-collection-cta',tile))tile.append(create('span','haki-collection-cta','VER PRENDAS'));});
     $$('article.product[data-code]').forEach(card=>{
-      const photo=$('.product-image',card), info=$('.product-info',card);
-      if(photo&&!$('.haki-mobile-product-open',photo)){const plus=create('span','haki-mobile-product-open','+');plus.setAttribute('aria-hidden','true');photo.append(plus);}
+      const info=$('.product-info',card);
       const guide=guideLabels[card.dataset.sizeGuide] || '';
       let label=$('.haki-card-guide',card);
       if(guide&&info){if(!label){label=create('p','haki-card-guide');$('strong',info)?.before(label);}if(label)label.textContent=guide;}
