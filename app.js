@@ -232,9 +232,7 @@
 
     applyCoverImage();
 
-    const ig = `https://www.instagram.com/${
-      CONFIG.instagram || 'haki__sv'
-    }/`;
+    const ig = window.hakiInstagramProfileUrl(CONFIG);
 
     $('#instagramHeader').href = ig;
     $('#instagramFooter').href = ig;
@@ -1403,7 +1401,7 @@ ${settings().totalTexto}: ${money(totals.total)}${window.HAKI_QUOTE_PRIVACY?.pro
     trackQuote('instagram');
 
     const text = quoteText();
-    const handle = String(CONFIG.instagram || '').replace(/^@/, '').trim();
+    const handle = window.hakiInstagramHandle(CONFIG).toLowerCase();
     const target = `https://ig.me/m/${encodeURIComponent(handle)}`;
     const legacyCopied = legacyCopyQuoteText(text);
     const modernCopy = (navigator.clipboard?.writeText && window.isSecureContext)

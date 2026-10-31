@@ -1,3 +1,11 @@
+// Resolve the retired profile name without rewriting stored catalogue settings.
+window.hakiInstagramHandle = config => {
+  const handle = String(config?.instagram || '').trim().replace(/^@/, '');
+  return !handle || handle.toLowerCase() === 'hakisv1' ? 'Haki__sv' : handle;
+};
+window.hakiInstagramProfileUrl = config =>
+  `https://www.instagram.com/${encodeURIComponent(window.hakiInstagramHandle(config).toLowerCase())}/`;
+
 // Defaults are shared by the storefront and its existing administrator.
 window.HAKI_COLLECTION_DEFAULTS = [
   { id: 'collection-1', nombre: 'Camisetas y tops', imagen: '', categoria: 'Camisetas' },

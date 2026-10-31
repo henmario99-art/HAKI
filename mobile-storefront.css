@@ -102,9 +102,9 @@ body.quick-add-open{overscroll-behavior:none}
   html body #top .haki-instagram-card{display:block;width:100%;box-sizing:border-box;margin:0;padding:12px;border:1px solid var(--line,#ddd);border-radius:10px;background:var(--surface,#fff);color:var(--ink,#141414);text-decoration:none!important}
   .haki-instagram-card:focus-visible{outline:2px solid var(--ink,#141414);outline-offset:4px}
   .haki-instagram-head{display:grid;grid-template-columns:44px minmax(0,1fr);gap:14px;align-items:center;padding:4px 2px 20px}
-  .haki-instagram-avatar{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--ink,#141414)}
-  .haki-instagram-avatar img{display:block;width:30px;height:12px;object-fit:contain;filter:brightness(0) invert(1)}
-  :root[data-theme="oscuro"] .haki-instagram-avatar img{filter:brightness(0)}
+  .haki-instagram-avatar{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:#000;overflow:hidden}
+  .haki-instagram-avatar img{display:block;width:44px;height:44px;object-fit:contain;filter:none}
+  :root[data-theme="oscuro"] .haki-instagram-avatar img{filter:none}
   .haki-instagram-head strong{display:block;font-size:14px;line-height:24px;font-weight:600;color:var(--ink,#141414)}
   .haki-instagram-head p{margin:2px 0 0;font-size:11px;line-height:20px;color:var(--muted,#737373)}
   .haki-instagram-photos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}

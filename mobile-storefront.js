@@ -54,17 +54,17 @@
     let section=$('#hakiInstagramSection');
     if(!section){
       section=create('section');section.id='hakiInstagramSection';section.setAttribute('aria-labelledby','hakiInstagramTitle');
-      const title=create('h2');title.id='hakiInstagramTitle';title.append('Más de HAKI,',create('br'),'en Instagram.');
+      const title=create('h2');title.id='hakiInstagramTitle';title.textContent='Síguenos en Instagram';
       const card=create('a','haki-instagram-card');card.target='_blank';card.rel='noopener noreferrer';card.dataset.hakiPress='none';
       const head=create('div','haki-instagram-head');
-      const avatar=create('span','haki-instagram-avatar');const logo=create('img');logo.src='/images/haki-wordmark.svg';logo.alt='';logo.width=30;logo.height=12;avatar.append(logo);
-      const meta=create('div');meta.append(create('strong','','@hakisv1'),create('p','','HAKI Sportswear · El Salvador'));head.append(avatar,meta);
+      const avatar=create('span','haki-instagram-avatar');const logo=create('img');logo.src='/images/instagram-haki-avatar-66ed57d2a803.webp';logo.alt='';logo.width=44;logo.height=44;avatar.append(logo);
+      const meta=create('div');meta.append(create('strong','','@Haki__sv'),create('p','','Haki Sportswear'));head.append(avatar,meta);
       const photos=create('div','haki-instagram-photos');
       // Static HAKI photographs from the approved design; this card only links to Instagram.
       for(const [source,alt] of [
-        ['/images/ONYXV1ROJA.webp','HAKI · camiseta de compresión'],
-        ['/images/YLA9.25.25D-BFBATCAVE_SOCIAL_023.jpg','HAKI · camisa de compresión'],
-        ['/images/1790039192375-afb42f55-WhatsApp-Image-2026-09-21-at-7.05.59-PM.webp','HAKI · prendas en el gimnasio']
+        ['/images/instagram-haki-post-01-c3dc97ad1444.webp','HAKI · avance de la colección en morado'],
+        ['/images/instagram-haki-post-02-c1a0dac5f6be.webp','HAKI · camiseta negra en el gimnasio'],
+        ['/images/instagram-haki-post-03-db42ea326115.webp','HAKI · camiseta negra de compresión']
       ]){
         const photo=create('img');photo.src=typeof window.hakiImage==='function'?window.hakiImage(source,400):source;
         photo.alt=alt;photo.width=108;photo.height=140;photo.loading='lazy';photo.decoding='async';
@@ -72,13 +72,8 @@
       }
       card.append(head,photos,create('span','haki-instagram-cta','Ver perfil de Instagram'));section.append(title,card);latest.after(section);
     }
-    let href='https://www.instagram.com/hakisv1/',handle='hakisv1';
-    try{
-      const original=$('#instagramFooter')?.getAttribute('href');const url=new URL(original||href,location.origin);
-      if(url.protocol==='https:'&&/(^|\.)instagram\.com$/.test(url.hostname)){
-        href=url.href;handle=url.pathname.split('/').filter(Boolean)[0]||handle;
-      }
-    }catch{}
+    const handle=window.hakiInstagramHandle?.(window.HAKI_CONFIG)||'Haki__sv';
+    const href=window.hakiInstagramProfileUrl?.(window.HAKI_CONFIG)||'https://www.instagram.com/haki__sv/';
     const card=$('.haki-instagram-card',section);card.href=href;card.setAttribute('aria-label','Visitar @'+handle+' en Instagram (se abre en una pestaña nueva)');
     $('.haki-instagram-head strong',section).textContent='@'+handle;section.hidden=latest.hidden;
   }
