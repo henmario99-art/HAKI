@@ -35,6 +35,8 @@
   async function refresh(){
     if(busy||document.hidden)return;
     busy=true;
+    if(!window.HAKI_CATALOG_READY)window.HAKI_COVER_WAITING_LIVE=true;
+    window.dispatchEvent(new CustomEvent('haki:catalog-loading',{detail:{initial:!window.HAKI_CATALOG_READY}}));
     try{
       let data;
       try{data=await request(edge+'?mode=public-catalog');}

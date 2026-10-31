@@ -74,6 +74,10 @@
     letter-spacing:0;
     line-height:1.2;
   }
+  html body #homeHero.mobile-drop-hero .mobile-drop-cta.is-awaiting-artwork .mobile-drop-cta-label{opacity:0}
+  html body #homeHero.mobile-drop-hero .mobile-drop-cta.is-revealed .mobile-drop-cta-label{
+    animation:hakiComprarEnter 600ms cubic-bezier(.16,1,.3,1) 120ms both;
+  }
   html body #homeHero.mobile-drop-hero .mobile-drop-cta:hover,
   html body #homeHero.mobile-drop-hero .mobile-drop-cta:active{background:transparent!important;color:#000!important}
   html body #homeHero.mobile-drop-hero .mobile-hero-scroll{
@@ -99,4 +103,8 @@
   html body #homeHero.mobile-drop-hero .mobile-drop-cta:focus-visible,
   html body #homeHero.mobile-drop-hero .mobile-hero-scroll:focus-visible{outline:2px solid #2563eb!important;outline-offset:4px}
   html body #homeHero.mobile-drop-hero + #novedades{padding-top:68px!important}
+}
+@keyframes hakiComprarEnter{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){
+  html body #homeHero.mobile-drop-hero .mobile-drop-cta.is-revealed .mobile-drop-cta-label{animation:none}
 }

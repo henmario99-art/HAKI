@@ -35,3 +35,37 @@ img[data-haki-image-pending]{background:var(--haki-placeholder)}
 .haki-skeleton-list[data-shape=detail] .photo{max-height:65svh}
 @media(min-width:801px){.haki-skeleton-card[data-shape=detail]{grid-template-columns:1fr 1fr;align-items:start}}
 body[data-haki-catalog-pending] :is(#newEmpty,#latestEmpty,#catalogNotice){visibility:hidden}
+
+/* Storefront placeholders follow the real rails/grids; no surrounding card panel. */
+html body[data-haki-catalog-pending] #top :is(#novedades,#latestSection,#collectionsSection,#catalogo) :is(#newProducts,#latestProducts,#collectionsGrid,#products){display:none!important}
+body[data-haki-catalog-pending] :is(#resultNotice,#productCount){visibility:hidden}
+.haki-catalog-placeholder{min-width:0}
+html .haki-catalog-placeholder .haki-skeleton-card{display:block;padding:0;border-radius:0;background:transparent}
+.haki-catalog-placeholder .haki-skeleton-block.photo{border-radius:0}
+.haki-catalog-placeholder .haki-skeleton-copy{display:flex;flex-direction:column;gap:0;height:94px;box-sizing:border-box;padding-top:16px}
+.haki-catalog-placeholder .haki-skeleton-copy .haki-skeleton-block{height:12px;width:70%}
+.haki-catalog-placeholder .haki-skeleton-copy .short{height:10px;width:38%;margin-top:12px}
+.haki-catalog-placeholder .haki-skeleton-copy .price{height:14px;width:25%;margin-top:18px}
+.haki-catalog-placeholder[data-list=products] .haki-skeleton-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:32px 9px}
+.haki-catalog-placeholder:is([data-list=newProducts],[data-list=latestProducts]) .haki-skeleton-list{display:flex;gap:16px;overflow:hidden;padding-bottom:20px}
+.haki-catalog-placeholder:is([data-list=newProducts],[data-list=latestProducts]) .haki-skeleton-card{flex:0 0 calc((100% - 48px)/4)}
+.haki-catalog-placeholder[data-list=collectionsGrid] .haki-skeleton-list{grid-template-columns:repeat(4,minmax(0,1fr));gap:28px 16px}
+.haki-catalog-placeholder[data-list=collectionsGrid] .photo{aspect-ratio:4/5}
+.haki-catalog-placeholder[data-list=collectionsGrid] .short{display:none}
+.haki-catalog-placeholder[data-list=collectionsGrid] .haki-skeleton-copy{height:52px}
+.haki-catalog-error{padding:24px 0;color:var(--ink,#141414);font:400 14px/1.5 var(--font-body,Poppins,sans-serif)}
+.haki-catalog-error p{margin:0 0 12px}
+.haki-catalog-error button{min-height:44px;padding:10px 18px;border:1px solid var(--ink,#141414);border-radius:0;background:var(--surface,#fff);color:inherit;font:inherit;cursor:pointer}
+@media(min-width:801px){.haki-catalog-placeholder[data-list=products] .haki-skeleton-list{grid-template-columns:repeat(4,minmax(0,1fr));gap:32px 16px}}
+@media(max-width:800px){
+  .haki-catalog-placeholder:is([data-list=newProducts],[data-list=latestProducts]){margin-right:-16px}
+  .haki-catalog-placeholder[data-list=newProducts] .haki-skeleton-list{gap:10px;padding-right:16px}
+  .haki-catalog-placeholder[data-list=newProducts] .haki-skeleton-card{flex-basis:calc((100vw - 32px)*.67)}
+  .haki-catalog-placeholder[data-list=latestProducts] .haki-skeleton-list{gap:4px;padding:0 16px 0 0}
+  .haki-catalog-placeholder[data-list=latestProducts] .haki-skeleton-card{flex-basis:min(61.54vw,330px)}
+  .haki-catalog-placeholder .haki-skeleton-copy{padding-top:12px}
+  .haki-catalog-placeholder[data-list=collectionsGrid] .haki-skeleton-list{display:flex;gap:12px;overflow:hidden;padding:0 16px}
+  .haki-catalog-placeholder[data-list=collectionsGrid] .haki-skeleton-card{position:relative;flex:0 0 min(calc(100vw - 62px),440px)}
+  .haki-catalog-placeholder[data-list=collectionsGrid] .photo{aspect-ratio:328/620}
+  .haki-catalog-placeholder[data-list=collectionsGrid] .haki-skeleton-copy{position:absolute;left:24px;bottom:104px;width:65%;height:auto;padding:0}
+}

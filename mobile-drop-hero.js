@@ -25,11 +25,33 @@
     });
     hero.append(cta, scroll);
     const image = document.getElementById('heroImage');
+    const mobile = matchMedia('(max-width:800px)');
+    let inView = false, revealed = false, artworkFailed = false;
+    // Animate the inner label only: the link keeps its approved position and hit area.
+    cta.classList.add('is-awaiting-artwork');
+    function reveal(force = false) {
+      if (revealed || !mobile.matches || (!force && (!inView ||
+          !(artworkFailed || (image?.complete && image.naturalWidth > 0))))) return;
+      revealed = true;
+      cta.classList.remove('is-awaiting-artwork');
+      cta.classList.add('is-revealed');
+      observer?.disconnect();
+    }
+    const observer = typeof IntersectionObserver === 'function' ? new IntersectionObserver(entries => {
+      inView = entries.some(entry => entry.isIntersecting);
+      reveal();
+    }, {threshold:.3}) : null;
+    if (observer) observer.observe(cta);
+    else inView = true;
+    cta.addEventListener('focus', () => reveal(true));
+    image?.addEventListener('error', () => {artworkFailed = true;reveal();});
     function fitArtwork() {
-      if (!matchMedia('(max-width:800px)').matches || !image?.naturalWidth || !image.naturalHeight) return;
+      reveal();
+      if (!mobile.matches || !image?.naturalWidth || !image.naturalHeight) return;
       hero.style.setProperty('--mobile-drop-aspect', `${image.naturalWidth}/${image.naturalHeight}`);
     }
     image?.addEventListener('load', fitArtwork);
+    mobile.addEventListener('change', fitArtwork);
     fitArtwork();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', setup, {once:true});

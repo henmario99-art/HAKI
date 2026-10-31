@@ -61,8 +61,9 @@
     for(let i=0;i<count;i++){
       const card=document.createElement('div');card.className='haki-skeleton-card';card.dataset.shape=kind;
       if(kind==='admin')card.append(block('round'));
-      if(['products','inventory','detail'].includes(kind))card.append(block('photo'));
+      if(['products','inventory','detail','store-products','collections'].includes(kind))card.append(block('photo'));
       const copy=document.createElement('div');copy.className='haki-skeleton-copy';copy.append(block(),block('short'));card.append(copy);
+      if(kind==='store-products')copy.append(block('price'));
       if(['admin','days'].includes(kind))card.append(block('short'));
       if(kind==='inventory'){const stock=document.createElement('div');stock.className='haki-skeleton-stock';for(let j=0;j<4;j++)stock.append(block());card.append(stock);}
       list.append(card);
@@ -125,22 +126,48 @@
   }).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['src','srcset']});
   function ready(){
     scan(document.documentElement);
-    // Put empty-catalog placeholders beside the lists, preserving their cached DOM fragments.
-    if(document.getElementById('catalogo') && !(window.HAKI_PRODUCTOS||[]).length && window.HAKI_COVER_WAITING_LIVE){
+    if(!document.getElementById('catalogo'))return;
+    // Siblings preserve the router's cached product fragments and their event handlers.
+    let pending=[],error=null;
+    const clear=()=>{
+      pending.forEach(({el,holder,finish,busy})=>{
+        finish(true);holder.remove();
+        if(busy===null)el.removeAttribute('aria-busy');else el.setAttribute('aria-busy',busy);
+      });
+      pending=[];
+      document.body.removeAttribute('data-haki-catalog-pending');
+      error?.remove();error=null;
+    };
+    const start=()=>{
+      if(pending.length || (window.HAKI_PRODUCTOS||[]).length || window.HAKI_CATALOG_READY===true)return;
+      clear();
       document.body.setAttribute('data-haki-catalog-pending','');
-      const pending=['products','newProducts'].map(id=>{
+      pending=['products','newProducts','latestProducts','collectionsGrid'].map(id=>{
         const el=document.getElementById(id);if(!el)return null;
-        const holder=document.createElement('div');el.before(holder);
-        return {holder,finish:begin(holder,'products',4)};
+        const busy=el.getAttribute('aria-busy');el.setAttribute('aria-busy','true');
+        const holder=document.createElement('div');
+        holder.className='haki-catalog-placeholder';holder.dataset.list=id;
+        holder.setAttribute('role','status');holder.setAttribute('aria-label','Cargando catálogo');
+        el.before(holder);
+        return {el,holder,busy,finish:begin(holder,id==='collectionsGrid'?'collections':'store-products',4)};
       }).filter(Boolean);
-      const changed=()=>{
-        const success=window.HAKI_CATALOG_READY!==false;
-        pending.forEach(item=>{item.finish(success);if(success)item.holder.remove();});
-        imageState(document.getElementById('heroImage'));
-        if(success){document.body.removeAttribute('data-haki-catalog-pending');window.removeEventListener('haki:catalog-updated',changed);}
-      };
-      window.addEventListener('haki:catalog-updated',changed);
-    }
+    };
+    window.addEventListener('haki:catalog-loading',event=>{if(event.detail?.initial)start();});
+    window.addEventListener('haki:catalog-updated',()=>{
+      // Availability updates can arrive before the initial catalogue request settles.
+      if(window.HAKI_COVER_WAITING_LIVE && window.HAKI_CATALOG_READY===false && !(window.HAKI_PRODUCTOS||[]).length)return;
+      clear();
+      imageState(document.getElementById('heroImage'));
+      if(window.HAKI_CATALOG_READY!==false || (window.HAKI_PRODUCTOS||[]).length)return;
+      const list=['newProducts','products'].map(id=>document.getElementById(id)).find(el=>el?.getClientRects().length);
+      if(!list)return;
+      error=document.createElement('div');error.className='haki-catalog-error';error.setAttribute('role','status');
+      const message=document.createElement('p');message.textContent='No se pudo cargar el catálogo.';
+      const retry=document.createElement('button');retry.type='button';retry.textContent='Volver a intentar';
+      retry.addEventListener('click',()=>{start();window.HAKIRefreshCatalog?.();});
+      error.append(message,retry);list.before(error);
+    });
+    if(window.HAKI_COVER_WAITING_LIVE)start();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ready,{once:true});else ready();
 })();
