@@ -14,7 +14,7 @@
   const renderedLists = new WeakMap();
   const listingNodes = new Map();
   const isIOS = window.hakiIOSWebKit === true;
-  const listingSections = ['homeHero', 'novedades', 'collectionsSection', 'latestSection', 'catalogo'];
+  const listingSections = ['homeHero', 'novedades', 'collectionsSection', 'latestSection', 'hakiInstagramSection', 'catalogo'];
   let iosListing = null;
   let iosCategory = null;
   let iosHome = null;
@@ -769,81 +769,158 @@
   let quickAddDialog = null;
   let quickAddCode = null;
   let quickAddTrigger = null;
+  let quickAddSize = '';
+  let quickAddBusy = false;
+  let quickAddClosing = false;
+  let quickAddCloseAnimation = null;
+  let quickAddCloseVersion = 0;
+  let quickAddNotice = null;
+  let quickAddNoticeTimer = null;
 
-  function closeQuickAdd(restoreFocus = true) {
-    if (!quickAddDialog?.open) return;
-    quickAddDialog.close();
-    document.body.classList.remove('quick-add-open');
-    unlockMenuBackground();
-    if (restoreFocus && quickAddTrigger?.isConnected) quickAddTrigger.focus({preventScroll:true});
-    quickAddCode = null;
+  const quickAddMotionAllowed = () => !matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function dismissQuickAddNotice() {
+    clearTimeout(quickAddNoticeTimer);
+    quickAddNotice?.remove();
+    quickAddNotice = null;
+  }
+
+  function showQuickAddNotice(product, size) {
+    dismissQuickAddNotice();
+    const notice = document.createElement('div');
+    notice.className = 'haki-quick-add-notice';
+    notice.setAttribute('role','status');
+    notice.setAttribute('aria-live','polite');
+    notice.setAttribute('aria-atomic','true');
+    notice.innerHTML = `<img src="${esc(freshImage(product.imagen || fallbackFor(product),160))}" alt="" width="52" height="72">
+      <div><p class="haki-quick-add-notice-title"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L19 7"/></svg>Añadida a tu bolsa</p>
+      <p>${esc(product.nombre)}</p><p>Talla ${esc(size)} · ${money(product.precio)}</p></div>`;
+    $('img',notice).addEventListener('error',event => {event.target.src=freshImage('images/producto.svg');},{once:true});
+    document.body.append(notice);
+    quickAddNotice = notice;
+    quickAddNoticeTimer = setTimeout(() => {
+      if (quickAddNotice !== notice) return;
+      if (!quickAddMotionAllowed()) {dismissQuickAddNotice();return;}
+      notice.animate([{opacity:1,transform:'translateY(0)'},{opacity:0,transform:'translateY(12px)'}],{duration:180,easing:'ease-in'}).finished.then(() => {
+        if (quickAddNotice === notice) dismissQuickAddNotice();
+      }).catch(() => {});
+    },2200);
+  }
+
+  function closeQuickAdd(restoreFocus = true, animate = true, afterClose) {
+    if (!quickAddDialog?.open || (quickAddClosing && animate)) return;
+    const version = ++quickAddCloseVersion;
+    quickAddCloseAnimation?.cancel();
+    quickAddCloseAnimation = null;
+    quickAddClosing = true;
+    const finish = () => {
+      if (version !== quickAddCloseVersion) return;
+      quickAddDialog.close();
+      quickAddDialog.classList.remove('is-closing');
+      quickAddCloseAnimation?.cancel();
+      quickAddCloseAnimation = null;
+      document.body.classList.remove('quick-add-open');
+      unlockMenuBackground();
+      if (restoreFocus && quickAddTrigger?.isConnected) quickAddTrigger.focus({preventScroll:true});
+      quickAddCode = null;quickAddSize = '';quickAddBusy = false;quickAddClosing = false;
+      afterClose?.();
+    };
+    if (!animate || !quickAddMotionAllowed()) {finish();return;}
+    quickAddDialog.classList.add('is-closing');
+    const transform = getComputedStyle(quickAddDialog).transform;
+    quickAddCloseAnimation = quickAddDialog.animate([{transform:transform === 'none' ? 'translateY(0)' : transform},{transform:'translateY(110%)'}],{duration:220,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'});
+    quickAddCloseAnimation.finished.then(finish).catch(() => {});
+  }
+
+  function syncQuickAddChoice() {
+    $$('[data-quick-size]',quickAddDialog).forEach(button => {
+      const selected = button.dataset.quickSize === quickAddSize;
+      button.classList.toggle('is-selected',selected);
+      button.setAttribute('aria-pressed',String(selected));
+    });
+    const add = $('[data-confirm-quick-add]',quickAddDialog);
+    add.disabled = !quickAddSize || quickAddBusy;
+    add.textContent = quickAddBusy ? 'Añadiendo…' : quickAddSize ? 'Añadir a la bolsa' : 'Selecciona una talla';
   }
 
   function renderQuickAdd() {
     const product = productByCode(quickAddCode);
-    if (!product) { closeQuickAdd(); return false; }
+    if (!product) {closeQuickAdd(true,false);return false;}
+    if (!product.tallas?.[quickAddSize]) quickAddSize = '';
     const type = productSizeGuideType(product);
     const signature = JSON.stringify({product,type});
-    if (quickAddDialog.dataset.signature === signature) return true;
+    if (quickAddDialog.dataset.signature === signature) {syncQuickAddChoice();return true;}
     quickAddDialog.dataset.signature = signature;
     const guide = SIZE_GUIDES[type]?.label || '';
     const label = guide ? guide.slice(0,1) + guide.slice(1).toLocaleLowerCase('es-SV') : '';
-    const rows = ['S','M','L','XL'].map(size => {
-      const available = !!product.tallas?.[size];
-      return `<button class="haki-quick-add-size" type="button" data-quick-size="${size}"
-        ${available ? '' : 'disabled'} aria-label="${available ? `Añadir ${esc(product.nombre)}, talla ${size} a la bolsa` : `Talla ${size}, agotada`}">
-        <span>${size}</span><span>${available ? 'Añadir a la bolsa' : 'Agotada'}</span>
-      </button>`;
-    }).join('');
-    quickAddDialog.innerHTML = `<div class="haki-quick-add-head">
-      <h2 id="hakiQuickAddTitle">Añadir a la bolsa</h2>
-      <button type="button" data-close-quick-add aria-label="Cerrar selección de talla">×</button>
-      </div><div class="haki-quick-add-summary">
-      <img src="${esc(freshImage(product.imagen || fallbackFor(product),400))}" alt="${esc(product.nombre)}" width="88" height="117">
-      <div><h3>${esc(product.nombre)}</h3>${label ? `<p>${esc(label)}</p>` : ''}<strong>${money(product.precio)}</strong></div>
-      </div><h3 class="haki-quick-add-label">Selecciona tu talla</h3>
-      <div class="haki-quick-add-sizes">${rows}</div>`;
-    $('img',quickAddDialog)?.addEventListener('error',event => { event.target.src=freshImage('images/producto.svg'); },{once:true});
+    const available = ['S','M','L','XL'].filter(size => product.tallas?.[size]);
+    const rows = ['S','M','L','XL'].map(size => `<button class="haki-quick-add-size" type="button" data-quick-size="${size}"
+      ${product.tallas?.[size] ? '' : 'disabled'} aria-pressed="false" aria-label="${product.tallas?.[size] ? `Elegir talla ${size}` : `Talla ${size}, agotada`}">${size}</button>`).join('');
+    quickAddDialog.innerHTML = `<h2 class="haki-quick-add-sr" id="hakiQuickAddTitle">Elegir talla de ${esc(product.nombre)}</h2>
+      <span class="haki-quick-add-handle" aria-hidden="true"></span>
+      <button class="haki-quick-add-close" type="button" data-close-quick-add aria-label="Cerrar selección de talla">×</button>
+      <div class="haki-quick-add-summary"><img src="${esc(freshImage(product.imagen || fallbackFor(product),400))}" alt="${esc(product.nombre)}" width="88" height="118">
+      <div><h3>${esc(product.nombre)}</h3>${label ? `<p>${esc(label)}</p>` : ''}<strong>${money(product.precio)}</strong></div></div>
+      <div class="haki-quick-add-label"><h3>Elige tu talla</h3><p>${available.length === 1 ? 'Disponible: '+available[0] : available.length ? available.length+' tallas disponibles' : 'Sin tallas disponibles'}</p></div>
+      <div class="haki-quick-add-sizes" role="group" aria-label="Seleccionar talla">${rows}</div>
+      <button class="haki-quick-add-confirm" type="button" data-confirm-quick-add disabled>Selecciona una talla</button>`;
+    $('img',quickAddDialog).addEventListener('error',event => {event.target.src=freshImage('images/producto.svg');},{once:true});
+    syncQuickAddChoice();
     return true;
   }
 
   function openQuickAdd(code, trigger) {
     if (!productByCode(code)) return;
-    closeCart(); closeMenu(); closeSearch();
+    if (quickAddDialog?.open) closeQuickAdd(false,false);
+    dismissQuickAddNotice();closeCart();closeMenu();closeSearch();
     if (!quickAddDialog) {
       quickAddDialog = document.createElement('dialog');
       quickAddDialog.className = 'haki-quick-add';
+      quickAddDialog.dataset.hakiPress = 'none';
       quickAddDialog.setAttribute('aria-labelledby','hakiQuickAddTitle');
       document.body.append(quickAddDialog);
       quickAddDialog.addEventListener('cancel',event => {event.preventDefault();closeQuickAdd();});
-      quickAddDialog.addEventListener('close',() => {if(!quickAddDialog.open&&document.body.classList.contains('quick-add-open')){document.body.classList.remove('quick-add-open');unlockMenuBackground();}});
+      quickAddDialog.addEventListener('close',() => {
+        if (!quickAddDialog.open && document.body.classList.contains('quick-add-open')) {
+          document.body.classList.remove('quick-add-open');unlockMenuBackground();
+        }
+      });
       quickAddDialog.addEventListener('click',event => {
-        if (event.target.closest('[data-close-quick-add]')) { closeQuickAdd(); return; }
+        if (quickAddBusy || quickAddClosing) return;
+        if (event.target.closest('[data-close-quick-add]')) {closeQuickAdd();return;}
         if (event.target === quickAddDialog) {
           const r=quickAddDialog.getBoundingClientRect();
           if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)closeQuickAdd();
           return;
         }
-        const row=event.target.closest('[data-quick-size]');
-        if (!row || row.disabled || !quickAddDialog.open) return;
-        const size=row.dataset.quickSize, product=productByCode(quickAddCode);
-        if (!product?.tallas?.[size]) {quickAddDialog.dataset.signature='';renderQuickAdd();showToast('Esa talla ya no está disponible.');return;}
-        const selectedCode=quickAddCode;
-        state.selected[selectedCode]=size;
+        const product = productByCode(quickAddCode);
+        const row = event.target.closest('[data-quick-size]');
+        if (row && !row.disabled) {
+          if (!product?.tallas?.[row.dataset.quickSize]) {quickAddDialog.dataset.signature='';renderQuickAdd();return;}
+          quickAddSize = row.dataset.quickSize;syncQuickAddChoice();return;
+        }
+        if (!event.target.closest('[data-confirm-quick-add]')) return;
+        if (!quickAddSize || !product?.tallas?.[quickAddSize]) {
+          quickAddSize='';quickAddDialog.dataset.signature='';renderQuickAdd();showToast('Esa talla ya no está disponible.');return;
+        }
+        const size=quickAddSize, selectedCode=quickAddCode;
+        quickAddBusy = true;syncQuickAddChoice();
+        state.selected[selectedCode] = size;
         [els.products,$('#newProducts'),$('#latestProducts')].filter(Boolean).forEach(syncCardSelections);
-        closeQuickAdd();
-        addToCart(selectedCode,{openDrawer:false});
+        if (!addToCart(selectedCode,{openDrawer:false,notify:false})) {quickAddBusy=false;renderQuickAdd();return;}
+        closeQuickAdd(true,true,() => showQuickAddNotice(product,size));
       });
-      window.addEventListener('haki:catalog-updated',()=>{if(quickAddDialog.open)renderQuickAdd();});
+      window.addEventListener('haki:catalog-updated',() => {if(quickAddDialog.open && !quickAddClosing)renderQuickAdd();});
     }
-    quickAddCode=code;quickAddTrigger=trigger;
+    quickAddCode=code;quickAddTrigger=trigger;quickAddSize='';quickAddBusy=false;
     if (!renderQuickAdd()) return;
     lockMenuBackground();document.body.classList.add('quick-add-open');
     quickAddDialog.showModal();
     $('[data-close-quick-add]',quickAddDialog).focus({preventScroll:true});
   }
 
-  function addToCart(code, {openDrawer = true} = {}) {
+
+  function addToCart(code, {openDrawer = true, notify = true} = {}) {
     const p = productByCode(code);
     const size = state.selected[code];
 
@@ -852,7 +929,7 @@
       !size ||
       !p.tallas[size]
     )
-      return;
+      return false;
 
     const existing = state.cart.find(
       i =>
@@ -880,9 +957,10 @@
     renderCart();
     if (openDrawer) openCart();
 
-    showToast(
+    if (notify) showToast(
       `${p.nombre} · ${size} añadida`
     );
+    return true;
   }
 
   function changeQty(code, size, delta) {
@@ -1059,6 +1137,7 @@
   }
 
   function openCart() {
+    dismissQuickAddNotice();
     closeMenu();
     closeSearch();
     if (state.cart.length) {
@@ -1583,6 +1662,7 @@ ${settings().totalTexto}: ${money(totals.total)}${window.HAKI_QUOTE_PRIVACY?.pro
     'keydown',
     e => {
       if (e.key === 'Escape') {
+        if (quickAddDialog?.open) {e.preventDefault();closeQuickAdd();return;}
         closeCart();
         closeMenu();
         closeSearch();
@@ -1614,7 +1694,7 @@ ${settings().totalTexto}: ${money(totals.total)}${window.HAKI_QUOTE_PRIVACY?.pro
 
   function setHomeVisible(show) {
     if (iosCategory) return;
-    ['homeHero', 'novedades', 'collectionsSection', 'latestSection'].forEach(id => { document.getElementById(id).hidden = !show; });
+    ['homeHero', 'novedades', 'collectionsSection', 'latestSection', 'hakiInstagramSection'].forEach(id => { const section=document.getElementById(id);if(section)section.hidden = !show; });
     document.body.classList.toggle('collection-view', !show);
   }
 
@@ -1661,7 +1741,7 @@ ${settings().totalTexto}: ${money(totals.total)}${window.HAKI_QUOTE_PRIVACY?.pro
     const restored = listingPositions.get(entry.key);
     let hash;
     try { hash = decodeURIComponent(location.hash.slice(1)); } catch { hash = ''; }
-    closeQuickAdd(false); closeMenu(); closeSearch(); $('#sizeGuideDialog').close();
+    closeQuickAdd(false,false); closeMenu(); closeSearch(); $('#sizeGuideDialog').close();
     detailCode = hash.startsWith('producto/') ? hash.slice(9) : null;
     $('#productDetail').hidden = !detailCode;
     document.body.classList.toggle('detail-view', !!detailCode && !isIOS);

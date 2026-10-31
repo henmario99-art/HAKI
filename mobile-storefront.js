@@ -49,6 +49,39 @@
       if(href)link.href=href;link.hidden=!href||original.hidden;
     });
   }
+  function setupInstagram(){
+    const latest=$('#latestSection');if(!latest)return;
+    let section=$('#hakiInstagramSection');
+    if(!section){
+      section=create('section');section.id='hakiInstagramSection';section.setAttribute('aria-labelledby','hakiInstagramTitle');
+      const title=create('h2');title.id='hakiInstagramTitle';title.append('Más de HAKI,',create('br'),'en Instagram.');
+      const card=create('a','haki-instagram-card');card.target='_blank';card.rel='noopener noreferrer';card.dataset.hakiPress='none';
+      const head=create('div','haki-instagram-head');
+      const avatar=create('span','haki-instagram-avatar');const logo=create('img');logo.src='/images/haki-wordmark.svg';logo.alt='';logo.width=30;logo.height=12;avatar.append(logo);
+      const meta=create('div');meta.append(create('strong','','@hakisv1'),create('p','','HAKI Sportswear · El Salvador'));head.append(avatar,meta);
+      const photos=create('div','haki-instagram-photos');
+      // Static HAKI photographs from the approved design; this card only links to Instagram.
+      for(const [source,alt] of [
+        ['/images/ONYXV1ROJA.webp','HAKI · camiseta de compresión'],
+        ['/images/YLA9.25.25D-BFBATCAVE_SOCIAL_023.jpg','HAKI · camisa de compresión'],
+        ['/images/1790039192375-afb42f55-WhatsApp-Image-2026-09-21-at-7.05.59-PM.webp','HAKI · prendas en el gimnasio']
+      ]){
+        const photo=create('img');photo.src=typeof window.hakiImage==='function'?window.hakiImage(source,400):source;
+        photo.alt=alt;photo.width=108;photo.height=140;photo.loading='lazy';photo.decoding='async';
+        photo.addEventListener('error',()=>{photo.src='/images/producto.svg';},{once:true});photos.append(photo);
+      }
+      card.append(head,photos,create('span','haki-instagram-cta','Ver perfil de Instagram'));section.append(title,card);latest.after(section);
+    }
+    let href='https://www.instagram.com/hakisv1/',handle='hakisv1';
+    try{
+      const original=$('#instagramFooter')?.getAttribute('href');const url=new URL(original||href,location.origin);
+      if(url.protocol==='https:'&&/(^|\.)instagram\.com$/.test(url.hostname)){
+        href=url.href;handle=url.pathname.split('/').filter(Boolean)[0]||handle;
+      }
+    }catch{}
+    const card=$('.haki-instagram-card',section);card.href=href;card.setAttribute('aria-label','Visitar @'+handle+' en Instagram (se abre en una pestaña nueva)');
+    $('.haki-instagram-head strong',section).textContent='@'+handle;section.hidden=latest.hidden;
+  }
   function polish(){
     const guideLabels={compression:'Compresión',oversized:'Oversized',pants:'Pants',shorts:'Shorts'};
     $$('#collectionsGrid .collection-tile').forEach(tile=>{if(mobile.matches)tile.dataset.hakiPress='none';else delete tile.dataset.hakiPress;if(!$('.haki-collection-cta',tile))tile.append(create('span','haki-collection-cta','VER PRENDAS'));});
@@ -59,7 +92,7 @@
       if(guide&&info){if(!label){label=create('p','haki-card-guide');$('strong',info)?.before(label);}if(label)label.textContent=guide;}
       else label?.remove();
     });
-    setupFooter();syncSocials();
+    setupFooter();syncSocials();setupInstagram();
 
   }
   function setup(){
@@ -69,7 +102,7 @@
     for(const id of ['collectionsGrid','products','newProducts','latestProducts']){
       const rail=document.getElementById(id);if(rail)new MutationObserver(queue).observe(rail,{childList:true});
     }
-    window.addEventListener('haki:catalog-updated',queue);mobile.addEventListener('change',queue);
+    window.addEventListener('haki:catalog-updated',queue);window.addEventListener('hashchange',queue);mobile.addEventListener('change',queue);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup,{once:true});else setup();
 })();
