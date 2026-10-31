@@ -49,35 +49,19 @@
       if(href)link.href=href;link.hidden=!href||original.hidden;
     });
   }
-  function arrows(section,rail){
-    if(!section||!rail||rail.dataset.mobileArrows)return;
-    rail.dataset.mobileArrows='true';
-    const buttons=['previous','next'].map(direction=>{
-      const button=create('button','haki-mobile-rail-arrow');button.type='button';button.dataset.direction=direction;
-      button.setAttribute('aria-label',(direction==='next'?'Siguiente':'Anterior')+' en '+(rail.id==='collectionsGrid'?'categorías':'últimas prendas'));
-      button.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+(direction==='next'?'M9 5L16 12L9 19':'M15 5L8 12L15 19')+'"/></svg>';
-      button.addEventListener('click',()=>{
-        const first=rail.firstElementChild;const gap=parseFloat(getComputedStyle(rail).columnGap)||0;
-        rail.scrollBy({left:(direction==='next'?1:-1)*((first?.getBoundingClientRect().width||rail.clientWidth)+gap),behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth'});
-      });section.append(button);return button;
-    });
-    const update=()=>{buttons[0].hidden=rail.scrollLeft<=2;buttons[1].hidden=rail.scrollLeft+rail.clientWidth>=rail.scrollWidth-2;};
-    rail.addEventListener('scroll',update,{passive:true});
-    if(window.ResizeObserver)new ResizeObserver(update).observe(rail);
-    new MutationObserver(update).observe(rail,{childList:true});update();
-  }
   function polish(){
-    const products=new Map((window.HAKI_PRODUCTOS||[]).map(p=>[p.codigo,p]));
-    $$('#collectionsGrid .collection-tile').forEach(tile=>{if(!$('.haki-collection-cta',tile))tile.append(create('span','haki-collection-cta','VER PRENDAS'));});
+    const guideLabels={compression:'Compresión',oversized:'Oversized',pants:'Pants',shorts:'Shorts'};
+    $$('#collectionsGrid .collection-tile').forEach(tile=>{if(mobile.matches)tile.dataset.hakiPress='none';else delete tile.dataset.hakiPress;if(!$('.haki-collection-cta',tile))tile.append(create('span','haki-collection-cta','VER PRENDAS'));});
     $$('article.product[data-code]').forEach(card=>{
       const photo=$('.product-image',card), info=$('.product-info',card);
       if(photo&&!$('.haki-mobile-product-open',photo)){const plus=create('span','haki-mobile-product-open','+');plus.setAttribute('aria-hidden','true');photo.append(plus);}
-      const product=products.get(card.dataset.code);const color=(Array.isArray(product?.colores)?product.colores[0]:'') || String(product?.nombre||'').match(/\b(Negro|Azul|Blanco|Rojo|Morado|Gris|Verde|Negra|Blanca|Roja|Morada)\b/i)?.[0]?.toLocaleLowerCase('es-SV').replace(/^./,c=>c.toUpperCase()) || '';
-      let label=$('.haki-card-color',card);
-      if(color&&info){if(!label){label=create('p','haki-card-color');$('strong',info)?.before(label);}if(label)label.textContent=color;}
+      const guide=guideLabels[card.dataset.sizeGuide] || '';
+      let label=$('.haki-card-guide',card);
+      if(guide&&info){if(!label){label=create('p','haki-card-guide');$('strong',info)?.before(label);}if(label)label.textContent=guide;}
+      else label?.remove();
     });
     setupFooter();syncSocials();
-    arrows($('#collectionsSection'),$('#collectionsGrid'));arrows($('#latestSection'),$('#latestProducts'));
+
   }
   function setup(){
     // Legacy inline sheets move into body at DOMContentLoaded; keep this scoped sheet last.

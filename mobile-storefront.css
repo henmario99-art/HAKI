@@ -1,11 +1,14 @@
-.haki-mobile-footer,.haki-mobile-rail-arrow,.haki-mobile-product-open,.haki-card-color,.haki-collection-cta{display:none}
+.haki-mobile-footer,.haki-mobile-rail-arrow,.haki-mobile-product-open,.haki-card-guide,.haki-collection-cta{display:none}
 @media(max-width:800px){
+  html body #top #collectionsGrid .collection-tile{scale:1!important;transform:none!important;transition:none!important;opacity:1!important}
+  html body #top #collectionsGrid .collection-tile :is(h3,.haki-collection-cta){pointer-events:none;user-select:none}
+  html body #top #novedades .rail-actions,html body .haki-mobile-rail-arrow{display:none!important}
   html body #top #collectionsSection #collectionsGrid,html body #top #latestSection #latestProducts{scroll-padding-inline:16px!important}
 }
 @media(max-width:800px){
-  html body #top #collectionsSection{position:relative!important;padding:0!important;background:#efefef!important;color:#141414!important;overflow:hidden}
+  html body #top #collectionsSection{position:relative!important;padding:0!important;background:var(--surface,#fff)!important;color:#141414!important;overflow:hidden}
   html body #top #collectionsSection>.section-heading{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip-path:inset(50%);white-space:nowrap}
-  html body #top #collectionsSection #collectionsGrid{display:flex!important;width:100%!important;gap:12px!important;padding:20px 16px!important;margin:0!important;border:0!important;overflow-x:auto!important;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  html body #top #collectionsSection #collectionsGrid{display:flex!important;width:100%!important;gap:12px!important;padding:0 16px!important;margin:0!important;border:0!important;overflow-x:auto!important;scroll-snap-type:none;scrollbar-width:none;-webkit-overflow-scrolling:touch}
   #collectionsGrid::-webkit-scrollbar,#latestProducts::-webkit-scrollbar{display:none}
   html body #top #collectionsSection #collectionsGrid .collection-tile{position:relative!important;display:block!important;flex:0 0 min(calc(100vw - 62px),440px)!important;aspect-ratio:328/620!important;min-height:0!important;padding:0!important;margin:0!important;overflow:hidden!important;border:0!important;background:#141414!important;color:#fff!important;scroll-snap-align:start}
   html body #top #collectionsSection #collectionsGrid .collection-tile:after{display:none!important;content:none!important}
@@ -14,12 +17,6 @@
   html body #top #collectionsSection #collectionsGrid .collection-tile:before{content:'';position:absolute;inset:50% 0 0;background:linear-gradient(transparent,rgba(0,0,0,.88));z-index:1;pointer-events:none}
   html body #top #collectionsSection #collectionsGrid .collection-tile h3{position:absolute!important;left:24px!important;right:24px!important;bottom:104px!important;z-index:2!important;padding:0!important;margin:0!important;font:600 23px/1.3 var(--font-body,Poppins,sans-serif)!important;letter-spacing:1.2px!important;text-transform:uppercase!important;color:#fff!important;white-space:normal!important}
   html body #top #collectionsSection .haki-collection-cta{position:absolute;display:grid;place-items:center;left:24px;bottom:28px;width:176px;height:44px;background:#fff!important;color:#141414!important;font:600 12px/1.3 var(--font-body,Poppins,sans-serif);letter-spacing:.9px;z-index:2;border:0;border-radius:0}
-  html body .haki-mobile-rail-arrow{position:absolute!important;display:grid!important;place-items:center!important;z-index:5!important;width:50px!important;height:50px!important;padding:0!important;border:0!important;border-radius:50%!important;background:#fff!important;color:#141414!important;box-shadow:0 1px 4px #0001!important;cursor:pointer}
-  html body .haki-mobile-rail-arrow[hidden]{display:none!important}
-  .haki-mobile-rail-arrow svg{display:block;width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.5}
-  #collectionsSection .haki-mobile-rail-arrow{top:calc(50% - 25px)}
-  .haki-mobile-rail-arrow[data-direction="next"]{right:21px}
-  .haki-mobile-rail-arrow[data-direction="previous"]{left:5px}
   html body #top #latestSection{position:relative!important;padding:26px 16px 27px!important;background:#fff!important;color:#141414!important;--ink:#141414;--muted:#737373;--surface:#fff;--soft:#efefef;overflow:hidden}
   html body #top #latestSection>.section-heading{display:flex!important;align-items:center!important;justify-content:space-between!important;margin:0 0 20px!important;padding:0!important;min-height:28px!important;border:0!important}
   html body #top #latestSection .section-heading h2{font:600 18px/28px var(--font-body,Poppins,sans-serif)!important;letter-spacing:.3px!important;text-transform:uppercase!important;color:#141414!important;margin:0!important}
@@ -34,12 +31,9 @@
   html body #top .product .product-info.product-detail-link{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-start!important;gap:0!important;min-height:0!important;padding:12px 0 0!important;border:0!important;color:var(--ink,#141414)!important}
   html body #top .product .product-info .product-code{display:none!important}
   html body #top .product .product-info h3{height:auto!important;min-height:20px!important;margin:0!important;font:400 13px/20px var(--font-body,Poppins,sans-serif)!important;letter-spacing:0!important;color:var(--ink,#141414)!important}
-  html body #top .product .product-info .haki-card-color{display:block;margin:4px 0 0!important;font:400 12px/20px var(--font-body,Poppins,sans-serif)!important;color:var(--muted,#737373)!important}
+  html body #top .product .product-info .haki-card-guide{display:block;margin:4px 0 0!important;font:400 12px/20px var(--font-body,Poppins,sans-serif)!important;color:var(--muted,#737373)!important}
   html body #top .product .product-info strong{display:block!important;margin:14px 0 0!important;font:600 16px/24px var(--font-body,Poppins,sans-serif)!important;color:var(--ink,#141414)!important}
   html body #top #latestSection .product-number,html body #top #latestSection .best-seller-badge{display:none!important}
-  html body #top #latestSection .haki-mobile-rail-arrow{top:calc(74px + min(61.54vw,330px)*.66667 - 18px);width:36px!important;height:36px!important}
-  #latestSection .haki-mobile-rail-arrow[data-direction="next"]{right:17px}
-  #latestSection .haki-mobile-rail-arrow[data-direction="previous"]{left:17px}
   html body footer.footer{display:block!important;padding:0!important;margin:0!important;border:0!important;background:#fff!important;color:#141414!important}
   html body footer.footer>:not(.haki-mobile-footer){display:none!important}
   html body footer.footer .haki-mobile-footer{display:flex!important;flex-direction:column!important;align-items:stretch!important;padding:0 16px 40px!important;margin:0!important;background:#fff!important;color:#141414!important;border:0!important;border-top:1px solid #ddd!important;font-family:var(--font-body,Poppins,sans-serif)!important;text-align:left!important}
@@ -60,5 +54,4 @@
   html body .haki-mobile-footer .haki-mobile-wordmark{display:block!important;width:110px!important;height:36px!important;min-height:36px!important;margin:32px auto 0!important;padding:0!important}
   .haki-mobile-wordmark img{display:block;width:110px;height:36px;object-fit:contain;filter:none!important}
   html body .haki-mobile-footer .haki-mobile-signature{display:block!important;min-height:20px!important;margin:32px 0 0!important;padding:0!important;border:0!important;text-align:center!important;font:400 10px/20px var(--font-body,Poppins,sans-serif)!important;color:#737373!important;letter-spacing:0!important}
-  .haki-mobile-footer :is(a,button,summary):focus-visible,.haki-mobile-rail-arrow:focus-visible{outline:2px solid #2563eb;outline-offset:3px}
 }

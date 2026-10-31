@@ -20,7 +20,7 @@
   function releaseAll() { for (const id of [...held.keys()]) release(id); }
   function target(event) {
     const el = event.target?.closest?.(controls);
-    return el && !el.matches(':disabled,[aria-disabled="true"]') && !el.closest('[inert]') ? el : null;
+    return el && !el.matches(':disabled,[aria-disabled="true"]') && !el.closest('[inert],[data-haki-press="none"]') ? el : null;
   }
   document.addEventListener('pointerdown', event => {
     if (event.isPrimary === false || (event.button !== undefined && event.button !== 0)) return;

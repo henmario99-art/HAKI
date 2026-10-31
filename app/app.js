@@ -421,7 +421,7 @@
   }
 
   function renderProductList(container, list) {
-    const signature = JSON.stringify(list);
+    const signature = JSON.stringify({ list, guideTypes: list.map(productSizeGuideType) });
     if (renderedLists.get(container) === signature) {
       syncCardSelections(container);
       return;
@@ -477,6 +477,7 @@
           <article
             class="product"
             data-code="${esc(p.codigo)}"
+            data-size-guide="${esc(productSizeGuideType(p) || '')}"
           >
 
             <a class="product-image product-detail-link" href="#producto/${encodeURIComponent(p.codigo)}" aria-label="Ver ${esc(p.nombre)}">
