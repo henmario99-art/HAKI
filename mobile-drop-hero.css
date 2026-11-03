@@ -61,22 +61,26 @@
   }
   html body #homeHero.mobile-drop-hero .mobile-drop-cta-label{
     display:flex;
+    box-sizing:border-box;
     align-items:center;
     justify-content:center;
-    min-height:28px;
+    width:100%;
+    max-width:120px;
+    height:clamp(32px,10vw,44px);
+    min-height:32px;
     padding:0 8px;
     background:#fff!important;
     color:#000!important;
     border:0;
     border-radius:0;
-    font-size:clamp(10px,2.9vw,12px);
+    font-size:clamp(14px,4vw,16px);
     font-weight:600;
     letter-spacing:0;
     line-height:1.2;
   }
   html body #homeHero.mobile-drop-hero .mobile-drop-cta.is-awaiting-artwork .mobile-drop-cta-label{opacity:0}
   html body #homeHero.mobile-drop-hero .mobile-drop-cta.is-revealed .mobile-drop-cta-label{
-    animation:hakiComprarEnter 600ms cubic-bezier(.16,1,.3,1) 120ms both;
+    animation:hakiComprarEnter 450ms cubic-bezier(.22,.61,.36,1) 120ms both;
   }
   html body #homeHero.mobile-drop-hero .mobile-drop-cta:hover,
   html body #homeHero.mobile-drop-hero .mobile-drop-cta:active{background:transparent!important;color:#000!important}
@@ -104,7 +108,7 @@
   html body #homeHero.mobile-drop-hero .mobile-hero-scroll:focus-visible{outline:2px solid #2563eb!important;outline-offset:4px}
   html body #homeHero.mobile-drop-hero + #novedades{padding-top:68px!important}
 }
-@keyframes hakiComprarEnter{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes hakiComprarEnter{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){
   html body #homeHero.mobile-drop-hero .mobile-drop-cta.is-revealed .mobile-drop-cta-label{animation:none}
 }
