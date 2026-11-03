@@ -61,26 +61,22 @@
   }
   html body #homeHero.mobile-drop-hero .mobile-drop-cta-label{
     display:flex;
-    box-sizing:border-box;
     align-items:center;
     justify-content:center;
-    width:100%;
-    max-width:120px;
-    height:clamp(32px,10vw,44px);
-    min-height:32px;
+    min-height:28px;
     padding:0 8px;
     background:#fff!important;
     color:#000!important;
     border:0;
     border-radius:0;
-    font-size:clamp(14px,4vw,16px);
+    font-size:clamp(10px,2.9vw,12px);
     font-weight:600;
     letter-spacing:0;
     line-height:1.2;
   }
   html body #homeHero.mobile-drop-hero .mobile-drop-cta.is-awaiting-artwork .mobile-drop-cta-label{opacity:0}
   html body #homeHero.mobile-drop-hero .mobile-drop-cta.is-revealed .mobile-drop-cta-label{
-    animation:hakiComprarEnter 450ms cubic-bezier(.22,.61,.36,1) 120ms both;
+    animation:hakiComprarEnter 1200ms cubic-bezier(.4,0,.2,1) 120ms both;
   }
   html body #homeHero.mobile-drop-hero .mobile-drop-cta:hover,
   html body #homeHero.mobile-drop-hero .mobile-drop-cta:active{background:transparent!important;color:#000!important}
