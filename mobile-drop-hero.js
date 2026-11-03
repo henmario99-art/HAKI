@@ -54,7 +54,7 @@
     function playCurrent(){
       clearTimeout(fallbackTimer);clearInterval(fallbackProgress);const item=slides[current];
       if(!canRun()){item.video.pause();return;}
-      if(!item.video.getAttribute('src'))item.video.src='/videos/mobile-'+item.cover.id+'-v2.mp4';
+      if(!item.video.getAttribute('src'))item.video.src='/videos/mobile-'+item.cover.id+'-v3.mp4';
       if(item.video.ended)item.video.currentTime=0;
       item.video.play().catch(()=>{if(item===slides[current]&&canRun()){item.panel.classList.remove('is-playing');scheduleFallback();}});
     }
@@ -63,7 +63,7 @@
       if(index===current||!canRun()||item.video.readyState<2||item.video.ended){activate(index,announce);return;}
       pendingSlide={index,announce};
       try{
-        if(item.video.currentTime<4.1)item.video.currentTime=4.1;
+        if(item.video.currentTime<4.7)item.video.currentTime=4.7;
         item.video.play().catch(()=>{if(pendingSlide){const next=pendingSlide;activate(next.index,next.announce);}});
       }catch{activate(index,announce);}
     }
