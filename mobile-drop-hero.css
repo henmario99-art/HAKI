@@ -13,12 +13,11 @@ html[data-theme=oscuro] body .header .haki-wordmark-spaced .brand-logo{filter:no
  html body #homeHero.mobile-drop-hero>.hero-photo,html body #homeHero.mobile-drop-hero>.hero-copy{display:none!important}
  html body #homeHero.mobile-drop-hero::after{content:none!important;background:none!important}
  html body #homeHero.mobile-drop-hero .mobile-cover-carousel{display:block!important;position:absolute;inset:0;background:#000;touch-action:pan-y pinch-zoom}
- .mobile-cover-slide{position:absolute;inset:0;overflow:hidden;background:#000}
+ .mobile-cover-slide{opacity:0;position:absolute;inset:0;overflow:hidden;background:#000}
  .mobile-cover-slide[hidden]{display:none!important}
  .mobile-cover-slide>img,.mobile-cover-slide>video{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:contain;object-position:center;pointer-events:none}
- .mobile-cover-slide>video{opacity:0}
- .mobile-cover-slide.is-playing>video{opacity:1}
- .mobile-cover-buy{position:absolute;z-index:3;background:transparent!important;color:transparent!important;text-decoration:none}
+
+ .mobile-cover-buy{opacity:0;will-change:transform,opacity;position:absolute;z-index:3;background:transparent!important;color:transparent!important;text-decoration:none}
  .mobile-cover-buy:focus-visible{outline:2px solid white;outline-offset:3px}
  .mobile-cover-controls{position:absolute;bottom:2px;left:auto;right:10px;height:24px;display:flex;justify-content:flex-end;align-items:center;z-index:5}
  .mobile-cover-dots{display:flex;align-items:center;justify-content:center}
@@ -38,3 +37,7 @@ html[data-theme=oscuro] body .header .haki-wordmark-spaced .brand-logo{filter:no
  html body .header .haki-wordmark-spaced .brand-logo{width:500px!important}
 }
 @media(prefers-reduced-motion:reduce){.mobile-cover-dots>button>span,.cover-progress circle{transition:none}}
+
+.mobile-cover-buy>img{display:block!important;position:static!important;width:100%!important;height:100%!important;max-width:none!important;object-fit:fill;pointer-events:none}
+.mobile-cover-slide.is-static{opacity:1}
+.mobile-cover-slide.is-static .mobile-cover-buy{opacity:1;transform:none}
