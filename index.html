@@ -685,7 +685,7 @@ h1{overflow-wrap:anywhere}.hero h1{line-height:1.1;font-size:clamp(38px,6vw,84px
 <script src="legal-config.js?v=20261027-2"></script><link rel="stylesheet" href="legal.css?v=20261027-2">
 <link rel="stylesheet" href="native-ui.css?v=20261031-loading-motion-6">
 <script src="native-ui.js?v=20261031-loading-motion-6"></script>
-<link rel="stylesheet" href="/mobile-drop-hero.css?v=20261103-comprar-2">
+<link rel="stylesheet" href="/mobile-drop-hero.css?v=20261103-carousel-1">
 <link rel="stylesheet" href="/mobile-storefront.css?v=20261031-instagram-final-5" data-mobile-storefront>
 </head>
 <body>
@@ -696,7 +696,7 @@ h1{overflow-wrap:anywhere}.hero h1{line-height:1.1;font-size:clamp(38px,6vw,84px
       <button class="header-icon" id="openMenu" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="categoryMenu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
       <a class="header-icon" id="instagramHeader" href="https://www.instagram.com/hakisv1/" target="_blank" rel="noopener noreferrer" aria-label="Instagram de HAKI"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none"/></svg></a>
     </div>
-    <a class="brand" href="#top" aria-label="HAKI inicio"><img class="brand-logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMTYgNzAiIHJvbGU9ImltZyIgYXJpYS1sYWJlbGxlZGJ5PSJ0aXRsZSI+CiAgPHRpdGxlIGlkPSJ0aXRsZSI+SEFLSTwvdGl0bGU+CiAgPHBhdGggZmlsbD0iY3VycmVudENvbG9yIiBkPSJNMCA1aDIwdjIzaDM0VjVoMjB2NjBINTRWNDJIMjB2MjNIMFY1WiIvPgogIDxwYXRoIGZpbGw9ImN1cnJlbnRDb2xvciIgZmlsbC1ydWxlPSJldmVub2RkIiBkPSJNOTIgNjUgMTI3IDVoMzVsMzUgNjBoLTI0bC03LTEzaC00M2wtNyAxM0g5MlptMzktMjloMjdsLTEzLjUtMjNMMTMxIDM2WiIgY2xpcC1ydWxlPSJldmVub2RkIi8+CiAgPHBhdGggZmlsbD0iY3VycmVudENvbG9yIiBkPSJNMjAyIDVoMjB2MjNsMzYtMjNoMzFsLTQ0IDI5IDQ3IDMxaC0zMmwtMzgtMjV2MjVoLTIwVjVaIi8+CiAgPHBhdGggZmlsbD0iY3VycmVudENvbG9yIiBkPSJNMjk2IDVoMjB2NjBoLTIwVjVaIi8+Cjwvc3ZnPgo=" alt="HAKI"></a>
+    <a class="brand haki-wordmark-spaced" href="#top" aria-label="HAKI inicio"><img class="brand-logo" src="/images/mobile-carousel/haki-wordmark-v1.png" alt="HAKI"></a>
     <div class="header-side header-right">
       <label class="desktop-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg><input id="desktopSearch" type="search" aria-label="Buscar prendas por código o nombre" placeholder="Escribe un código o nombre de prenda…"></label><button class="header-icon" id="openSearch" type="button" aria-label="Buscar prendas" aria-expanded="false" aria-controls="searchPanel"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button>
       <button class="header-icon bag" id="openCart" type="button" aria-label="Abrir mi cotización"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16v13H4zM8 8V6a4 4 0 0 1 8 0v2"/></svg><b id="cartCount">0</b></button>
@@ -2334,7 +2334,7 @@ document.addEventListener('DOMContentLoaded',()=>document.body.append(document.g
 #productDetail .detail-color-option:not(.is-active) span{visibility:hidden!important}
 #productDetail .detail-color-option.is-active span{visibility:visible!important}
 @media(max-width:800px){
-  #homeHero.hero{height:max(280px,calc(100svh - var(--haki-mobile-masthead,76px) - 155px))!important;min-height:0!important;max-height:none!important}
+  #homeHero.hero{height:max(280px,calc(100svh - var(--haki-mobile-masthead,64px) - 155px))!important;min-height:0!important;max-height:none!important}
   #homeHero .hero-buttons .hero-button{font-size:12px!important}
 }
 </style>
@@ -2367,7 +2367,7 @@ document.addEventListener('DOMContentLoaded',()=>document.body.append(document.g
 #categoryMenu{overflow-y:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch}
 body.menu-open{overscroll-behavior:none}
 @media(max-width:800px){
-  #homeHero.hero{height:max(280px,calc(100svh - var(--haki-mobile-masthead,76px) - 75px))!important}
+  #homeHero.hero{height:max(280px,calc(100svh - var(--haki-mobile-masthead,64px) - 75px))!important}
 }
 @media(min-width:801px){
   #openCart.header-icon{width:54px!important;min-width:54px!important;height:50px!important}
@@ -2471,7 +2471,7 @@ html[data-theme=oscuro] #openCart b,html[data-theme=oscuro] #productDetail .loca
   }
 }
 @media(max-width:800px) and (orientation:landscape){
-  html body #homeHero.hero{height:max(280px,calc(100svh - var(--haki-mobile-masthead,76px) - 75px))!important}
+  html body #homeHero.hero{height:max(280px,calc(100svh - var(--haki-mobile-masthead,64px) - 75px))!important}
 }
 @media(prefers-reduced-motion:reduce){
   html body #productDetail .gallery-dots button span{transition:none!important}
@@ -2490,7 +2490,7 @@ html[data-theme=oscuro] #openCart b,html[data-theme=oscuro] #productDetail .loca
 
 <script src="legal.js?v=20261027-2"></script>
 <script defer src="quote-consent.js?v=20261027-2"></script>
-<script src="/mobile-drop-hero.js?v=20261031-loading-motion-6"></script>
+<script src="/mobile-drop-hero.js?v=20261103-carousel-1"></script>
 <script src="/mobile-storefront.js?v=20261031-instagram-final-5"></script>
 </body>
 </html>
