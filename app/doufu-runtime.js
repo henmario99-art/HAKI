@@ -22,6 +22,7 @@
   };
 
   window.hakiImage = (url = '', size = 800) => {
+    if (window.HAKI_MEDIA?.isCatalogImage(url)) return window.HAKI_MEDIA.image(url, size);
     const items = itemsFor(url);
     if (items.length) return rootAsset(pickItem(items, size).src);
     if (!url) return '/images/producto.svg';
@@ -31,6 +32,7 @@
   };
 
   window.hakiSrcset = url => {
+    if (window.HAKI_MEDIA?.isCatalogImage(url)) return window.HAKI_MEDIA.srcset(url);
     const items = itemsFor(url);
     if (items.length) {
       return items.map(item => rootAsset(item.src) + ' ' + item.width + 'w').join(', ');
