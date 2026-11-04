@@ -37,6 +37,7 @@
   ]);
   const imageItems=url=>((window.HAKI_IMAGES||{})[url]||[]).filter(v=>v&&v.src&&!brokenImageVariants.has(v.src));
   window.hakiImage=(url='',size=800)=>{
+    if(window.HAKI_MEDIA?.isCatalogImage(url)) return window.HAKI_MEDIA.image(url,size);
     const items=imageItems(url);
     if(items.length) return (items.find(v=>v.width>=size)||items.at(-1)).src;
     if(!url) return 'images/producto.svg';
@@ -44,7 +45,7 @@
     if(/\.svg$/i.test(url))return url;
     return '/'+String(url).replace(/^\/?(?:\.\/)?/,'');
   };
-  window.hakiSrcset=url=>imageItems(url).map(v=>`${v.src} ${v.width}w`).join(', ');
+  window.hakiSrcset=url=>window.HAKI_MEDIA?.isCatalogImage(url) ? window.HAKI_MEDIA.srcset(url) : imageItems(url).map(v=>`${v.src} ${v.width}w`).join(', ');
   window.hakiSafeLink=(value,fallback='#catalogo')=>{try{const u=new URL(value,location.href);return ['https:','http:'].includes(u.protocol)?value:fallback;}catch{return fallback;}};
 
   const animateShippingProgressOnManualOpen=()=>{

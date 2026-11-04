@@ -114,3 +114,20 @@ test('Both storefronts load image delivery before rendering and keep cover dimen
     assert.match(readFileSync(new URL('../' + path, import.meta.url), 'utf8'), /HAKI_MEDIA\?\.original\(url.href\)/);
   }
 });
+
+test('The actual storefront script order preserves cached delivery after legacy helper overrides', () => {
+  for (const order of [
+    ['image-delivery.js','online-catalog.js','experience-config.js'],
+    ['image-delivery.js','app/experience-config.js','app/catalog-loader.js','app/doufu-runtime.js'],
+  ]) {
+    const window={addEventListener(){}};
+    const document={readyState:'loading',addEventListener(){},getElementById(){return null;},
+      documentElement:{dataset:{},classList:{add(){}}},head:{append(){}},createElement(){return {};}};
+    const context=vm.createContext({window,document,URL,location:{href:'https://haki-sv.netlify.app/',pathname:'/'},
+      localStorage:{getItem(){return null;}},MutationObserver:class{observe(){}},Element:class{}});
+    for(const file of order)vm.runInContext(readFileSync(new URL('../'+file,import.meta.url),'utf8'),context);
+    assert.match(window.hakiImage(IMAGE,400), /^\/\.netlify\/images\?/,order.join(' -> '));
+    assert.equal(window.hakiImage(IMAGE,1400),window.HAKI_MEDIA.original(IMAGE));
+    assert.match(window.hakiSrcset(IMAGE),/400w/);
+  }
+});
