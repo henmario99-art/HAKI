@@ -123,7 +123,7 @@ window.HAKI_COVER_WAITING_LIVE = true;
     if(valid(cached)) apply(cached);
   }catch{}
 
-  let busy=false;
+  let busy=false, lastLiveAt=null;
   let recoveryPromise=null;
   const hasUsableProducts=()=>Array.isArray(window.HAKI_PRODUCTOS)
     && window.HAKI_PRODUCTOS.some(product=>product&&product.borrador!==true);
@@ -174,10 +174,12 @@ window.HAKI_COVER_WAITING_LIVE = true;
       data.config.catalogVersion = data.version || data.config.portadaRevision || '';
       const changed=JSON.stringify(data)!==JSON.stringify({config:window.HAKI_CONFIG,products:window.HAKI_PRODUCTOS});
       apply(data);
+      lastLiveAt=Date.now();
       window.HAKI_COVER_WAITING_LIVE=false;
       try{localStorage.setItem(key,JSON.stringify(data));}catch{}
       window.dispatchEvent(new CustomEvent('haki:catalog-updated',{detail:{live:true,changed,version:data.version||''}}));
     }catch{
+      lastLiveAt=null;
       // Never leave the installed app with an empty product array because of
       // a stale/poisoned cache. Reload the bundled catalog if necessary.
       if(!hasUsableProducts())await recoverBundledCatalog();
@@ -196,7 +198,9 @@ window.HAKI_COVER_WAITING_LIVE = true;
   }else{
     bootCatalog();
   }
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});
+  document.addEventListener('visibilitychange',()=>{
+    if(!document.hidden&&(lastLiveAt===null||Date.now()-lastLiveAt>=30000))refresh();
+  });
 })();
 
 
@@ -205,6 +209,7 @@ window.HAKI_COVER_WAITING_LIVE = true;
   const endpoint='https://uysfqzlihiosebqzvfrl.supabase.co/functions/v1/haki-operations?mode=availability';
   let busy=false;
   let refreshAgain=false;
+  let lastLiveAt=null;
   async function refreshAvailability(){
     if(document.hidden)return;
     if(busy){refreshAgain=true;return;}
@@ -213,7 +218,8 @@ window.HAKI_COVER_WAITING_LIVE = true;
       const response=await fetch(endpoint,{cache:'no-store',signal:AbortSignal.timeout(8000)});
       if(!response.ok)throw new Error('Stock unavailable');
       const data=await response.json();
-      if(!data?.migrated||!data.inventory||typeof data.inventory!=='object')return;
+      if(!data?.migrated||!data.inventory||typeof data.inventory!=='object')throw new Error('Stock unavailable');
+      lastLiveAt=Date.now();
       const current=window.HAKI_PRODUCTOS||[];
       let changed=false;
       const next=current.map(product=>{
@@ -240,13 +246,19 @@ window.HAKI_COVER_WAITING_LIVE = true;
       window.HAKI_PRODUCTOS=next;
       try{localStorage.setItem('haki_catalog_cache_v4',JSON.stringify({config:window.HAKI_CONFIG||{},products:next}));}catch{}
       window.dispatchEvent(new CustomEvent('haki:catalog-updated',{detail:{availability:true}}));
-    }catch{}finally{
+    }catch{lastLiveAt=null;}finally{
       busy=false;
       if(refreshAgain){refreshAgain=false;setTimeout(refreshAvailability,0);}
     }
   }
+  // Lifecycle and catalog events often arrive together. Keep explicit stock
+  // refreshes and the 45s timer immediate, but reuse just-loaded stock on events.
+  const refreshOnEvent=()=>{
+    if(busy)return;
+    if(lastLiveAt===null||Date.now()-lastLiveAt>=5000)return refreshAvailability();
+  };
   window.HAKI_REFRESH_AVAILABILITY=refreshAvailability;
   window.addEventListener('DOMContentLoaded',()=>{refreshAvailability();setInterval(refreshAvailability,45000);});
-  window.addEventListener('haki:catalog-updated',event=>{if(event.detail?.availability)return;setTimeout(refreshAvailability,150);});
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshAvailability();});
+  window.addEventListener('haki:catalog-updated',event=>{if(event.detail?.availability)return;setTimeout(refreshOnEvent,150);});
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshOnEvent();});
 })();
