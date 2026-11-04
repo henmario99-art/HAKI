@@ -9,11 +9,12 @@ html[data-theme=oscuro] body .header .haki-wordmark-spaced .brand-logo{filter:no
  html body .header{height:64px!important;min-height:64px!important}
  html body .header .brand.haki-wordmark-spaced{width:116px!important;height:26px!important}
  html body .header .haki-wordmark-spaced .brand-logo{width:580px!important}
- html body #homeHero.hero.mobile-drop-hero{position:relative!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;aspect-ratio:4/5!important;overflow:visible!important;background:#000!important;border:0!important}
+ html body #homeHero.hero.mobile-drop-hero{position:relative!important;width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;aspect-ratio:1/1!important;overflow:visible!important;background:#000!important;border:0!important}
  html body #homeHero.mobile-drop-hero>.hero-photo,html body #homeHero.mobile-drop-hero>.hero-copy{display:none!important}
  html body #homeHero.mobile-drop-hero::after{content:none!important;background:none!important}
  html body #homeHero.mobile-drop-hero .mobile-cover-carousel{display:block!important;position:absolute;inset:0;background:#000;touch-action:pan-y pinch-zoom}
- .mobile-cover-slide{opacity:0;position:absolute;inset:0;overflow:hidden;background:#000}
+ /* Keep the 1080 x 1350 artwork and its CTA in the same proportional frame. */
+ .mobile-cover-slide{opacity:0;position:absolute;inset:0 10%;overflow:hidden;background:#000}
  .mobile-cover-slide[hidden]{display:none!important}
  .mobile-cover-slide>img,.mobile-cover-slide>video{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:contain;object-position:center;pointer-events:none}
 
