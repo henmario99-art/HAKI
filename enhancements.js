@@ -25,20 +25,7 @@
   }
 
   function applyCardStatuses() {
-    const dropIds = new Set(window.hakiDropProducts(config(), products()).map(p => String(p.id)));
-    $$('.product[data-code]').forEach(card => {
-      const p = byCode(card.dataset.code);
-      if (!p) return;
-      const badge = $('.product-number', card);
-      if (!badge) return;
-      const out = soldOut(p);
-      const inNewDrop = card.closest('#products') && document.body.classList.contains('new-drop-view');
-      const text = inNewDrop && dropIds.has(String(p.id)) ? 'NUEVO' : '';
-      badge.hidden = !text;
-      if (badge.textContent.trim() !== text) badge.textContent = text;
-      badge.classList.add('availability-badge');
-      badge.classList.toggle('sold-out', out);
-    });
+    $$('.product .availability-badge, .detail-new').forEach(badge => badge.remove());
   }
 
   function currentDetailProduct() {
@@ -114,7 +101,7 @@
     section.setAttribute('aria-labelledby', 'combineTitle');
     section.innerHTML = `
       <div class="haki-complements-head">
-        <div><h2 id="combineTitle">COMBÍNALOS</h2><p>Completa tu outfit con estas prendas.</p></div>
+        <div><h2 id="combineTitle">COMBÍNALOS</h2></div>
       </div>
       <div class="haki-complement-grid" tabindex="0" aria-label="Sugerencias complementarias, desplázate horizontalmente">
         ${picks.map(item => `

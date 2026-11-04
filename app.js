@@ -482,8 +482,7 @@
   window.addEventListener('haki:drop-updated',()=>{if(state.newDrop)renderProducts();});
 
   function renderProductList(container, list) {
-    const showNew = container === els.products && state.newDrop;
-    const signature = JSON.stringify({ list, showNew, guideTypes: list.map(productSizeGuideType) });
+    const signature = JSON.stringify({ list, guideTypes: list.map(productSizeGuideType) });
     if (renderedLists.get(container) === signature) {
       syncCardSelections(container);
       return;
@@ -554,7 +553,6 @@
                 loading="lazy" decoding="async" width="400" height="500" srcset="${esc(window.hakiSrcset(p.imagen))}" sizes="(max-width:800px) 50vw, 25vw"
               >
 
-              ${showNew ? '<span class="product-number availability-badge">NUEVO</span>' : ''}
 
               ${p.masVendido === true ? `<span class="best-seller-badge">${esc(String(p.etiquetaMasVendido || '').trim() || 'MÁS VENDIDO')}</span>` : ''}
 
@@ -1866,7 +1864,6 @@ ${settings().totalTexto}: ${money(totals.total)}${window.HAKI_QUOTE_PRIVACY?.pro
         </div>
         <div class="detail-content">
           <div class="detail-summary">
-            ${state.newDrop && dropCodes().includes(String(p.codigo)) ? '<span class="detail-new">NUEVO</span>' : ''}
             <h1>${esc(p.nombre)}</h1>
             <p class="detail-code">${esc(p.codigo)}</p>
             <button class="solid detail-add" type="button">AÑADIR AL CARRITO</button>
@@ -1882,7 +1879,7 @@ ${settings().totalTexto}: ${money(totals.total)}${window.HAKI_QUOTE_PRIVACY?.pro
               </section>
             ` : ''}
             ${stockTotal === 1 ? '<p class="detail-low-stock" role="status">Rápido, Solo queda 1</p>' : ''}
-            <div class="detail-size-heading"><h2>Seleccioná tu talla</h2>${showSizeGuide ? '<button id="openSizeGuide" type="button" class="size-guide-link">Guía de tallas</button>' : ''}</div>
+            ${showSizeGuide ? '<div class="detail-size-heading"><button id="openSizeGuide" type="button" class="size-guide-link">Guía de tallas</button></div>' : ''}
             <div id="detailSizes" class="detail-sizes" role="group" aria-label="Seleccionar talla">
               ${['S','M','L','XL'].map(size => `<button type="button" class="detail-size ${selected === size ? 'selected' : ''}" data-detail-size="${size}" aria-pressed="${selected === size}" ${p.tallas?.[size] ? '' : 'disabled'}>${size}</button>`).join('')}
             </div>

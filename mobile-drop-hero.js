@@ -4,9 +4,9 @@
   if(!hero||hero.querySelector('.mobile-cover-carousel'))return;
   const mobile=matchMedia('(max-width:800px)'),reduced=matchMedia('(prefers-reduced-motion:reduce)');
   const covers=[
-   {id:'disponible',name:'Disponible',href:'#nuevo-drop',button:[409,1052,280,79]},
-   {id:'onyx',name:'Colección Onyx',href:'#producto/GSCV1-03',button:[419,1043,291,82]},
-   {id:'bat',name:'Colección Bat',href:'#producto/BATC-05',button:[419,1043,291,82]}
+   {id:'disponible',name:'Disponible',href:'#nuevo-drop',button:[429,827,292,81]},
+   {id:'onyx',name:'Colección Onyx',href:'#producto/GSCV1-03',button:[429,827,292,81]},
+   {id:'bat',name:'Colección Bat',href:'#producto/BATC-05',button:[429,827,292,81]}
   ];
   const carousel=document.createElement('section'),controls=document.createElement('div'),dots=document.createElement('div'),status=document.createElement('span');
   carousel.className='mobile-cover-carousel';carousel.setAttribute('aria-label','Portadas HAKI');carousel.setAttribute('aria-roledescription','carrusel');
@@ -15,11 +15,15 @@
   const slides=covers.map((cover,i)=>{
    const panel=document.createElement('div'),image=document.createElement('img'),buy=document.createElement('a'),graphic=document.createElement('img'),dot=document.createElement('button');
    panel.className='mobile-cover-slide';panel.id='mobile-cover-'+cover.id;panel.hidden=i!==0;panel.setAttribute('role','group');panel.setAttribute('aria-roledescription','diapositiva');panel.setAttribute('aria-label',(i+1)+' de 3: '+cover.name);
-   image.alt=cover.name;image.width=1080;image.height=1350;image.decoding='async';
-   if(mobile.matches)image.src='/images/mobile-carousel/'+cover.id+'-background-v4.png';
+   image.alt=cover.name;image.width=1080;image.height=1080;image.decoding='async';
+   if(mobile.matches)image.src='/images/mobile-carousel/'+cover.id+'-square-v5.png';
    buy.className='mobile-cover-buy';buy.href=cover.href;buy.setAttribute('aria-label','Comprar — '+cover.name);
-   const [x,y,w,h]=cover.button;Object.assign(buy.style,{left:x/1080*100+'%',top:y/1350*100+'%',width:w/1080*100+'%',height:h/1350*100+'%'});
-   if(mobile.matches)graphic.src='/images/mobile-carousel/'+cover.id+'-button-v4.png';graphic.alt='';graphic.width=w;graphic.height=h;buy.append(graphic);panel.append(image,buy);carousel.append(panel);
+   const [x,y,w,h]=cover.button;Object.assign(buy.style,{left:x/1080*100+'%',top:y/1080*100+'%',width:w/1080*100+'%',height:h/1080*100+'%'});
+   const pct=value=>value/1080*100+'%';
+   // Preserve the supplied PNG pixels. Only its button region is displayed in a separate animated crop.
+   image.style.clipPath='polygon(evenodd,0 0,100% 0,100% 100%,0 100%,0 0,'+pct(x)+' '+pct(y)+','+pct(x+w)+' '+pct(y)+','+pct(x+w)+' '+pct(y+h)+','+pct(x)+' '+pct(y+h)+','+pct(x)+' '+pct(y)+',0 0)';
+   buy.style.setProperty('--cover-crop-width',1080/w*100+'%');buy.style.setProperty('--cover-crop-height',1080/h*100+'%');buy.style.setProperty('--cover-crop-left',-x/w*100+'%');buy.style.setProperty('--cover-crop-top',-y/h*100+'%');
+   if(mobile.matches)graphic.src='/images/mobile-carousel/'+cover.id+'-square-v5.png';graphic.alt='';graphic.width=1080;graphic.height=1080;buy.append(graphic);panel.append(image,buy);carousel.append(panel);
    dot.type='button';dot.setAttribute('aria-label','Ver portada '+(i+1)+': '+cover.name);dot.setAttribute('aria-controls',panel.id);dot.setAttribute('aria-pressed',String(i===0));
    dot.innerHTML='<span></span><svg class="cover-progress" viewBox="0 0 10 10" aria-hidden="true"><g transform="rotate(-90 5 5)"><circle cx="5" cy="5" r="3.8" pathLength="100"/></g></svg>';
    dot.addEventListener('click',()=>{rotating=!reduced.matches;request(i,true);});dots.append(dot);
@@ -56,8 +60,8 @@
    const token=++epoch;cancel();pending=null;outgoing=false;current=index;clock=0;
    slides.forEach((s,i)=>{s.panel.hidden=i!==index;s.panel.style.opacity='0';s.buy.style.opacity='0';s.buy.style.transform='translateY(75%)';s.dot.setAttribute('aria-pressed',String(i===index));});
    const s=slides[index];
-   if(!s.image.getAttribute('src'))s.image.src='/images/mobile-carousel/'+s.cover.id+'-background-v4.png';
-   if(!s.graphic.getAttribute('src'))s.graphic.src='/images/mobile-carousel/'+s.cover.id+'-button-v4.png';
+   if(!s.image.getAttribute('src'))s.image.src='/images/mobile-carousel/'+s.cover.id+'-square-v5.png';
+   if(!s.graphic.getAttribute('src'))s.graphic.src='/images/mobile-carousel/'+s.cover.id+'-square-v5.png';
    if(announce)status.textContent=(index+1)+' de 3: '+s.cover.name;
    if(reduced.matches){staticButton();return;}
    Promise.all([s.image.decode().catch(()=>{}),s.graphic.decode().catch(()=>{})]).then(()=>{

@@ -91,8 +91,8 @@ iframe#nl-badge-frame[title="Powered by Netlify"]{display:none!important}
 
 /* Estado de disponibilidad: arriba a la izquierda y sin marco */
 .product-number.availability-badge,.detail-availability{background:#fff;color:#111;border:0!important;font-size:9px;line-height:1;letter-spacing:.09em;text-transform:uppercase;font-weight:800;padding:7px 9px}.product-number.availability-badge{top:14px!important;left:14px!important;right:auto!important;bottom:auto!important}.product-number.availability-badge.sold-out,.detail-availability.sold-out{background:#111;color:#fff}.detail-media{position:relative}.detail-availability{position:absolute;top:14px;left:14px;z-index:6}
-.best-seller-badge{position:absolute;top:44px;left:14px;z-index:6;display:inline-flex;align-items:center;min-height:25px;padding:5px 9px;background:#111;color:#fff;font-size:9px;line-height:1;letter-spacing:.16em;text-transform:uppercase;font-weight:800}.detail-best-seller{top:44px}
-.product-image .best-seller-badge{top:14px}.product-image .availability-badge+.best-seller-badge{top:44px}
+.best-seller-badge{position:absolute;top:14px;left:14px;z-index:6;display:inline-flex;align-items:center;min-height:25px;padding:5px 9px;background:#111;color:#fff;font-size:9px;line-height:1;letter-spacing:.16em;text-transform:uppercase;font-weight:800}.detail-best-seller{top:14px}
+.product-image .best-seller-badge{top:14px}
 
 /* En detalle dejamos un solo botón de añadir, debajo de las tallas */
 .detail-summary .detail-add{display:none!important}
@@ -685,8 +685,9 @@ h1{overflow-wrap:anywhere}.hero h1{line-height:1.1;font-size:clamp(38px,6vw,84px
 <script src="legal-config.js?v=20261027-2"></script><link rel="stylesheet" href="legal.css?v=20261027-2">
 <link rel="stylesheet" href="native-ui.css?v=20261031-loading-motion-6">
 <script src="native-ui.js?v=20261031-loading-motion-6"></script>
-<link rel="stylesheet" href="/mobile-drop-hero.css?v=20261103-square-cover-1">
-<link rel="stylesheet" href="/mobile-storefront.css?v=20261031-instagram-final-5" data-mobile-storefront>
+<link rel="stylesheet" href="/mobile-drop-hero.css?v=20261103-square-covers-2">
+<link rel="stylesheet" href="/mobile-storefront.css?v=20261103-spacing-6" data-mobile-storefront>
+<style>.product .availability-badge,.detail-new{display:none!important}</style>
 </head>
 <body>
   <div class="announcement" hidden><span id="announcementText">HECHO PARA TU SIGUIENTE NIVEL</span><span id="countryText" hidden>HAKI · EL SALVADOR</span><button id="pauseAnnouncement" type="button" aria-label="Pausar anuncios">Ⅱ</button></div>
@@ -861,9 +862,9 @@ h1{overflow-wrap:anywhere}.hero h1{line-height:1.1;font-size:clamp(38px,6vw,84px
 
 
 <script src="ios-safari-fix.js?v=20261002-definitivo"></script>
-<script src="app.js?v=20261031-instagram-final-5"></script>
+<script src="app.js?v=20261103-badges-spacing-6"></script>
 <script src="safari-internal-detail.js?v=20261002-definitivo"></script>
-<script src="enhancements.js?v=20261030-drop-1"></script>
+<script src="enhancements.js?v=20261103-badges-spacing-6"></script>
 <script src="personalization.js?v=20261002-definitivo"></script>
 <script src="gymrat-test.js?v=20261002-definitivo"></script>
 <script src="mobile-detail.js?v=20261002-definitivo"></script>
@@ -2319,7 +2320,7 @@ body.collection-view #latestSection,body.all-stock-view #latestSection,body.new-
   #novedades .product-actions .size-option,#latestProducts .product-actions .size-option{height:40px!important;font-size:11px!important}
   #novedades .product-actions .add,#latestProducts .product-actions .add{width:32px!important;min-width:32px!important;height:40px!important}
   #novedades .product-number.availability-badge,#latestProducts .product-number.availability-badge{top:14px!important;left:14px!important;min-width:0!important;width:auto!important;height:23px!important;min-height:23px!important;padding:7px 9px!important;line-height:1!important;letter-spacing:.09em!important;font-size:0!important}
-  #novedades .product-number.availability-badge::after,#latestProducts .product-number.availability-badge::after{content:'NUEVO';font-size:9px!important;font-weight:800!important;line-height:1!important;letter-spacing:.09em!important}
+  #novedades .product-number.availability-badge,#latestProducts .product-number.availability-badge{display:none!important}
 }
 </style>
 <script>
@@ -2490,7 +2491,7 @@ html[data-theme=oscuro] #openCart b,html[data-theme=oscuro] #productDetail .loca
 
 <script src="legal.js?v=20261027-2"></script>
 <script defer src="quote-consent.js?v=20261027-2"></script>
-<script src="/mobile-drop-hero.js?v=20261103-carousel-5"></script>
+<script src="/mobile-drop-hero.js?v=20261103-square-covers-2"></script>
 <script src="/mobile-storefront.js?v=20261031-instagram-final-5"></script>
 </body>
 </html>
