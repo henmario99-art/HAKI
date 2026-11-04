@@ -6,9 +6,9 @@
   window.HAKI_STANDALONE=false;
   window.HAKI_COVER_WAITING_LIVE=true;
   window.HAKI_CATALOG_READY=false;
-  window.HAKI_ASSET=value=>String(value||'');
-  window.hakiImage=window.HAKI_ASSET;
-  window.hakiSrcset=()=>'';
+  window.HAKI_ASSET=window.HAKI_MEDIA?.original || (value=>String(value||''));
+  window.hakiImage=window.HAKI_MEDIA?.image || window.HAKI_ASSET;
+  window.hakiSrcset=window.HAKI_MEDIA?.srcset || (()=>'');
   window.HAKI_CONFIG={};
   window.HAKI_PRODUCTOS=[];
   const valid=data=>data&&typeof data.config==='object'&&data.config&&Array.isArray(data.products);

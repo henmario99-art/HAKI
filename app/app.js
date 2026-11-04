@@ -137,7 +137,7 @@
     const versioned = (source, revision) => {
       const url = new URL(source, new URL('/', location.href));
       if (revision && !/^(data:|blob:)/i.test(url.protocol)) url.searchParams.set('v', revision);
-      return url.href;
+      return window.HAKI_MEDIA?.original(url.href) || url.href;
     };
     const source = versioned(mobile || desktop, mobile ? CONFIG.portadaMovilRevision : CONFIG.portadaRevision);
     hero.removeAttribute('srcset');

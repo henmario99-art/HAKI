@@ -14,6 +14,7 @@ window.HAKI_COVER_WAITING_LIVE = true;
   const originalSrcset = window.hakiSrcset;
 
   window.hakiImage = (url = '', size = 800) => {
+    if (window.HAKI_MEDIA?.isCatalogImage(url)) return window.HAKI_MEDIA.image(url, size);
     const items = legacyItems(url);
     if (items.length && typeof originalHakiImage === 'function') return originalHakiImage(url, size);
     if (!url) return 'images/producto.svg';
@@ -22,6 +23,7 @@ window.HAKI_COVER_WAITING_LIVE = true;
   };
 
   window.hakiSrcset = url => {
+    if (window.HAKI_MEDIA?.isCatalogImage(url)) return window.HAKI_MEDIA.srcset(url);
     const items = legacyItems(url);
     if (items.length && typeof originalSrcset === 'function') return originalSrcset(url);
     if (!url || isRemote(url) || isSvg(url)) return '';

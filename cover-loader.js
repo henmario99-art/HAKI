@@ -23,7 +23,7 @@
     // Only replacing the cover invalidates it; sales/catalog edits reuse its cache.
     const revision = !fallback && mobile ? config.portadaMovilRevision : config.portadaRevision;
     if (revision) url.searchParams.set('v', revision);
-    return url.href;
+    return window.HAKI_MEDIA?.original(url.href) || url.href;
   }
 
   function warm(config) {
