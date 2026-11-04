@@ -2,7 +2,7 @@
 (() => {
   const edge='https://uysfqzlihiosebqzvfrl.supabase.co/functions/v1/haki-operations';
   const key='haki_online_catalog_definitivo_v1';
-  let busy=false, revision='';
+  let busy=false, revision='', lastLiveAt=null;
   window.HAKI_STANDALONE=false;
   window.HAKI_COVER_WAITING_LIVE=true;
   window.HAKI_CATALOG_READY=false;
@@ -42,14 +42,21 @@
       try{data=await request(edge+'?mode=public-catalog');}
       catch{data=await request('/.netlify/functions/public-catalog');}
       apply(data,true);
+      lastLiveAt=Date.now();
       try{localStorage.setItem(key,JSON.stringify(data));}catch{}
     }catch{
+      lastLiveAt=null;
       window.HAKI_COVER_WAITING_LIVE=false;
       window.dispatchEvent(new CustomEvent('haki:catalog-updated',{detail:{live:false}}));
     }finally{busy=false;}
   }
   window.HAKIRefreshCatalog=refresh;
+  // Reuse a recent successful response on quick tab switches. The minute timer
+  // and explicit retries remain independent of this short event cooldown.
+  const refreshOnReturn=()=>{
+    if(lastLiveAt===null||Date.now()-lastLiveAt>=30000)return refresh();
+  };
   document.addEventListener('DOMContentLoaded',()=>{refresh();setInterval(refresh,60000);});
-  window.addEventListener('focus',refresh);
-  document.addEventListener('visibilitychange',refresh);
+  window.addEventListener('focus',refreshOnReturn);
+  document.addEventListener('visibilitychange',refreshOnReturn);
 })();
