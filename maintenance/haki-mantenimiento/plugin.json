@@ -1,0 +1,32 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "haki-mantenimiento",
+  "version": "0.1.0",
+  "description": "Mantenimiento del catálogo HAKI y control preventivo del consumo de Supabase Free.",
+  "author": {
+    "name": "HAKI"
+  },
+  "keywords": [
+    "haki",
+    "supabase",
+    "mantenimiento",
+    "consumo"
+  ],
+  "extensions": {
+    "com.openai": {
+      "apps": "./.app.json",
+      "interface": {
+        "displayName": "HAKI Mantenimiento",
+        "shortDescription": "Catálogo y consumo de HAKI",
+        "longDescription": "Revisa el catálogo HAKI, su sincronización con Supabase, permisos, respaldos y consumo. Detecta umbrales y prepara correcciones verificadas conservando autorización antes de publicar.",
+        "developerName": "HAKI",
+        "category": "Business & Operations",
+        "capabilities": [],
+        "defaultPrompt": [
+          "Revisa el consumo gratuito de HAKI y avísame qué requiere atención.",
+          "Haz el mantenimiento de HAKI y prepara correcciones para revisar."
+        ]
+      }
+    }
+  }
+}

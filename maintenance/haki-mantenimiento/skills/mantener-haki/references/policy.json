@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "verified_at": "2026-11-04",
+  "thresholds": [
+    60,
+    75,
+    85
+  ],
+  "max_age_hours": 26,
+  "input_contract": "measured_at, cycle_start, cycle_end: ISO timestamps; metrics: numeric values in the units below, null if unverified; grace: {active:boolean, ends_date:string|null, reason:string|null} or null if unverified. Policy is a dated baseline: reverify live quotas and enforcement before relying on it.",
+  "metrics": {
+    "database_bytes": {
+      "label": "Base de datos",
+      "limit": 500000000,
+      "mode": "snapshot",
+      "required": true
+    },
+    "storage_bytes": {
+      "label": "Archivos",
+      "limit": 1000000000,
+      "mode": "snapshot",
+      "required": true
+    },
+    "egress_bytes": {
+      "label": "Transferencia sin caché",
+      "limit": 5000000000,
+      "mode": "cumulative",
+      "required": true
+    },
+    "cached_egress_bytes": {
+      "label": "Transferencia con caché",
+      "limit": 5000000000,
+      "mode": "cumulative",
+      "required": true
+    },
+    "function_invocations": {
+      "label": "Funciones",
+      "limit": 500000,
+      "mode": "cumulative",
+      "required": true
+    },
+    "monthly_active_users": {
+      "label": "Usuarios activos",
+      "limit": 50000,
+      "mode": "cumulative",
+      "required": true
+    },
+    "realtime_messages": {
+      "label": "Mensajes Realtime",
+      "limit": 2000000,
+      "mode": "cumulative",
+      "required": true
+    },
+    "realtime_peak_connections": {
+      "label": "Conexiones Realtime",
+      "limit": 200,
+      "mode": "snapshot",
+      "required": true
+    },
+    "log_ingest_bytes": {
+      "label": "Ingreso de registros",
+      "limit": 1000000000,
+      "mode": "cumulative",
+      "enforced": false,
+      "required": false
+    },
+    "log_query_bytes": {
+      "label": "Consulta de registros",
+      "limit": 100000000000,
+      "mode": "cumulative",
+      "enforced": false,
+      "required": false
+    }
+  }
+}
