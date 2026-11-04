@@ -46,8 +46,8 @@
 .gymrat-result-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
 .gymrat-restart,.gymrat-shop{min-height:44px;padding:0 18px;border:1px solid var(--ink,#111);border-radius:999px;background:transparent;color:inherit;font-size:10px;font-weight:750;letter-spacing:.05em;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
 .gymrat-shop{background:var(--ink,#111);color:var(--inverse,#fff)}
-:root[data-theme=oscuro] .gymrat-dialog{background:#151515;color:#fff}
-:root[data-theme=oscuro] .gymrat-close,:root[data-theme=oscuro] .gymrat-result-badge{background:#242424}
+:root[data-theme=oscuro] .gymrat-dialog{background:var(--surface);color:#fff}
+:root[data-theme=oscuro] .gymrat-close,:root[data-theme=oscuro] .gymrat-result-badge{background:var(--soft)}
 :root[data-theme=oscuro] .gymrat-option{border-color:#3a3a3a}
 :root[data-theme=oscuro] .gymrat-option.is-selected{background:#fff;color:#111;border-color:#fff}
 :root[data-theme=oscuro] .gymrat-result-copy,:root[data-theme=oscuro] .gymrat-intro,:root[data-theme=oscuro] .gymrat-recs-head p,:root[data-theme=oscuro] .gymrat-reveal p{color:#b5b5b5}
@@ -59,6 +59,6 @@
 
 /* Product detail loading: static placeholder, no repeating shimmer or page pulse. */
 #productDetail .detail-media.haki-image-loading::before{animation:none!important;background-image:none!important;background:#ececea!important;opacity:1!important}
-:root[data-theme=oscuro] #productDetail .detail-media.haki-image-loading::before{background:#151515!important}
+:root[data-theme=oscuro] #productDetail .detail-media.haki-image-loading::before{background:var(--surface)!important}
 #productDetail.haki-detail-entering .detail-layout{animation:none!important}
 #productDetail .detail-gallery img{transition:opacity .22s ease!important}
