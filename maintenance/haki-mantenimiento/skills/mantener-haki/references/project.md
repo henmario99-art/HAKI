@@ -7,6 +7,7 @@
 - Supabase: uysfqzlihiosebqzvfrl.
 - Organización: dymrbrtdblbpfpfktyej.
 - Usage: https://supabase.com/dashboard/org/dymrbrtdblbpfpfktyej/usage
+- Netlify: equipo henmario99, proyecto haki-sv. Leer créditos y desglose diario según references/netlify-usage.md; el saldo del equipo puede incluir otros proyectos.
 - Zona horaria: America/El_Salvador.
 - Vigilancia horaria existente: Errores de HAKI. Mantener su propósito y no crear otra vigilancia de caídas.
 

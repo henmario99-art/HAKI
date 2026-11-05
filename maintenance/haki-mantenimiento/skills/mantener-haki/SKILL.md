@@ -1,6 +1,6 @@
 ---
 name: mantener-haki
-description: "Usar para mantenimiento de HAKI, revisión del catálogo público y Supabase, consumo del plan gratuito, sincronización de tallas, lentitud, seguridad y preparación de correcciones. Usar también en revisiones programadas de consumo de HAKI."
+description: "Usar para mantenimiento de HAKI, revisión del catálogo público, Supabase y Netlify, consumo diario de créditos y del plan gratuito, sincronización de tallas, lentitud, seguridad y preparación de correcciones. Usar también en revisiones programadas de consumo de HAKI."
 ---
 
 # Mantener HAKI
@@ -9,7 +9,7 @@ Consultar [el proyecto y las reglas](references/project.md) antes de actuar.
 Usar las conexiones existentes de Supabase y GitHub. Cargar también sus instrucciones vigentes cuando corresponda.
 Responder en español con resultados confirmados, fecha de medición, trabajo realizado y límites de la revisión.
 
-## Control de consumo
+## Control de consumo de Supabase
 
 1. Abrir la página Usage de la organización indicada en project.md con el navegador conectado cuando no exista una herramienta para estas métricas. Mantener «Current billing cycle» y «All projects» para las cuotas compartidas. Leer inicio y fin del ciclo, fecha de actualización, métricas, avisos de prórroga y restricciones.
 2. Recoger por separado Egress y Cached Egress; no sumarlos como una cuota intercambiable. Recoger Database Size, Storage Size, funciones, Realtime, usuarios y Logs. Distinguir almacenamiento actual de promedios del ciclo.
@@ -17,7 +17,11 @@ Responder en español con resultados confirmados, fecha de medición, trabajo re
 4. Preparar un JSON con measured_at ISO, cycle_start/cycle_end ISO, metrics y grace según el contrato en policy.json. Usar null cuando no se pueda verificar una métrica. Cargar [la política](references/policy.json) y ejecutar assessUsage del [evaluador](scripts/usage-budget.mjs), o su interfaz CLI con JSON y política. Confirmar cuotas y estado de aplicación en la documentación/panel vigente antes de cambiar policy.json.
 5. Avisar por umbrales 60/75/85 %, previsión de agotamiento antes del cierre o aviso de restricción/prórroga. Informar una medición incompleta como incompleta; nunca convertir falta de acceso en consumo cero ni considerar una prórroga resuelta solo porque el ciclo actual esté bajo cuota.
 6. Guardar un resumen fechado sin secretos ni datos de clientes en el destino persistente del usuario cuando se pida un informe. Usar el resultado anterior de la tarea para comparar, deduplicar y seguir tendencias; si no hay una medición comparable del mismo ciclo, etiquetar la proyección lineal como estimación inicial.
-7. En ejecución programada, notificar cambios de nivel, previsiones preocupantes, pérdida persistente de acceso a métricas o avisos de restricción próximos. No emitir mensajes diarios cuando todo esté verificado y normal. Mantener un recordatorio breve de una prórroga activa si faltan 3 días o menos; no generar alertas horarias duplicadas.
+7. En ejecución programada de Supabase, notificar cambios de nivel, previsiones preocupantes, pérdida persistente de acceso a métricas o avisos de restricción próximos. No emitir mensajes diarios cuando todo esté verificado y normal. Mantener un recordatorio breve de una prórroga activa si faltan 3 días o menos; no generar alertas horarias duplicadas.
+
+## Consumo diario de Netlify
+
+Para medir créditos de Netlify, seguir [el seguimiento diario](references/netlify-usage.md). Usar el saldo compartido del equipo y el desglose nativo por día. Separar consumo del equipo de consumo exclusivo de haki-sv, y saldo deducido de créditos informados por categoría. Esta función entrega un resumen diario cuando el usuario lo pida; la regla de silencio de Supabase no se aplica a ese resumen. No duplicar la vigilancia horaria de disponibilidad.
 
 ## Mantenimiento del catálogo
 
