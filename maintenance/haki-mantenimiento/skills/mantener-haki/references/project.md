@@ -16,7 +16,7 @@ Revisar, medir y preparar correcciones verificadas. Publicar cambios requiere au
 Precios, cantidades, estados de ventas, eliminaciones y migraciones de producción requieren una instrucción concreta o una política expresamente aprobada.
 Conservar tallas S/M/L/XL, ocultar agotadas y reaparecer al reponer respetando ocultación manual, ventas archivadas, diseño y animaciones actuales.
 Conservar noindex global y acceso directo por enlace. No cambiar consentimiento ni seguimiento por una optimización de consumo.
-No incluir credenciales, cookies, tokens, datos personales de compradores ni metadatos privados de ventas en informes, GitHub o paquetes.
+No incluir credenciales, cookies, tokens, datos personales de compradores ni metadatos privados de ventas en informes, GitHub o paquetes del complemento. Las copias de respaldo solicitadas por el usuario se guardan de forma privada y pueden contener los datos operativos necesarios para recuperar HAKI.
 
 ## Arquitectura verificada el 4 de noviembre de 2026
 

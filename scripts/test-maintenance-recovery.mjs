@@ -1,0 +1,28 @@
+import assert from 'node:assert/strict';
+import { extractRawTableData,renderApplicationSql,cleanupExpiredSql } from '../maintenance/haki-mantenimiento/skills/mantener-haki/scripts/backup-restore.mjs';
+
+const json=String.raw`{"format":"haki-logical-backup-v1","data":{"haki_sales":[{"payload":{"price":25.00,"nested":[{"text":"braces } ] and quote \\" end"}],"discount":1e-2}}],"haki_inventory":[{"quantity":3}]},"tail":"data"}`;
+const valid=json.replace(String.raw`\\" end`,String.raw`\" end`);
+const raw=extractRawTableData(valid,['haki_sales','haki_inventory']);
+assert.equal(JSON.parse(raw.haki_sales)[0].payload.price,25);
+assert.ok(raw.haki_sales.includes('25.00'));
+assert.ok(raw.haki_sales.includes('1e-2'));
+assert.deepEqual(JSON.parse(raw.haki_inventory),[{quantity:3}]);
+assert.throws(()=>extractRawTableData(valid,['missing']),/No se encontró/);
+assert.throws(()=>extractRawTableData('{"data":[]}', ['haki_sales']),/objeto/);
+const names=['haki_admins','haki_expenses','haki_inventory','haki_meta','haki_recovery_snapshots','haki_sales','haki_sales_history','haki_sessions'];
+const fixture={format:'haki-logical-backup-v1',captured_at:'2026-11-05T04:28:12Z',schema:{tables:names.map(name=>({name,ddl:'CREATE TABLE public.'+name+'(payload jsonb);',rls:true})),constraints:[],indexes:[],routines:[],triggers:[],table_grants:[]},data:{haki_sales:JSON.parse(raw.haki_sales)}};
+const sql=renderApplicationSql(fixture,raw);
+assert.ok(sql.includes('"price":25.00'));
+assert.ok(sql.includes('El destino ya contiene tablas HAKI'));
+assert.throws(()=>renderApplicationSql({...fixture,format:'other'}),/Formato/);
+assert.throws(()=>renderApplicationSql({...fixture,schema:{...fixture.schema,tables:[...fixture.schema.tables,{name:'unexpected'}]}}),/Tablas/);
+assert.throws(()=>renderApplicationSql({...fixture,data:{haki_sessions:[{}]}}),/fuera del alcance/);
+const options={expectedCount:1,expectedFingerprint:'a'.repeat(64)};
+const clean=cleanupExpiredSql('2026-10-29T00:00:00Z',options);
+assert.ok(clean.includes("now()-interval '7 days'"));
+assert.ok(clean.includes('FOR UPDATE'));
+assert.ok(clean.includes('s.expires_at=c.expires_at'));
+for(const extra of [{maxRows:0},{maxRows:10001},{expectedCount:0},{expectedFingerprint:'bad'}])assert.throws(()=>cleanupExpiredSql('2026-10-29T00:00:00Z',{...options,...extra}),/Alcance/);
+assert.throws(()=>cleanupExpiredSql("'; DELETE FROM anything; --",options),/Alcance/);
+console.log('PASS: exact decimal/exponent preservation, nested JSON, restore guard and bounded fingerprint-protected cleanup.');

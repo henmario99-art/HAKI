@@ -30,6 +30,10 @@ Responder en español con resultados confirmados, fecha de medición, trabajo re
 - Preparar mejoras reversibles en una rama independiente, verificar lo cambiado y abrir PR borrador. Publicar o fusionar solo con autorización del usuario.
 - Para retención, identificar candidatos y proponer plazo; no borrar sesiones, archivos ni historial automáticamente sin una regla aprobada y una copia recuperable.
 
+## Respaldo y recuperación
+
+Cuando se autorice crear o verificar un respaldo o limpiar sesiones, seguir [el procedimiento de recuperación](references/backup-recovery.md). Usar el exportador SQL y el generador de restauración incluidos. Mantener las copias con datos privados fuera del código y del paquete del complemento.
+
 ## Evitar que el mantenimiento consuma la cuota
 
 Reutilizar la vigilancia horaria de caídas existente. No duplicarla.
