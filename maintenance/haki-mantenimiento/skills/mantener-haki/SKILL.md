@@ -1,6 +1,6 @@
 ---
 name: mantener-haki
-description: "Usar para mantenimiento de HAKI, revisión del catálogo público, Supabase y Netlify, consumo diario de créditos y del plan gratuito, sincronización de tallas, lentitud, seguridad y preparación de correcciones. Usar también en revisiones programadas de consumo de HAKI."
+description: "Usar para mantenimiento de HAKI, revisión del catálogo público, Supabase y Netlify, consumo diario de créditos y del plan gratuito, sincronización de tallas, lentitud, seguridad, preparación de correcciones, mantenimiento nocturno y atención de urgencias. Usar también en revisiones programadas de consumo de HAKI."
 ---
 
 # Mantener HAKI
@@ -8,6 +8,10 @@ description: "Usar para mantenimiento de HAKI, revisión del catálogo público,
 Consultar [el proyecto y las reglas](references/project.md) antes de actuar.
 Usar las conexiones existentes de Supabase y GitHub. Cargar también sus instrucciones vigentes cuando corresponda.
 Responder en español con resultados confirmados, fecha de medición, trabajo realizado y límites de la revisión.
+
+## Horario de mantenimiento y urgencias
+
+Aplicar [el horario nocturno y la respuesta urgente](references/night-maintenance.md). Las revisiones rutinarias se realizan desde las 21:00, hora de El Salvador. La vigilancia ligera continúa durante el día. Ante una urgencia confirmada, resolver de inmediato con la corrección mínima reversible y comprobar la recuperación; la autorización ya incluye publicar esa reparación concreta.
 
 ## Control de consumo de Supabase
 
@@ -31,7 +35,7 @@ Para medir créditos de Netlify, seguir [el seguimiento diario](references/netli
 - Revisar consultas duplicadas, respuestas completas innecesarias, tamaños de imagen y caché. Mantener verificación de disponibilidad al comprar; no aplicar caché prolongada a inventario ni datos privados.
 - Usar Security/Performance Advisor en revisiones completas o tras cambios relacionados. RLS habilitado sin políticas puede ser deliberado si solo accede el backend; inspeccionar la arquitectura antes de «corregir» permisos.
 - Revisar respaldos de base de datos e imágenes por separado. Comprobar restauración únicamente en una copia aislada. Un historial de recuperación dentro de la misma base no equivale a una copia externa.
-- Preparar mejoras reversibles en una rama independiente, verificar lo cambiado y abrir PR borrador. Publicar o fusionar solo con autorización del usuario.
+- Preparar mejoras reversibles en una rama independiente, verificar lo cambiado y abrir PR borrador. Publicar o fusionar cambios ordinarios solo con autorización del usuario. Para la reparación urgente concreta, aplicar la autorización anterior.
 - Para retención, identificar candidatos y proponer plazo; no borrar sesiones, archivos ni historial automáticamente sin una regla aprobada y una copia recuperable.
 
 ## Respaldo y recuperación

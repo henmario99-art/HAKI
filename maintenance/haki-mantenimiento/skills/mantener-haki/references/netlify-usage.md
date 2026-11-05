@@ -23,13 +23,13 @@
 
 ## Ejecución programada
 
-Crear o actualizar únicamente la tarea de consumo Netlify que el usuario haya pedido, sin duplicados. No cambiar las tareas de Supabase, historias o disponibilidad. El paquete enseña la revisión; programarla requiere una tarea activa independiente. Verificar acceso actual antes de programar y confirmar por separado el guardado del complemento y la activación de la tarea.
+Usar la tarea existente de consumo Netlify, sin duplicados. Programar sus revisiones desde las 21:00, hora de El Salvador, conforme a [horario y urgencias](night-maintenance.md). Evitar adelantos de la ejecución flexible. No modificar otras tareas como parte de una revisión de consumo. El paquete enseña la revisión; programarla requiere una tarea activa independiente. Verificar acceso actual antes de programar y confirmar por separado el guardado del complemento y la activación de la tarea.
 
 Si se pierde acceso, informar «no se pudo medir» y la última lectura con su antigüedad. Nunca presentar la línea base como actual ni asegurar seguimiento completo cuando el equipo o la sesión no estén disponibles.
 
 ## Evitar consumo y cambios involuntarios
 
-No generar deploys, pruebas de carga, descargas de fotos ni recorridos del catálogo para medir facturación. No escanear logs salvo incidente confirmado y dentro del límite del procedimiento general. No cambiar plan, auto recarga, pagos, créditos, pausas ni límites. Proponer correcciones de consumo según la categoría dominante y preparar cambios en una rama; publicar solo con autorización.
+No generar deploys, pruebas de carga, descargas de fotos ni recorridos del catálogo para medir facturación. No escanear logs salvo incidente confirmado y dentro del límite del procedimiento general. No cambiar plan, auto recarga, pagos, créditos, pausas ni límites. Proponer correcciones de consumo según la categoría dominante y preparar cambios en una rama; publicar cambios ordinarios solo con autorización. La reparación urgente concreta sigue la regla de [horario y urgencias](night-maintenance.md).
 
 ## Referencias oficiales
 

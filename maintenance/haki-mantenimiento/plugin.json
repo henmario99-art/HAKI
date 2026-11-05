@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "haki-mantenimiento",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Mantenimiento del catálogo HAKI y control preventivo del consumo de Supabase Free.",
   "author": {
     "name": "HAKI"

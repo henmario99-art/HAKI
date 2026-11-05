@@ -8,12 +8,12 @@
 - Organización: dymrbrtdblbpfpfktyej.
 - Usage: https://supabase.com/dashboard/org/dymrbrtdblbpfpfktyej/usage
 - Netlify: equipo henmario99, proyecto haki-sv. Leer créditos y desglose diario según references/netlify-usage.md; el saldo del equipo puede incluir otros proyectos.
-- Zona horaria: America/El_Salvador.
+- Zona horaria: America/El_Salvador. Mantenimiento rutinario desde las 21:00; ver [horario y urgencias](night-maintenance.md).
 - Vigilancia horaria existente: Errores de HAKI. Mantener su propósito y no crear otra vigilancia de caídas.
 
 ## Reglas autorizadas
 
-Revisar, medir y preparar correcciones verificadas. Publicar cambios requiere autorización.
+Revisar, medir y preparar correcciones verificadas durante el bloque nocturno. Publicar cambios ordinarios requiere autorización. El usuario autoriza resolver y publicar de inmediato la corrección mínima reversible de una urgencia confirmada, conforme a [horario y urgencias](night-maintenance.md).
 Precios, cantidades, estados de ventas, eliminaciones y migraciones de producción requieren una instrucción concreta o una política expresamente aprobada.
 Conservar tallas S/M/L/XL, ocultar agotadas y reaparecer al reponer respetando ocultación manual, ventas archivadas, diseño y animaciones actuales.
 Conservar noindex global y acceso directo por enlace. No cambiar consentimiento ni seguimiento por una optimización de consumo.
