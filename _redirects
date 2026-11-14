@@ -5,3 +5,8 @@
 /catalogo-en-pausa      / 302!
 # Nuevo panel HAKI Admin (en revision): todas sus pantallas usan su index.
 /admin-nuevo/*  /admin-nuevo/index.html  200
+# HAKI Admin: /admin abre el nuevo diseno. El panel anterior sigue en /admin/index.html?panel=1 (ajustes de la tienda).
+/admin/  panel=:panel  /admin/index.html?panel=:panel  302!
+/admin   panel=:panel  /admin/index.html?panel=:panel  302!
+/admin/  /admin-nuevo/  302!
+/admin   /admin-nuevo/  302!
