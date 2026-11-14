@@ -3,3 +3,5 @@
 /product.html /index.html  200
 /catalogo-en-pausa.html / 302!
 /catalogo-en-pausa      / 302!
+# Nuevo panel HAKI Admin (en revision): todas sus pantallas usan su index.
+/admin-nuevo/*  /admin-nuevo/index.html  200
