@@ -136,3 +136,4 @@ html body .product .product-actions .add:disabled:not(#_):not(#_){background:#d9
 /* Encuadre de la portada elegido en el admin (ver window.hakiFrame). */
 html body img[data-framed]:not(#_):not(#_){object-fit:cover!important;object-position:var(--fx,50%) var(--fy,50%)!important}
 html body :is(.product-image,.detail-gallery,.haki-complement-image) img[data-framed]:not(#_):not(#_){transform:scale(var(--fz,1))!important;transform-origin:var(--fx,50%) var(--fy,50%)!important}
+html body #top #collectionsSection #collectionsGrid .collection-image img[data-framed]:not(#_){object-position:var(--fx,50%) var(--fy,50%)!important;transform:scale(var(--fz,1))!important;transform-origin:var(--fx,50%) var(--fy,50%)!important}

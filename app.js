@@ -1698,7 +1698,7 @@ ${settings().totalTexto}: ${money(totals.total)}${window.HAKI_QUOTE_PRIVACY?.pro
     $('#collectionsGrid').innerHTML = COLLECTIONS.map(c => {
       const first = ALL_PRODUCTS.find(p => inCollection(p, c));
       const picture = c.imagen || first?.imagen || 'images/producto.svg';
-      return `<a class="collection-tile" href="#coleccion/${encodeURIComponent(c.id)}"><div class="collection-image"><img src="${esc(freshImage(picture))}" alt="${esc(c.nombre)}" loading="lazy"></div><h3>${esc(c.nombre)}</h3></a>`;
+      return `<a class="collection-tile" href="#coleccion/${encodeURIComponent(c.id)}"><div class="collection-image"><img src="${esc(freshImage(picture))}" alt="${esc(c.nombre)}" loading="lazy"${window.hakiFrame(c)}></div><h3>${esc(c.nombre)}</h3></a>`;
     }).join('');
     $$('#collectionsGrid img').forEach(img => img.addEventListener('error', () => { img.src = freshImage('images/producto.svg'); }, { once: true }));
     const bestSellers = ALL_PRODUCTS.filter(p => p.masVendido === true && hasStock(p));
