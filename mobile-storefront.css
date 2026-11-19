@@ -6,7 +6,7 @@
 }
 @media(max-width:800px){
   #collectionsGrid::-webkit-scrollbar,#latestProducts::-webkit-scrollbar{display:none}
-  html body #top #latestSection{position:relative!important;padding:64px 16px 27px!important;background:var(--surface,#fff)!important;color:var(--ink,#141414)!important;overflow:hidden}
+  html body #top #latestSection{position:relative!important;padding:28px 16px 27px!important;background:var(--surface,#fff)!important;color:var(--ink,#141414)!important;overflow:hidden}
   html body #top #latestSection>.section-heading{display:flex!important;align-items:center!important;justify-content:space-between!important;margin:0 0 20px!important;padding:0!important;min-height:28px!important;border:0!important}
   html body #top #latestSection .section-heading h2{font:600 18px/28px var(--font-body,Poppins,sans-serif)!important;letter-spacing:.3px!important;text-transform:uppercase!important;color:var(--ink,#141414)!important;margin:0!important}
   html body #top #latestSection #allStockLink{font:400 11px/20px var(--font-body,Poppins,sans-serif)!important;color:var(--muted,#737373)!important;text-decoration:underline!important;text-underline-offset:2px!important;min-height:0!important;white-space:nowrap!important}
@@ -108,8 +108,9 @@ body.quick-add-open{overscroll-behavior:none}
 }
 
 /* Categorias: 4 cuadrados en 2 filas de 2 (mismo orden que el panel). */
-html body #top #collectionsSection{padding:20px 16px 40px!important;background:var(--surface,#fff)!important;overflow:visible!important}
-html body #top #collectionsSection>.section-heading{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip-path:inset(50%);white-space:nowrap}
+html body #top #collectionsSection{padding:40px 16px 0!important;background:var(--surface,#fff)!important;overflow:visible!important}
+html body #top #collectionsSection>.section-heading{display:flex!important;align-items:center!important;min-height:28px!important;margin:0 0 20px!important;padding:0!important;border:0!important}
+html body #top #collectionsSection .section-heading h2{font:600 18px/28px var(--font-body,Poppins,sans-serif)!important;letter-spacing:.3px!important;text-transform:uppercase!important;color:var(--ink,#141414)!important;margin:0!important}
 html body #top #collectionsSection #collectionsGrid.collections-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:20px 10px!important;width:100%!important;max-width:760px!important;margin:0 auto!important;padding:0!important;overflow:visible!important;align-items:start!important}
 html body #top #collectionsSection #collectionsGrid .collection-tile{display:block!important;position:relative!important;flex:none!important;aspect-ratio:auto!important;min-width:0!important;padding:0!important;margin:0!important;overflow:visible!important;border:0!important;background:transparent!important;color:var(--ink,#141414)!important}
 html body #top #collectionsSection #collectionsGrid .collection-tile:before,html body #top #collectionsSection #collectionsGrid .collection-tile:after{display:none!important;content:none!important}

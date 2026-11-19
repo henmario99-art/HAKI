@@ -243,7 +243,7 @@
     });
 
     $('#year').textContent = new Date().getFullYear();
-    $('#collectionsTitle').textContent = CONFIG.tituloColecciones || 'EXPLORA POR CATEGORÍA';
+    $('#collectionsTitle').textContent = '¿Qué buscas?';
 
     // The editable mark belongs to the cover, not the header or footer.
     const customBrandIcon = String(CONFIG.iconoHaki || '').trim();

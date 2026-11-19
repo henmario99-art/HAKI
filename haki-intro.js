@@ -17,11 +17,11 @@
   const mark = new Image();
   mark.alt = '';
   mark.decoding = 'sync';
-  mark.src = '/images/haki-intro.webp?v=1';
+  mark.src = '/images/haki-intro-v2.webp';
   cover.append(mark);
   root.append(cover);
   const start = performance.now();
-  const MIN = 900, MAX = 2200;
+  const MIN = 1400, MAX = 2600;
   let closed = false;
   const show = () => requestAnimationFrame(() => cover.classList.add('is-in'));
   mark.complete ? show() : (mark.onload = show, mark.onerror = () => close());
