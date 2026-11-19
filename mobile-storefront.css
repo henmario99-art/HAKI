@@ -147,3 +147,29 @@ html body #top #latestSection #allStockLink:not(#_){display:none!important}
 html body #top #latestSection #latestProducts:not(#_){display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:28px 10px!important;margin:0!important;padding:0!important;overflow:visible!important;scroll-snap-type:none!important}
 html body #top #latestSection #latestProducts>.product:not(#_){flex:none!important;width:auto!important;max-width:none!important;min-width:0!important}
 @media(min-width:801px){html body #top #latestSection #latestProducts:not(#_){grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:40px 16px!important}}
+
+/* Todas las prendas: boton "Ver menos / Ver todas" a la derecha del titulo. */
+html body #top #latestSection .haki-latest-toggle{display:inline-flex;align-items:center;min-height:32px;margin:0 0 0 auto;padding:0;border:0;background:none;color:var(--muted,#737373);font:400 12px/20px var(--font-body,Poppins,sans-serif);text-decoration:underline;text-underline-offset:2px;cursor:pointer;white-space:nowrap}
+html body .haki-latest-toggle:focus{outline:none}
+/* Ver menos: una sola fila deslizable con 10 prendas. */
+html body #top #latestSection.is-compact #latestProducts:not(#_){display:flex!important;gap:10px!important;margin:0 -16px!important;padding:0 16px 8px!important;overflow-x:auto!important;scroll-snap-type:x mandatory!important;scrollbar-width:none}
+html body #top #latestSection.is-compact #latestProducts>.product:not(#_){flex:0 0 calc((100vw - 32px)*.67)!important;max-width:calc((100vw - 32px)*.67)!important;scroll-snap-align:start}
+html body #top #latestSection.is-compact #latestProducts>.product:nth-child(n+11){display:none!important}
+@media(min-width:801px){html body #top #latestSection.is-compact #latestProducts>.product:not(#_){flex-basis:calc((100% - 48px)/4)!important;max-width:calc((100% - 48px)/4)!important}html body #top #latestSection.is-compact #latestProducts:not(#_){margin:0!important;padding:0 0 8px!important}}
+
+/* Botones de cotizar por WhatsApp e Instagram, redondeados como Comprar. */
+html body #cartDrawer .quote-actions button:not(#_):not(#_){border-radius:8px!important}
+
+/* Boton flotante de WhatsApp. */
+.haki-wa-float{position:fixed;right:16px;bottom:max(18px,calc(env(safe-area-inset-bottom) + 12px));z-index:900;display:flex;align-items:center;gap:10px;text-decoration:none!important;-webkit-tap-highlight-color:transparent}
+.haki-wa-icon{display:grid;place-items:center;width:56px;height:56px;border-radius:50%;background:#25d366;color:#fff;box-shadow:0 6px 18px rgba(0,0,0,.22);transition:transform .2s ease}
+.haki-wa-icon svg{width:30px;height:30px;display:block}
+.haki-wa-float:active .haki-wa-icon{transform:scale(.94)}
+.haki-wa-float:focus{outline:none}
+.haki-wa-float:focus-visible .haki-wa-icon{outline:2px solid var(--ink,#141414);outline-offset:3px}
+.haki-wa-bubble{order:-1;padding:10px 14px;border-radius:14px;background:var(--surface,#fff);color:var(--ink,#141414);font:500 14px/20px var(--font-body,Poppins,sans-serif);white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,.16);opacity:0;transform:translateX(10px) scale(.96);transform-origin:right center;pointer-events:none;transition:opacity .25s ease,transform .25s ease}
+.haki-wa-float.is-asking .haki-wa-bubble{opacity:1;transform:none;pointer-events:auto}
+.haki-wa-float.is-asking .haki-wa-icon{animation:hakiWaNudge 1.4s ease-in-out 3}
+@keyframes hakiWaNudge{0%,100%{transform:none}15%{transform:rotate(-12deg) scale(1.08)}30%{transform:rotate(10deg) scale(1.08)}45%{transform:rotate(-6deg)}60%{transform:rotate(4deg)}75%{transform:none}}
+body:is(.cart-open,.menu-open,.quick-add-open) .haki-wa-float{opacity:0;pointer-events:none}
+@media(prefers-reduced-motion:reduce){.haki-wa-float.is-asking .haki-wa-icon{animation:none}.haki-wa-bubble{transition:none}}

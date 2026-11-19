@@ -77,9 +77,43 @@
     const card=$('.haki-instagram-card',section);card.href=href;card.setAttribute('aria-label','Visitar @'+handle+' en Instagram (se abre en una pestaña nueva)');
     $('.haki-instagram-head strong',section).textContent='@'+handle;section.hidden=latest.hidden;
   }
+  // Todas las prendas: "Ver menos" leaves a single row of 10 garments.
+  function setupLatestToggle(){
+    const button=$('#latestToggle'),section=$('#latestSection');
+    if(!button||!section||button.dataset.ready)return;
+    button.dataset.ready='1';
+    button.addEventListener('click',()=>{
+      const compact=!section.classList.contains('is-compact');
+      section.classList.toggle('is-compact',compact);
+      button.textContent=compact?'Ver todas':'Ver menos';
+      button.setAttribute('aria-expanded',String(!compact));
+      const rail=$('#latestProducts');if(rail)rail.scrollLeft=0;
+      // The list gets much shorter: keep its title in view.
+      if(compact&&section.getBoundingClientRect().top<0)section.scrollIntoView({block:'start'});
+    });
+  }
+  // Floating WhatsApp button; after 40 s on the store it asks "¿Necesitas ayuda?" once per visit.
+  function setupWhatsApp(){
+    if($('.haki-wa-float'))return;
+    const link=create('a','haki-wa-float');link.target='_blank';link.rel='noopener noreferrer';
+    link.setAttribute('aria-label','Escríbenos por WhatsApp (se abre en una pestaña nueva)');link.dataset.hakiPress='none';
+    const bubble=create('span','haki-wa-bubble','¿Necesitas ayuda?');
+    const icon=create('span','haki-wa-icon');
+    icon.innerHTML='<svg viewBox="0 0 32 32" aria-hidden="true"><path fill="currentColor" d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3Zm0 23.6c-2 0-4-.6-5.7-1.6l-.4-.2-3.9 1 1-3.8-.3-.4A10.6 10.6 0 1 1 16 26.6Zm5.8-7.9c-.3-.2-1.9-.9-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7 0a8.7 8.7 0 0 1-4.3-3.8c-.3-.6.3-.5.9-1.7.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.6 3.6 0 0 0-1.1 2.7 6.3 6.3 0 0 0 1.3 3.3 14.4 14.4 0 0 0 5.5 4.9c2 .9 2.8.9 3.9.8a3.3 3.3 0 0 0 2.1-1.5 2.7 2.7 0 0 0 .2-1.5c-.1-.2-.3-.3-.6-.5Z"/></svg>';
+    link.append(bubble,icon);document.body.append(link);
+    const sync=()=>{const href=$('#whatsappFooter')?.getAttribute('href');if(href)link.href=href+(href.includes('?')?'&':'?')+'text='+encodeURIComponent('Hola HAKI, necesito ayuda con una prenda.');};
+    sync();link.addEventListener('pointerdown',sync);link.addEventListener('focus',sync);
+    let asked=false;try{asked=sessionStorage.getItem('haki_wa_ask_v1')==='1';}catch{}
+    if(asked)return;
+    setTimeout(()=>{
+      try{sessionStorage.setItem('haki_wa_ask_v1','1');}catch{}
+      link.classList.add('is-asking');
+      setTimeout(()=>link.classList.remove('is-asking'),12000);
+    },40000);
+  }
   function polish(){
     $$('#collectionsGrid .collection-tile').forEach(tile=>{if(mobile.matches)tile.dataset.hakiPress='none';else delete tile.dataset.hakiPress;if(!$('.haki-collection-cta',tile))tile.append(create('span','haki-collection-cta','VER PRENDAS'));});
-    setupFooter();syncSocials();setupInstagram();
+    setupFooter();syncSocials();setupInstagram();setupLatestToggle();setupWhatsApp();
 
   }
   function setup(){

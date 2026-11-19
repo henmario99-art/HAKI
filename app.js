@@ -1709,8 +1709,11 @@ ${settings().totalTexto}: ${money(totals.total)}${window.HAKI_QUOTE_PRIVACY?.pro
     const bestSellers = ALL_PRODUCTS.filter(p => p.masVendido === true && hasStock(p));
     renderProductList($('#newProducts'), bestSellers);
     // Todas las prendas: every garment on sale (hidden ones never reach the
-    // store; sold-out ones are left out), newest first.
-    const latest = ALL_PRODUCTS.filter(hasStock).reverse();
+    // store; sold-out ones are left out), Oversized first, then newest first.
+    const onSale = ALL_PRODUCTS.filter(hasStock).reverse();
+    const oversized = COLLECTIONS.find(c => /oversized/i.test(String(c.nombre || '')));
+    const isOversized = p => !!oversized && inCollection(p, oversized);
+    const latest = [...onSale.filter(isOversized), ...onSale.filter(p => !isOversized(p))];
     renderProductList($('#latestProducts'), latest);
     $('#latestEmpty').hidden = latest.length > 0;
     $('#newEmpty').hidden = bestSellers.length > 0;
