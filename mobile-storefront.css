@@ -6,7 +6,7 @@
 }
 @media(max-width:800px){
   #collectionsGrid::-webkit-scrollbar,#latestProducts::-webkit-scrollbar{display:none}
-  html body #top #latestSection{position:relative!important;padding:44px 16px 27px!important;background:var(--surface,#fff)!important;color:var(--ink,#141414)!important;overflow:hidden}
+  html body #top #latestSection{position:relative!important;padding:56px 16px 40px!important;background:var(--surface,#fff)!important;color:var(--ink,#141414)!important;overflow:hidden}
   html body #top #latestSection>.section-heading{display:flex!important;align-items:center!important;justify-content:space-between!important;margin:0 0 20px!important;padding:0!important;min-height:28px!important;border:0!important}
   html body #top #latestSection .section-heading h2{font:600 18px/28px var(--font-body,Poppins,sans-serif)!important;letter-spacing:.3px!important;text-transform:uppercase!important;color:var(--ink,#141414)!important;margin:0!important}
   html body #top #latestSection #allStockLink{font:400 11px/20px var(--font-body,Poppins,sans-serif)!important;color:var(--muted,#737373)!important;text-decoration:underline!important;text-underline-offset:2px!important;min-height:0!important;white-space:nowrap!important}
@@ -108,9 +108,9 @@ body.quick-add-open{overscroll-behavior:none}
 }
 
 /* Categorias: 4 cuadrados en 2 filas de 2 (mismo orden que el panel). */
-html body #top #novedades{padding-bottom:12px!important}
+html body #top #novedades{padding-bottom:24px!important}
 html body #top #collectionsSection{padding:0 16px!important;background:var(--surface,#fff)!important;overflow:visible!important}
-html body #top #collectionsSection>.section-heading{display:flex!important;align-items:center!important;min-height:34px!important;margin:0 0 28px!important;padding:0!important;border:0!important}
+html body #top #collectionsSection>.section-heading{display:flex!important;align-items:center!important;min-height:34px!important;margin:0 0 40px!important;padding:0!important;border:0!important}
 html body #top #collectionsSection .section-heading h2{font:400 26px/34px var(--font-body,Poppins,sans-serif)!important;letter-spacing:.3px!important;text-transform:uppercase!important;color:var(--ink,#141414)!important;margin:0!important}
 html body #top #collectionsSection #collectionsGrid.collections-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;width:100%!important;max-width:760px!important;margin:0 auto!important;padding:0!important;overflow:visible!important;align-items:start!important}
 html body #top #collectionsSection #collectionsGrid .collection-tile{display:block!important;position:relative!important;flex:none!important;aspect-ratio:auto!important;min-width:0!important;padding:0!important;margin:0!important;overflow:visible!important;border:0!important;background:transparent!important;color:var(--ink,#141414)!important}
@@ -137,3 +137,13 @@ html body .product .product-actions .add:disabled:not(#_):not(#_){background:#d9
 html body img[data-framed]:not(#_):not(#_){object-fit:cover!important;object-position:var(--fx,50%) var(--fy,50%)!important}
 html body :is(.product-image,.detail-gallery,.haki-complement-image) img[data-framed]:not(#_):not(#_){transform:scale(var(--fz,1))!important;transform-origin:var(--fx,50%) var(--fy,50%)!important}
 html body #top #collectionsSection #collectionsGrid .collection-image img[data-framed]:not(#_){object-position:var(--fx,50%) var(--fy,50%)!important;transform:scale(var(--fz,1))!important;transform-origin:var(--fx,50%) var(--fy,50%)!important}
+
+/* Comprar sin talla elegida: se ve apagado, pero al tocarlo avisa. */
+html body .product .product-actions .add.is-idle:not(#_):not(#_){background:#d9d9d6!important;color:#6f6f6b!important}
+/* Sin recuadro azul de foco en las tarjetas (aparecia al volver de elegir talla). */
+html body .product :is(.add,.size-option,.product-detail-link):focus:not(#_):not(#_),html body .product :is(.add,.size-option,.product-detail-link):focus-visible:not(#_):not(#_){outline:none!important;box-shadow:none!important}
+/* Todas las prendas: cuadricula de 2 columnas (4 en computadora), sin "Ver todas". */
+html body #top #latestSection #allStockLink:not(#_){display:none!important}
+html body #top #latestSection #latestProducts:not(#_){display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:28px 10px!important;margin:0!important;padding:0!important;overflow:visible!important;scroll-snap-type:none!important}
+html body #top #latestSection #latestProducts>.product:not(#_){flex:none!important;width:auto!important;max-width:none!important;min-width:0!important}
+@media(min-width:801px){html body #top #latestSection #latestProducts:not(#_){grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:40px 16px!important}}

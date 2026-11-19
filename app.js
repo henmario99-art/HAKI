@@ -588,7 +588,7 @@
               </div>
 
               <button
-                class="add"
+                class="add${hasStock(p) && !p.tallas?.[selected] ? ' is-idle' : ''}"
                 type="button"
                 data-add="${esc(p.codigo)}"
                 ${hasStock(p) ? '' : 'disabled'}
@@ -629,17 +629,18 @@
               option.classList.toggle('selected', active);
               option.setAttribute('aria-pressed', String(active));
             });
+            $('[data-add]', card)?.classList.remove('is-idle');
           });
         })
     );
 
-    // Comprar: with a size chosen it goes straight to the bag; without one it
-    // opens the size sheet.
+    // Comprar: with a size chosen it goes straight to the bag; without one a
+    // short notice asks for it.
     $$('[data-add]', container).forEach(btn =>
       btn.addEventListener('click', () => {
         const code = btn.dataset.add;
         if (productByCode(code)?.tallas?.[state.selected[code]]) addToCart(code);
-        else openQuickAdd(code, btn);
+        else showToast('Selecciona una talla');
       })
     );
   }
@@ -653,7 +654,11 @@
         option.setAttribute('aria-pressed', String(active));
       });
       const add = $('[data-add]', card);
-      if (add) add.disabled = !hasStock(productByCode(card.dataset.code) || {});
+      const product = productByCode(card.dataset.code) || {};
+      if (add) {
+        add.disabled = !hasStock(product);
+        add.classList.toggle('is-idle', hasStock(product) && !product.tallas?.[selected]);
+      }
     });
   }
 
@@ -1703,7 +1708,9 @@ ${settings().totalTexto}: ${money(totals.total)}${window.HAKI_QUOTE_PRIVACY?.pro
     $$('#collectionsGrid img').forEach(img => img.addEventListener('error', () => { img.src = freshImage('images/producto.svg'); }, { once: true }));
     const bestSellers = ALL_PRODUCTS.filter(p => p.masVendido === true && hasStock(p));
     renderProductList($('#newProducts'), bestSellers);
-    const latest = ALL_PRODUCTS.filter(hasStock).slice(-12);
+    // Todas las prendas: every garment on sale (hidden ones never reach the
+    // store; sold-out ones are left out), newest first.
+    const latest = ALL_PRODUCTS.filter(hasStock).reverse();
     renderProductList($('#latestProducts'), latest);
     $('#latestEmpty').hidden = latest.length > 0;
     $('#newEmpty').hidden = bestSellers.length > 0;
