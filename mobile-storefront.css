@@ -174,5 +174,5 @@ html body #cartDrawer .quote-actions button:not(#_):not(#_){border-radius:8px!im
 body:is(.cart-open,.menu-open,.quick-add-open) .haki-wa-float{opacity:0;pointer-events:none}
 @media(prefers-reduced-motion:reduce){.haki-wa-float.is-asking .haki-wa-icon{animation:none}.haki-wa-bubble{transition:none}}
 
-/* PC: las 4 categorias en una sola fila que ocupa todo el ancho de la pantalla. */
-@media(min-width:801px){html body #top #collectionsSection #collectionsGrid.collections-grid:not(#_){grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:16px!important;max-width:none!important}html body #top #collectionsSection:not(#_):not(#_){max-width:none!important}}
+/* PC: las 4 categorias en una sola fila, con el mismo ancho y margenes que "Todas las prendas". */
+@media(min-width:801px){html body #top #collectionsSection #collectionsGrid.collections-grid:not(#_){grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:16px!important;width:100%!important;max-width:none!important;margin:0!important}html body #top #collectionsSection:not(#_):not(#_){box-sizing:border-box!important;width:100%!important;max-width:1680px!important;margin-left:auto!important;margin-right:auto!important;padding-left:max(16px,4vw)!important;padding-right:max(16px,4vw)!important;overflow:hidden!important}}
