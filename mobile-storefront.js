@@ -92,7 +92,7 @@
       if(compact&&section.getBoundingClientRect().top<0)section.scrollIntoView({block:'start'});
     });
   }
-  // Floating WhatsApp button; after 40 s on the store it asks "¿Necesitas ayuda?" once per visit.
+  // Floating WhatsApp button; after 15 s on the store it asks "¿Necesitas ayuda?" once per visit.
   function setupWhatsApp(){
     if($('.haki-wa-float'))return;
     const link=create('a','haki-wa-float');link.target='_blank';link.rel='noopener noreferrer';
@@ -109,7 +109,7 @@
       try{sessionStorage.setItem('haki_wa_ask_v1','1');}catch{}
       link.classList.add('is-asking');
       setTimeout(()=>link.classList.remove('is-asking'),12000);
-    },40000);
+    },15000);
   }
   function polish(){
     $$('#collectionsGrid .collection-tile').forEach(tile=>{if(mobile.matches)tile.dataset.hakiPress='none';else delete tile.dataset.hakiPress;if(!$('.haki-collection-cta',tile))tile.append(create('span','haki-collection-cta','VER PRENDAS'));});
