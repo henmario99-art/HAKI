@@ -550,7 +550,7 @@
                   freshImage(fallbackFor(p))
                 )}"
                 alt="${esc(p.nombre)}"
-                loading="lazy" decoding="async" width="400" height="500" srcset="${esc(window.hakiSrcset(p.imagen))}" sizes="(max-width:800px) 50vw, 25vw"
+                loading="lazy" decoding="async" width="400" height="500" srcset="${esc(window.hakiSrcset(p.imagen))}" sizes="(max-width:800px) 50vw, 25vw"${window.hakiFrame(p)}
               >
 
 
@@ -591,11 +591,9 @@
                 class="add"
                 type="button"
                 data-add="${esc(p.codigo)}"
-                ${selected ? '' : 'disabled'}
-                aria-label="Añadir ${esc(p.nombre)}"
-              >
-                +
-              </button>
+                ${hasStock(p) ? '' : 'disabled'}
+                aria-label="Comprar ${esc(p.nombre)}"
+              >${hasStock(p) ? 'Comprar' : 'Agotado'}</button>
 
             </div>
 
@@ -631,15 +629,18 @@
               option.classList.toggle('selected', active);
               option.setAttribute('aria-pressed', String(active));
             });
-            $('[data-add]', card).disabled = false;
           });
         })
     );
 
+    // Comprar: with a size chosen it goes straight to the bag; without one it
+    // opens the size sheet.
     $$('[data-add]', container).forEach(btn =>
-      btn.addEventListener('click', () =>
-        addToCart(btn.dataset.add)
-      )
+      btn.addEventListener('click', () => {
+        const code = btn.dataset.add;
+        if (productByCode(code)?.tallas?.[state.selected[code]]) addToCart(code);
+        else openQuickAdd(code, btn);
+      })
     );
   }
 
@@ -651,7 +652,8 @@
         option.classList.toggle('selected', active);
         option.setAttribute('aria-pressed', String(active));
       });
-      $('[data-add]', card).disabled = !productByCode(card.dataset.code)?.tallas?.[selected];
+      const add = $('[data-add]', card);
+      if (add) add.disabled = !hasStock(productByCode(card.dataset.code) || {});
     });
   }
 
@@ -788,7 +790,7 @@
     notice.setAttribute('role','status');
     notice.setAttribute('aria-live','polite');
     notice.setAttribute('aria-atomic','true');
-    notice.innerHTML = `<img src="${esc(freshImage(product.imagen || fallbackFor(product),160))}" alt="" width="52" height="72">
+    notice.innerHTML = `<img src="${esc(freshImage(product.imagen || fallbackFor(product),160))}" alt="" width="52" height="72"${window.hakiFrame(product)}>
       <div><p class="haki-quick-add-notice-title"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L19 7"/></svg>Añadida a tu bolsa</p>
       <p>${esc(product.nombre)}</p><p>Talla ${esc(size)} · ${money(product.precio)}</p></div>`;
     $('img',notice).addEventListener('error',event => {event.target.src=freshImage('images/producto.svg');},{once:true});
@@ -847,16 +849,14 @@
     const signature = JSON.stringify({product,type});
     if (quickAddDialog.dataset.signature === signature) {syncQuickAddChoice();return true;}
     quickAddDialog.dataset.signature = signature;
-    const guide = SIZE_GUIDES[type]?.label || '';
-    const label = guide ? guide.slice(0,1) + guide.slice(1).toLocaleLowerCase('es-SV') : '';
     const available = ['S','M','L','XL'].filter(size => product.tallas?.[size]);
     const rows = ['S','M','L','XL'].map(size => `<button class="haki-quick-add-size" type="button" data-quick-size="${size}"
       ${product.tallas?.[size] ? '' : 'disabled'} aria-pressed="false" aria-label="${product.tallas?.[size] ? `Elegir talla ${size}` : `Talla ${size}, agotada`}">${size}</button>`).join('');
     quickAddDialog.innerHTML = `<h2 class="haki-quick-add-sr" id="hakiQuickAddTitle">Elegir talla de ${esc(product.nombre)}</h2>
       <span class="haki-quick-add-handle" aria-hidden="true"></span>
       <button class="haki-quick-add-close" type="button" data-close-quick-add aria-label="Cerrar selección de talla">×</button>
-      <div class="haki-quick-add-summary"><img src="${esc(freshImage(product.imagen || fallbackFor(product),400))}" alt="${esc(product.nombre)}" width="88" height="118">
-      <div><h3>${esc(product.nombre)}</h3>${label ? `<p>${esc(label)}</p>` : ''}<strong>${money(product.precio)}</strong></div></div>
+      <div class="haki-quick-add-summary"><img src="${esc(freshImage(product.imagen || fallbackFor(product),400))}" alt="${esc(product.nombre)}" width="88" height="118"${window.hakiFrame(product)}>
+      <div><h3>${esc(product.nombre)}</h3><strong>${money(product.precio)}</strong></div></div>
       <div class="haki-quick-add-label"><h3>Elige tu talla</h3><p>${available.length === 1 ? 'Disponible: '+available[0] : available.length ? available.length+' tallas disponibles' : 'Sin tallas disponibles'}</p></div>
       <div class="haki-quick-add-sizes" role="group" aria-label="Seleccionar talla">${rows}</div>
       <button class="haki-quick-add-confirm" type="button" data-confirm-quick-add disabled>Selecciona una talla</button>`;
@@ -1028,7 +1028,7 @@
           <div class="cart-row">
 
             <img
-              class="cart-thumb"
+              class="cart-thumb"${window.hakiFrame(p)}
               src="${esc(freshImage(p.imagen))}"
               data-fallback="${esc(
                 freshImage(fallbackFor(p))
@@ -1853,7 +1853,7 @@ ${settings().totalTexto}: ${money(totals.total)}${window.HAKI_QUOTE_PRIVACY?.pro
       <div class="detail-layout">
         <div class="detail-media show-gallery-dots">
           <div id="detailGallery" class="detail-gallery" data-photo-count="${images.length}" tabindex="0" aria-label="Fotos de ${esc(p.nombre)}">
-            ${images.map((url, i) => `<img src="${esc(freshImage(url,1400))}" data-fallback="${esc(freshImage(fallbackFor(p)))}" alt="${esc(p.nombre)} · Foto ${i + 1}" width="400" height="500" decoding="async" ${i ? 'loading="lazy"' : 'fetchpriority="high"'}>`).join('')}
+            ${images.map((url, i) => `<img src="${esc(freshImage(url,1400))}" data-fallback="${esc(freshImage(fallbackFor(p)))}" alt="${esc(p.nombre)} · Foto ${i + 1}" width="400" height="500" decoding="async" ${i ? 'loading="lazy"' : 'fetchpriority="high"'}${i ? '' : window.hakiFrame(p)}>`).join('')}
           </div>
           <div class="gallery-controls" ${images.length < 2 ? 'hidden' : ''}>
             <button class="header-icon" type="button" id="galleryPrev" aria-label="Foto anterior">←</button>

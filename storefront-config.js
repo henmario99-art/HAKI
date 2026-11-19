@@ -1,3 +1,17 @@
+// Encuadre de la foto de portada elegido en el admin (punto x/y en % y zoom).
+// Devuelve atributos para la etiqueta <img>; solo numeros, nunca texto libre.
+window.hakiFrame = product => {
+  const frame = product && product.encuadre;
+  if (!frame || typeof frame !== 'object') return '';
+  const clamp = (value, min, max, fallback) => {
+    const n = Number(value);
+    return Number.isFinite(n) ? Math.round(Math.min(max, Math.max(min, n)) * 100) / 100 : fallback;
+  };
+  const x = clamp(frame.x, 0, 100, 50), y = clamp(frame.y, 0, 100, 50), zoom = clamp(frame.zoom, 1, 4, 1);
+  if (x === 50 && y === 50 && zoom === 1) return '';
+  return ` data-framed style="--fx:${x}%;--fy:${y}%;--fz:${zoom}"`;
+};
+
 // Resolve the retired profile name without rewriting stored catalogue settings.
 window.hakiInstagramHandle = config => {
   const handle = String(config?.instagram || '').trim().replace(/^@/, '');

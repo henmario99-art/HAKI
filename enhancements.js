@@ -106,7 +106,7 @@
       <div class="haki-complement-grid" tabindex="0" aria-label="Sugerencias complementarias, desplázate horizontalmente">
         ${picks.map(item => `
           <a class="haki-complement-card" href="#producto/${encodeURIComponent(item.codigo)}">
-            <div class="haki-complement-image"><img src="${window.hakiImage(item.imagen || item.imagenRespaldo,400)}" alt="${String(item.nombre || '').replace(/"/g,'&quot;')}" loading="lazy"></div>
+            <div class="haki-complement-image"><img src="${window.hakiImage(item.imagen || item.imagenRespaldo,400)}" alt="${String(item.nombre || '').replace(/"/g,'&quot;')}" loading="lazy"${window.hakiFrame(item)}></div>
             <div class="haki-complement-info"><div><span class="haki-complement-code">${item.codigo}</span><span class="haki-complement-name">${item.nombre}</span></div><span class="haki-complement-price">${money(item.precio)}</span></div>
           </a>`).join('')}
       </div>`;

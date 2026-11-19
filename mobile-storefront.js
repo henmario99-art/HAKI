@@ -78,15 +78,7 @@
     $('.haki-instagram-head strong',section).textContent='@'+handle;section.hidden=latest.hidden;
   }
   function polish(){
-    const guideLabels={compression:'Compresión',oversized:'Oversized',pants:'Pants',shorts:'Shorts'};
     $$('#collectionsGrid .collection-tile').forEach(tile=>{if(mobile.matches)tile.dataset.hakiPress='none';else delete tile.dataset.hakiPress;if(!$('.haki-collection-cta',tile))tile.append(create('span','haki-collection-cta','VER PRENDAS'));});
-    $$('article.product[data-code]').forEach(card=>{
-      const info=$('.product-info',card);
-      const guide=guideLabels[card.dataset.sizeGuide] || '';
-      let label=$('.haki-card-guide',card);
-      if(guide&&info){if(!label){label=create('p','haki-card-guide');$('strong',info)?.before(label);}if(label)label.textContent=guide;}
-      else label?.remove();
-    });
     setupFooter();syncSocials();setupInstagram();
 
   }

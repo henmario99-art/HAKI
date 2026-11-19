@@ -117,6 +117,22 @@ html body #top #collectionsSection #collectionsGrid .collection-tile{display:blo
 html body #top #collectionsSection #collectionsGrid .collection-tile:before,html body #top #collectionsSection #collectionsGrid .collection-tile:after{display:none!important;content:none!important}
 html body #top #collectionsSection #collectionsGrid .collection-image{display:block!important;position:relative!important;inset:auto!important;width:100%!important;height:auto!important;aspect-ratio:1/1!important;margin:0 0 10px!important;overflow:hidden!important;background:var(--soft,#efefef)!important}
 html body #top #collectionsSection #collectionsGrid .collection-image img{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center top!important;transform:none}
-html body #top #collectionsSection #collectionsGrid .collection-tile h3{position:static!important;margin:0!important;padding:0 2px!important;font:600 14px/1.3 var(--font-body,Poppins,sans-serif)!important;letter-spacing:.6px!important;text-transform:uppercase!important;color:var(--ink,#141414)!important;white-space:normal!important}
+html body #top #collectionsSection #collectionsGrid .collection-tile h3{position:static!important;margin:0!important;padding:0 2px!important;font:500 15px/1.3 var(--font-body,Poppins,sans-serif)!important;letter-spacing:0!important;text-transform:none!important;color:var(--ink,#141414)!important;white-space:normal!important}
 html body #top #collectionsSection .haki-collection-cta{display:none!important}
 @media(max-width:800px){html body #top #latestSection #latestProducts{scroll-padding-inline:16px!important}}
+
+/* Tarjeta de prenda: nombre, precio, tallas a todo el ancho y boton Comprar
+   del ancho de la prenda. Sin codigo ni tipo de prenda. */
+html body .product .haki-card-guide,html body .product .product-code,html body .product .haki-mobile-product-open{display:none!important}
+html body .product .product-info.product-detail-link:not(#_):not(#_){display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:0!important;padding:10px 0 0!important;border:0!important}
+html body .product .product-info h3:not(#_):not(#_){margin:0!important;font:400 14px/20px var(--font-body,Poppins,sans-serif)!important;letter-spacing:0!important;text-transform:none!important;color:var(--ink,#141414)!important}
+html body .product .product-info strong:not(#_):not(#_){display:block!important;margin:2px 0 0!important;font:600 15px/22px var(--font-body,Poppins,sans-serif)!important;color:var(--ink,#141414)!important}
+html body .product .product-actions:not(#_):not(#_){display:flex!important;flex-direction:column!important;flex-wrap:nowrap!important;align-items:stretch!important;gap:6px!important;width:100%!important;margin:10px 0 0!important;padding:0!important}
+html body .product .product-actions .sizes:not(#_):not(#_){display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:4px!important;width:100%!important;min-width:0!important;flex:none!important}
+html body .product .product-actions .size-option:not(#_):not(#_){width:100%!important;min-width:0!important;height:38px!important;margin:0!important;padding:0!important}
+html body .product .product-actions .add:not(#_):not(#_){display:flex!important;align-items:center!important;justify-content:center!important;flex:none!important;width:100%!important;min-width:0!important;height:44px!important;margin:0!important;padding:0 12px!important;border:0!important;border-radius:0!important;background:var(--ink,#141414)!important;color:var(--inverse,#fff)!important;font:600 13px/1 var(--font-body,Poppins,sans-serif)!important;letter-spacing:.3px!important;text-transform:none!important;transform:none!important;cursor:pointer}
+html body .product .product-actions .add:disabled:not(#_):not(#_){background:#d9d9d6!important;color:#fff!important;opacity:1!important;cursor:default}
+
+/* Encuadre de la portada elegido en el admin (ver window.hakiFrame). */
+html body img[data-framed]:not(#_):not(#_){object-fit:cover!important;object-position:var(--fx,50%) var(--fy,50%)!important}
+html body :is(.product-image,.detail-gallery,.haki-complement-image) img[data-framed]:not(#_):not(#_){transform:scale(var(--fz,1))!important;transform-origin:var(--fx,50%) var(--fy,50%)!important}
