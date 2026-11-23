@@ -52,6 +52,8 @@
     newDrop: false,
     category: 'Todos',
     collection: null,
+    allStock: false,
+    offFilter: 0,
     selected: {},
     cart: loadCart()
   };
@@ -350,6 +352,7 @@
         (state.category === 'Todos' ||
           normalize(p.categoria || '') === normalize(state.category)) &&
         (!state.collection || inCollection(p, state.collection)) &&
+        (!state.allStock || !state.offFilter || Number(p.descuentoAplicado) === state.offFilter) &&
         (!q ||
           normalize(
             `${p.codigo} ${p.nombre} ${p.categoria}`
@@ -490,7 +493,37 @@
 
   window.HAKI_OPEN_SIZE_GUIDE = openSizeGuide;
 
+  // "Todas las prendas": one chip per discount in use (10% OFF, 20% OFF…).
+  function offPercents() {
+    if (!state.allStock) return [];
+    return [...new Set(ALL_PRODUCTS.filter(p => hasStock(p) && p.precioOriginal > p.precio)
+      .map(p => Number(p.descuentoAplicado)).filter(n => n > 0))].sort((a, b) => a - b);
+  }
+  function renderOffFilters() {
+    const notice = els.notice;
+    if (!notice?.parentElement) return;
+    let bar = notice.parentElement.querySelector('.haki-off-filters');
+    const percents = offPercents();
+    if (!percents.includes(state.offFilter)) state.offFilter = 0;
+    if (!percents.length) { bar?.remove(); return; }
+    if (!bar) {
+      bar = document.createElement('div');
+      bar.className = 'haki-off-filters';
+      bar.setAttribute('role', 'group');
+      bar.setAttribute('aria-label', 'Filtrar por descuento');
+      notice.before(bar);
+    }
+    bar.innerHTML = [0, ...percents].map(n => `<button type="button" data-off-filter="${n}" aria-pressed="${state.offFilter === n}">${n ? `${n}% OFF` : 'Todas'}</button>`).join('');
+  }
+  document.addEventListener('click', event => {
+    const chip = event.target.closest?.('[data-off-filter]');
+    if (!chip) return;
+    state.offFilter = Number(chip.dataset.offFilter) || 0;
+    renderProducts();
+  });
+
   function renderProducts() {
+    renderOffFilters();
     const list = visibleProducts();
 
     els.count.textContent = `${list.length} productos`;
@@ -1822,6 +1855,8 @@ ${settings().totalTexto}: ${money(totals.total)}${window.HAKI_QUOTE_PRIVACY?.pro
     }
     document.body.classList.toggle('new-drop-view',state.newDrop);
     document.body.classList.toggle('all-stock-view',hash === 'stock');
+    state.allStock = hash === 'stock' && !state.query && !state.newDrop && state.category === 'Todos' && !state.collection;
+    if (!state.allStock) state.offFilter = 0;
     const filtered = hash === 'stock' || state.newDrop || state.category !== 'Todos' || !!state.collection || !!state.query;
     setHomeVisible(!filtered);
     $('#catalogTitle').textContent = state.query ? 'RESULTADOS' : state.newDrop ? 'NUEVO DROP' : state.collection?.nombre || (filtered && hash !== 'stock' ? state.category : 'TODAS LAS PRENDAS');
