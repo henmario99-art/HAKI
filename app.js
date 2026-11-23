@@ -92,21 +92,31 @@
     return `${CONFIG.moneda || '$'}${Number(n).toFixed(2)}`;
   }
 
-  // Price with the store discount: the old price struck through before it.
+  // Price with the store discount: the new price, then the old one struck
+  // through in red.
   function priceHtml(p) {
     return p?.precioOriginal > p?.precio
-      ? `<s class="haki-old-price">${money(p.precioOriginal)}</s> ${money(p.precio)}`
+      ? `<span class="haki-new-price">${money(p.precio)}</span> <s class="haki-old-price">${money(p.precioOriginal)}</s>`
       : money(p?.precio || 0);
   }
+  // "30% OFF" on the photo of a discounted garment.
+  function offBadge(p) {
+    const percent = Number(p?.descuentoAplicado);
+    return p?.precioOriginal > p?.precio && percent > 0 ? `<span class="haki-off-badge">${percent}% OFF</span>` : '';
+  }
 
-  // "Código de descuento" (optional): checked by the server, applied on top
-  // of the store price, rounded per unit like the admin.
+  // "Código de descuento" (optional): checked by the server; a valid code
+  // makes the encomienda shipping ($1 per garment) free.
   const DISCOUNT_KEY = 'haki_discount_code';
-  const discount = { code: '', percent: 0, checking: '', typed: '' };
+  const discount = { code: '', valid: false, checking: '', typed: '' };
   function unitPrice(p) {
-    const price = Number(p?.precio) || 0;
-    if (!discount.percent) return price;
-    return Math.round(Math.round(price * 100) * (100 - discount.percent) / 100) / 100;
+    return Number(p?.precio) || 0;
+  }
+  function totalsNow() {
+    const t = window.hakiTotals(cartTotal(), itemCount(), CONFIG);
+    return discount.valid && state.cart.length
+      ? { ...t, shipping: 0, total: t.subtotal, free: true, remaining: 0, progress: 100 }
+      : t;
   }
 
   function normalize(s = '') {
@@ -172,7 +182,7 @@
 
   function analyticsCartValue() {
     try {
-      const totals = window.hakiTotals(cartTotal(), itemCount(), CONFIG);
+      const totals = totalsNow();
       return Number(totals?.total) || Number(cartTotal()) || 0;
     } catch {
       return Number(cartTotal()) || 0;
@@ -571,6 +581,7 @@
               >
 
 
+              ${offBadge(p)}
               ${p.masVendido === true ? `<span class="best-seller-badge">${esc(String(p.etiquetaMasVendido || '').trim() || 'MÁS VENDIDO')}</span>` : ''}
 
             </a>
@@ -1222,11 +1233,11 @@
         unitPrice(p) * i.cantidad
       )}`;
     });
-    const codeLine = discount.percent
-      ? `\nCódigo de descuento: ${discount.code} (-${discount.percent}%)\n`
+    const codeLine = discount.valid
+      ? `\nCódigo de descuento: ${discount.code} (envío gratis)\n`
       : '';
 
-    const totals = window.hakiTotals(cartTotal(), itemCount(), CONFIG);
+    const totals = totalsNow();
     return `${settings().saludoCotizacion}
 
 Nombre: ${name}
@@ -2085,7 +2096,7 @@ ${settings().totalTexto}: ${money(totals.total)}${window.HAKI_QUOTE_PRIVACY?.pro
   }
   $('#pauseAnnouncement').addEventListener('click',()=>{announcementPaused=!announcementPaused;applyExperience();});
   function renderShipping(){
-    const c=settings(),t=window.hakiTotals(cartTotal(),itemCount(),CONFIG);
+    const c=settings(),t=totalsNow();
     $('#shippingMessage').textContent=t.free?c.envioListo:String(c.envioFalta).replaceAll('{monto}',money(t.remaining));
     $('#shippingProgress').value=t.progress;$('#shippingThreshold').textContent=money(t.threshold);
     renderDiscount();
@@ -2167,11 +2178,9 @@ ${settings().totalTexto}: ${money(totals.total)}${window.HAKI_QUOTE_PRIVACY?.pro
   function renderDiscount(){
     const row=$('#discountRow');
     if(!row)return;
-    const before=state.cart.reduce((n,i)=>n+(Number(productByCode(i.codigo)?.precio)||0)*i.cantidad,0);
-    const saved=Math.round((before-cartTotal())*100)/100;
-    row.hidden=!(discount.percent&&state.cart.length);
-    $('#discountLabel').textContent=`Código ${discount.code} (-${discount.percent}%)`;
-    $('#discountAmount').textContent=`-${money(saved)}`;
+    row.hidden=!(discount.valid&&state.cart.length);
+    $('#discountLabel').textContent=`Código ${discount.code}`;
+    $('#discountAmount').textContent='Envío gratis';
   }
   function discountStatus(text,ok){
     const status=$('#discountStatus');
@@ -2181,8 +2190,8 @@ ${settings().totalTexto}: ${money(totals.total)}${window.HAKI_QUOTE_PRIVACY?.pro
   async function checkDiscount(raw){
     const code=String(raw||'').normalize('NFKC').replace(/\s+/g,'').toUpperCase().slice(0,30);
     discount.typed=code;
-    if(!code){discount.code='';discount.percent=0;discount.checking='';discountStatus('');try{localStorage.removeItem(DISCOUNT_KEY);}catch{}renderCart();return;}
-    if(code===discount.code&&discount.percent){discount.checking='';return;}
+    if(!code){discount.code='';discount.valid=false;discount.checking='';discountStatus('');try{localStorage.removeItem(DISCOUNT_KEY);}catch{}renderCart();return;}
+    if(code===discount.code&&discount.valid){discount.checking='';return;}
     discount.checking=code;discountStatus('Revisando…');
     let result=null;
     try{
@@ -2191,12 +2200,12 @@ ${settings().totalTexto}: ${money(totals.total)}${window.HAKI_QUOTE_PRIVACY?.pro
     }catch{}
     if(discount.typed!==code)return; // the customer kept typing
     discount.checking='';
-    if(result?.valid===true&&Number.isInteger(result.percent)){
-      discount.code=result.code||code;discount.percent=result.percent;
-      discountStatus(`Código aplicado: -${result.percent}%`,true);
+    if(result?.valid===true){
+      discount.code=result.code||code;discount.valid=true;
+      discountStatus('Código aplicado: envío gratis',true);
       try{localStorage.setItem(DISCOUNT_KEY,discount.code);}catch{}
     }else{
-      discount.code='';discount.percent=0;
+      discount.code='';discount.valid=false;
       discountStatus(result?'Código no válido':'No se pudo revisar el código. Puedes cotizar sin él.');
       try{localStorage.removeItem(DISCOUNT_KEY);}catch{}
     }

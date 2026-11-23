@@ -1,7 +1,8 @@
 import { json } from './_shared.mjs';
 
-// Checks ONE "Código de descuento" for the cart. The list of codes never
-// reaches the store: the server answers only for the code typed.
+// Checks ONE "Código de descuento" for the cart (a valid code makes the
+// encomienda shipping free). The list of codes never reaches the store: the
+// server answers only for the code typed.
 const EDGE = 'https://uysfqzlihiosebqzvfrl.supabase.co/functions/v1/haki-admin-v2?mode=discount-code';
 
 export default async request => {
@@ -17,10 +18,7 @@ export default async request => {
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) return json({ error: 'No se pudo revisar el código.' }, 503);
-    const percent = Number(data?.percent);
-    return data?.valid === true && Number.isInteger(percent) && percent >= 1 && percent <= 90
-      ? json({ valid: true, code, percent })
-      : json({ valid: false });
+    return data?.valid === true ? json({ valid: true, code }) : json({ valid: false });
   } catch (error) {
     console.error(error);
     return json({ error: 'No se pudo revisar el código.' }, 503);
