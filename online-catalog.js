@@ -12,6 +12,19 @@
   window.HAKI_CONFIG={};
   window.HAKI_PRODUCTOS=[];
   const valid=data=>data&&typeof data.config==='object'&&data.config&&Array.isArray(data.products);
+  // Store discount (edited in the admin): the garment's own "descuento" or the
+  // store-wide "descuentoGeneral", in percent. Rounded per unit in cents, the
+  // same way the admin does it, so the quote and the order always match.
+  const pct=v=>Number.isInteger(v)&&v>=0&&v<=90?v:null;
+  function discounted(products,config){
+    const general=pct(config.descuentoGeneral)??0;
+    return products.map(p=>{
+      const percent=pct(p?.descuento)??general;
+      const cents=Math.round(Number(p?.precio)*100);
+      if(!percent||!(cents>0))return p;
+      return {...p,precioOriginal:cents/100,precio:Math.round(cents*(100-percent)/100)/100,descuentoAplicado:percent};
+    });
+  }
   function apply(data,live){
     if(!valid(data))throw Error('Catálogo no disponible');
     const next=JSON.stringify(data);
@@ -20,7 +33,7 @@
     if(next!==revision){
       revision=next;
       window.HAKI_CONFIG=data.config;
-      window.HAKI_PRODUCTOS=data.products;
+      window.HAKI_PRODUCTOS=discounted(data.products,data.config);
       window.HAKITheme.configure(data.config.tema);
       window.dispatchEvent(new CustomEvent('haki:catalog-updated',{detail:{live}}));
     }

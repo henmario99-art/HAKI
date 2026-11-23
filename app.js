@@ -92,6 +92,23 @@
     return `${CONFIG.moneda || '$'}${Number(n).toFixed(2)}`;
   }
 
+  // Price with the store discount: the old price struck through before it.
+  function priceHtml(p) {
+    return p?.precioOriginal > p?.precio
+      ? `<s class="haki-old-price">${money(p.precioOriginal)}</s> ${money(p.precio)}`
+      : money(p?.precio || 0);
+  }
+
+  // "Código de descuento" (optional): checked by the server, applied on top
+  // of the store price, rounded per unit like the admin.
+  const DISCOUNT_KEY = 'haki_discount_code';
+  const discount = { code: '', percent: 0, checking: '', typed: '' };
+  function unitPrice(p) {
+    const price = Number(p?.precio) || 0;
+    if (!discount.percent) return price;
+    return Math.round(Math.round(price * 100) * (100 - discount.percent) / 100) / 100;
+  }
+
   function normalize(s = '') {
     return s
       .normalize('NFD')
@@ -573,7 +590,7 @@
               </div>
 
               <strong>
-                ${money(p.precio)}
+                ${priceHtml(p)}
               </strong>
 
             </a>
@@ -861,7 +878,7 @@
       <span class="haki-quick-add-handle" aria-hidden="true"></span>
       <button class="haki-quick-add-close" type="button" data-close-quick-add aria-label="Cerrar selección de talla">×</button>
       <div class="haki-quick-add-summary"><img src="${esc(freshImage(product.imagen || fallbackFor(product),400))}" alt="${esc(product.nombre)}" width="88" height="118"${window.hakiFrame(product)}>
-      <div><h3>${esc(product.nombre)}</h3><strong>${money(product.precio)}</strong></div></div>
+      <div><h3>${esc(product.nombre)}</h3><strong>${priceHtml(product)}</strong></div></div>
       <div class="haki-quick-add-label"><h3>Elige tu talla</h3><p>${available.length === 1 ? 'Disponible: '+available[0] : available.length ? available.length+' tallas disponibles' : 'Sin tallas disponibles'}</p></div>
       <div class="haki-quick-add-sizes" role="group" aria-label="Seleccionar talla">${rows}</div>
       <button class="haki-quick-add-confirm" type="button" data-confirm-quick-add disabled>Selecciona una talla</button>`;
@@ -1002,7 +1019,7 @@
     return state.cart.reduce(
       (sum, i) =>
         sum +
-        (productByCode(i.codigo)?.precio || 0) *
+        unitPrice(productByCode(i.codigo)) *
           i.cantidad,
       0
     );
@@ -1092,8 +1109,10 @@
             </div>
 
             <div class="price">
-              ${money(
-                p.precio * i.cantidad
+              ${(p.precioOriginal || p.precio) > unitPrice(p)
+                ? `<s class="haki-old-price">${money((p.precioOriginal || p.precio) * i.cantidad)}</s><br>`
+                : ''}${money(
+                unitPrice(p) * i.cantidad
               )}
             </div>
 
@@ -1200,9 +1219,12 @@
       const p = productByCode(i.codigo);
 
       return `• ${p.nombre} (${p.codigo}) — Talla ${i.talla} x${i.cantidad} — ${money(
-        p.precio * i.cantidad
+        unitPrice(p) * i.cantidad
       )}`;
     });
+    const codeLine = discount.percent
+      ? `\nCódigo de descuento: ${discount.code} (-${discount.percent}%)\n`
+      : '';
 
     const totals = window.hakiTotals(cartTotal(), itemCount(), CONFIG);
     return `${settings().saludoCotizacion}
@@ -1213,13 +1235,17 @@ Municipio: ${muni}
 
 Productos:
 ${lines.join('\n')}
-
+${codeLine}
 ${settings().subtotalTexto}: ${money(totals.subtotal)}
 ${settings().envioTexto}: ${totals.free ? settings().gratisTexto : money(totals.shipping)}
 ${settings().totalTexto}: ${money(totals.total)}${window.HAKI_QUOTE_PRIVACY?.proof() || ''}`;
   }
 
   function validateQuote() {
+    if (discount.checking) {
+      showToast('Revisando el código de descuento…');
+      return false;
+    }
     if (!state.cart.length) {
       showToast(
         'Añade al menos una prenda.'
@@ -1879,7 +1905,7 @@ ${settings().totalTexto}: ${money(totals.total)}${window.HAKI_QUOTE_PRIVACY?.pro
             <button class="solid detail-add" type="button">AÑADIR AL CARRITO</button>
           </div>
           <div class="detail-options">
-            <strong class="detail-price">${money(p.precio)}</strong>
+            <strong class="detail-price">${priceHtml(p)}</strong>
             ${variants.length > 1 ? `
               <section class="detail-color-variants" aria-label="Colores disponibles">
                 <div class="detail-color-heading"><span>COLOR</span><strong>${esc(activeColor)}</strong></div>
@@ -2062,6 +2088,7 @@ ${settings().totalTexto}: ${money(totals.total)}${window.HAKI_QUOTE_PRIVACY?.pro
     const c=settings(),t=window.hakiTotals(cartTotal(),itemCount(),CONFIG);
     $('#shippingMessage').textContent=t.free?c.envioListo:String(c.envioFalta).replaceAll('{monto}',money(t.remaining));
     $('#shippingProgress').value=t.progress;$('#shippingThreshold').textContent=money(t.threshold);
+    renderDiscount();
     $('#cartSubtotal').textContent=money(t.subtotal);$('#shippingAmount').textContent=t.free?c.gratisTexto:money(t.shipping);els.total.textContent=money(t.total);
     $('#cartRecommendations').hidden=true;
     $('#recommendationItems').replaceChildren();
@@ -2136,6 +2163,60 @@ ${settings().totalTexto}: ${money(totals.total)}${window.HAKI_QUOTE_PRIVACY?.pro
     gallery.addEventListener('keydown',e=>{if(e.key==='Escape') resetAll();});
     window.addEventListener('resize',()=>{if(!isDesktop()) resetAll();},{passive:true});
   }
+  // ---- Código de descuento ----
+  function renderDiscount(){
+    const row=$('#discountRow');
+    if(!row)return;
+    const before=state.cart.reduce((n,i)=>n+(Number(productByCode(i.codigo)?.precio)||0)*i.cantidad,0);
+    const saved=Math.round((before-cartTotal())*100)/100;
+    row.hidden=!(discount.percent&&state.cart.length);
+    $('#discountLabel').textContent=`Código ${discount.code} (-${discount.percent}%)`;
+    $('#discountAmount').textContent=`-${money(saved)}`;
+  }
+  function discountStatus(text,ok){
+    const status=$('#discountStatus');
+    if(!status)return;
+    status.hidden=!text;status.textContent=text||'';status.classList.toggle('is-ok',!!ok);
+  }
+  async function checkDiscount(raw){
+    const code=String(raw||'').normalize('NFKC').replace(/\s+/g,'').toUpperCase().slice(0,30);
+    discount.typed=code;
+    if(!code){discount.code='';discount.percent=0;discount.checking='';discountStatus('');try{localStorage.removeItem(DISCOUNT_KEY);}catch{}renderCart();return;}
+    if(code===discount.code&&discount.percent){discount.checking='';return;}
+    discount.checking=code;discountStatus('Revisando…');
+    let result=null;
+    try{
+      const response=await fetch('/.netlify/functions/discount-code',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({code}),signal:AbortSignal.timeout(10000)});
+      result=response.ok?await response.json():null;
+    }catch{}
+    if(discount.typed!==code)return; // the customer kept typing
+    discount.checking='';
+    if(result?.valid===true&&Number.isInteger(result.percent)){
+      discount.code=result.code||code;discount.percent=result.percent;
+      discountStatus(`Código aplicado: -${result.percent}%`,true);
+      try{localStorage.setItem(DISCOUNT_KEY,discount.code);}catch{}
+    }else{
+      discount.code='';discount.percent=0;
+      discountStatus(result?'Código no válido':'No se pudo revisar el código. Puedes cotizar sin él.');
+      try{localStorage.removeItem(DISCOUNT_KEY);}catch{}
+    }
+    renderCart();
+  }
+  (()=>{
+    const input=$('#discountCode');
+    if(!input)return;
+    let timer=0;
+    input.addEventListener('input',()=>{
+      clearTimeout(timer);
+      const value=input.value;
+      discount.checking=value.trim()?'pending':'';
+      timer=setTimeout(()=>checkDiscount(value),650);
+    });
+    input.addEventListener('change',()=>{clearTimeout(timer);checkDiscount(input.value);});
+    input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();clearTimeout(timer);checkDiscount(input.value);}});
+    let saved='';try{saved=localStorage.getItem(DISCOUNT_KEY)||'';}catch{}
+    if(saved){input.value=saved;checkDiscount(saved);}
+  })();
   function reconcileCart(){state.cart=state.cart.filter(i=>{const p=productByCode(i.codigo);return p&&p.tallas?.[i.talla]&&Number.isInteger(i.cantidad)&&i.cantidad>0;});saveCart();}
   window.addEventListener('haki:catalog-updated',()=>{
     Object.keys(CONFIG).forEach(k=>delete CONFIG[k]);Object.assign(CONFIG,window.HAKI_CONFIG);

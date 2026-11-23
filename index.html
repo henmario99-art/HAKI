@@ -687,6 +687,12 @@ h1{overflow-wrap:anywhere}.hero h1{line-height:1.1;font-size:clamp(38px,6vw,84px
 <script src="native-ui.js?v=20261031-loading-motion-6"></script>
 <link rel="stylesheet" href="/mobile-drop-hero.css?v=20261104-button-motion-6">
 <link rel="stylesheet" href="/mobile-storefront.css?v=20261119-pc-3" data-mobile-storefront>
+<style id="haki-discounts">
+.haki-old-price,html body .product .product-info strong .haki-old-price:not(#_){font-weight:400!important;opacity:.5;text-decoration:line-through;margin-right:4px}
+.quote-discount input{width:100%;text-transform:uppercase}.quote-discount input::placeholder{text-transform:none}
+.discount-status{margin:-4px 0 0;font-size:12px;color:var(--muted,#777)}.discount-status.is-ok{color:var(--ink,#111);font-weight:600}
+#discountRow[hidden]{display:none!important}
+</style>
 <style>.product .availability-badge,.detail-new{display:none!important}</style>
 </head>
 <body>
@@ -789,7 +795,7 @@ h1{overflow-wrap:anywhere}.hero h1{line-height:1.1;font-size:clamp(38px,6vw,84px
     <div class="cart-items" id="cartItems"></div>
     <div class="cart-empty" id="cartEmpty"><strong>Tu cotización está vacía.</strong><span>Elige una talla y añade prendas desde el catálogo.</span></div>
     <section id="cartRecommendations" class="cart-recommendations" hidden><h3 id="recommendationsTitle"></h3><p id="recommendationsText"></p><div id="recommendationItems" class="recommendation-rail"></div></section>
-    <section class="order-summary"><h3 id="orderSummaryTitle"></h3><div><span id="subtotalLabel"></span><span id="cartSubtotal"></span></div><div><span id="shippingLabel"></span><span id="shippingAmount"></span></div><div class="cart-summary"><span id="totalLabel">Total estimado</span><strong id="cartTotal">$0.00</strong></div></section>
+    <section class="order-summary"><h3 id="orderSummaryTitle"></h3><div id="discountRow" hidden><span id="discountLabel"></span><span id="discountAmount"></span></div><div><span id="subtotalLabel"></span><span id="cartSubtotal"></span></div><div><span id="shippingLabel"></span><span id="shippingAmount"></span></div><div class="cart-summary"><span id="totalLabel">Total estimado</span><strong id="cartTotal">$0.00</strong></div></section>
     <form class="quote-form" id="quoteForm">
       <p class="form-title">COTIZA</p>
       <label><span class="sr-only" id="nameLabel">Nombre</span><input id="customerName" required placeholder="Tu nombre"></label>
@@ -797,6 +803,8 @@ h1{overflow-wrap:anywhere}.hero h1{line-height:1.1;font-size:clamp(38px,6vw,84px
         <label><span class="sr-only" id="departmentLabel">Departamento</span><select id="customerDepartment" required aria-label="Departamento"><option value="">Departamento</option></select></label>
         <label><span class="sr-only" id="municipalityLabel">Municipio</span><select id="customerMunicipality" required aria-label="Municipio" disabled><option value="">Municipio</option></select></label>
       </div>
+      <label class="quote-discount"><span class="sr-only">Código de descuento</span><input id="discountCode" name="discountCode" placeholder="Código de descuento" aria-label="Código de descuento" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="30" enterkeyhint="done"></label>
+      <p id="discountStatus" class="discount-status" role="status" hidden></p>
       <div class="quote-policy-note"><label class="quote-authorization"><input type="checkbox" id="quoteAuthorization" name="quoteAuthorization" required aria-describedby="quotePrivacyNote"><span>Autorizo a HAKI a usar estos datos para cotizar por el canal elegido. <a href="/privacidad.html" target="_blank" rel="noopener">Aviso de privacidad</a></span></label><p id="quotePrivacyNote"><a href="/terminos.html" target="_blank" rel="noopener">Términos y condiciones</a></p></div>
       <div class="quote-actions">
         <button class="solid whatsapp" type="submit">SOLICITAR POR WHATSAPP ↗</button>
@@ -856,13 +864,13 @@ h1{overflow-wrap:anywhere}.hero h1{line-height:1.1;font-size:clamp(38px,6vw,84px
       },{passive:true});
     })();
   </script>
-<script src="online-catalog.js?v=20261104-cost-1"></script>
+<script src="online-catalog.js?v=20261122-descuentos-1"></script>
 <script src="storefront-config.js?v=20261119-frame-1"></script>
 <script src="experience-config.js?v=20261104-image-delivery-1"></script>
 
 
 <script src="ios-safari-fix.js?v=20261002-definitivo"></script>
-<script src="app.js?v=20261119-wa-1"></script>
+<script src="app.js?v=20261122-descuentos-1"></script>
 <script src="safari-internal-detail.js?v=20261002-definitivo"></script>
 <script src="enhancements.js?v=20261119-frame-1"></script>
 <script src="personalization.js?v=20261002-definitivo"></script>
