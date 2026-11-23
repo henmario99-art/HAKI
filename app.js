@@ -494,11 +494,11 @@
 
   window.HAKI_OPEN_SIZE_GUIDE = openSizeGuide;
 
-  // "Todas las prendas": one chip per discount in use (10% OFF, 20% OFF…).
+  // "Todas las prendas": one chip per discount in use, highest first (50% OFF, 30% OFF…).
   function offPercents(always = false) {
     if (!always && !state.allStock) return [];
     return [...new Set(ALL_PRODUCTS.filter(p => hasStock(p) && p.precioOriginal > p.precio)
-      .map(p => Number(p.descuentoAplicado)).filter(n => n > 0))].sort((a, b) => a - b);
+      .map(p => Number(p.descuentoAplicado)).filter(n => n > 0))].sort((a, b) => b - a);
   }
   function renderOffFilters() {
     const notice = els.notice;
