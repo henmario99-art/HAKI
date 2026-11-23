@@ -54,6 +54,7 @@
     collection: null,
     allStock: false,
     offFilter: 0,
+    homeOff: 0,
     selected: {},
     cart: loadCart()
   };
@@ -494,8 +495,8 @@
   window.HAKI_OPEN_SIZE_GUIDE = openSizeGuide;
 
   // "Todas las prendas": one chip per discount in use (10% OFF, 20% OFF…).
-  function offPercents() {
-    if (!state.allStock) return [];
+  function offPercents(always = false) {
+    if (!always && !state.allStock) return [];
     return [...new Set(ALL_PRODUCTS.filter(p => hasStock(p) && p.precioOriginal > p.precio)
       .map(p => Number(p.descuentoAplicado)).filter(n => n > 0))].sort((a, b) => a - b);
   }
@@ -516,11 +517,41 @@
     bar.innerHTML = [0, ...percents].map(n => `<button type="button" data-off-filter="${n}" aria-pressed="${state.offFilter === n}">${n ? `${n}% OFF` : 'Todas'}</button>`).join('');
   }
   document.addEventListener('click', event => {
+    const home = event.target.closest?.('[data-home-off]');
+    if (home) {
+      state.homeOff = Number(home.dataset.homeOff) || 0;
+      renderLatest();
+      return;
+    }
     const chip = event.target.closest?.('[data-off-filter]');
     if (!chip) return;
     state.offFilter = Number(chip.dataset.offFilter) || 0;
     renderProducts();
   });
+  // Home "Todas las prendas" rail: the same chips, filtering that list.
+  let homeLatest = [];
+  function renderLatest() {
+    const rail = $('#latestProducts');
+    if (!rail) return;
+    const percents = offPercents(true);
+    if (!percents.includes(state.homeOff)) state.homeOff = 0;
+    let bar = rail.parentElement.querySelector('.haki-off-filters.is-home');
+    if (!percents.length) bar?.remove();
+    else {
+      if (!bar) {
+        bar = document.createElement('div');
+        bar.className = 'haki-off-filters is-home';
+        bar.setAttribute('role', 'group');
+        bar.setAttribute('aria-label', 'Filtrar por descuento');
+        rail.before(bar);
+      }
+      bar.innerHTML = [0, ...percents].map(n => `<button type="button" data-home-off="${n}" aria-pressed="${state.homeOff === n}">${n ? `${n}% OFF` : 'Todas'}</button>`).join('');
+    }
+    const list = state.homeOff ? homeLatest.filter(p => Number(p.descuentoAplicado) === state.homeOff) : homeLatest;
+    renderProductList(rail, list);
+    rail.scrollLeft = 0;
+    $('#latestEmpty').hidden = list.length > 0;
+  }
 
   function renderProducts() {
     renderOffFilters();
@@ -1784,8 +1815,8 @@ ${settings().totalTexto}: ${money(totals.total)}${window.HAKI_QUOTE_PRIVACY?.pro
     const oversized = COLLECTIONS.find(c => /oversized/i.test(String(c.nombre || '')));
     const isOversized = p => !!oversized && inCollection(p, oversized);
     const latest = [...onSale.filter(isOversized), ...onSale.filter(p => !isOversized(p))];
-    renderProductList($('#latestProducts'), latest);
-    $('#latestEmpty').hidden = latest.length > 0;
+    homeLatest = latest;
+    renderLatest();
     $('#newEmpty').hidden = bestSellers.length > 0;
     $('.rail-actions').hidden = !bestSellers.length;
   }
